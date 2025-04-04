@@ -1,0 +1,64 @@
+:root {
+  --color-fondo1: #f5f5f5;
+  --color-fondo2: #e7e7e7;
+  --color-texto1: #1b1f22;
+
+  --color-hover1: rgba(204, 204, 204, 0.3);
+
+  --color-borde1: #cacaca;
+  --h-main-header: 57px;
+  --w-main-sidebar: 250px;
+  --w-main-sidebar-mini: 73.59px;
+
+  --color-primary: rgb(247 147 34);
+  --color-text: rgb(33 33 33);
+  --color-success: rgb(0 200 81);
+  --color-info: rgb(51 181 229);
+  --color-info-a: rgb(51 181 229 / 0.2);
+  --color-warn: rgb(255 187 51);
+  --color-error: rgb(254 78 78);
+}
+:root[data-bs-theme="dark"] {
+  --color-fondo1: #262c30;
+  --color-fondo2: #343a40;
+  --color-texto1: #f5f5f5;
+  --color-borde1: #5c5c5c;
+}
+
+body {
+  transition: background-color 0.5s ease;
+}
+
+/* C O N T E N T   W R A P P E R */
+.content-wrapper {
+  padding: 8px;
+  margin-left: 0px;
+
+  transition: margin-left 0.5s ease, width 0.5s ease, background-color 0.5s ease;
+  /* height: calc(100vh - var(--h-main-header)); */
+}
+.main-header.fixed-top ~ .content-wrapper{
+  margin-top: var(--h-main-header);
+}
+
+/* Dark Sweetalert2 */
+.swal-dark {
+  background-color: var(--color-fondo2);
+  color: var(--color-texto1);
+}
+
+/* R E S P O N S I V E */
+@media (min-width: 768px) {
+  .content-wrapper {
+    margin-left: 250px;
+
+  }
+  body.main-sidebar-mini .content-wrapper {
+    margin-left: var(--w-main-sidebar-mini);
+  }
+}
+/* ModalIcons.tsx */
+.boton-icon:hover {
+  background-color: #99999950;
+}
+

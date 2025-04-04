@@ -1,0 +1,22 @@
+.login-container {
+  height: 100vh;
+  background: var(--color-fondo1);
+}
+.login-card {
+  margin-top: 20vh;
+  width: 350px;
+  background-color: var(--color-fondo2);
+}
+
+.forgot-card {
+  margin-top: 10vh;
+  width: 350px;
+  background-color: var(--color-fondo2);
+}
+.register-container {
+  height: 100vh;
+  background: var(--color-fondo1);
+}
+.register-card {
+  background-color: var(--color-fondo2);
+}

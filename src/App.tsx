@@ -1,0 +1,50 @@
+import { lazy, Suspense } from 'react';
+import { Navigate, Route, Routes } from "react-router-dom";
+import MainContent from "./pages/layout/MainContent";
+import PrivateRoutes from "./core/routes/PrivateRoutes";
+import PublicRoutes from "./core/routes/PublicRoutes";
+import Home from "./pages/home/Home";
+import Ventas from "./pages/ventas/Ventas";
+import "./index.css";
+import Modulos from './pages/modulos/Modulos';
+
+import User from './pages/user/User';
+import Register from './pages/auth/Register';
+import Auth from './pages/auth/Auth';
+import Configuraciones from './pages/configuraciones/Configuraciones';
+import Roles from './pages/roles/Roles';
+
+const Tareas = lazy(() => import("./pages/tareas/Tareas"));
+const Users = lazy(() => import("./pages/users/Users"));
+
+function App() {
+  
+  return (
+    <Routes>
+      <Route element={<PublicRoutes redirectTo="/" />}>
+        <Route path="/auth" element={<Auth />} />
+        <Route path="/register" element={<Register />} />
+      </Route>
+      <Route element={<PrivateRoutes redirectTo="/auth" />}>
+        <Route element={<MainContent />}>
+          <Route path="/" element={<Navigate to="/home" />} />
+          <Route path="home" element={<Home />} />
+          <Route path="ventas" element={<Ventas />} />
+          <Route path="pos"
+            element={<Suspense fallback={<div>Loading...</div>}><Tareas /></Suspense>} 
+          />
+          <Route path="users" 
+            element={<Suspense fallback={<div>Loading...</div>}><Users /></Suspense>}  
+          />
+          <Route path="modulos" element={<Modulos />} />
+          <Route path="roles" element={<Roles />} />
+          <Route path="configuraciones" element={<Configuraciones />} />
+          <Route path="user" element={<User />} />
+        </Route>
+      </Route>
+      <Route path="*" element={<div>404 NOT FOUND</div>} />
+    </Routes>
+  );
+}
+
+export default App;

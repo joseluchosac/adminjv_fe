@@ -1,0 +1,104 @@
+/* LDS-BAR */
+/* HTML: <div class="loader"></div> */
+.lds-bar {
+  height: 3px;
+  width: 100%;
+  --c:no-repeat linear-gradient(#6100ee 0 0);
+  background: var(--c),var(--c),#b8e4be00;
+  background-size: 60% 100%;
+  animation: lds-bar 3s infinite;
+}
+
+@keyframes lds-bar {
+  0%   {background-position:-150% 0,-150% 0}
+  66%  {background-position: 250% 0,-150% 0}
+  100% {background-position: 250% 0, 250% 0}
+}
+
+
+/* LDS-ELLIPSIS */
+.lds-ellipsis-container {
+  background-color: rgba(0, 0, 40, 0.5);
+}
+.lds-ellipsis,
+.lds-ellipsis div {
+  box-sizing: border-box;
+}
+.lds-ellipsis {
+  display: inline-block;
+  position: relative;
+  width: 80px;
+  height: 80px;
+}
+.lds-ellipsis div {
+  position: absolute;
+  top: 33.33333px;
+  width: 13.33333px;
+  height: 13.33333px;
+  border-radius: 50%;
+  background: #5ddb09;
+  animation-timing-function: cubic-bezier(0, 1, 1, 0);
+}
+.lds-ellipsis div:nth-child(1) {
+  left: 8px;
+  animation: lds-ellipsis1 0.6s infinite;
+}
+.lds-ellipsis div:nth-child(2) {
+  left: 8px;
+  animation: lds-ellipsis2 0.6s infinite;
+}
+.lds-ellipsis div:nth-child(3) {
+  left: 32px;
+  animation: lds-ellipsis2 0.6s infinite;
+}
+.lds-ellipsis div:nth-child(4) {
+  left: 56px;
+  animation: lds-ellipsis3 0.6s infinite;
+}
+@keyframes lds-ellipsis1 {
+  0% {
+    transform: scale(0);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+@keyframes lds-ellipsis3 {
+  0% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(0);
+  }
+}
+@keyframes lds-ellipsis2 {
+  0% {
+    transform: translate(0, 0);
+  }
+  100% {
+    transform: translate(24px, 0);
+  }
+}
+
+
+
+
+
+/* HTML: <div class="lds-dots-11"></div> */
+.lds-dots-11 {
+  width: 35px;
+  aspect-ratio: 1;
+  --_g: no-repeat radial-gradient(circle closest-side,#5d4df0 90%,#0000);
+  background: 
+    var(--_g) 0    0,
+    var(--_g) 0    100%,
+    var(--_g) 100% 100%;
+  background-size: 40% 40%;
+  animation:l11 1s infinite linear;
+}
+@keyframes l11 {
+    25% {background-position:100% 0   ,0 100%,100% 100%}
+    50% {background-position:100% 0   ,0 0   ,100% 100%}
+    75% {background-position:100% 0   ,0 0   ,0    100%}
+    100%{background-position:100% 100%,0 0   ,0    100%}
+}
