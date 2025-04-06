@@ -12,6 +12,7 @@ export type LoginForm = {
 export type RestoreForm = {
   code:string; new_password:string; new_password_repeat:string;
 }
+
 //--> TIPOS PARA LA TABLA USUARIOS
 // *****************************************************
 
@@ -273,4 +274,45 @@ export type EmpresaSession = { // para la sesion
   telefono: string;
   email: string;
   urlLogo: string;
+}
+
+
+
+//--> TIPOS PARA FILTROS GENERALES
+// *****************************************************
+
+export interface FilterParams {
+  offset: number;
+  search: string;
+  equals: FilterParamsEqual[];
+  between: FilterParamsBetween;
+  orders: FilterParamsOrder[];
+}
+export type FilterCurrent = Omit<FilterParamsUsers, "offset" | "search">
+export type FilterParamsEqual = {
+  campo_name: string;
+  value: string;
+  text: string;
+  campo_text: string
+}
+
+export type FilterParamsBetween = {
+  campo_name: string;
+  campo_text: string;
+  range: string
+}
+
+export type FilterParamsOrder = {
+  campo_name: string;
+  order_dir: string;
+  text: string
+}
+
+//--> TIPOS PARA EL CAMPO DE UNA TABLA
+// *****************************************************
+export type CampoTable = {
+  campo_name: string;
+  text: string;
+  order_dir: string;
+  show: boolean
 }

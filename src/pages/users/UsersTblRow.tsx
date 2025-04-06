@@ -20,7 +20,6 @@ function UsersTblRow({ user, camposUser }: UsersTblRowProps) {
 
   const handleToEdit = () => {
     setCurrentUserId(user.id)
-    // setUserFormChange({name: "id", value: user.id.toString()})
     setShowUserFormMdl(true)
   }
 
@@ -43,10 +42,6 @@ function UsersTblRow({ user, camposUser }: UsersTblRowProps) {
       })}
     </tr>
   );
-}
-
-export const UsersTblRowCampos = () => {
-
 }
 
 export default UsersTblRow;

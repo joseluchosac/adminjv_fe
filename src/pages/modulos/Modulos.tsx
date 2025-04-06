@@ -180,7 +180,7 @@ const Modulos:React.FC = () => {
       <Row>
         <Col className="mb-3">
           <Card>
-            <Card.Header>Árbol de módulos</Card.Header>
+            <Card.Header>Menú de módulos</Card.Header>
             <Card.Body className="position-relative">
               {isPendingGetModulos && <LdsBar />}
               <Row className="mb-2">
@@ -221,7 +221,6 @@ const Modulos:React.FC = () => {
                       <Form.Control
                         type="text"
                         name="descripcion"
-                        placeholder="Mi módulo"
                         value={moduloForm.descripcion}
                         onChange={handleChange}
                       />
@@ -251,7 +250,6 @@ const Modulos:React.FC = () => {
                       <Form.Control 
                         type="text" 
                         name="nombre"
-                        placeholder="mi_modulo"
                         value={moduloForm.nombre}
                         onChange={handleChange}
                         disabled={moduloForm.nombre == "" && moduloForm.id != 0}

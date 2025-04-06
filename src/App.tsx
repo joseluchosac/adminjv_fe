@@ -4,7 +4,6 @@ import MainContent from "./pages/layout/MainContent";
 import PrivateRoutes from "./core/routes/PrivateRoutes";
 import PublicRoutes from "./core/routes/PublicRoutes";
 import Home from "./pages/home/Home";
-import Ventas from "./pages/ventas/Ventas";
 import "./index.css";
 import Modulos from './pages/modulos/Modulos';
 
@@ -13,6 +12,8 @@ import Register from './pages/auth/Register';
 import Auth from './pages/auth/Auth';
 import Configuraciones from './pages/configuraciones/Configuraciones';
 import Roles from './pages/roles/Roles';
+import Comprobantes from './pages/comprobantes/Comprobantes';
+import Clientes from './pages/clientes/Clientes';
 
 const Tareas = lazy(() => import("./pages/tareas/Tareas"));
 const Users = lazy(() => import("./pages/users/Users"));
@@ -29,13 +30,14 @@ function App() {
         <Route element={<MainContent />}>
           <Route path="/" element={<Navigate to="/home" />} />
           <Route path="home" element={<Home />} />
-          <Route path="ventas" element={<Ventas />} />
+          <Route path="comprobantes" element={<Comprobantes />} />
           <Route path="pos"
             element={<Suspense fallback={<div>Loading...</div>}><Tareas /></Suspense>} 
           />
           <Route path="users" 
             element={<Suspense fallback={<div>Loading...</div>}><Users /></Suspense>}  
           />
+          <Route path="clientes" element={<Clientes />} />
           <Route path="modulos" element={<Modulos />} />
           <Route path="roles" element={<Roles />} />
           <Route path="configuraciones" element={<Configuraciones />} />
