@@ -20,14 +20,12 @@ export const clientesStoreInit = {
   currentClienteId: 0,
   camposCliente: [
     {campo_name: "id", text:"Id", order_dir:"", show: false},
-    {campo_name: "tipo_documento", text:"Tipo", order_dir:"", show: true},
     {campo_name: "nro_documento", text:"Nro Doc", order_dir:"", show: true},
     {campo_name: "nombre_razon_social", text:"Cliente", order_dir:"", show: true},
-    {campo_name: "direccion", text:"Direccion", order_dir:"", show: true},
-    {campo_name: "departamento", text:"Departamento", order_dir:"", show: true},
-    {campo_name: "provincia", text:"Provincia", order_dir:"", show: true},
-    {campo_name: "distrito", text:"Distrito", order_dir:"", show: true},
-    {campo_name: "estado", text:"Estado", order_dir:"", show: true},
+    {campo_name: "direccion", text:"Dirección", order_dir:"", show: true},
+    {campo_name: "email", text:"Correo", order_dir:"", show: true},
+    {campo_name: "telefono", text:"Teléf.", order_dir:"", show: true},
+    {campo_name: "acciones", text:"Acciones", order_dir:"", show: true},
   ],
   filterParamsClientes: {
     offset: 10,

@@ -9,6 +9,7 @@ import { LdsBar, LdsEllipsisCenter } from "../../core/components/Loaders"
 import { FaFileExcel, FaFilePdf } from "react-icons/fa"
 import DynaIcon from "../../core/components/DynaComponents"
 import ClientesTbl from "./ClientesTbl"
+import ClienteFormMdl from "./ClienteFormMdl"
 
 export default function Clientes() {
   const filterParamsClientes = useClientesStore(state => state.filterParamsClientes)
@@ -120,55 +121,55 @@ const handleInputSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
 
   return (
     <>
-    <Container className="mb-2 pt-2 position-relative">
+      <Container className="mb-2 pt-2 position-relative">
         {isFetching && <LdsBar />}
-      <Row className="align-items-center">
-        <Col sm className="text-center text-sm-start">
-          <h5>Lista de Clientes</h5>
-        </Col>
-        <Col sm className="text-center text-sm-start mb-3 mb-sm-0">
-          <Form.Control
-            type="search"
-            placeholder="Buscar"
-            value={inputSearch}
-            onChange={handleInputSearch}
+        <Row className="align-items-center">
+          <Col sm className="text-center text-sm-start">
+            <h5>Lista de Clientes</h5>
+          </Col>
+          <Col sm className="text-center text-sm-start mb-3 mb-sm-0">
+            <Form.Control
+              type="search"
+              placeholder="Buscar"
+              value={inputSearch}
+              onChange={handleInputSearch}
             />
-        </Col>
-        <Col className="text-center flex-sm-grow-0">
-          <div className="d-flex justify-content-center align-items-center gap-3">
-            <div className="d-flex">
-              <div 
-                role="button" 
-                className="d-flex align-items-center px-2 boton-icon"
-                title="Generar archivo xls"
-                onClick={handleTraerTodo}
-              >
-                <FaFileExcel className="fs-5 text-success"/>
+          </Col>
+          <Col className="text-center flex-sm-grow-0">
+            <div className="d-flex justify-content-center align-items-center gap-3">
+              <div className="d-flex">
+                <div 
+                  role="button" 
+                  className="d-flex align-items-center px-2 boton-icon"
+                  title="Generar archivo xls"
+                  onClick={handleTraerTodo}
+                >
+                  <FaFileExcel className="fs-5 text-success"/>
+                </div>
+                <div 
+                  role="button" 
+                  className="d-flex align-items-center px-2 boton-icon" 
+                  title="Generar archivo pdf"
+                  onClick={handleTraerTodo}
+                >
+                  <FaFilePdf className="fs-5 text-danger"/>
+                </div>
               </div>
-              <div 
-                role="button" 
-                className="d-flex align-items-center px-2 boton-icon" 
-                title="Generar archivo pdf"
-                onClick={handleTraerTodo}
+              <div
+                role="button"
+                onClick={handleShowFilterMdl}
+                className="px-1"
+                title="Filtros"
               >
-                <FaFilePdf className="fs-5 text-danger"/>
+                <DynaIcon name="FaEllipsisV" />
               </div>
+              <Button onClick={handleNuevo} variant="primary">
+                Nuevo
+              </Button>
             </div>
-            <div
-              role="button"
-              onClick={handleShowFilterMdl}
-              className="px-1"
-              title="Filtros"
-            >
-              <DynaIcon name="FaEllipsisV" />
-            </div>
-            <Button onClick={handleNuevo} variant="primary">
-              Nuevo
-            </Button>
-          </div>
-        </Col>
-      </Row>
-    </Container>
+          </Col>
+        </Row>
+      </Container>
       <div className="position-relative mb-2 overflow-hidden">
         <Row className="align-items-center">
           <Col className="text-end">
@@ -215,26 +216,26 @@ const handleInputSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
             </div>
           </Col>
         </Row>
-    </div>
-    <Card className="overflow-hidden">
-      <div className="position-relative">
-        <div className="table-responsive" style={{ height: "73vh" }} ref={tableRef}>
-          {filas && <ClientesTbl filas={filas} />}
-          <div className="position-relative">
-            {hasNextPage &&
-              <div className="m-3">
-                <button onClick={handleNextPage} className="btn btn-success">Cargar mas registros</button>
-              </div>
-            }
-            {(filas?.length === 0) && <div>No hay registros para mostrar</div>}
-          </div>
-        </div>
-        {isLoading && <LdsEllipsisCenter innerRef={ldsEllipsisRef}/>}
-        {isError && <div className="text-danger">Error de conexion</div>}
       </div>
-    </Card>
-    {/* <UsersLstFilterMdl /> */}
-    {/* <UserFormMdl /> */}
-  </>
+      <Card className="overflow-hidden">
+        <div className="position-relative">
+          <div className="table-responsive" style={{ height: "73vh" }} ref={tableRef}>
+            {filas && <ClientesTbl filas={filas} />}
+            <div className="position-relative">
+              {hasNextPage &&
+                <div className="m-3">
+                  <button onClick={handleNextPage} className="btn btn-success">Cargar mas registros</button>
+                </div>
+              }
+              {(filas?.length === 0) && <div>No hay registros para mostrar</div>}
+            </div>
+          </div>
+          {isLoading && <LdsEllipsisCenter innerRef={ldsEllipsisRef}/>}
+          {isError && <div className="text-danger">Error de conexion</div>}
+        </div>
+      </Card>
+      {/* <UsersLstFilterMdl /> */}
+      <ClienteFormMdl />
+    </>
   )
 }

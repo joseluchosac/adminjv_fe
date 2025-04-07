@@ -84,17 +84,17 @@ export interface RegisterForm {
 // *****************************************************
 export interface Catalogos {
   cajas: Caja[];
-  formasPago: FormaPago[];
+  formas_pago: FormaPago[];
   impuestos: Impuesto[];
-  motivosNota: MotivoNota[];
+  motivos_nota: MotivoNota[];
   roles: Rol[];
-  tiposComprobante: TipoComprobante[];
-  tiposDocumento: TipoDocumento[];
-  tiposMoneda: TipoMoneda[];
-  tiposMovimientoCaja: TipoMovimientoCaja[];
-  tiposMovimientoProducto: TipoMovimientoProducto[];
-  tiposOperacion: TipoOperacion[];
-  unidadesMedida: UnidadMedida[];
+  tipos_comprobante: TipoComprobante[];
+  tipos_documento: TipoDocumento[];
+  tipos_moneda: TipoMoneda[];
+  tipos_movimiento_caja: TipoMovimientoCaja[];
+  tipos_movimiento_producto: TipoMovimientoProducto[];
+  tipos_operacion: TipoOperacion[];
+  unidades_medida: UnidadMedida[];
   departamentos: Departamento[];
 }
 export type Caja = {

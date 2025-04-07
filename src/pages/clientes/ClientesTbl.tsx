@@ -59,6 +59,7 @@ const ClientesTbl: React.FC<Props> = ({filas}) => {
               onClick={handleSort}
               data-campo={el.campo_name}
               role="button"
+              style={el.campo_name=="acciones" ? {position: "sticky", right: 0} : {}}
             >
               <div className="d-flex gap-1">
                 <div>{el.text}</div>
