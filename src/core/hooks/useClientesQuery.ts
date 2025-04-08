@@ -6,6 +6,7 @@ import { mutationFetch } from "../services/mutationFecth"
 import { useNavigate } from "react-router-dom";
 import { filterClientesFetch } from "../services/clientesFetch";
 import useClientesStore, { clientesStoreInit } from "../store/useClientesStore";
+import { Cliente } from "../types/clientesTypes";
 
 
 // ****** FILTRAR CLIENTES ******
@@ -109,7 +110,7 @@ export const useMutationClientesQuery = () => {
     mutate(params)
   }
 
-  const createCliente = (param: any) => {
+  const createCliente = (param: Cliente) => {
     const params = {
       url: beURL + "api/clientes/create_cliente",
       method: "POST",
@@ -123,7 +124,7 @@ export const useMutationClientesQuery = () => {
   }
 
 
-  const updateCliente = (param: any) => {
+  const updateCliente = (param: Cliente) => {
     const params = {
       url: beURL + "api/clientes/update_cliente",
       method: "PUT",

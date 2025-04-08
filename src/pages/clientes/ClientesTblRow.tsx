@@ -20,13 +20,14 @@ function ClientesTblRow({ cliente, camposCliente }: ClientesTblRowProps) {
   //   return isValid(parseISO(date)) ? format(date, formato) : ''
   // }
 
-  const handleToEdit = () => {
+  const handleToEdit = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
+    e.preventDefault()
     setCurrentClienteId(cliente.id)
     setShowClienteFormMdl(true)
   }
 
   return (
-    <tr className="text-nowrap" onClick={handleToEdit}>
+    <tr className="text-nowrap">
       {camposCliente.map((el) => {
         const {campo_name, show} = el
         if(show){
@@ -70,7 +71,7 @@ function ClientesTblRow({ cliente, camposCliente }: ClientesTblRowProps) {
               return (
                 <td key={campo_name} style={{position: "sticky", right: 0, verticalAlign: "middle"} }>
                   <div className="d-flex gap-2 justify-content-center">
-                    <a href="#" className="p-1" title="Editar">
+                    <a  onClick={handleToEdit} href="#" className="p-1" title="Editar">
                       <FaEdit />
                     </a>
                     <a href="#" className="text-danger p-1" title="Deshabilitar">

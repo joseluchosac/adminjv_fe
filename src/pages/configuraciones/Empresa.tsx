@@ -86,7 +86,7 @@ export default function Empresa() {
     setValue("provincia", ubigeo.provincia)
     setValue("distrito", ubigeo.distrito)
     setValue("ubigeo_inei", ubigeo.ubigeo_inei,{shouldDirty: true})
-    }
+  }
   
 
 

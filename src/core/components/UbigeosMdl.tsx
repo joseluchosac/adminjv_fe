@@ -6,14 +6,14 @@ import { useMutationCatalogosQuery } from '../hooks/useCatalogosQuery';
 import { Distrito, Provincia, Ubigeo } from '../types';
 import useCatalogosStore from '../store/useCatalogosStore';
 
-type UbigeosProps = {
+type Props = {
   show: boolean;
   setShow: (par:boolean)=>void;
   onChooseUbigeo: (ubigeo: Ubigeo) => void
 }
 const formInit = {ubigeo_inei:"", departamento:"", provincia:"", distrito:""}
 
-function UbigeosMdl({show, setShow, onChooseUbigeo}: UbigeosProps) {
+function UbigeosMdl({show, setShow, onChooseUbigeo}: Props) {
   const [form, setForm] = useState(formInit)
   const departamentos = useCatalogosStore(state=>state.catalogos?.departamentos)
   const {

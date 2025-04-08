@@ -9,7 +9,7 @@ import { LdsBar, LdsEllipsisCenter } from "../../core/components/Loaders"
 import { FaFileExcel, FaFilePdf } from "react-icons/fa"
 import DynaIcon from "../../core/components/DynaComponents"
 import ClientesTbl from "./ClientesTbl"
-import ClienteFormMdl from "./ClienteFormMdl"
+import ClienteFormMdl from "../../core/components/ClienteFormMdl"
 
 export default function Clientes() {
   const filterParamsClientes = useClientesStore(state => state.filterParamsClientes)
@@ -45,8 +45,10 @@ export default function Clientes() {
     fetchNextPage();
   };
 
-
-const handleInputSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const onChooseCliente = (cliente: Cliente) => {
+    console.log(cliente)
+  }
+  const handleInputSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputSearch(e.target.value)
   };
 
@@ -235,7 +237,7 @@ const handleInputSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
         </div>
       </Card>
       {/* <UsersLstFilterMdl /> */}
-      <ClienteFormMdl />
+      <ClienteFormMdl onChooseCliente={onChooseCliente}/>
     </>
   )
 }
