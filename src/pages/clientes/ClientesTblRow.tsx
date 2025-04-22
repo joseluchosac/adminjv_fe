@@ -4,17 +4,27 @@ import { CampoTable} from "../../core/types";
 import { Cliente } from "../../core/types/clientesTypes";
 import useClientesStore from "../../core/store/useClientesStore";
 import { FaEdit, FaTrash } from "react-icons/fa";
+import { useMutationClientesQuery } from "../../core/hooks/useClientesQuery";
+import Swal from "sweetalert2";
+import useLayoutStore from "../../core/store/useLayoutStore";
+import { useEffect } from "react";
+import { Bounce, toast } from "react-toastify";
 
-interface ClientesTblRowProps {
+interface Props {
   cliente: Cliente ;
   camposCliente: CampoTable[]
 }
 
-function ClientesTblRow({ cliente, camposCliente }: ClientesTblRowProps) {
-
+function ClientesTblRow({ cliente, camposCliente }: Props) {
   const setCurrentClienteId = useClientesStore(state => state.setCurrentClienteId)
   const setShowClienteFormMdl = useClientesStore(state => state.setShowClienteFormMdl)
-
+  const darkMode = useLayoutStore(state => state.layout.darkMode)
+  
+  const {
+    data,
+    isPending,
+    deleteCliente
+  } = useMutationClientesQuery()
 
   // const validDate = (date:string, formato = "dd/MM/yyyy") => {
   //   return isValid(parseISO(date)) ? format(date, formato) : ''
@@ -26,6 +36,33 @@ function ClientesTblRow({ cliente, camposCliente }: ClientesTblRowProps) {
     setShowClienteFormMdl(true)
   }
 
+  const handleDelete = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
+    e.preventDefault()
+    Swal.fire({
+      icon: 'question',
+      text: `¿Desea eliminar permanentemente a ${cliente.nombre_razon_social}?`,
+      showCancelButton: true,
+      confirmButtonText: "Sí",
+      cancelButtonText: 'Cancelar',
+      customClass: { 
+        popup: darkMode ? 'swal-dark' : ''
+      }
+    }).then((result) => {
+      if (result.isConfirmed) {
+        deleteCliente(cliente.id)
+      }
+    });
+  }
+
+  useEffect(() => {
+    if (!data) return
+    toast(data.msg, {
+      type: data.msgType,
+      autoClose: 3000,
+      transition: Bounce,
+    })
+  }, [data])
+  
   return (
     <tr className="text-nowrap">
       {camposCliente.map((el) => {
@@ -71,10 +108,10 @@ function ClientesTblRow({ cliente, camposCliente }: ClientesTblRowProps) {
               return (
                 <td key={campo_name} style={{position: "sticky", right: 0, verticalAlign: "middle"} }>
                   <div className="d-flex gap-2 justify-content-center">
-                    <a  onClick={handleToEdit} href="#" className="p-1" title="Editar">
+                    <a onClick={handleToEdit} href="#" className="p-1" title="Editar">
                       <FaEdit />
                     </a>
-                    <a href="#" className="text-danger p-1" title="Deshabilitar">
+                    <a onClick={handleDelete} href="#" className="text-danger p-1" title="Deshabilitar">
                       <FaTrash />
                     </a>
                   </div>

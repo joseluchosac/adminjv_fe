@@ -23,8 +23,6 @@ export const useMutationConfiguracionesQuery = () => {
     }
   })
 
-
-
   const obtenerEmpresa = () => {
     const params = {
       url: beURL + "api/configuraciones/obtener_empresa",
@@ -73,9 +71,87 @@ export const useMutationConfiguracionesQuery = () => {
     mutate(params)
   }
 
+  const obtenerApisNroDoc = () => {
+    const params = {
+      url: beURL + "api/configuraciones/obtener_apis_nro_doc",
+      method: "POST",
+      headers:{ 
+        Authorization,
+        'nombre-modulo': nombreModulo,
+      },
+    }
+    mutate(params) 
+  }
+
+  const actualizarApisNroDoc = (form: any) => {
+    const params = {
+      url: beURL + "api/configuraciones/actualizar_apis_nro_doc",
+      method: "POST",
+      headers:{ 
+        Authorization,
+        'nombre-modulo': nombreModulo,
+      },
+      body: JSON.stringify(form)
+    }
+    mutate(params) 
+  }
+
+  const obtenerCpeFact = () => {
+    const params = {
+      url: beURL + "api/configuraciones/obtener_cpe_fact",
+      method: "POST",
+      headers:{ 
+        Authorization,
+        'nombre-modulo': nombreModulo,
+      },
+    }
+    mutate(params)  
+  }
+
+  const actualizarCpeFact = (form: any) => {
+    const params = {
+      url: beURL + "api/configuraciones/actualizar_cpe_fact",
+      method: "POST",
+      headers:{ 
+        Authorization,
+        'nombre-modulo': nombreModulo,
+      },
+      body: JSON.stringify(form)
+    }
+    mutate(params)  
+  }
+
+  const obtenerCpeGuia = () => {
+    const params = {
+      url: beURL + "api/configuraciones/obtener_cpe_guia",
+      method: "POST",
+      headers:{ 
+        Authorization,
+        'nombre-modulo': nombreModulo,
+      },
+    }
+    mutate(params) 
+  }
+  
+  const actualizarCpeGuia = (form: any) => {
+    const params = {
+      url: beURL + "api/configuraciones/actualizar_cpe_guia",
+      method: "POST",
+      headers:{ 
+        Authorization,
+        'nombre-modulo': nombreModulo,
+      },
+      body: JSON.stringify(form)
+    }
+    mutate(params) 
+  }
+
+  
+
   const resetValues = (newValues: any) => {
     mutate({newValues}) // Solo actualiza los datos, no hace fetch
   }
+
   useEffect(()=>{
     if(data?.msgType === "errorToken"){
       resetSessionStore()
@@ -91,6 +167,12 @@ export const useMutationConfiguracionesQuery = () => {
     actualizarEmpresa,
     obtenerConfiguraciones,
     actualizarConfiguraciones,
+    obtenerApisNroDoc,
+    actualizarApisNroDoc,
+    obtenerCpeFact,
+    actualizarCpeFact,
+    obtenerCpeGuia,
+    actualizarCpeGuia,
     resetValues,
   }
 }

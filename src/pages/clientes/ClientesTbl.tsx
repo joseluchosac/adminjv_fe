@@ -70,7 +70,6 @@ const ClientesTbl: React.FC<Props> = ({filas}) => {
                       ? (<DynaIcon className="text-warning" name="FaArrowDownZA" />)
                       : ("")
                   }
-
                 </div>
               </div>
             </th>

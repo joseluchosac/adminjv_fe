@@ -57,11 +57,11 @@ export const useFilterClientesQuery = () => {
 
   return {
     data,
-    fetchNextPage, 
     isError, 
     isLoading, 
     isFetching, 
     hasNextPage, 
+    fetchNextPage, 
   }
 }
 
@@ -80,7 +80,7 @@ export const useMutationClientesQuery = () => {
     mutationFn: mutationFetch,
     onSuccess: (resp) => {
       if(resp.msgType !== 'success') return
-      queryClient.invalidateQueries({queryKey:["clientes"]})
+      queryClient.invalidateQueries({queryKey:["clientes"]}) // Recarga la tabla clientes
     }
   })
 
@@ -137,8 +137,6 @@ export const useMutationClientesQuery = () => {
     mutate(params)
   }
 
-
-
   const deleteCliente = (id: number) => {
     const params = {
       url: beURL + "api/clientes/delete_cliente",
@@ -152,6 +150,22 @@ export const useMutationClientesQuery = () => {
     mutate(params)
   }
 
+  const consultarNroDocumento = (param: any) => {
+    const params = {
+      url: beURL + "api/clientes/consultar_nro_documento",
+      method: "POST",
+      headers:{ 
+        Authorization,
+        'nombre-modulo': nombreModulo,
+      },
+      body: JSON.stringify(param),
+    }
+    mutate(params)
+  }
+
+  const reset = (newValues: any) => {
+    mutate({newValues}) // Solo actualiza los datos, no hace fetch
+  }
 
   useEffect(()=>{
     if(data?.msgType === "errorToken"){
@@ -169,6 +183,8 @@ export const useMutationClientesQuery = () => {
     createCliente,
     updateCliente,
     deleteCliente,
+    consultarNroDocumento,
+    reset
   }
 }
 
