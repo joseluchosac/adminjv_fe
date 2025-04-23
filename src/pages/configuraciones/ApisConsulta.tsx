@@ -4,6 +4,7 @@ import { FormControlElement } from "../../core/types"
 import { useMutationConfiguracionesQuery } from "../../core/hooks/useConfiguracionesQuery"
 import { ConfirmPass } from "../../core/components/ConfirmsMdl"
 import { Bounce, toast } from "react-toastify"
+import { LdsBar } from "../../core/components/Loaders"
 
 const apisNroDocInit = {
   apisnetpe:{
@@ -19,7 +20,7 @@ const apisNroDocInit = {
   default:"",
 }
 
-export default function ApisNroDoc() {
+export default function ApisConsulta() {
   const [formApisNroDoc, setFormApisNroDoc] = useState(apisNroDocInit)
   const [showConfirmPass, setShowConfirmPass] = useState(false)
   const {
@@ -78,7 +79,8 @@ export default function ApisNroDoc() {
       <Accordion defaultActiveKey={['0']} alwaysOpen>
         <Accordion.Item eventKey="0">
           <Accordion.Header>DNI, RUC</Accordion.Header>
-          <Accordion.Body>
+          <Accordion.Body className="position-relative">
+            {(isPendingObtenerApisNroDoc || isPendingActualizarApisNroDoc) && <LdsBar />}
             <Form onSubmit={handleSubmit}>
               <Row>
                 <h6 className="mb-3">APIS.NET.PE</h6>

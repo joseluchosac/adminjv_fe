@@ -47,30 +47,6 @@ export const useMutationConfiguracionesQuery = () => {
     mutate(params)
   }
 
-  const obtenerConfiguraciones = () => {
-    const params = {
-      url: beURL + "api/configuraciones/obtener_configuraciones",
-      headers:{ 
-        Authorization,
-        'nombre-modulo': nombreModulo,
-      },
-    }
-    mutate(params)
-  }
-
-  const actualizarConfiguraciones = (form: any) => {
-    const params = {
-      url: beURL + "api/configuraciones/actualizar_configuraciones",
-      method: "POST",
-      headers:{ 
-        Authorization,
-        'nombre-modulo': nombreModulo,
-      },
-      body: JSON.stringify(form)
-    }
-    mutate(params)
-  }
-
   const obtenerApisNroDoc = () => {
     const params = {
       url: beURL + "api/configuraciones/obtener_apis_nro_doc",
@@ -146,6 +122,56 @@ export const useMutationConfiguracionesQuery = () => {
     mutate(params) 
   }
 
+  const obtenerUsuarioSolSec = () => {
+    const params = {
+      url: beURL + "api/configuraciones/obtener_usuario_sol_sec",
+      method: "POST",
+      headers:{ 
+        Authorization,
+        'nombre-modulo': nombreModulo,
+      },
+    }
+    mutate(params) 
+  }
+  
+  const actualizarUsuarioSolSec = (form: any) => {
+    const params = {
+      url: beURL + "api/configuraciones/actualizar_usuario_sol_sec",
+      method: "POST",
+      headers:{ 
+        Authorization,
+        'nombre-modulo': nombreModulo,
+      },
+      body: JSON.stringify(form)
+    }
+    mutate(params) 
+  }
+
+  const obtenerEmailConfig = () => {
+    const params = {
+      url: beURL + "api/configuraciones/obtener_email_config",
+      method: "POST",
+      headers:{ 
+        Authorization,
+        'nombre-modulo': nombreModulo,
+      },
+    }
+    mutate(params) 
+  }
+  
+  const actualizarEmailConfig = (form: any) => {
+    const params = {
+      url: beURL + "api/configuraciones/actualizar_email_config",
+      method: "POST",
+      headers:{ 
+        Authorization,
+        'nombre-modulo': nombreModulo,
+      },
+      body: JSON.stringify(form)
+    }
+    mutate(params) 
+  }
+
   
 
   const resetValues = (newValues: any) => {
@@ -165,14 +191,16 @@ export const useMutationConfiguracionesQuery = () => {
     isError,
     obtenerEmpresa,
     actualizarEmpresa,
-    obtenerConfiguraciones,
-    actualizarConfiguraciones,
     obtenerApisNroDoc,
     actualizarApisNroDoc,
     obtenerCpeFact,
     actualizarCpeFact,
     obtenerCpeGuia,
     actualizarCpeGuia,
+    obtenerUsuarioSolSec,
+    actualizarUsuarioSolSec,
+    obtenerEmailConfig,
+    actualizarEmailConfig,
     resetValues,
   }
 }
