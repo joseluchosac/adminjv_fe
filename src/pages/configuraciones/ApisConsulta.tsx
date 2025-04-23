@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { Accordion, Button, Card, Col, Form, Row } from "react-bootstrap"
+import { Accordion, Button, Col, Form, Row } from "react-bootstrap"
 import { FormControlElement } from "../../core/types"
 import { useMutationConfiguracionesQuery } from "../../core/hooks/useConfiguracionesQuery"
 import { ConfirmPass } from "../../core/components/ConfirmsMdl"
