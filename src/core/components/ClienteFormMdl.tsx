@@ -46,7 +46,6 @@ export default function ClienteFormMdl({onChooseCliente}: Props) {
     formState: {errors, isDirty}, 
     handleSubmit, 
     reset,
-    // watch,
     getValues,
     setValue,
   } = useForm<Cliente>({defaultValues: clienteForm_init})
@@ -74,8 +73,13 @@ export default function ClienteFormMdl({onChooseCliente}: Props) {
 
   const onChooseUbigeo = (ubigeo: Ubigeo) => {
     setShowUbigeos(false)
-    setLugar(`${ubigeo.distrito} - ${ubigeo.provincia} - ${ubigeo.departamento}`)
+    setLugar(`${ubigeo.departamento} - ${ubigeo.provincia} - ${ubigeo.distrito}`)
     setValue("ubigeo_inei", ubigeo.ubigeo_inei,{shouldDirty: true})
+  }
+  
+  const clearUbigeo = () => {
+    setLugar("")
+    setValue("ubigeo_inei", "",{shouldDirty: true})
   }
 
   const handleConsultarNroDocumento = () => {
@@ -147,7 +151,7 @@ export default function ClienteFormMdl({onChooseCliente}: Props) {
         setValue("ubigeo_inei", "",{shouldDirty: true})
       }else if(tipoDocumento == "6"){
         const {ubigeo, departamento, provincia, distrito, direccion} = dataConsultarNroDocumento
-        setLugar(`${distrito} - ${provincia} - ${departamento}`)
+        setLugar(`${departamento} - ${provincia} - ${distrito}`)
         setValue("direccion", direccion)
         setValue("ubigeo_inei", ubigeo,{shouldDirty: true})
       }
@@ -176,7 +180,7 @@ export default function ClienteFormMdl({onChooseCliente}: Props) {
     }else{
       if(dataGetCliente){
         reset(dataGetCliente)
-        setLugar(`${dataGetCliente.distrito} - ${dataGetCliente.provincia} - ${dataGetCliente.departamento}`)
+        setLugar(`${dataGetCliente.departamento} - ${dataGetCliente.provincia} - ${dataGetCliente.distrito}`)
 
       }
     }
@@ -205,7 +209,7 @@ export default function ClienteFormMdl({onChooseCliente}: Props) {
   return (
     <div>
       <Modal show={showClienteFormMdl} onHide={handleClose} backdrop="static" size="md" >
-        <Modal.Header closeButton>
+        <Modal.Header closeButton className="py-2">
           <Modal.Title>{currentClienteId ? "Editar cliente" : "Nuevo cliente"}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
@@ -300,6 +304,7 @@ export default function ClienteFormMdl({onChooseCliente}: Props) {
                     readOnly
                   />
                   <Button 
+                    onClick={clearUbigeo}
                     variant="outline-secondary" 
                     title="Eliminar ubigeo"
                     disabled={dataConsultarNroDocumento?.ubigeo ? true : false}

@@ -72,7 +72,7 @@ const User: React.FC = () => {
       },
       showCancelButton: true,
       confirmButtonText: "Confirmar",
-      cancelButtonText: "cancelar",
+      cancelButtonText: "Cancelar",
       customClass: { 
         popup: darkMode ? 'swal-dark' : ''
       },
@@ -89,7 +89,6 @@ const User: React.FC = () => {
   useEffect(() => {
     if(!dataGetUserSession) return
     if(dataGetUserSession.error) return
-    // console.log(userSession)
     const newForm = {...userForm, ...dataGetUserSession}
     setUserSession(dataGetUserSession)
     setUserForm(newForm)
@@ -123,7 +122,7 @@ const User: React.FC = () => {
     <Container>
       <Card>
         <Card.Header>
-          <h3>Modificar datos</h3>
+          <h4>Modificar datos</h4>
         </Card.Header>
         <Card.Body>
           <Form onSubmit={handleSubmit}>
@@ -185,7 +184,7 @@ const User: React.FC = () => {
               <h5 className="mt-3">Cambio de contraseña</h5>
               <hr className="mb-2" />
               <small className="text-muted mb-3">
-                Ingrese una nueva contraseña de lo contrario dejarlo en blanco
+                Ingrese una nueva contraseña si desea cambiar la actual
               </small>
               <Form.Group as={Col} md={6} xl={4} className="mb-3">
                 <Form.Label htmlFor="password">Nueva contraseña</Form.Label>
@@ -210,8 +209,7 @@ const User: React.FC = () => {
                 {validated && feedbk.password_repeat && <div className="invalid-feedback d-block">{feedbk.password_repeat}</div>}
               </Form.Group>
             </Row>
-            <Row>
-              <Col className="text-end">
+            <div className="d-flex gap-2 justify-content-end">
               <Button
                   variant="secondary" 
                   type="button"
@@ -226,9 +224,7 @@ const User: React.FC = () => {
                 >
                   Guardar
                 </Button>
-
-              </Col>
-            </Row>
+            </div>
           </Form>
         </Card.Body>
       </Card>

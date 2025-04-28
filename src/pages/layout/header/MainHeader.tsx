@@ -72,6 +72,7 @@ function MainHeader () {
                   <span>{userSession?.username}</span>
                 </div>
               }
+              style={{zIndex:"1035"}}
             >
               <NavDropdown.Item href="#" onClick={handleMisDatos} className="d-flex align-items-center gap-2">
                 <FaUserEdit /> <span>Mis datos</span>

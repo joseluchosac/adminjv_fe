@@ -1,4 +1,4 @@
-import { Badge } from "react-bootstrap";
+import { Badge, Dropdown, NavDropdown } from "react-bootstrap";
 import { CampoTable} from "../../core/types";
 // import { format, isValid, parseISO } from "date-fns";
 import { Cliente } from "../../core/types/clientesTypes";
@@ -106,13 +106,16 @@ function ClientesTblRow({ cliente, camposCliente }: Props) {
             }
             case "acciones":{
               return (
-                <td key={campo_name} style={{position: "sticky", right: 0, verticalAlign: "middle"} }>
+                <td key={campo_name}>
                   <div className="d-flex gap-2 justify-content-center">
+                    <NavDropdown title={<div className="p-1"></div>}>
+                      <NavDropdown.Item onClick={handleDelete}  className="d-flex gap-2 align-middle" href="#">
+                        <div><FaTrash className="text-danger mb-1" /></div>
+                        <div>Eliminar</div>
+                      </NavDropdown.Item>
+                    </NavDropdown>
                     <a onClick={handleToEdit} href="#" className="p-1" title="Editar">
                       <FaEdit />
-                    </a>
-                    <a onClick={handleDelete} href="#" className="text-danger p-1" title="Deshabilitar">
-                      <FaTrash />
                     </a>
                   </div>
                 </td>

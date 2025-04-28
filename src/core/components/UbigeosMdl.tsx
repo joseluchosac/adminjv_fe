@@ -68,7 +68,7 @@ function UbigeosMdl({show, setShow, onChooseUbigeo}: Props) {
 
   return (
     <Modal show={show} onHide={handleClose}>
-      <Modal.Header closeButton>
+      <Modal.Header closeButton className="py-2">
         <Modal.Title>Ubigeos</Modal.Title>
       </Modal.Header>
       <Modal.Body>

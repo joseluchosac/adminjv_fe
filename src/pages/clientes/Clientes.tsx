@@ -4,12 +4,14 @@ import {type Cliente } from "../../core/types/clientesTypes"
 import { useFilterClientesQuery } from "../../core/hooks/useClientesQuery"
 import { useDebounce } from "react-use"
 import { Bounce, toast } from "react-toastify"
-import { Badge, Button, Card, Col, Container, Form, Row, Stack } from "react-bootstrap"
+import { Badge, Button, Card, Col, Container, Dropdown, Form, InputGroup, Row, Stack } from "react-bootstrap"
 import { LdsBar, LdsEllipsisCenter } from "../../core/components/Loaders"
-import { FaFileExcel, FaFilePdf } from "react-icons/fa"
+import { FaRegFileExcel, FaRegFilePdf, } from "react-icons/fa"
 import DynaIcon from "../../core/components/DynaComponents"
 import ClientesTbl from "./ClientesTbl"
 import ClienteFormMdl from "../../core/components/ClienteFormMdl"
+import { BsSearch } from "react-icons/bs"
+import { FiFilter } from "react-icons/fi"
 
 export default function Clientes() {
   const filterParamsClientes = useClientesStore(state => state.filterParamsClientes)
@@ -46,8 +48,9 @@ export default function Clientes() {
   };
 
   const onChooseCliente = (cliente: Cliente) => {
-    console.log(cliente)
+    // console.log(cliente)
   }
+
   const handleInputSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputSearch(e.target.value)
   };
@@ -130,40 +133,60 @@ export default function Clientes() {
             <h5>Lista de Clientes</h5>
           </Col>
           <Col sm className="text-center text-sm-start mb-3 mb-sm-0">
-            <Form.Control
+            {/* <Form.Control
               type="search"
               placeholder="Buscar"
               value={inputSearch}
               onChange={handleInputSearch}
-            />
+            /> */}
+            <InputGroup>
+              <Form.Control
+                size="sm"
+                type="search"
+                value={inputSearch}
+                onChange={handleInputSearch}
+              />
+              <Button variant="outline-secondary" className="px-2 py-1">
+                <BsSearch />
+              </Button>
+            </InputGroup>
           </Col>
           <Col className="text-center flex-sm-grow-0">
             <div className="d-flex justify-content-center align-items-center gap-3">
-              <div className="d-flex">
-                <div 
-                  role="button" 
-                  className="d-flex align-items-center px-2 boton-icon"
+              <div className="d-flex gap-3">
+                <Button 
+                  variant="outline-success" 
+                  className="px-2 py-1"
                   title="Generar archivo xls"
                   onClick={handleTraerTodo}
                 >
-                  <FaFileExcel className="fs-5 text-success"/>
-                </div>
-                <div 
-                  role="button" 
-                  className="d-flex align-items-center px-2 boton-icon" 
+                  <FaRegFileExcel />
+                </Button>
+                <Button 
+                  variant="outline-danger" 
+                  className="px-2 py-1"
                   title="Generar archivo pdf"
                   onClick={handleTraerTodo}
                 >
-                  <FaFilePdf className="fs-5 text-danger"/>
-                </div>
-              </div>
-              <div
-                role="button"
-                onClick={handleShowFilterMdl}
-                className="px-1"
-                title="Filtros"
-              >
-                <DynaIcon name="FaEllipsisV" />
+                  <FaRegFilePdf />
+                </Button>
+                <Button 
+                  variant="outline-secondary" 
+                  className="px-2 py-1"
+                  title="Filtros"
+                  onClick={handleShowFilterMdl}
+                >
+                  <FiFilter />
+                </Button>
+                <Dropdown>
+                  <Dropdown.Toggle variant="outline-secondary" id="dropdown-basic" className="px-2 py-1">
+                  </Dropdown.Toggle>
+                  <Dropdown.Menu style={{zIndex:"1030"}}>
+                    <Dropdown.Item href="#/action-1">Action</Dropdown.Item>
+                    <Dropdown.Item href="#/action-2">Another action</Dropdown.Item>
+                    <Dropdown.Item href="#/action-3">Something else</Dropdown.Item>
+                  </Dropdown.Menu>
+                </Dropdown>
               </div>
               <Button onClick={handleNuevo} variant="primary">
                 Nuevo
