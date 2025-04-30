@@ -21,7 +21,7 @@ export const filterClientesFetch = async({filterParamsClientes, pageParam, signa
   if(token){
     options.headers = {...options.headers, Authorization: "Bearer " + token}
   }
-  const res = await fetch(`${beURL}api/clientes/filtrar_clientes?page=${pageParam}`, options)
+  const res = await fetch(`${beURL}api/clientes/filter_clientes?page=${pageParam}`, options)
   return res.json()
 }
 

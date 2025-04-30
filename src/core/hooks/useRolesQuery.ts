@@ -24,9 +24,9 @@ export const useMutateRolesQuery = () => {
     }
   })
 
-  const actualizarRol = (param:any) => {
+  const updateRol = (param:any) => {
     const params = {
-      url: beURL + "api/roles/actualizar_rol",
+      url: beURL + "api/roles/update_rol",
       method: "PUT",
       headers:{ 
         Authorization,
@@ -37,9 +37,9 @@ export const useMutateRolesQuery = () => {
     mutate(params)
   }
   
-  const registrarRol = (param:any) => {
+  const createRol = (param:any) => {
     const params = {
-      url: beURL + "api/roles/registrar_rol",
+      url: beURL + "api/roles/create_rol",
       method: "POST",
       headers:{ 
         Authorization,
@@ -50,9 +50,9 @@ export const useMutateRolesQuery = () => {
     mutate(params)
   }
   
-  const eliminarRol = (param: any) => {
+  const deleteRol = (param: any) => {
     const params = {
-      url: beURL + "api/roles/eliminar_rol",
+      url: beURL + "api/roles/delete_rol",
       method: "DELETE",
       headers:{ 
         Authorization,
@@ -72,9 +72,9 @@ export const useMutateRolesQuery = () => {
 
   return {
     data, 
-    actualizarRol, 
-    registrarRol, 
-    eliminarRol, 
+    updateRol, 
+    createRol, 
+    deleteRol, 
     isPending
   }
 }

@@ -23,9 +23,9 @@ export default function EmailConfig() {
   } = useMutationConfiguracionesQuery()
 
   const {
-    data: dataActualizarEmailConfig,
-    isPending: isPendingActualizarEmailConfig,
-    actualizarEmailConfig
+    data: dataUpdateEmailConfig,
+    isPending: isPendingUpdateEmailConfig,
+    updateEmailConfig
   } = useMutationConfiguracionesQuery()
 
 
@@ -36,7 +36,7 @@ export default function EmailConfig() {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    actualizarEmailConfig(formEmailConfig)
+    updateEmailConfig(formEmailConfig)
   }
 
   useEffect(() => {
@@ -49,9 +49,9 @@ export default function EmailConfig() {
   },[dataGetEmailConfig])
 
   useEffect(()=>{
-    if(!dataActualizarEmailConfig) return
-    console.log(dataActualizarEmailConfig)
-  },[dataActualizarEmailConfig])
+    if(!dataUpdateEmailConfig) return
+    console.log(dataUpdateEmailConfig)
+  },[dataUpdateEmailConfig])
 
   return (
     <div className='position-relative'>
@@ -59,7 +59,7 @@ export default function EmailConfig() {
         <Accordion.Item eventKey="0">
           <Accordion.Header>CONFIGURACIÓN DE CORREO</Accordion.Header>
           <Accordion.Body className="position-relative">
-            {(isPendingGetEmailConfig || isPendingActualizarEmailConfig) && <LdsBar />}
+            {(isPendingGetEmailConfig || isPendingUpdateEmailConfig) && <LdsBar />}
             <Form className='mx-4' onSubmit={handleSubmit} data-form="formCpeFact">
               <Form.Group as={Row} className="mb-3">
                 <Form.Label column sm="2">Host</Form.Label>

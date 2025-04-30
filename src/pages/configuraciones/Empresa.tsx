@@ -25,10 +25,10 @@ export default function Empresa() {
     resetValues: resetEmpresa,
   } = useMutationConfiguracionesQuery()
   const {
-    data: dataActualizarEmpresa,
+    data: dataUpdateEmpresa,
     // isError: isErrorActualizar, 
-    isPending: isPendingActualizarEmpresa, 
-    actualizarEmpresa 
+    isPending: isPendingUpdateEmpresa, 
+    updateEmpresa 
   } = useMutationConfiguracionesQuery()
     const {
       register, 
@@ -59,7 +59,7 @@ export default function Empresa() {
     if(data.fileCertificado?.length){
       formData.append("fileCertificado",data.fileCertificado[0])
     }
-    actualizarEmpresa(formData)
+    updateEmpresa(formData)
   }
 
   const handleResetLogoFile = () => {
@@ -122,9 +122,9 @@ export default function Empresa() {
   }, [watchLogoFile])
 
   useEffect(()=>{
-    if(!dataActualizarEmpresa) return
-    if(dataActualizarEmpresa?.msgType === "success"){
-      resetEmpresa(dataActualizarEmpresa.registro)
+    if(!dataUpdateEmpresa) return
+    if(dataUpdateEmpresa?.msgType === "success"){
+      resetEmpresa(dataUpdateEmpresa.registro)
       const {
         razon_social,
         nombre_comercial,
@@ -136,7 +136,7 @@ export default function Empresa() {
         telefono,
         email,
         urlLogo,
-      } = dataActualizarEmpresa.registro
+      } = dataUpdateEmpresa.registro
       setEmpresaSession({
         razon_social,
         nombre_comercial,
@@ -151,13 +151,13 @@ export default function Empresa() {
       })
     setValue("fileLogo", null) 
     }
-    toast(dataActualizarEmpresa?.msg, {
-      type: dataActualizarEmpresa?.msgType,
+    toast(dataUpdateEmpresa?.msg, {
+      type: dataUpdateEmpresa?.msgType,
       autoClose: 3000,
       transition: Bounce,
     })
-    // console.log(dataActualizarEmpresa)
-  },[dataActualizarEmpresa])
+    // console.log(dataUpdateEmpresa)
+  },[dataUpdateEmpresa])
 
   return (
     <div>
@@ -348,7 +348,7 @@ export default function Empresa() {
             Guardar datos de la Empresa
           </Button>
         </div>
-        {(isPendingGetEmpresa || isPendingActualizarEmpresa) && <LdsEllipsisCenter />}
+        {(isPendingGetEmpresa || isPendingUpdateEmpresa) && <LdsEllipsisCenter />}
         
       </Form>
       <UbigeosMdl

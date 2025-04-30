@@ -22,9 +22,9 @@ const Roles: React.FC = () => {
   const darkMode = useLayoutStore(state => state.layout.darkMode)
   const setModulosSesion = useSessionStore(state => state.setModulosSesion)
   const catalogos = useCatalogosStore(state => state.catalogos)
-  const registrarRolStore = useCatalogosStore(state => state.registrarRolStore)
-  const actualizarRolStore = useCatalogosStore(state => state.actualizarRolStore)
-  const eliminarRolStore = useCatalogosStore(state => state.eliminarRolStore)
+  const createRolStore = useCatalogosStore(state => state.createRolStore)
+  const updateRolStore = useCatalogosStore(state => state.updateRolStore)
+  const deleteRolStore = useCatalogosStore(state => state.deleteRolStore)
 
   const {
     data: dataGetModulosSession,
@@ -38,17 +38,17 @@ const Roles: React.FC = () => {
   } = useMutateModulosQuery()
 
   const {
-    data: dataActualizarModulosRoles, 
-    isPending: isPendingActualizarModulosRoles,
-    actualizarModulosRoles,
+    data: dataUpdateModulosRoles, 
+    isPending: isPendingUpdateModulosRoles,
+    updateModulosRoles,
   } = useMutateModulosQuery()
 
   const {
     data: dataMutateRol,
     isPending: isPendingMutateRol,
-    registrarRol,
-    actualizarRol,
-    eliminarRol,
+    createRol,
+    updateRol,
+    deleteRol,
   } = useMutateRolesQuery()
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -75,7 +75,7 @@ const Roles: React.FC = () => {
       }
     }).then((result) => {
       if (result.isConfirmed) {
-        eliminarRol({id: rol_id})
+        deleteRol({id: rol_id})
       }
     });
   }
@@ -113,9 +113,9 @@ const Roles: React.FC = () => {
     }).then((result) => {
       if (result.isConfirmed) {
         if(rolForm.id){
-          actualizarRol(rolForm)
+          updateRol(rolForm)
         }else{
-          registrarRol(rolForm)
+          createRol(rolForm)
         }
       }
     });
@@ -132,7 +132,7 @@ const Roles: React.FC = () => {
   const guardarModulosRoles = () => {
     const newModulosPefilData = modulosRol?.filter((el) => el.assign === true)
       .map((el) => ({modulo_id: el.id}))
-    actualizarModulosRoles({rol_id: rolForm.id, modulos: newModulosPefilData})
+    updateModulosRoles({rol_id: rolForm.id, modulos: newModulosPefilData})
   }
 
   useEffect(() => {
@@ -145,14 +145,14 @@ const Roles: React.FC = () => {
 
 
   useEffect(() => {
-    if(!dataActualizarModulosRoles) return
-    toast(dataActualizarModulosRoles.msg, {
-      type: dataActualizarModulosRoles.msgType,
+    if(!dataUpdateModulosRoles) return
+    toast(dataUpdateModulosRoles.msg, {
+      type: dataUpdateModulosRoles.msgType,
       autoClose: 3000,
       transition: Bounce,
     })
     getModulosSession()
-  }, [dataActualizarModulosRoles])
+  }, [dataUpdateModulosRoles])
   
   useEffect(() => {
     if(!dataMutateRol) return
@@ -163,11 +163,11 @@ const Roles: React.FC = () => {
     })
     if(dataMutateRol.msgType == "success"){
       if(dataMutateRol.accion === "registrar"){
-        registrarRolStore(dataMutateRol.rol)
-      }else if(dataMutateRol.accion === "actualizar"){
-        actualizarRolStore(dataMutateRol.rol)
+        createRolStore(dataMutateRol.rol)
+      }else if(dataMutateRol.accion === "update"){
+        updateRolStore(dataMutateRol.rol)
       }else if(dataMutateRol.accion === "eliminar"){
-        eliminarRolStore(dataMutateRol.rol_id)
+        deleteRolStore(dataMutateRol.rol_id)
       }
       resetForm()
     }
@@ -261,7 +261,7 @@ const Roles: React.FC = () => {
             <Card.Header>MÓDULOS {Boolean(rolForm.id) && `PARA:  ${rolForm.rol}`}</Card.Header>
             <Card.Body className="position-relative">
               {isPendingGetModuloRol && <LdsBar />}
-              {isPendingActualizarModulosRoles && <LdsBar />}
+              {isPendingUpdateModulosRoles && <LdsBar />}
               {itemsTree ? 
                 <>
                   <Row className="mb-2">

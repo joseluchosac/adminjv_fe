@@ -34,9 +34,9 @@ export const useMutationConfiguracionesQuery = () => {
     mutate(params)
   }
   
-  const actualizarEmpresa = (formData: FormData) => {
+  const updateEmpresa = (formData: FormData) => {
     const params = {
-      url: beURL + "api/configuraciones/actualizar_empresa",
+      url: beURL + "api/configuraciones/update_empresa",
       method: "POST",
       headers:{ 
         Authorization,
@@ -59,9 +59,9 @@ export const useMutationConfiguracionesQuery = () => {
     mutate(params) 
   }
 
-  const actualizarApisNroDoc = (form: any) => {
+  const updateApisNroDoc = (form: any) => {
     const params = {
-      url: beURL + "api/configuraciones/actualizar_apis_nro_doc",
+      url: beURL + "api/configuraciones/update_apis_nro_doc",
       method: "POST",
       headers:{ 
         Authorization,
@@ -84,9 +84,9 @@ export const useMutationConfiguracionesQuery = () => {
     mutate(params)  
   }
 
-  const actualizarCpeFact = (form: any) => {
+  const updateCpeFact = (form: any) => {
     const params = {
-      url: beURL + "api/configuraciones/actualizar_cpe_fact",
+      url: beURL + "api/configuraciones/update_cpe_fact",
       method: "POST",
       headers:{ 
         Authorization,
@@ -109,9 +109,9 @@ export const useMutationConfiguracionesQuery = () => {
     mutate(params) 
   }
   
-  const actualizarCpeGuia = (form: any) => {
+  const updateCpeGuia = (form: any) => {
     const params = {
-      url: beURL + "api/configuraciones/actualizar_cpe_guia",
+      url: beURL + "api/configuraciones/update_cpe_guia",
       method: "POST",
       headers:{ 
         Authorization,
@@ -134,9 +134,9 @@ export const useMutationConfiguracionesQuery = () => {
     mutate(params) 
   }
   
-  const actualizarUsuarioSolSec = (form: any) => {
+  const updateUsuarioSolSec = (form: any) => {
     const params = {
-      url: beURL + "api/configuraciones/actualizar_usuario_sol_sec",
+      url: beURL + "api/configuraciones/update_usuario_sol_sec",
       method: "POST",
       headers:{ 
         Authorization,
@@ -159,9 +159,9 @@ export const useMutationConfiguracionesQuery = () => {
     mutate(params) 
   }
   
-  const actualizarEmailConfig = (form: any) => {
+  const updateEmailConfig = (form: any) => {
     const params = {
-      url: beURL + "api/configuraciones/actualizar_email_config",
+      url: beURL + "api/configuraciones/update_email_config",
       method: "POST",
       headers:{ 
         Authorization,
@@ -190,17 +190,17 @@ export const useMutationConfiguracionesQuery = () => {
     isPending, 
     isError,
     getEmpresa,
-    actualizarEmpresa,
+    updateEmpresa,
     getApisNroDoc,
-    actualizarApisNroDoc,
+    updateApisNroDoc,
     getCpeFact,
-    actualizarCpeFact,
+    updateCpeFact,
     getCpeGuia,
-    actualizarCpeGuia,
+    updateCpeGuia,
     getUsuarioSolSec,
-    actualizarUsuarioSolSec,
+    updateUsuarioSolSec,
     getEmailConfig,
-    actualizarEmailConfig,
+    updateEmailConfig,
     resetValues,
   }
 }

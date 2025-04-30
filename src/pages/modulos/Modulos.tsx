@@ -19,9 +19,9 @@ const Modulos:React.FC = () => {
   const {
     data: dataOnMutate,
     sort, 
-    registrarModulo, 
-    actualizarModulo, 
-    eliminarModulo, 
+    createModulo, 
+    updateModulo, 
+    deleteModulo, 
   } = useMutateModulosQuery()
   const {
     isPendingGetModulos,
@@ -93,9 +93,9 @@ const Modulos:React.FC = () => {
     }).then((result) => {
       if (result.isConfirmed) {
         if(moduloForm.id){
-          actualizarModulo(moduloForm)
+          updateModulo(moduloForm)
         }else{
-          registrarModulo(moduloForm)
+          createModulo(moduloForm)
         }
       }
     });
@@ -130,7 +130,7 @@ const Modulos:React.FC = () => {
       }
     }).then((result) => {
       if (result.isConfirmed) {
-        eliminarModulo(id)
+        deleteModulo(id)
       }
     });
   }

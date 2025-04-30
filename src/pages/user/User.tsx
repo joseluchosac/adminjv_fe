@@ -2,12 +2,13 @@ import { useQueryClient } from "@tanstack/react-query"
 import useSessionStore from "../../core/store/useSessionStore"
 import { Button, Card, Col, Container, Form, Row } from "react-bootstrap"
 import { useEffect, useRef, useState } from "react"
-import type { CajaT, Rol } from "../../core/types"
+import type { CajaT } from "../../core/types"
 import Swal from "sweetalert2"
 import useLayoutStore from "../../core/store/useLayoutStore"
 import { Bounce, toast } from "react-toastify"
 import { useMutationUsersQuery } from "../../core/hooks/useUsersQuery"
 import useUserActualFormValidate from "./useUserActualFormValidate"
+import { Rol } from "../../core/types/catalogosTypes"
 
 const userFormInit = {
   id: 0,

@@ -72,9 +72,9 @@ export const useMutateModulosQuery = () => {
     mutate(params)
   }
 
-  const actualizarModulo = (param: ModuloForm) => {
+  const updateModulo = (param: ModuloForm) => {
     const params = {
-      url: beURL + "api/modulos/actualizar_modulo",
+      url: beURL + "api/modulos/update_modulo",
       method: "PUT",
       headers:{ 
         Authorization,
@@ -85,9 +85,9 @@ export const useMutateModulosQuery = () => {
     mutate(params)
   }
 
-  const registrarModulo = (param:  ModuloForm) => {
+  const createModulo = (param:  ModuloForm) => {
     const params = {
-      url: beURL + "api/modulos/registrar_modulo",
+      url: beURL + "api/modulos/create_modulo",
       method: "POST",
       headers:{ 
         Authorization,
@@ -98,9 +98,9 @@ export const useMutateModulosQuery = () => {
     mutate(params)
   }
 
-  const eliminarModulo = (id: number) => {
+  const deleteModulo = (id: number) => {
     const params = {
-      url: beURL + "api/modulos/eliminar_modulo",
+      url: beURL + "api/modulos/delete_modulo",
       method: "DELETE",
       headers:{ 
         Authorization,
@@ -111,9 +111,9 @@ export const useMutateModulosQuery = () => {
     mutate(params)
   }
 
-  const actualizarModulosRoles = (param: any) => {
+  const updateModulosRoles = (param: any) => {
     const params = {
-      url: beURL + "api/modulos/actualizar_modulos_roles",
+      url: beURL + "api/modulos/update_modulos_roles",
       method: "POST",
       headers:{ 
         Authorization,
@@ -134,14 +134,14 @@ export const useMutateModulosQuery = () => {
   return {
     data, 
     isPending, 
-    registrarModulo, 
-    actualizarModulo, 
-    eliminarModulo, 
+    createModulo, 
+    updateModulo, 
+    deleteModulo, 
     sort,
     getModulos,
     getModulosSession,
     getModuloRol,
-    actualizarModulosRoles,
+    updateModulosRoles,
   }
 }
 

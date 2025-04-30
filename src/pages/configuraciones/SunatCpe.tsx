@@ -43,9 +43,9 @@ export default function SunatCpe() {
   } = useMutationConfiguracionesQuery()
 
   const {
-    data: dataActualizarCpeFact,
-    isPending: isPendingActualizarCpeFact,
-    actualizarCpeFact
+    data: dataUpdateCpeFact,
+    isPending: isPendingUpdateCpeFact,
+    updateCpeFact
   } = useMutationConfiguracionesQuery()
 
   const {
@@ -55,9 +55,9 @@ export default function SunatCpe() {
   } = useMutationConfiguracionesQuery()
 
   const {
-    data: dataActualizarCpeGuia,
-    isPending: isPendingActualizarCpeGuia,
-    actualizarCpeGuia
+    data: dataUpdateCpeGuia,
+    isPending: isPendingUpdateCpeGuia,
+    updateCpeGuia
   } = useMutationConfiguracionesQuery()
 
   const {
@@ -67,9 +67,9 @@ export default function SunatCpe() {
   } = useMutationConfiguracionesQuery()
 
   const {
-    data: dataActualizarUsuarioSolSec,
-    isPending: isPendingActualizarUsuarioSolSec,
-    actualizarUsuarioSolSec
+    data: dataUpdateUsuarioSolSec,
+    isPending: isPendingUpdateUsuarioSolSec,
+    updateUsuarioSolSec
   } = useMutationConfiguracionesQuery()
 
 
@@ -87,11 +87,11 @@ export default function SunatCpe() {
 
   const onSuccessConfirmPass = () => {
     if(formActual.current === "formCpeFact"){
-      actualizarCpeFact(formCpeFact)
+      updateCpeFact(formCpeFact)
     }else if(formActual.current === "formCpeGuia"){
-      actualizarCpeGuia(formCpeGuia)
+      updateCpeGuia(formCpeGuia)
     }else if(formActual.current === "formUsuarioSolSec"){
-      actualizarUsuarioSolSec(formUsuarioSolSec)
+      updateUsuarioSolSec(formUsuarioSolSec)
     }
   }
 
@@ -124,31 +124,31 @@ export default function SunatCpe() {
   },[dataGetUsuarioSolSec])
 
   useEffect(() => {
-    if(!dataActualizarCpeFact) return
-    toast(dataActualizarCpeFact?.msg, {
-      type: dataActualizarCpeFact?.msgType,
+    if(!dataUpdateCpeFact) return
+    toast(dataUpdateCpeFact?.msg, {
+      type: dataUpdateCpeFact?.msgType,
       autoClose: 3000,
       transition: Bounce,
     })
-  },[dataActualizarCpeFact])
+  },[dataUpdateCpeFact])
 
   useEffect(() => {
-    if(!dataActualizarCpeGuia) return
-    toast(dataActualizarCpeGuia?.msg, {
-      type: dataActualizarCpeGuia?.msgType,
+    if(!dataUpdateCpeGuia) return
+    toast(dataUpdateCpeGuia?.msg, {
+      type: dataUpdateCpeGuia?.msgType,
       autoClose: 3000,
       transition: Bounce,
     })
-  },[dataActualizarCpeGuia])
+  },[dataUpdateCpeGuia])
 
   useEffect(() => {
-    if(!dataActualizarUsuarioSolSec) return
-    toast(dataActualizarUsuarioSolSec?.msg, {
-      type: dataActualizarUsuarioSolSec?.msgType,
+    if(!dataUpdateUsuarioSolSec) return
+    toast(dataUpdateUsuarioSolSec?.msg, {
+      type: dataUpdateUsuarioSolSec?.msgType,
       autoClose: 3000,
       transition: Bounce,
     })
-  },[dataActualizarUsuarioSolSec])
+  },[dataUpdateUsuarioSolSec])
 
   return (
     <div className='position-relative'>
@@ -156,7 +156,7 @@ export default function SunatCpe() {
         <Accordion.Item eventKey="0">
           <Accordion.Header>MODO FACTURACIÓN / WEBSERVICE SUNAT</Accordion.Header>
           <Accordion.Body className="position-relative">
-            {(isPendingGetCpeFact || isPendingActualizarCpeFact) && <LdsBar />}
+            {(isPendingGetCpeFact || isPendingUpdateCpeFact) && <LdsBar />}
             <Form className='mx-4' onSubmit={handleSubmit} data-form="formCpeFact">
               <Form.Group as={Row} className="mb-3">
                 <Form.Label column sm="2">Desarrollo</Form.Label>
@@ -200,7 +200,7 @@ export default function SunatCpe() {
         <Accordion.Item eventKey="1">
           <Accordion.Header>MODO GUÍA DE REMISIÓN / API SUNAT</Accordion.Header>
           <Accordion.Body className="position-relative">
-            {(isPendingGetCpeGuia || isPendingActualizarCpeGuia) && <LdsBar />}
+            {(isPendingGetCpeGuia || isPendingUpdateCpeGuia) && <LdsBar />}
             <Form className='mx-4' onSubmit={handleSubmit} data-form="formCpeGuia">
               <Form.Group as={Row} className="mb-3">
                 <Form.Label column sm="3">Client Id desarrollo</Form.Label>
@@ -303,7 +303,7 @@ export default function SunatCpe() {
         <Accordion.Item eventKey="2">
           <Accordion.Header>USUARIO SOL SECUNDARIO</Accordion.Header>
           <Accordion.Body className="position-relative">
-            {(isPendingGetUsuarioSolSec || isPendingActualizarUsuarioSolSec) && <LdsBar />}
+            {(isPendingGetUsuarioSolSec || isPendingUpdateUsuarioSolSec) && <LdsBar />}
             <Form className='mx-4' onSubmit={handleSubmit} data-form="formUsuarioSolSec">
               <Form.Group as={Row} className="mb-3">
                 <Form.Label column sm="3">Usuario SOL</Form.Label>
