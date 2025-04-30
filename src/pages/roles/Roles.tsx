@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import { Button, Card, Col, Container, Form, Row, Table } from "react-bootstrap"
-import { ModuloT, Rol } from "../../core/types"
+import { ModuloT } from "../../core/types"
 import ModulosRolTree from "./ModulosRolTree"
 import { getTree } from "../../core/utils/funciones"
 import { rolFormInit } from "../../core/types/initials"
@@ -13,6 +13,7 @@ import useSessionStore from "../../core/store/useSessionStore"
 import useCatalogosStore from "../../core/store/useCatalogosStore"
 import { Bounce, toast } from "react-toastify"
 import { useMutateRolesQuery } from "../../core/hooks/useRolesQuery"
+import { Rol } from "../../core/types/catalogosTypes"
 
 const Roles: React.FC = () => {
   const [rolForm, setRolForm] = useState<Rol>(rolFormInit)

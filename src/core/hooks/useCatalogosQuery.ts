@@ -1,15 +1,17 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { useMutation, useQuery } from "@tanstack/react-query"
 import useSessionStore from "../store/useSessionStore"
-import { useEffect } from "react"
-import { Catalogos } from "../types"
+import { useEffect, useRef } from "react"
 import { obtenerCatalogosFetch } from "../services/catalogosFetch"
 import useCatalogosStore from "../store/useCatalogosStore"
 import { mutationFetch } from "../services/mutationFecth"
 import { useNavigate } from "react-router-dom"
-const beURL = import.meta.env.VITE_BE_URL;
+import { Catalogos, TipoComprobante } from "../types/catalogosTypes"
+const apiURL = import.meta.env.VITE_BE_URL + "api/"
 
 type ObtenerProvincias = {departamento:string}
 type ObtenerDistritos = {departamento: string, provincia: string}
+
+
 // ****** GET CATALOGOS ******
 export const useObtenerCatalogosQuery = () => {
   const tknSession = useSessionStore(state => state.tknSession)
@@ -43,24 +45,28 @@ export const useObtenerCatalogosQuery = () => {
 
 // ****** MUTATION CATALOGOS ******
 export const useMutationCatalogosQuery = () => {
+  const fnName = useRef("")
   const resetSessionStore = useSessionStore(state => state.resetSessionStore)
+  const setCatalogos = useCatalogosStore(state => state.setCatalogos)
+  const catalogos = useCatalogosStore(state => state.catalogos)
   const navigate = useNavigate()
   const tknSession = useSessionStore(state => state.tknSession)
   const nombreModulo = useSessionStore(state => state.moduloActual?.nombre)
   const Authorization = "Bearer " + tknSession
-  const queryClient = useQueryClient()
+  // const queryClient = useQueryClient()
 
   const {data, isPending, isError, mutate, } = useMutation({
     mutationFn: mutationFetch,
     onSuccess: (resp) => {
       if(resp.msgType !== 'success') return
-      queryClient.invalidateQueries({queryKey:["catalogos"]})
+      // queryClient.invalidateQueries({queryKey:["catalogos"]})
     }
   })
 
   const obtenerProvincias = ({departamento}:ObtenerProvincias) => {
+    fnName.current = obtenerProvincias.name
     const params = {
-      url: beURL + "api/catalogos/obtener_provincias",
+      url: apiURL + 'catalogos/obtener_provincias',
       method: "POST",
       headers:{ 
         Authorization,
@@ -70,9 +76,11 @@ export const useMutationCatalogosQuery = () => {
     }
     mutate(params)
   }
+
   const obtenerDistritos = ({departamento, provincia}: ObtenerDistritos) => {
+    fnName.current = obtenerDistritos.name
     const params = {
-      url: beURL + "api/catalogos/obtener_distritos",
+      url: apiURL + 'catalogos/obtener_distritos',
       method: "POST",
       headers:{ 
         Authorization,
@@ -83,10 +91,73 @@ export const useMutationCatalogosQuery = () => {
     mutate(params)
   }
 
+  const createTipoComprobante = (param: TipoComprobante) => {
+    fnName.current = createTipoComprobante.name
+    const params = {
+      url: apiURL + 'catalogos/create_tipo_comprobante',
+      method: "POST",
+      headers:{ 
+        Authorization,
+        'nombre-modulo': nombreModulo,
+      },
+      body: JSON.stringify(param),
+    }
+    mutate(params)
+  }
+  
+  const updateTipoComprobante = (param: TipoComprobante) => {
+    fnName.current = updateTipoComprobante.name
+    const params = {
+      url: apiURL + 'catalogos/update_tipo_comprobante',
+      method: "PUT",
+      headers:{ 
+        Authorization,
+        'nombre-modulo': nombreModulo,
+      },
+      body: JSON.stringify(param),
+    }
+    mutate(params)
+  }
+
+  const deleteTipoComprobante = (id: number) => {
+    fnName.current = deleteTipoComprobante.name
+    const params = {
+      url: apiURL + 'catalogos/delete_tipo_comprobante',
+      method: "DELETE",
+      headers:{ 
+        Authorization,
+        'nombre-modulo': nombreModulo,
+      },
+      body: JSON.stringify({id}),
+    }
+    mutate(params)
+  }
+
   useEffect(()=>{
+    if(!data) return
     if(data?.msgType === "errorToken"){
       resetSessionStore()
       navigate("/auth")
+    }
+    if(data.error) return
+    // Actualizando el store
+    switch (fnName.current) {
+      case "createTipoComprobante":
+      case "updateTipoComprobante":{
+        const tipos_comprobante = data.registro as TipoComprobante[]
+        if(catalogos) setCatalogos({...catalogos, tipos_comprobante})
+        break;
+      }
+      case "deleteTipoComprobante":{
+        const id = data.id as number
+        const newtiposComprobante = catalogos?.tipos_comprobante.filter(el=>el.id !== id) as TipoComprobante[]
+        if(catalogos) setCatalogos({...catalogos, tipos_comprobante: newtiposComprobante})
+        break;
+      }
+      default:{
+        console.log("funcion no comprobada")
+        break
+      }
     }
   },[data])
   
@@ -94,6 +165,9 @@ export const useMutationCatalogosQuery = () => {
     data, 
     isPending, 
     isError,
+    createTipoComprobante,
+    updateTipoComprobante,
+    deleteTipoComprobante,
     obtenerProvincias,
     obtenerDistritos,
   }

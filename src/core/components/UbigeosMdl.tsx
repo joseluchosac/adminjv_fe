@@ -3,8 +3,9 @@ import { Form } from 'react-bootstrap';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import { useMutationCatalogosQuery } from '../hooks/useCatalogosQuery';
-import { Distrito, Provincia, Ubigeo } from '../types';
+// import { Distrito, Provincia, Ubigeo } from '../types';
 import useCatalogosStore from '../store/useCatalogosStore';
+import { Distrito, Provincia, Ubigeo } from '../types/catalogosTypes';
 
 type Props = {
   show: boolean;

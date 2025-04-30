@@ -7,13 +7,13 @@ import Swal from "sweetalert2";
 import { Bounce, toast } from "react-toastify";
 import useCatalogosStore from "../store/useCatalogosStore";
 import { useForm } from "react-hook-form";
-import useClientesStore from "../store/useClientesStore";
-import {type Cliente } from "../types/clientesTypes";
-import { useMutationClientesQuery } from "../hooks/useClientesQuery";
+import useProveedoresStore from "../store/useProveedoresStore";
+import {type Proveedor } from "../types/proveedoresTypes";
+import { useMutationProveedoresQuery } from "../hooks/useProveedoresQuery";
 import { FaEdit, FaSearch, FaTrash } from "react-icons/fa";
 import UbigeosMdl from "./UbigeosMdl";
 import { Ubigeo } from "../types/catalogosTypes";
-const clienteForm_init = {
+const proveedorForm_init = {
   id: 0,
   tipo_documento_cod: "0",
   tipo_documento: "",
@@ -30,15 +30,15 @@ const clienteForm_init = {
   estado: 1,
 }
 type Props = {
-  onChooseCliente: (cliente: Cliente) => void
+  onChooseProveedor: (proveedor: Proveedor) => void
 }
 
-export default function ClienteFormMdl({onChooseCliente}: Props) {
-  const showClienteFormMdl = useClientesStore(state => state.showClienteFormMdl)
+export default function ProveedorFormMdl({onChooseProveedor}: Props) {
+  const showProveedorFormMdl = useProveedoresStore(state => state.showProveedorFormMdl)
   const [lugar, setLugar] = useState("");
   const [showUbigeos, setShowUbigeos] = useState(false)
-  const currentClienteId = useClientesStore(state => state.currentClienteId)
-  const setShowClienteFormMdl = useClientesStore(state => state.setShowClienteFormMdl)
+  const currentProveedorId = useProveedoresStore(state => state.currentProveedorId)
+  const setShowProveedorFormMdl = useProveedoresStore(state => state.setShowProveedorFormMdl)
   const darkMode = useLayoutStore(state => state.layout.darkMode)
   const catalogos = useCatalogosStore(state => state.catalogos)
   const {
@@ -48,28 +48,28 @@ export default function ClienteFormMdl({onChooseCliente}: Props) {
     reset,
     getValues,
     setValue,
-  } = useForm<Cliente>({defaultValues: clienteForm_init})
+  } = useForm<Proveedor>({defaultValues: proveedorForm_init})
 
   const {
-    data: dataGetCliente,
-    isPending: isPendingGetCliente,
-    isError: isErrorGetCliente,
-    getCliente
-  } = useMutationClientesQuery()
+    data: dataGetProveedor,
+    isPending: isPendingGetProveedor,
+    isError: isErrorGetProveedor,
+    getProveedor
+  } = useMutationProveedoresQuery()
 
   const {
     data: dataMutate,
     isPending: isPendingMutate ,
-    createCliente, 
-    updateCliente, 
-  } = useMutationClientesQuery()
+    createProveedor, 
+    updateProveedor, 
+  } = useMutationProveedoresQuery()
 
   const {
     data: dataConsultarNroDocumento,
     isPending: isPendingConsultarNroDocumento ,
     consultarNroDocumento,
     reset: resetDataConsultarNroDocumento
-  } = useMutationClientesQuery()
+  } = useMutationProveedoresQuery()
 
   const onChooseUbigeo = (ubigeo: Ubigeo) => {
     setShowUbigeos(false)
@@ -95,7 +95,7 @@ export default function ClienteFormMdl({onChooseCliente}: Props) {
     }
   }
 
-  const submit = (data: Cliente) => {
+  const submit = (data: Proveedor) => {
     Swal.fire({
       icon: 'question',
       text: data.id
@@ -104,40 +104,40 @@ export default function ClienteFormMdl({onChooseCliente}: Props) {
       showCancelButton: true,
       confirmButtonText: "Sí",
       cancelButtonText: 'Cancelar',
-      target: document.getElementById('frm_cliente'),
+      target: document.getElementById('frm_proveedor'),
       customClass: { 
         popup: darkMode ? 'swal-dark' : ''
       }
     }).then((result) => {
       if (result.isConfirmed) {
         if (data.id){
-          updateCliente(data)
+          updateProveedor(data)
         }else{
-          createCliente(data)
+          createProveedor(data)
         }
       }
     });
   };
 
   const resetForm = () => {
-    reset(clienteForm_init)
+    reset(proveedorForm_init)
     resetDataConsultarNroDocumento(null)
     setLugar("")
   }
 
   const handleClose = () => {
-    setShowClienteFormMdl(false);
+    setShowProveedorFormMdl(false);
   };
 
   useEffect(() => {
-    if(showClienteFormMdl){
-      if(currentClienteId){
-        getCliente(currentClienteId)
+    if(showProveedorFormMdl){
+      if(currentProveedorId){
+        getProveedor(currentProveedorId)
       }
     }else{
       resetForm()
     }
-  }, [showClienteFormMdl])
+  }, [showProveedorFormMdl])
 
   useEffect(() => {
     if(!dataConsultarNroDocumento) return
@@ -170,35 +170,35 @@ export default function ClienteFormMdl({onChooseCliente}: Props) {
   }, [dataConsultarNroDocumento])
   
   useEffect(() => {
-    if(!dataGetCliente) return
-    if(dataGetCliente.error){
+    if(!dataGetProveedor) return
+    if(dataGetProveedor.error){
       toast.error("Error al obtener los datos", {
         autoClose: 3000,
         transition: Bounce,
       })
-      setShowClienteFormMdl(false);
+      setShowProveedorFormMdl(false);
     }else{
-      if(dataGetCliente){
-        reset(dataGetCliente)
-        setLugar(`${dataGetCliente.departamento} - ${dataGetCliente.provincia} - ${dataGetCliente.distrito}`)
+      if(dataGetProveedor){
+        reset(dataGetProveedor)
+        setLugar(`${dataGetProveedor.departamento} - ${dataGetProveedor.provincia} - ${dataGetProveedor.distrito}`)
 
       }
     }
-  }, [dataGetCliente])
+  }, [dataGetProveedor])
 
   useEffect(() => {
-    if(!isErrorGetCliente) return
+    if(!isErrorGetProveedor) return
     toast.error("Error de conexion", {
       autoClose: 3000,
       transition: Bounce,
     })
-    setShowClienteFormMdl(false);
-  }, [isErrorGetCliente])
+    setShowProveedorFormMdl(false);
+  }, [isErrorGetProveedor])
 
   useEffect(() => {
     if(!dataMutate) return
-    if(!dataMutate.error) setShowClienteFormMdl(false);
-    onChooseCliente(dataMutate.registro)
+    if(!dataMutate.error) setShowProveedorFormMdl(false);
+    onChooseProveedor(dataMutate.registro)
     toast(dataMutate.msg, {
       type: dataMutate.msgType,
       autoClose: 3000,
@@ -208,12 +208,12 @@ export default function ClienteFormMdl({onChooseCliente}: Props) {
 
   return (
     <div>
-      <Modal show={showClienteFormMdl} onHide={handleClose} backdrop="static" size="md" >
+      <Modal show={showProveedorFormMdl} onHide={handleClose} backdrop="static" size="md" >
         <Modal.Header closeButton className="py-2">
-          <Modal.Title>{currentClienteId ? "Editar cliente" : "Nuevo cliente"}</Modal.Title>
+          <Modal.Title>{currentProveedorId ? "Editar proveedor" : "Nuevo proveedor"}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <Form onSubmit={handleSubmit(submit)} id="frm_cliente">
+          <Form onSubmit={handleSubmit(submit)} id="frm_proveedor">
             {isPendingMutate && <LdsBar />}
             {isPendingConsultarNroDocumento && <LdsBar />}
             <Row>
@@ -222,7 +222,7 @@ export default function ClienteFormMdl({onChooseCliente}: Props) {
                 <Form.Select
                   id="tipo_documento_cod"
                   {...register('tipo_documento_cod',{valueAsNumber:true})}
-                  disabled={dataConsultarNroDocumento?.nombre_razon_social || currentClienteId 
+                  disabled={dataConsultarNroDocumento?.nombre_razon_social || currentProveedorId 
                     ? true : false
                   }
                 >
@@ -246,7 +246,7 @@ export default function ClienteFormMdl({onChooseCliente}: Props) {
                     {...register('nro_documento',{
                       maxLength: {value: 13, message:"Se permite máximo 13 caracteres"}
                     })}
-                    disabled={dataConsultarNroDocumento?.nombre_razon_social || currentClienteId 
+                    disabled={dataConsultarNroDocumento?.nombre_razon_social || currentProveedorId 
                       ? true : false
                     }
                   />
@@ -353,7 +353,7 @@ export default function ClienteFormMdl({onChooseCliente}: Props) {
                 onClick={() => resetForm()}
                 variant="seccondary"
                 type="button"
-                hidden={currentClienteId ? true : false}
+                hidden={currentProveedorId ? true : false}
               >Reset</Button>
               <Button
                 variant="seccondary"
@@ -379,7 +379,7 @@ export default function ClienteFormMdl({onChooseCliente}: Props) {
             </div>
           </Form>
         </Modal.Body>
-        {isPendingGetCliente && <LdsEllipsisCenter/>}
+        {isPendingGetProveedor && <LdsEllipsisCenter/>}
       </Modal>
       <UbigeosMdl
         show={showUbigeos} 

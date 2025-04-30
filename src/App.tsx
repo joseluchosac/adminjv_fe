@@ -14,6 +14,8 @@ import Configuraciones from './pages/configuraciones/Configuraciones';
 import Roles from './pages/roles/Roles';
 import Comprobantes from './pages/comprobantes/Comprobantes';
 import Clientes from './pages/clientes/Clientes';
+import Proveedores from './pages/proveedores/Proveedores';
+import Catalogos from './pages/catalogos/Catalogos';
 
 const Tareas = lazy(() => import("./pages/tareas/Tareas"));
 const Users = lazy(() => import("./pages/users/Users"));
@@ -38,6 +40,8 @@ function App() {
             element={<Suspense fallback={<div>Loading...</div>}><Users /></Suspense>}  
           />
           <Route path="clientes" element={<Clientes />} />
+          <Route path="proveedores" element={<Proveedores />} />
+          <Route path="catalogos" element={<Catalogos />} />
           <Route path="modulos" element={<Modulos />} />
           <Route path="roles" element={<Roles />} />
           <Route path="configuraciones" element={<Configuraciones />} />

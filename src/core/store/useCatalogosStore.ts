@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { Catalogos, Rol } from "../types";
+import { Catalogos, Rol } from "../types/catalogosTypes";
 
 interface UseCatalogosStore {
   catalogos: Catalogos | null;
