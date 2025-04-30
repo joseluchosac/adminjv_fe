@@ -35,14 +35,14 @@ const Modulos:React.FC = () => {
     setModuloForm,
     padres,
     actualizarPadres,
-    obtenerModulos
+    getModulos
   } = useModulos()
 
   const setModulosSesion = useSessionStore(state => state.setModulosSesion)
 
   const {
-    data: dataObtenerModulosSession,
-    obtenerModulosSession
+    data: dataGetModulosSession,
+    getModulosSession
   } = useMutateModulosQuery()
 
 
@@ -165,14 +165,14 @@ const Modulos:React.FC = () => {
       setModuloForm(moduloFormInit)
     }
     setIsSorted(false)
-    obtenerModulosSession()
-    obtenerModulos()
+    getModulosSession()
+    getModulos()
   }, [dataOnMutate])
 
   useEffect(() => {
-    if(!dataObtenerModulosSession) return
-    setModulosSesion(dataObtenerModulosSession)
-  }, [dataObtenerModulosSession])
+    if(!dataGetModulosSession) return
+    setModulosSesion(dataGetModulosSession)
+  }, [dataGetModulosSession])
 
 
   return (

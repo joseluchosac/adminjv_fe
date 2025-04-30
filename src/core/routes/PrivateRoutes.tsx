@@ -23,8 +23,8 @@ const PrivateRoutes: React.FC<Props> = ({ redirectTo }) => {
   } = useMutationUsersQuery()
 
   const {
-    data: dataObtenerModulosSession,
-    obtenerModulosSession
+    data: dataGetModulosSession,
+    getModulosSession
   } = useMutateModulosQuery()
 
   useEffect(()=>{
@@ -43,14 +43,14 @@ const PrivateRoutes: React.FC<Props> = ({ redirectTo }) => {
     }else{
       setUserSession(dataCheckAuth.registro)
       setEmpresaSession(dataCheckAuth.empresaSession)
-      obtenerModulosSession()
+      getModulosSession()
     }
   }, [dataCheckAuth])
 
   useEffect(() => {
-    if(!dataObtenerModulosSession) return
-    setModulosSesion(dataObtenerModulosSession)
-  }, [dataObtenerModulosSession])
+    if(!dataGetModulosSession) return
+    setModulosSesion(dataGetModulosSession)
+  }, [dataGetModulosSession])
 
   useEffect(() => {
     const nombreModulo = location.pathname.split("/").filter(Boolean).pop();

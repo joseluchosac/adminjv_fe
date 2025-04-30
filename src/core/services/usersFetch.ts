@@ -21,7 +21,7 @@ export const filterUsersFetch = async({filterParamsUsers, pageParam, signal, tok
   if(token){
     options.headers = {...options.headers, Authorization: "Bearer " + token}
   }
-  const res = await fetch(`${beURL}api/users/filtrar_users?page=${pageParam}`, options)
+  const res = await fetch(`${beURL}api/users/filter_users?page=${pageParam}`, options)
   return res.json()
 }
 

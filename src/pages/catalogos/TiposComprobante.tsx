@@ -167,7 +167,7 @@ export default function TiposComprobante() {
                     <th>Código</th>
                     <th>Descripción</th>
                     <th>Estado</th>
-                    <th></th>
+                    <th>Acciones</th>
                   </tr>
                 </thead>
                 <tbody>

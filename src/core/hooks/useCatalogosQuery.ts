@@ -1,26 +1,26 @@
 import { useMutation, useQuery } from "@tanstack/react-query"
 import useSessionStore from "../store/useSessionStore"
 import { useEffect, useRef } from "react"
-import { obtenerCatalogosFetch } from "../services/catalogosFetch"
+import { getCatalogosFetch } from "../services/catalogosFetch"
 import useCatalogosStore from "../store/useCatalogosStore"
 import { mutationFetch } from "../services/mutationFecth"
 import { useNavigate } from "react-router-dom"
 import { Catalogos, TipoComprobante } from "../types/catalogosTypes"
 const apiURL = import.meta.env.VITE_BE_URL + "api/"
 
-type ObtenerProvincias = {departamento:string}
-type ObtenerDistritos = {departamento: string, provincia: string}
+type GetProvincias = {departamento:string}
+type GetDistritos = {departamento: string, provincia: string}
 
 
 // ****** GET CATALOGOS ******
-export const useObtenerCatalogosQuery = () => {
+export const useGetCatalogosQuery = () => {
   const tknSession = useSessionStore(state => state.tknSession)
   // const queryClient = useQueryClient()
   const setCatalogos = useCatalogosStore(state => state.setCatalogos)
   const {data, isLoading, isFetching, isError, refetch } = useQuery<Catalogos, Error>({
     queryKey: ["catalogos"],
     queryFn: ({signal}) => {
-      return obtenerCatalogosFetch({token: tknSession, signal})
+      return getCatalogosFetch({token: tknSession, signal})
     },
     staleTime: 1000 * 60 * 60,
     // refetchOnMount: false,
@@ -63,10 +63,10 @@ export const useMutationCatalogosQuery = () => {
     }
   })
 
-  const obtenerProvincias = ({departamento}:ObtenerProvincias) => {
-    fnName.current = obtenerProvincias.name
+  const getProvincias = ({departamento}:GetProvincias) => {
+    fnName.current = getProvincias.name
     const params = {
-      url: apiURL + 'catalogos/obtener_provincias',
+      url: apiURL + 'catalogos/get_provincias',
       method: "POST",
       headers:{ 
         Authorization,
@@ -77,10 +77,10 @@ export const useMutationCatalogosQuery = () => {
     mutate(params)
   }
 
-  const obtenerDistritos = ({departamento, provincia}: ObtenerDistritos) => {
-    fnName.current = obtenerDistritos.name
+  const getDistritos = ({departamento, provincia}: GetDistritos) => {
+    fnName.current = getDistritos.name
     const params = {
-      url: apiURL + 'catalogos/obtener_distritos',
+      url: apiURL + 'catalogos/get_distritos',
       method: "POST",
       headers:{ 
         Authorization,
@@ -168,8 +168,8 @@ export const useMutationCatalogosQuery = () => {
     createTipoComprobante,
     updateTipoComprobante,
     deleteTipoComprobante,
-    obtenerProvincias,
-    obtenerDistritos,
+    getProvincias,
+    getDistritos,
   }
 }
 

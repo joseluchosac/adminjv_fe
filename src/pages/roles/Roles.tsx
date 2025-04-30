@@ -27,14 +27,14 @@ const Roles: React.FC = () => {
   const eliminarRolStore = useCatalogosStore(state => state.eliminarRolStore)
 
   const {
-    data: dataObtenerModulosSession,
-    obtenerModulosSession
+    data: dataGetModulosSession,
+    getModulosSession
   } = useMutateModulosQuery()
 
   const {
-    data: dataObtenerModuloRol,
-    isPending: isPendingObtenerModuloRol,
-    obtenerModuloRol
+    data: dataGetModuloRol,
+    isPending: isPendingGetModuloRol,
+    getModuloRol
   } = useMutateModulosQuery()
 
   const {
@@ -85,7 +85,7 @@ const Roles: React.FC = () => {
     if(rol_id){
       const currentRol = catalogos?.roles?.find((el) => el.id === parseInt(rol_id)) as Rol
       setRolForm(currentRol)
-      obtenerModuloRol(Number(rol_id))
+      getModuloRol(Number(rol_id))
     }
   }
 
@@ -151,7 +151,7 @@ const Roles: React.FC = () => {
       autoClose: 3000,
       transition: Bounce,
     })
-    obtenerModulosSession()
+    getModulosSession()
   }, [dataActualizarModulosRoles])
   
   useEffect(() => {
@@ -171,18 +171,18 @@ const Roles: React.FC = () => {
       }
       resetForm()
     }
-    // obtenerModulosSession()
+    // getModulosSession()
   }, [dataMutateRol])
 
   useEffect(() => {
-    if(!dataObtenerModulosSession) return
-    setModulosSesion(dataObtenerModulosSession)
-  }, [dataObtenerModulosSession])
+    if(!dataGetModulosSession) return
+    setModulosSesion(dataGetModulosSession)
+  }, [dataGetModulosSession])
 
   useEffect(() => {
-    if(!dataObtenerModuloRol) return
-    setModulosRol(dataObtenerModuloRol)
-  }, [dataObtenerModuloRol])
+    if(!dataGetModuloRol) return
+    setModulosRol(dataGetModuloRol)
+  }, [dataGetModuloRol])
 
 
   return (
@@ -260,7 +260,7 @@ const Roles: React.FC = () => {
           <Card>
             <Card.Header>MÓDULOS {Boolean(rolForm.id) && `PARA:  ${rolForm.rol}`}</Card.Header>
             <Card.Body className="position-relative">
-              {isPendingObtenerModuloRol && <LdsBar />}
+              {isPendingGetModuloRol && <LdsBar />}
               {isPendingActualizarModulosRoles && <LdsBar />}
               {itemsTree ? 
                 <>

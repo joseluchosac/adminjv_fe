@@ -23,9 +23,9 @@ export const useMutationConfiguracionesQuery = () => {
     }
   })
 
-  const obtenerEmpresa = () => {
+  const getEmpresa = () => {
     const params = {
-      url: beURL + "api/configuraciones/obtener_empresa",
+      url: beURL + "api/configuraciones/get_empresa",
       headers:{ 
         Authorization, 
         'nombre-modulo': nombreModulo,
@@ -47,9 +47,9 @@ export const useMutationConfiguracionesQuery = () => {
     mutate(params)
   }
 
-  const obtenerApisNroDoc = () => {
+  const getApisNroDoc = () => {
     const params = {
-      url: beURL + "api/configuraciones/obtener_apis_nro_doc",
+      url: beURL + "api/configuraciones/get_apis_nro_doc",
       method: "POST",
       headers:{ 
         Authorization,
@@ -72,9 +72,9 @@ export const useMutationConfiguracionesQuery = () => {
     mutate(params) 
   }
 
-  const obtenerCpeFact = () => {
+  const getCpeFact = () => {
     const params = {
-      url: beURL + "api/configuraciones/obtener_cpe_fact",
+      url: beURL + "api/configuraciones/get_cpe_fact",
       method: "POST",
       headers:{ 
         Authorization,
@@ -97,9 +97,9 @@ export const useMutationConfiguracionesQuery = () => {
     mutate(params)  
   }
 
-  const obtenerCpeGuia = () => {
+  const getCpeGuia = () => {
     const params = {
-      url: beURL + "api/configuraciones/obtener_cpe_guia",
+      url: beURL + "api/configuraciones/get_cpe_guia",
       method: "POST",
       headers:{ 
         Authorization,
@@ -122,9 +122,9 @@ export const useMutationConfiguracionesQuery = () => {
     mutate(params) 
   }
 
-  const obtenerUsuarioSolSec = () => {
+  const getUsuarioSolSec = () => {
     const params = {
-      url: beURL + "api/configuraciones/obtener_usuario_sol_sec",
+      url: beURL + "api/configuraciones/get_usuario_sol_sec",
       method: "POST",
       headers:{ 
         Authorization,
@@ -147,9 +147,9 @@ export const useMutationConfiguracionesQuery = () => {
     mutate(params) 
   }
 
-  const obtenerEmailConfig = () => {
+  const getEmailConfig = () => {
     const params = {
-      url: beURL + "api/configuraciones/obtener_email_config",
+      url: beURL + "api/configuraciones/get_email_config",
       method: "POST",
       headers:{ 
         Authorization,
@@ -189,17 +189,17 @@ export const useMutationConfiguracionesQuery = () => {
     data, 
     isPending, 
     isError,
-    obtenerEmpresa,
+    getEmpresa,
     actualizarEmpresa,
-    obtenerApisNroDoc,
+    getApisNroDoc,
     actualizarApisNroDoc,
-    obtenerCpeFact,
+    getCpeFact,
     actualizarCpeFact,
-    obtenerCpeGuia,
+    getCpeGuia,
     actualizarCpeGuia,
-    obtenerUsuarioSolSec,
+    getUsuarioSolSec,
     actualizarUsuarioSolSec,
-    obtenerEmailConfig,
+    getEmailConfig,
     actualizarEmailConfig,
     resetValues,
   }

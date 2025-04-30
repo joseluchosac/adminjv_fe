@@ -1,6 +1,6 @@
 const apiURL = import.meta.env.VITE_BE_URL + "api/"
 
-export const obtenerCatalogosFetch = async ({token, signal}: any) => {
+export const getCatalogosFetch = async ({token, signal}: any) => {
   const options: RequestInit = {
     method: "POST",
     headers: {
@@ -9,6 +9,6 @@ export const obtenerCatalogosFetch = async ({token, signal}: any) => {
     },
     signal,
   }
-  const res = await fetch(apiURL + "catalogos/obtener_catalogos", options)
+  const res = await fetch(apiURL + "catalogos/get_catalogos", options)
   return res.json()
 }

@@ -17,9 +17,9 @@ export default function EmailConfig() {
   const [formEmailConfig, setFormEmailConfig] = useState(emailConfigInit)
   
   const {
-    data: dataObtenerEmailConfig,
-    isPending: isPendingObtenerEmailConfig,
-    obtenerEmailConfig
+    data: dataGetEmailConfig,
+    isPending: isPendingGetEmailConfig,
+    getEmailConfig
   } = useMutationConfiguracionesQuery()
 
   const {
@@ -40,13 +40,13 @@ export default function EmailConfig() {
   }
 
   useEffect(() => {
-    obtenerEmailConfig()
+    getEmailConfig()
   }, [])
 
   useEffect(()=>{
-    if(!dataObtenerEmailConfig) return
-    setFormEmailConfig(JSON.parse(dataObtenerEmailConfig.doc_value))
-  },[dataObtenerEmailConfig])
+    if(!dataGetEmailConfig) return
+    setFormEmailConfig(JSON.parse(dataGetEmailConfig.doc_value))
+  },[dataGetEmailConfig])
 
   useEffect(()=>{
     if(!dataActualizarEmailConfig) return
@@ -59,7 +59,7 @@ export default function EmailConfig() {
         <Accordion.Item eventKey="0">
           <Accordion.Header>CONFIGURACIÓN DE CORREO</Accordion.Header>
           <Accordion.Body className="position-relative">
-            {(isPendingObtenerEmailConfig || isPendingActualizarEmailConfig) && <LdsBar />}
+            {(isPendingGetEmailConfig || isPendingActualizarEmailConfig) && <LdsBar />}
             <Form className='mx-4' onSubmit={handleSubmit} data-form="formCpeFact">
               <Form.Group as={Row} className="mb-3">
                 <Form.Label column sm="2">Host</Form.Label>

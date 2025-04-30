@@ -12,7 +12,7 @@ const useModulos = () => {
   const {
     isPending: isPendingGetModulos,
     data: modulos,
-    obtenerModulos
+    getModulos
   } = useMutateModulosQuery()
 
   const resetSort = () => {
@@ -46,7 +46,7 @@ const useModulos = () => {
   }
 
   useEffect(() => {
-    obtenerModulos()
+    getModulos()
   }, [])
 
   useEffect(() => {
@@ -68,7 +68,7 @@ const useModulos = () => {
     toEdit,
     setModuloForm,
     actualizarPadres,
-    obtenerModulos,
+    getModulos,
   }
 }
 

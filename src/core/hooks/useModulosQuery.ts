@@ -22,9 +22,9 @@ export const useMutateModulosQuery = () => {
     }
   })
 
-  const obtenerModulos = () => {
+  const getModulos = () => {
     const params = {
-      url: beURL + "api/modulos/obtener_modulos",
+      url: beURL + "api/modulos/gt_modulos",
       method: "POST",
       headers:{ 
         Authorization,
@@ -34,9 +34,9 @@ export const useMutateModulosQuery = () => {
     mutate(params)
   }
 
-  const obtenerModulosSession = () => {
+  const getModulosSession = () => {
     const params = {
-      url: beURL + "api/modulos/obtener_modulos_sesion",
+      url: beURL + "api/modulos/get_modulos_sesion",
       method: "POST",
       headers:{ 
         Authorization,
@@ -46,9 +46,9 @@ export const useMutateModulosQuery = () => {
     mutate(params)
   }
 
-  const obtenerModuloRol = (rol_id: number) => {
+  const getModuloRol = (rol_id: number) => {
     const params = {
-      url: beURL + "api/modulos/obtener_modulo_rol",
+      url: beURL + "api/modulos/get_modulo_rol",
       method: "POST",
       headers:{ 
         Authorization,
@@ -138,9 +138,9 @@ export const useMutateModulosQuery = () => {
     actualizarModulo, 
     eliminarModulo, 
     sort,
-    obtenerModulos,
-    obtenerModulosSession,
-    obtenerModuloRol,
+    getModulos,
+    getModulosSession,
+    getModuloRol,
     actualizarModulosRoles,
   }
 }

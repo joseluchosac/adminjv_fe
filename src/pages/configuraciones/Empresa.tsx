@@ -4,12 +4,13 @@ import { Button, Col, Form, InputGroup, Row } from "react-bootstrap"
 import { MdHideImage, MdImage } from "react-icons/md"
 import { FaUndo } from "react-icons/fa"
 import { useForm, useWatch } from "react-hook-form"
-import {type Ubigeo, type Empresa } from "../../core/types"
+import {type Empresa } from "../../core/types"
 import UbigeosMdl from "../../core/components/UbigeosMdl"
 import { LdsEllipsisCenter } from "../../core/components/Loaders"
 import { ConfirmPass } from "../../core/components/ConfirmsMdl"
 import { Bounce, toast } from "react-toastify"
 import useSessionStore from "../../core/store/useSessionStore"
+import { Ubigeo } from "../../core/types/catalogosTypes"
 
 export default function Empresa() {
   const [urlLogoPreview, setUrlLogoPreview] = useState("")
@@ -18,9 +19,9 @@ export default function Empresa() {
   const setEmpresaSession = useSessionStore(state=>state.setEmpresaSession)
   const {
     data: dataEmpresa,
-    // isError: isErrorObtenerEmpresa, 
-    isPending: isPendingObtenerEmpresa, 
-    obtenerEmpresa,
+    // isError: isErrorGetEmpresa, 
+    isPending: isPendingGetEmpresa, 
+    getEmpresa,
     resetValues: resetEmpresa,
   } = useMutationConfiguracionesQuery()
   const {
@@ -91,7 +92,7 @@ export default function Empresa() {
 
 
   useEffect(()=>{
-    obtenerEmpresa()
+    getEmpresa()
   },[])
   useEffect(()=>{
     if(dataEmpresa){
@@ -347,7 +348,7 @@ export default function Empresa() {
             Guardar datos de la Empresa
           </Button>
         </div>
-        {(isPendingObtenerEmpresa || isPendingActualizarEmpresa) && <LdsEllipsisCenter />}
+        {(isPendingGetEmpresa || isPendingActualizarEmpresa) && <LdsEllipsisCenter />}
         
       </Form>
       <UbigeosMdl

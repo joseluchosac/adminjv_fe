@@ -24,9 +24,9 @@ export default function ApisConsulta() {
   const [formApisNroDoc, setFormApisNroDoc] = useState(apisNroDocInit)
   const [showConfirmPass, setShowConfirmPass] = useState(false)
   const {
-    data: dataObtenerApisNroDoc,
-    isPending: isPendingObtenerApisNroDoc,
-    obtenerApisNroDoc
+    data: dataGetApisNroDoc,
+    isPending: isPendingGetApisNroDoc,
+    getApisNroDoc
   } = useMutationConfiguracionesQuery()
   const {
     data: dataActualizarApisNroDoc,
@@ -56,14 +56,14 @@ export default function ApisConsulta() {
   }
 
   useEffect(() => {
-    obtenerApisNroDoc()
+    getApisNroDoc()
   }, [])
   
   useEffect(()=>{
-    if(!dataObtenerApisNroDoc) return
-    const obj = JSON.parse(dataObtenerApisNroDoc.doc_value)
+    if(!dataGetApisNroDoc) return
+    const obj = JSON.parse(dataGetApisNroDoc.doc_value)
     setFormApisNroDoc(obj)
-  },[dataObtenerApisNroDoc])
+  },[dataGetApisNroDoc])
 
   useEffect(()=>{
     if(!dataActualizarApisNroDoc) return
@@ -80,7 +80,7 @@ export default function ApisConsulta() {
         <Accordion.Item eventKey="0">
           <Accordion.Header>DNI, RUC</Accordion.Header>
           <Accordion.Body className="position-relative">
-            {(isPendingObtenerApisNroDoc || isPendingActualizarApisNroDoc) && <LdsBar />}
+            {(isPendingGetApisNroDoc || isPendingActualizarApisNroDoc) && <LdsBar />}
             <Form onSubmit={handleSubmit}>
               <Row>
                 <h6 className="mb-3">APIS.NET.PE</h6>

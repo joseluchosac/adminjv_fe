@@ -20,12 +20,12 @@ function UbigeosMdl({show, setShow, onChooseUbigeo}: Props) {
   const {
     data: dataProvincias,
     isPending: isPendingProvincias,
-    obtenerProvincias
+    getProvincias
   } = useMutationCatalogosQuery()
   const {
     data: dataDistritos,
     isPending: isPendingDistritos,
-    obtenerDistritos
+    getDistritos
   } = useMutationCatalogosQuery()
 
   const handleClose = () => setShow(false);
@@ -43,13 +43,13 @@ function UbigeosMdl({show, setShow, onChooseUbigeo}: Props) {
     const {id, value} = e.target
     switch (id) {
       case "departamento":{
-        obtenerProvincias({departamento: value})
-        obtenerDistritos({departamento: form.departamento, provincia: ""})
+        getProvincias({departamento: value})
+        getDistritos({departamento: form.departamento, provincia: ""})
         setForm({departamento: value, provincia:"", distrito:"", ubigeo_inei:""})
         break
       }
       case "provincia":{
-        obtenerDistritos({departamento: form.departamento, provincia: value})
+        getDistritos({departamento: form.departamento, provincia: value})
         setForm({...form, provincia: value, distrito:"", ubigeo_inei:""})
         break
       }
