@@ -48,7 +48,7 @@ export default function Proveedores() {
   };
 
   const onChooseProveedor = (proveedor: Proveedor) => {
-    // console.log(proveedor)
+    console.log(proveedor)
   }
 
   const handleInputSearch = (e: React.ChangeEvent<HTMLInputElement>) => {

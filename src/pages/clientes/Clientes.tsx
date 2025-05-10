@@ -48,7 +48,7 @@ export default function Clientes() {
   };
 
   const onChooseCliente = (cliente: Cliente) => {
-    // console.log(cliente)
+    console.log(cliente)
   }
 
   const handleInputSearch = (e: React.ChangeEvent<HTMLInputElement>) => {

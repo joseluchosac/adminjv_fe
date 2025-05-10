@@ -24,7 +24,7 @@ export const useMutateModulosQuery = () => {
 
   const getModulos = () => {
     const params = {
-      url: beURL + "api/modulos/gt_modulos",
+      url: beURL + "api/modulos/get_modulos",
       method: "POST",
       headers:{ 
         Authorization,

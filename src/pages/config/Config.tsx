@@ -1,15 +1,15 @@
 import { Tab, Tabs} from "react-bootstrap";
 import { useState } from "react";
-import Empresa from "./Empresa";
+import EmpresaConfig from "./EmpresaConfig";
 import ApisConsulta from "./ApisConsulta";
 import SunatCpe from "./SunatCpe";
-import EmailConfig from "./EmailConfig";
+import SeriesConfig from "./SeriesConfig";
 
-export default function Configuraciones() {
+export default function Config() {
   const [tabKey, setTabKey] = useState('empresa');
 
   return (
-    <div style={{maxWidth:"892px"}} className="mx-auto">
+    <div style={{maxWidth: "991.98px"}} className="mx-auto">
       <Tabs
         id="controlled-tab-example"
         activeKey={tabKey}
@@ -17,16 +17,16 @@ export default function Configuraciones() {
         className="mb-3"
       >
         <Tab eventKey="empresa" title="Empresa">
-          {tabKey === "empresa" && <Empresa />}
+          {tabKey === "empresa" && <EmpresaConfig />}
+        </Tab>
+        <Tab eventKey="series" title="Series">
+          {tabKey === "series" && <SeriesConfig />}
         </Tab>
         <Tab eventKey="sunat_cpe" title="Sunat CPE">
           {tabKey === "sunat_cpe" && <SunatCpe />}
         </Tab>
         <Tab eventKey="apis_consulta" title="Apis consulta">
           {tabKey === "apis_consulta" && <ApisConsulta />}
-        </Tab>
-        <Tab eventKey="email" title="Correo">
-          {tabKey === "email" && <EmailConfig />}
         </Tab>
       </Tabs>
     </div>

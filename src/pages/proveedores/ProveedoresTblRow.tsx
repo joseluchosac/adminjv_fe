@@ -1,6 +1,5 @@
-import { Badge, Dropdown, NavDropdown } from "react-bootstrap";
+import { Badge, NavDropdown } from "react-bootstrap";
 import { CampoTable} from "../../core/types";
-// import { format, isValid, parseISO } from "date-fns";
 import { Proveedor } from "../../core/types/proveedoresTypes";
 import useProveedoresStore from "../../core/store/useProveedoresStore";
 import { FaEdit, FaTrash } from "react-icons/fa";
@@ -22,7 +21,6 @@ function ProveedoresTblRow({ proveedor, camposProveedor }: Props) {
   
   const {
     data,
-    isPending,
     deleteProveedor
   } = useMutationProveedoresQuery()
 

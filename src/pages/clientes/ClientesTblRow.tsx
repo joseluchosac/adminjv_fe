@@ -1,4 +1,4 @@
-import { Badge, Dropdown, NavDropdown } from "react-bootstrap";
+import { Badge, NavDropdown } from "react-bootstrap";
 import { CampoTable} from "../../core/types";
 // import { format, isValid, parseISO } from "date-fns";
 import { Cliente } from "../../core/types/clientesTypes";
@@ -22,7 +22,6 @@ function ClientesTblRow({ cliente, camposCliente }: Props) {
   
   const {
     data,
-    isPending,
     deleteCliente
   } = useMutationClientesQuery()
 

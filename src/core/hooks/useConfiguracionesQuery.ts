@@ -25,7 +25,7 @@ export const useMutationConfiguracionesQuery = () => {
 
   const getEmpresa = () => {
     const params = {
-      url: beURL + "api/configuraciones/get_empresa",
+      url: beURL + "api/config/get_empresa",
       headers:{ 
         Authorization, 
         'nombre-modulo': nombreModulo,
@@ -36,7 +36,7 @@ export const useMutationConfiguracionesQuery = () => {
   
   const updateEmpresa = (formData: FormData) => {
     const params = {
-      url: beURL + "api/configuraciones/update_empresa",
+      url: beURL + "api/config/update_empresa",
       method: "POST",
       headers:{ 
         Authorization,
@@ -49,7 +49,7 @@ export const useMutationConfiguracionesQuery = () => {
 
   const getApisNroDoc = () => {
     const params = {
-      url: beURL + "api/configuraciones/get_apis_nro_doc",
+      url: beURL + "api/config/get_apis_nro_doc",
       method: "POST",
       headers:{ 
         Authorization,
@@ -61,7 +61,7 @@ export const useMutationConfiguracionesQuery = () => {
 
   const updateApisNroDoc = (form: any) => {
     const params = {
-      url: beURL + "api/configuraciones/update_apis_nro_doc",
+      url: beURL + "api/config/update_apis_nro_doc",
       method: "POST",
       headers:{ 
         Authorization,
@@ -74,7 +74,7 @@ export const useMutationConfiguracionesQuery = () => {
 
   const getCpeFact = () => {
     const params = {
-      url: beURL + "api/configuraciones/get_cpe_fact",
+      url: beURL + "api/config/get_cpe_fact",
       method: "POST",
       headers:{ 
         Authorization,
@@ -86,7 +86,7 @@ export const useMutationConfiguracionesQuery = () => {
 
   const updateCpeFact = (form: any) => {
     const params = {
-      url: beURL + "api/configuraciones/update_cpe_fact",
+      url: beURL + "api/config/update_cpe_fact",
       method: "POST",
       headers:{ 
         Authorization,
@@ -99,7 +99,7 @@ export const useMutationConfiguracionesQuery = () => {
 
   const getCpeGuia = () => {
     const params = {
-      url: beURL + "api/configuraciones/get_cpe_guia",
+      url: beURL + "api/config/get_cpe_guia",
       method: "POST",
       headers:{ 
         Authorization,
@@ -111,7 +111,7 @@ export const useMutationConfiguracionesQuery = () => {
   
   const updateCpeGuia = (form: any) => {
     const params = {
-      url: beURL + "api/configuraciones/update_cpe_guia",
+      url: beURL + "api/config/update_cpe_guia",
       method: "POST",
       headers:{ 
         Authorization,
@@ -124,7 +124,7 @@ export const useMutationConfiguracionesQuery = () => {
 
   const getUsuarioSolSec = () => {
     const params = {
-      url: beURL + "api/configuraciones/get_usuario_sol_sec",
+      url: beURL + "api/config/get_usuario_sol_sec",
       method: "POST",
       headers:{ 
         Authorization,
@@ -136,7 +136,7 @@ export const useMutationConfiguracionesQuery = () => {
   
   const updateUsuarioSolSec = (form: any) => {
     const params = {
-      url: beURL + "api/configuraciones/update_usuario_sol_sec",
+      url: beURL + "api/config/update_usuario_sol_sec",
       method: "POST",
       headers:{ 
         Authorization,
@@ -149,7 +149,7 @@ export const useMutationConfiguracionesQuery = () => {
 
   const getEmailConfig = () => {
     const params = {
-      url: beURL + "api/configuraciones/get_email_config",
+      url: beURL + "api/config/get_email_config",
       method: "POST",
       headers:{ 
         Authorization,
@@ -161,7 +161,7 @@ export const useMutationConfiguracionesQuery = () => {
   
   const updateEmailConfig = (form: any) => {
     const params = {
-      url: beURL + "api/configuraciones/update_email_config",
+      url: beURL + "api/config/update_email_config",
       method: "POST",
       headers:{ 
         Authorization,
@@ -172,7 +172,30 @@ export const useMutationConfiguracionesQuery = () => {
     mutate(params) 
   }
 
+  const getEstablecimientos = () => {
+    const params = {
+      url: beURL + "api/config/get_establecimientos",
+      method: "POST",
+      headers:{ 
+        Authorization,
+        'nombre-modulo': nombreModulo,
+      },
+    }
+    mutate(params) 
+  }
   
+  const getSeriesEstablecimiento = (establecimiento_id: number) => {
+    const params = {
+      url: beURL + "api/config/get_series_establecimiento",
+      method: "POST",
+      headers:{ 
+        Authorization,
+        'nombre-modulo': nombreModulo,
+      },
+      body: JSON.stringify({establecimiento_id})
+    }
+    mutate(params) 
+  }
 
   const resetValues = (newValues: any) => {
     mutate({newValues}) // Solo actualiza los datos, no hace fetch
@@ -201,6 +224,8 @@ export const useMutationConfiguracionesQuery = () => {
     updateUsuarioSolSec,
     getEmailConfig,
     updateEmailConfig,
+    getEstablecimientos,
+    getSeriesEstablecimiento,
     resetValues,
   }
 }
