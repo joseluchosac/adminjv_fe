@@ -2,7 +2,7 @@ import './MainSidebar.css'
 import { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from 'react-router-dom';
 import NavItems from './NavItems';
-import { getTree } from '../../../core/utils/funciones';
+import { getModulosTree } from '../../../core/utils/funciones';
 import { LdsEllipsisCenter } from '../../../core/components/Loaders';
 import useLayoutStore from '../../../core/store/useLayoutStore';
 import DynaIcon from '../../../core/components/DynaComponents';
@@ -62,7 +62,7 @@ const MainSidebar:React.FC = () => {
 
   useEffect(() => {
     if(!modulosSesion) return
-    setModulosSesionTree(getTree(modulosSesion))
+    setModulosSesionTree(getModulosTree(modulosSesion))
   }, [modulosSesion])
 
   useEffect(() => {

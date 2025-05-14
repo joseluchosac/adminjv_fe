@@ -1,9 +1,9 @@
 // Genera arbol a partir de un arreglo de objetos
 
-import { ModuloT } from "../types";
+import { Categoria, ModuloT } from "../types";
 
 
-export function getTree(data: ModuloT[]): ModuloT[] {
+export function getModulosTree(data: ModuloT[]): ModuloT[] {
   const mapa = new Map();
   const raiz: ModuloT[] = [];
   // Crear un mapa de los elementos
@@ -25,7 +25,7 @@ export function getTree(data: ModuloT[]): ModuloT[] {
   return raiz;
 }
 
-// Ejemplo de uso
+// Ejemplo de uso getModulosTree
 // const modulos = [
 //   { id: 1, padre_id: null, descripcion: 'Raíz' },
 //   { id: 2, padre_id: 1, descripcion: 'Hijo 1' },
@@ -34,8 +34,29 @@ export function getTree(data: ModuloT[]): ModuloT[] {
 //   { id: 5, padre_id: 2, descripcion: 'Nieto 2' }
 // ];
 
-// const arbol = getTree(datos);
+// const arbol = getModulosTree(datos);
 
+export function getCategoriasTree(data: Categoria[]): Categoria[] {
+  const mapa = new Map();
+  const raiz: Categoria[] = [];
+  // Crear un mapa de los elementos
+  data.forEach(item => {
+    mapa.set(item.id, { ...item, children: [] });
+  });
+
+  // Construir el árbol
+  data.forEach(item => {
+    if (item.padre_id === 0) {
+      raiz.push(mapa.get(item.id));
+    } else {
+      const padre = mapa.get(item.padre_id);
+      if (padre) {
+        padre.children.push(mapa.get(item.id));
+      }
+    }
+  });
+  return raiz;
+}
 
 export function debounce<T extends (...args: any[]) => void>(func: T, wait: number): (...args: Parameters<T>) => void {
   let timeout: ReturnType<typeof setTimeout>;

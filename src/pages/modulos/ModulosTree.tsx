@@ -4,12 +4,11 @@ import DynaIcon from '../../core/components/DynaComponents';
 import { ModuloT } from '../../core/types';
 interface Props {
   modulosTree: ModuloT[];
-  setModulosTree: React.Dispatch<React.SetStateAction<ModuloT[] | null>>;
   toEdit: (id: number) => void;
-  setIsSorted: (par: boolean) => void;
+  sortModulos: (itemsOrdered: ModuloT[]) => void;
 }
 
-const ModulosTree: React.FC<Props> = ({modulosTree, setModulosTree, toEdit, setIsSorted}) => {
+const ModulosTree: React.FC<Props> = ({modulosTree, toEdit, sortModulos}) => {
 
   const listRef = useRef<HTMLUListElement>(null);
 
@@ -23,26 +22,19 @@ const ModulosTree: React.FC<Props> = ({modulosTree, setModulosTree, toEdit, setI
       const sortable = Sortable.create(listRef.current, {
         animation: 100,
         onEnd: (evt) => {
-          const padre_id = parseInt(evt.item.dataset.padre_id as string)
           const newItems = [...modulosTree];
           const [movedItem] = newItems.splice(evt.oldIndex!, 1);
           newItems.splice(evt.newIndex!, 0, movedItem);
-          if(padre_id == 0){
-            setModulosTree(newItems);
-          }else{
-            setModulosTree((prevItems) => {
-              const idx = prevItems?.findIndex((el:ModuloT) => el.id === padre_id) as number
-              const prevItemsClone = structuredClone(prevItems) as ModuloT[]
-              prevItemsClone[idx].children = newItems
-              return prevItemsClone
-            })
-          }
-          setIsSorted(true)
+          let orderedItems = newItems.map((el, idx) => {
+            el.orden = idx + 1
+            return el
+          })
+          sortModulos(orderedItems)
         },
       });
       return () => { sortable.destroy(); };
     }
-  }, [modulosTree, setModulosTree]);
+  }, [modulosTree]);
 
   return (
     <ul ref={listRef} style={{paddingInlineStart: "20px"}}>
@@ -65,7 +57,11 @@ const ModulosTree: React.FC<Props> = ({modulosTree, setModulosTree, toEdit, setI
                   <div>+ {el.descripcion}</div>
                   <span onClick={handleEdit} data-id={el.id}><DynaIcon name='FaEdit' className='text-success' /></span>
                 </summary>
-                <ModulosTree modulosTree={el.children} setModulosTree={setModulosTree} toEdit={toEdit} setIsSorted={setIsSorted}/>
+                <ModulosTree
+                  modulosTree={el.children}
+                  toEdit={toEdit}
+                  sortModulos={sortModulos}
+                />
                 </details>
             }
           </li>

@@ -1,71 +1,69 @@
 import { useEffect, useState } from "react"
-import useLayoutStore from "../../core/store/useLayoutStore"
-import ModulosTree from "./ModulosTree"
+import { useMutateCategoriasQuery } from "../../core/hooks/useCategoriasQuery"
+import { getCategoriasTree } from "../../core/utils/funciones"
+import { Categoria, Padre } from "../../core/types"
+import CategoriasTree from "./CategoriasTree"
 import { Button, Card, Col, Container, Form, Nav, Row } from "react-bootstrap"
-import { Padre } from "../../core/types"
-import { useMutateModulosQuery } from "../../core/hooks/useModulosQuery"
-import { Bounce, toast } from "react-toastify"
-import Swal from "sweetalert2"
-import useModulos from "./hooks/useModulos"
-import { moduloFormInit } from "../../core/types/initials"
+import { LdsBar } from "../../core/components/Loaders"
 import DynaIcon from "../../core/components/DynaComponents"
 import IconsModal from "../../core/components/IconsModal"
-import useSessionStore from "../../core/store/useSessionStore"
-import { LdsBar } from "../../core/components/Loaders"
+import { Bounce, toast } from "react-toastify"
+import Swal from "sweetalert2"
+import useLayoutStore from "../../core/store/useLayoutStore"
 
-const Modulos:React.FC = () => {
+export const categoriaFrmInit = {
+  id: 0,
+  nombre: "",
+  descripcion: "",
+  padre_id: 0,
+  icon: "FaRegCircle",
+  orden: 0,
+  estado: 1
+}
+
+export default function Categorias() {
+  const [categoriasTree, setCategoriasTree] = useState<Categoria[] | null>(null)
+  const [categoriaFrm, setCategoriaFrm] = useState<Categoria>(categoriaFrmInit)
+  const [padres, setPadres] = useState<Padre[] | null>(null)
   const [showIconsModal, setShowIconsModal] = useState(false);
   const darkMode = useLayoutStore(state => state.layout.darkMode)
-  const {
-    data: dataOnMutate,
-    isPending: isPending_mutate,
-    sortModulos, 
-    createModulo, 
-    updateModulo, 
-    deleteModulo, 
-  } = useMutateModulosQuery()
-  const {
-    isPendingGetModulos,
-    modulosTree,
-    setModulosTree,
-    toEdit,
-    moduloForm,
-    setModuloForm,
-    padres,
-    actualizarPadres,
-    getModulos
-  } = useModulos()
-
-  const setModulosSesion = useSessionStore(state => state.setModulosSesion)
 
   const {
-    data: dataGetModulosSession,
-    getModulosSession
-  } = useMutateModulosQuery()
+    data: data_getCategorias, 
+    isPending: isPending_getCategorias, 
+    getCategorias
+  } = useMutateCategoriasQuery()
 
+  const {
+    data: data_mutate, 
+    isPending: isPending_mutate, 
+    sortCategorias, 
+    createCategoria, 
+    updateCategoria, 
+    deleteCategoria, 
+  } = useMutateCategoriasQuery()
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const {name, value} = e.currentTarget
-    setModuloForm({...moduloForm, [name]: value})
+  const actualizarPadres = (id: number) => {
+    if(!data_getCategorias) return
+    let nuevosPadres = data_getCategorias
+      .filter((el: any)=> el.id != id)
+      .map((el: any) => {
+        const {id, descripcion} = el
+        return {id, descripcion}
+      }
+    )
+    setPadres(nuevosPadres)
   }
 
-  const handleChangeSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const {name, value} = e.currentTarget
-    setModuloForm({...moduloForm, [name]: value})
-  }
-  
-  const onChooseIcon = (nameIcon: string) => {
-    setModuloForm({...moduloForm, icon_menu: nameIcon})
-  }
-
-  const handleResetForm = () => {
-    setModuloForm(moduloFormInit)
-    actualizarPadres()
+  const toEdit = (id: number) => {
+    const categoriaActual = data_getCategorias?.find((el: Categoria) => el.id === id) as Categoria
+    setCategoriaFrm(categoriaActual)
+    actualizarPadres(id)
   }
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    if(!moduloForm.descripcion.trim()){
+    if(!categoriaFrm.descripcion.trim()){
       toast.warning("Ingrese la descripcion", {
         autoClose: 3000,
         transition: Bounce,
@@ -83,27 +81,37 @@ const Modulos:React.FC = () => {
       }
     }).then((result) => {
       if (result.isConfirmed) {
-        if(moduloForm.id){
-          updateModulo(moduloForm)
+        if(categoriaFrm.id){
+          updateCategoria(categoriaFrm)
         }else{
-          createModulo(moduloForm)
+          createCategoria(categoriaFrm)
         }
       }
     });
   }
 
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const {name, value} = e.currentTarget
+    setCategoriaFrm({...categoriaFrm, [name]: value})
+  }
+
+  const handleResetForm = () => {
+    setCategoriaFrm(categoriaFrmInit)
+    actualizarPadres(0)
+  }
+
   const handleDelete = () => {
-    const {id} = moduloForm
+    const {id} = categoriaFrm
     if(!id){
-      toast.warning("Seleccione un módulo de la lista!", {
+      toast.warning("Seleccione una categoría de la lista!", {
         autoClose: 3000,
         transition: Bounce,
       })
       return
     }
-    const item = modulosTree?.find(el => el.id === id)
+    const item = categoriasTree?.find(el => el.id === id)
     if(item?.children.length){
-      toast.warning("No se puede eliminar módulos que tienen hijos", {
+      toast.warning("No se puede eliminar categorías que tienen hijos", {
         autoClose: 3000,
         transition: Bounce,
       })
@@ -112,7 +120,7 @@ const Modulos:React.FC = () => {
 
     Swal.fire({
       icon: 'question',
-      text: '¿Desea eliminar el módulo seleccionado?',
+      text: '¿Desea eliminar la categoría seleccionada?',
       showCancelButton: true,
       confirmButtonText: "Sí",
       cancelButtonText: 'Cancelar',
@@ -121,48 +129,59 @@ const Modulos:React.FC = () => {
       }
     }).then((result) => {
       if (result.isConfirmed) {
-        deleteModulo(id)
+        deleteCategoria(id)
       }
     });
   }
 
+  const handleChangeSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const {name, value} = e.currentTarget
+    setCategoriaFrm({...categoriaFrm, [name]: value})
+  }
+
+  const onChooseIcon = (nameIcon: string) => {
+    setCategoriaFrm({...categoriaFrm, icon: nameIcon})
+  }
+
+  useEffect(()=>{
+    getCategorias()
+  },[])
+
   useEffect(() => {
-    if(!dataOnMutate) return
-    if(!dataOnMutate?.msgType || !dataOnMutate?.msg) return
-    toast(dataOnMutate.msg, {
-      type: dataOnMutate?.msgType,
+    if(!data_mutate) return
+    if(!data_mutate?.msgType || !data_mutate?.msg) return
+    toast(data_mutate.msg, {
+      type: data_mutate?.msgType,
       autoClose: 3000,
       transition: Bounce,
     })
-    if(dataOnMutate?.msgType == "success"){
-      setModuloForm(moduloFormInit)
+    if(data_mutate?.msgType == "success"){
+      setCategoriaFrm(categoriaFrmInit)
     }
-    getModulosSession()
-    getModulos()
-  }, [dataOnMutate])
-
-  useEffect(() => {
-    if(!dataGetModulosSession) return
-    setModulosSesion(dataGetModulosSession)
-  }, [dataGetModulosSession])
-
+    getCategorias()
+  }, [data_mutate])
+    
+  useEffect(()=>{
+    if(!data_getCategorias) return
+    setCategoriasTree(getCategoriasTree(data_getCategorias))
+  }, [data_getCategorias])
 
   return (
     <Container>
       <Row>
         <Col className="mb-3">
           <Card>
-            <Card.Header>Menú de módulos</Card.Header>
+            <Card.Header>Categorías</Card.Header>
             <Card.Body className="position-relative">
-              {(isPendingGetModulos || isPending_mutate) && <LdsBar />}
+              {(isPending_getCategorias || isPending_mutate) && <LdsBar />}
               <Row>
                 <Col>
                   <div className="mb-2"><small>Arrastre los items para ordenar.</small></div>
-                  {modulosTree && 
-                    <ModulosTree 
-                      modulosTree={modulosTree} 
+                  {categoriasTree && 
+                    <CategoriasTree 
+                      categoriasTree={categoriasTree} 
                       toEdit={toEdit}
-                      sortModulos={sortModulos}
+                      sortCategorias={sortCategorias}
                     />
                   }
                 </Col>
@@ -173,9 +192,9 @@ const Modulos:React.FC = () => {
         <Col className="mb-3">
           <Card>
             {
-              Boolean(moduloForm.id)
-              ? <Card.Header>Edición - {moduloForm.descripcion}</Card.Header>
-              : <Card.Header>Nuevo módulo</Card.Header>
+              Boolean(categoriaFrm.id)
+              ? <Card.Header>Edición - {categoriaFrm.descripcion}</Card.Header>
+              : <Card.Header>Nueva categoría</Card.Header>
             }
             <Card.Body>
               <Form onSubmit={handleSubmit}>
@@ -186,7 +205,7 @@ const Modulos:React.FC = () => {
                       <Form.Control
                         type="text"
                         name="descripcion"
-                        value={moduloForm.descripcion}
+                        value={categoriaFrm.descripcion}
                         onChange={handleChange}
                       />
                     </Form.Group>
@@ -196,7 +215,7 @@ const Modulos:React.FC = () => {
                       <Form.Label>Padre</Form.Label>
                       <Form.Select 
                         name="padre_id"
-                        value={moduloForm.padre_id}
+                        value={categoriaFrm.padre_id}
                         onChange={handleChangeSelect}
                       >
                         <option value="0"> - Sin padre -</option>
@@ -215,9 +234,9 @@ const Modulos:React.FC = () => {
                       <Form.Control 
                         type="text" 
                         name="nombre"
-                        value={moduloForm.nombre}
+                        value={categoriaFrm.nombre}
                         onChange={handleChange}
-                        disabled={moduloForm.nombre == "" && moduloForm.id != 0}
+                        disabled={categoriaFrm.nombre == "" && categoriaFrm.id != 0}
                       />
                     </Form.Group>
                   </Col>
@@ -225,7 +244,7 @@ const Modulos:React.FC = () => {
                     <Form.Group className="mb-3 d-flex gap-3 align-items-center">
                       <div>Icono</div>
                       <Nav.Link href="#" onClick={() => setShowIconsModal(true)}>
-                        <DynaIcon name={moduloForm.icon_menu} />
+                        <DynaIcon name={categoriaFrm.icon} />
                       </Nav.Link>
                       
                     </Form.Group>
@@ -259,6 +278,3 @@ const Modulos:React.FC = () => {
     </Container>
   )
 }
-
-
-export default Modulos

@@ -16,6 +16,7 @@ import Comprobantes from './pages/comprobantes/Comprobantes';
 import Clientes from './pages/clientes/Clientes';
 import Proveedores from './pages/proveedores/Proveedores';
 import Catalogos from './pages/catalogos/Catalogos';
+import Categorias from './pages/categorias/Categorias';
 
 const Tareas = lazy(() => import("./pages/tareas/Tareas"));
 const Users = lazy(() => import("./pages/users/Users"));
@@ -41,6 +42,7 @@ function App() {
           />
           <Route path="clientes" element={<Clientes />} />
           <Route path="proveedores" element={<Proveedores />} />
+          <Route path="categorias" element={<Categorias />} />
           <Route path="catalogos" element={<Catalogos />} />
           <Route path="modulos" element={<Modulos />} />
           <Route path="roles" element={<Roles />} />

@@ -225,7 +225,7 @@ export interface Padre {
   id: number;
   descripcion: string;
 }
-export type Sorted = {id: number; orden: number}
+// export type Sorted = {id: number; orden: number}
 
 // TIPOS PARA LA TABLA TAREAS
 // *****************************************************
@@ -312,4 +312,17 @@ export type CampoTable = {
   text: string;
   order_dir: string;
   show: boolean
+}
+
+//--> TIPOS PARA CATEGORIAS
+// 
+export interface Categoria {
+  id: number;
+  nombre: string;
+  descripcion: string;
+  padre_id: number;
+  icon: string;
+  orden: number;
+  estado: number;
+  children?: any;
 }

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react"
 import { Button, Card, Col, Container, Form, Row, Table } from "react-bootstrap"
 import { ModuloT } from "../../core/types"
 import ModulosRolTree from "./ModulosRolTree"
-import { getTree } from "../../core/utils/funciones"
+import { getModulosTree } from "../../core/utils/funciones"
 import { rolFormInit } from "../../core/types/initials"
 import { useMutateModulosQuery } from "../../core/hooks/useModulosQuery"
 import DynaIcon from "../../core/components/DynaComponents"
@@ -139,7 +139,7 @@ const Roles: React.FC = () => {
     if(!modulosRol){
       setItemsTree(null)
     }else{
-      setItemsTree(getTree(modulosRol))
+      setItemsTree(getModulosTree(modulosRol))
     }
   }, [modulosRol])
 

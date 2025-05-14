@@ -1,13 +1,13 @@
 const beURL = import.meta.env.VITE_BE_URL;
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import useSessionStore from "../store/useSessionStore"
-import { ModuloForm, ModuloT } from "../types"
+import { Categoria } from "../types"
 import { mutationFetch } from "../services/mutationFecth";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 // ****** MUTATION ******
-export const useMutateModulosQuery = () => {
+export const useMutateCategoriasQuery = () => {
   const resetSessionStore = useSessionStore(state => state.resetSessionStore)
   const navigate = useNavigate()
   const tknSession = useSessionStore(state => state.tknSession)
@@ -18,13 +18,13 @@ export const useMutateModulosQuery = () => {
   const {mutate, isPending, data} = useMutation({
     mutationFn: mutationFetch,
     onSuccess: () => {
-      queryClient.fetchQuery({queryKey:["modulos"]});
+      queryClient.fetchQuery({queryKey:["categorias"]});
     }
   })
 
-  const getModulos = () => {
+  const getCategorias = () => {
     const params = {
-      url: beURL + "api/modulos/get_modulos",
+      url: beURL + "api/categorias/get_categorias",
       method: "POST",
       headers:{ 
         Authorization,
@@ -34,34 +34,9 @@ export const useMutateModulosQuery = () => {
     mutate(params)
   }
 
-  const getModulosSession = () => {
+  const sortCategorias = (orderedItems: Categoria[]) => {
     const params = {
-      url: beURL + "api/modulos/get_modulos_sesion",
-      method: "POST",
-      headers:{ 
-        Authorization,
-        // 'nombre-modulo': nombreModulo,
-      },
-    }
-    mutate(params)
-  }
-
-  const getModuloRol = (rol_id: number) => {
-    const params = {
-      url: beURL + "api/modulos/get_modulo_rol",
-      method: "POST",
-      headers:{ 
-        Authorization,
-        'nombre-modulo': nombreModulo,
-      },
-      body: JSON.stringify({rol_id})
-    }
-    mutate(params)
-  }
-
-  const sortModulos = (orderedItems: ModuloT[]) => {
-    const params = {
-      url: beURL + "api/modulos/sort_modulos",
+      url: beURL + "api/categorias/sort_categorias",
       method: "PUT",
       headers:{ 
         Authorization,
@@ -72,35 +47,35 @@ export const useMutateModulosQuery = () => {
     mutate(params)
   }
 
-  const updateModulo = (param: ModuloForm) => {
+  const createCategoria = (categoria:  Categoria) => {
     const params = {
-      url: beURL + "api/modulos/update_modulo",
-      method: "PUT",
-      headers:{ 
-        Authorization,
-        'nombre-modulo': nombreModulo,
-      },
-      body: JSON.stringify(param),
-    }
-    mutate(params)
-  }
-
-  const createModulo = (param:  ModuloForm) => {
-    const params = {
-      url: beURL + "api/modulos/create_modulo",
+      url: beURL + "api/categorias/create_categoria",
       method: "POST",
       headers:{ 
         Authorization,
         'nombre-modulo': nombreModulo,
       },
-      body: JSON.stringify(param),
+      body: JSON.stringify(categoria),
     }
     mutate(params)
   }
 
-  const deleteModulo = (id: number) => {
+  const updateCategoria = (categoria: Categoria) => {
     const params = {
-      url: beURL + "api/modulos/delete_modulo",
+      url: beURL + "api/categorias/update_categoria",
+      method: "PUT",
+      headers:{ 
+        Authorization,
+        'nombre-modulo': nombreModulo,
+      },
+      body: JSON.stringify(categoria),
+    }
+    mutate(params)
+  }
+
+  const deleteCategoria = (id: number) => {
+    const params = {
+      url: beURL + "api/categorias/delete_categoria",
       method: "DELETE",
       headers:{ 
         Authorization,
@@ -111,18 +86,6 @@ export const useMutateModulosQuery = () => {
     mutate(params)
   }
 
-  const updateModulosRoles = (param: any) => {
-    const params = {
-      url: beURL + "api/modulos/update_modulos_roles",
-      method: "POST",
-      headers:{ 
-        Authorization,
-        'nombre-modulo': nombreModulo,
-      },
-      body: JSON.stringify(param),
-    }
-    mutate(params)
-  }
 
   useEffect(()=>{
     if(data?.msgType === "errorToken"){
@@ -134,14 +97,11 @@ export const useMutateModulosQuery = () => {
   return {
     data, 
     isPending, 
-    createModulo, 
-    updateModulo, 
-    deleteModulo, 
-    sortModulos,
-    getModulos,
-    getModulosSession,
-    getModuloRol,
-    updateModulosRoles,
+    getCategorias,
+    sortCategorias,
+    createCategoria, 
+    updateCategoria, 
+    deleteCategoria,
   }
 }
 
