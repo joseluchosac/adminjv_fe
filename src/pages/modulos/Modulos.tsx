@@ -27,7 +27,6 @@ const Modulos:React.FC = () => {
   const {
     isPendingGetModulos,
     modulosTree,
-    setModulosTree,
     toEdit,
     moduloForm,
     setModuloForm,

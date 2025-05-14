@@ -53,7 +53,6 @@ const useModulos = () => {
     padres,
     modulosTree,
     moduloForm,
-    setModulosTree,
     toEdit,
     setModuloForm,
     actualizarPadres,
