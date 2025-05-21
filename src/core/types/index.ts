@@ -225,7 +225,6 @@ export interface Padre {
   id: number;
   descripcion: string;
 }
-// export type Sorted = {id: number; orden: number}
 
 // TIPOS PARA LA TABLA TAREAS
 // *****************************************************
@@ -310,6 +309,7 @@ export type FilterParamsOrder = {
 export type CampoTable = {
   campo_name: string;
   text: string;
+  orderable?: boolean;
   order_dir: string;
   show: boolean
 }
@@ -325,4 +325,23 @@ export interface Categoria {
   orden: number;
   estado: number;
   children?: any;
+}
+//--> TIPOS PARA TABLA LABORATORIOS
+// 
+export interface Laboratorio {
+  id: number;
+  nombre: string;
+  estado: number;
+}
+//--> TIPOS PARA TABLA MARCAS
+// 
+export interface Marca {
+  id: number;
+  nombre: string;
+  estado: number;
+}
+
+export type OptionSelect = {
+  value: number;
+  label: string
 }

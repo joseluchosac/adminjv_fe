@@ -1,8 +1,9 @@
-import Select, { StylesConfig, components } from "react-select";
+import Select, { components } from "react-select";
 import DynaIcon from "../../core/components/DynaComponents";
 import { useState } from "react";
+import { selectDark } from "../../core/utils/constants";
 
-interface ColourOption { value: string; label: string }
+// interface ColourOption { value: string; label: string }
 const options = [
   { value: 'chocolate', label: 'Chocolate', icon: "FaSun" },
   { value: 'strawberry', label: 'Strawberry', icon: "FaSun" },
@@ -11,40 +12,40 @@ const options = [
   { value: 'maracuya', label: 'Maracuya', icon: "FaSun" },
 ] 
 
-const darkStyles: StylesConfig<ColourOption> = {
-  control: (styles) => ({ ...styles, backgroundColor: '#212529' }),
-  input: (styles) => ({ ...styles, color: 'white' }),
-  singleValue: (styles) => ({ ...styles, color: 'white' }),
-  menuList: (styles) => ({ ...styles, backgroundColor: '#2b3035' }),
+// const darkStyles: StylesConfig<ColourOption> = {
+//   control: (styles) => ({ ...styles, backgroundColor: '#212529' }),
+//   input: (styles) => ({ ...styles, color: 'white' }),
+//   singleValue: (styles) => ({ ...styles, color: 'white' }),
+//   menuList: (styles) => ({ ...styles, backgroundColor: '#2b3035' }),
 
-  option: (styles, { isDisabled, isFocused, isSelected }) => {
-    return {
-      ...styles,
-      backgroundColor: isDisabled
-        ? undefined
-        : isSelected
-        ? "#2684ff"
-        : isFocused
-        ? "#2684ff20"
-        : undefined,
-      color: isDisabled
-        ? '#888'
-        : isSelected
-        ? 'white'
-        : 'white',
-      cursor: isDisabled ? 'not-allowed' : 'default',
+//   option: (styles, { isDisabled, isFocused, isSelected }) => {
+//     return {
+//       ...styles,
+//       backgroundColor: isDisabled
+//         ? undefined
+//         : isSelected
+//         ? "#2684ff"
+//         : isFocused
+//         ? "#2684ff20"
+//         : undefined,
+//       color: isDisabled
+//         ? '#888'
+//         : isSelected
+//         ? 'white'
+//         : 'white',
+//       cursor: isDisabled ? 'not-allowed' : 'default',
 
-      ':active': {
-        ...styles[':active'],
-        backgroundColor: !isDisabled
-          ? isSelected
-            ? "#2684ff"
-            : "#2684ff40"
-          : undefined,
-      },
-    };
-  },
-}
+//       ':active': {
+//         ...styles[':active'],
+//         backgroundColor: !isDisabled
+//           ? isSelected
+//             ? "#2684ff"
+//             : "#2684ff40"
+//           : undefined,
+//       },
+//     };
+//   },
+// }
 
 const CustomOption = (props: any) => {
   return (
@@ -82,7 +83,7 @@ export default function HomeReactSelect() {
           options={options}
           onChange={onChange}
           isClearable
-          styles={darkStyles}
+          styles={selectDark}
           closeMenuOnSelect={false}
           components={{ Option: CustomOption }}
           // value={options.find(el => el.value === color)}

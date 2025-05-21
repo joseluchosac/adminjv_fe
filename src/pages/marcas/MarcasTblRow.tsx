@@ -1,0 +1,105 @@
+import { CampoTable, Marca} from "../../core/types";
+import { FaEdit, FaToggleOff, FaToggleOn, FaTrash } from "react-icons/fa";
+import { useMutationMarcasQuery } from "../../core/hooks/useMarcasQuery";
+import Swal from "sweetalert2";
+import useLayoutStore from "../../core/store/useLayoutStore";
+import { useEffect } from "react";
+import { Bounce, toast } from "react-toastify";
+import { useMarcas } from "./context/MarcasContext";
+
+interface Props {
+  marca: Marca ;
+  camposMarca: CampoTable[]
+}
+
+function MarcasTblRow({ marca, camposMarca }: Props) {
+  const darkMode = useLayoutStore(state => state.layout.darkMode)
+  const {setShowMarcaFrm, setCurrentMarcaId} = useMarcas()
+  const {data, deleteMarca, updateMarca} = useMutationMarcasQuery()
+
+  const handleToEdit = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
+    e.preventDefault()
+    setCurrentMarcaId(marca.id)
+    setShowMarcaFrm(true)
+  }
+
+  const handleDelete = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
+    e.preventDefault()
+    Swal.fire({
+      icon: 'question',
+      text: `¿Desea eliminar permanentemente a ${marca.nombre}?`,
+      showCancelButton: true,
+      confirmButtonText: "Sí",
+      cancelButtonText: 'Cancelar',
+      customClass: { 
+        popup: darkMode ? 'swal-dark' : ''
+      }
+    }).then((result) => {
+      if (result.isConfirmed) {
+        deleteMarca(marca.id)
+      }
+    });
+  }
+
+  const toggleEstado = () => {
+    updateMarca({...marca, estado: marca.estado ? 0 : 1})
+  }
+
+  useEffect(() => {
+    if (!data) return
+    toast(data.msg, {
+      type: data.msgType,
+      autoClose: 3000,
+      transition: Bounce,
+    })
+  }, [data])
+  
+  return (
+    <tr className="text-nowrap">
+      {camposMarca.map((el) => {
+        const {campo_name, show} = el
+        if(show){
+          switch (campo_name) {
+            case "estado":{
+              return <td key={campo_name}>
+                {marca.estado == 0
+                  ? <div role="button" onClick={toggleEstado} title="Habilitar" data-estado="0">
+                      <FaToggleOff className="text-muted" size={"1.5rem"} />
+                    </div>
+                  : <div role="button" onClick={toggleEstado} title="Deshabilitar" data-estado="1">
+                      <FaToggleOn className="text-primary" size={"1.5rem"} />
+                    </div>
+                }
+                </td>
+            }
+            case "acciones":{
+              return (
+                <td key={campo_name}>
+                  <div className="d-flex gap-2 justify-content-start">
+                    <a onClick={handleToEdit} href="#" className="p-1" title="Editar">
+                      <FaEdit />
+                    </a>
+                    <a onClick={handleDelete} href="#" className="p-1" title="Eliminar">
+                      <FaTrash className="text-danger mb-1"/>
+                    </a>
+                  </div>
+                </td>
+              )
+            } 
+            default:{
+              return (
+                <td key={campo_name}>
+                  <div className="text-wrap">
+                    {marca[campo_name as keyof Marca]}
+                  </div>
+                </td>
+              )
+            }
+          }
+        }
+      })}
+    </tr>
+  );
+}
+
+export default MarcasTblRow;

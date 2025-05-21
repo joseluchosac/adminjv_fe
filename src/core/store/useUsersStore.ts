@@ -33,7 +33,7 @@ export const usersStoreInit = {
     {campo_name: "updated_at", text:"F actualización", order_dir:"", show: true},
   ],
   filterParamsUsers: {
-    offset: 10,
+    offset: 25,
     search: "",
     equals: [], // [{campo_name: "sucursal_id", value: "1", text:"principal", campo_text: "Sucursal"}]
     between: {campo_name: "", campo_text: "", range: ""}, // {campo_name: "created_at", campo_text:"Creado", range: "2024-12-18 00:00:00, 2024-12-19 23:59:59"}
