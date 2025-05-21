@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { useMutationConfiguracionesQuery } from "../../../core/hooks/useConfiguracionesQuery"
+import { useMutationConfigQuery } from "../../../core/hooks/useConfigQuery"
 import { FormControlElement } from "../../../core/types"
 import { LdsBar } from "../../../core/components/Loaders"
 import { Button, Col, Form, Row } from "react-bootstrap"
@@ -20,13 +20,13 @@ export default function Emails() {
     data: dataGetEmailConfig,
     isPending: isPendingGetEmailConfig,
     getEmailConfig
-  } = useMutationConfiguracionesQuery()
+  } = useMutationConfigQuery()
 
   const {
     data: dataUpdateEmailConfig,
     isPending: isPendingUpdateEmailConfig,
     updateEmailConfig
-  } = useMutationConfiguracionesQuery()
+  } = useMutationConfigQuery()
 
 
   const handleChange = (e: React.ChangeEvent<FormControlElement>) => {

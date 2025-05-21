@@ -1,4 +1,4 @@
-const beURL = import.meta.env.VITE_BE_URL;
+const apiURL = import.meta.env.VITE_API_URL;
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import useSessionStore from "../store/useSessionStore"
 import { mutationFetch } from "../services/mutationFecth";
@@ -26,7 +26,7 @@ export const useMutateRolesQuery = () => {
 
   const updateRol = (param:any) => {
     const params = {
-      url: beURL + "api/roles/update_rol",
+      url: apiURL + "roles/update_rol",
       method: "PUT",
       headers:{ 
         Authorization,
@@ -39,7 +39,7 @@ export const useMutateRolesQuery = () => {
   
   const createRol = (param:any) => {
     const params = {
-      url: beURL + "api/roles/create_rol",
+      url: apiURL + "roles/create_rol",
       method: "POST",
       headers:{ 
         Authorization,
@@ -52,7 +52,7 @@ export const useMutateRolesQuery = () => {
   
   const deleteRol = (param: any) => {
     const params = {
-      url: beURL + "api/roles/delete_rol",
+      url: apiURL + "roles/delete_rol",
       method: "DELETE",
       headers:{ 
         Authorization,

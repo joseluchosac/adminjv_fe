@@ -1,9 +1,9 @@
 import { useEffect } from "react"
-import { useMutationConfiguracionesQuery } from "../../../core/hooks/useConfiguracionesQuery"
+import { useMutationConfigQuery } from "../../../core/hooks/useConfigQuery"
 import { Table } from "react-bootstrap"
 
 export default function Locales() {
-  const {data, getEstablecimientos} = useMutationConfiguracionesQuery()
+  const {data, getEstablecimientos} = useMutationConfigQuery()
 
   useEffect(() => {
     getEstablecimientos()

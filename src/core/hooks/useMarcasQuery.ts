@@ -1,16 +1,17 @@
-const beURL = import.meta.env.VITE_BE_URL;
+const apiURL = import.meta.env.VITE_API_URL;
+import { useEffect, useState } from "react"
+import { useNavigate } from "react-router-dom";
 import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import useSessionStore from "../store/useSessionStore"
-import { useEffect, useState } from "react"
-import { mutationFetch } from "../services/mutationFecth"
-import { useNavigate } from "react-router-dom";
 import useMarcasStore, { marcasStoreInit } from "../store/useMarcasStore";
+import { mutationFetch } from "../services/mutationFecth"
 import { filterMarcasFetch } from "../services/marcasFetch";
 import { Marca } from "../types";
 
-type ActionType = "filterMarcasFull" 
-  | "getMarca" 
-  | "mutation"
+type TypeAction = 
+  "filter_full" 
+  | "get_marca" 
+  | "mutate_marca"
 
 // ****** FILTRAR ******
 export const useFilterMarcasQuery = () => {
@@ -69,7 +70,7 @@ export const useFilterMarcasQuery = () => {
 
 // ****** MUTATION ******
 export const useMutationMarcasQuery = () => {
-  const [actionType, setActionType] = useState<ActionType | "">("")
+  const [typeAction, setTypeAction] = useState<TypeAction | "">("")
   const resetSessionStore = useSessionStore(state => state.resetSessionStore)
   const navigate = useNavigate()
   const tknSession = useSessionStore(state => state.tknSession)
@@ -87,9 +88,9 @@ export const useMutationMarcasQuery = () => {
   })
 
   const filterMarcasFull = () => {// Sin Paginacion
-    setActionType("filterMarcasFull")
+    setTypeAction("filter_full")
     const params = {
-      url: beURL + "api/marcas/filter_marcas_full",
+      url: apiURL + "marcas/filter_marcas_full",
       method: "POST",
       headers:{ 
         Authorization,
@@ -101,9 +102,9 @@ export const useMutationMarcasQuery = () => {
   }
 
   const getMarca = (id: number) => {
-    setActionType("getMarca")
+    setTypeAction("get_marca")
     const params = {
-      url: beURL + "api/marcas/get_marca",
+      url: apiURL + "marcas/get_marca",
       method: "POST",
       headers:{ 
         Authorization,
@@ -115,9 +116,9 @@ export const useMutationMarcasQuery = () => {
   }
 
   const createMarca = (marca: Marca) => {
-    setActionType("mutation")
+    setTypeAction("mutate_marca")
     const params = {
-      url: beURL + "api/marcas/create_marca",
+      url: apiURL + "marcas/create_marca",
       method: "POST",
       headers:{ 
         Authorization,
@@ -129,9 +130,9 @@ export const useMutationMarcasQuery = () => {
   }
 
   const updateMarca = (marca: Marca) => {
-    setActionType("mutation")
+    setTypeAction("mutate_marca")
     const params = {
-      url: beURL + "api/marcas/update_marca",
+      url: apiURL + "marcas/update_marca",
       method: "PUT",
       headers:{ 
         Authorization,
@@ -143,9 +144,9 @@ export const useMutationMarcasQuery = () => {
   }
 
   const deleteMarca = (id: number) => {
-    setActionType("mutation")
+    setTypeAction("mutate_marca")
     const params = {
-      url: beURL + "api/marcas/delete_marca",
+      url: apiURL + "marcas/delete_marca",
       method: "DELETE",
       headers:{ 
         Authorization,
@@ -176,7 +177,7 @@ export const useMutationMarcasQuery = () => {
     createMarca,
     updateMarca,
     deleteMarca,
+    typeAction,
     reset,
-    actionType
   }
 }

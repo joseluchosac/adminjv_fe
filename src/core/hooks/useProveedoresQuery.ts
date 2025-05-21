@@ -1,4 +1,4 @@
-const beURL = import.meta.env.VITE_BE_URL;
+const apiURL = import.meta.env.VITE_API_URL;
 import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import useSessionStore from "../store/useSessionStore"
 import { useEffect, useState } from "react"
@@ -86,7 +86,7 @@ export const useMutationProveedoresQuery = () => {
 
   const filterProveedoresFull = () => {// Sin Paginacion
     const params = {
-      url: beURL + "api/proveedores/filter_proveedores_full",
+      url: apiURL + "proveedores/filter_proveedores_full",
       method: "POST",
       headers:{ 
         Authorization,
@@ -99,7 +99,7 @@ export const useMutationProveedoresQuery = () => {
 
   const getProveedor = (id: number) => {
     const params = {
-      url: beURL + "api/proveedores/get_proveedor",
+      url: apiURL + "proveedores/get_proveedor",
       method: "POST",
       headers:{ 
         Authorization,
@@ -112,7 +112,7 @@ export const useMutationProveedoresQuery = () => {
 
   const createProveedor = (param: Proveedor) => {
     const params = {
-      url: beURL + "api/proveedores/create_proveedor",
+      url: apiURL + "proveedores/create_proveedor",
       method: "POST",
       headers:{ 
         Authorization,
@@ -126,7 +126,7 @@ export const useMutationProveedoresQuery = () => {
 
   const updateProveedor = (param: Proveedor) => {
     const params = {
-      url: beURL + "api/proveedores/update_proveedor",
+      url: apiURL + "proveedores/update_proveedor",
       method: "PUT",
       headers:{ 
         Authorization,
@@ -139,7 +139,7 @@ export const useMutationProveedoresQuery = () => {
 
   const deleteProveedor = (id: number) => {
     const params = {
-      url: beURL + "api/proveedores/delete_proveedor",
+      url: apiURL + "proveedores/delete_proveedor",
       method: "DELETE",
       headers:{ 
         Authorization,
@@ -152,7 +152,7 @@ export const useMutationProveedoresQuery = () => {
 
   const consultarNroDocumento = (param: any) => {
     const params = {
-      url: beURL + "api/proveedores/consultar_nro_documento",
+      url: apiURL + "proveedores/consultar_nro_documento",
       method: "POST",
       headers:{ 
         Authorization,

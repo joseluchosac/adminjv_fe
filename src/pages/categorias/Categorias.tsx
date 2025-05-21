@@ -11,7 +11,7 @@ import { Bounce, toast } from "react-toastify"
 import Swal from "sweetalert2"
 import useLayoutStore from "../../core/store/useLayoutStore"
 
-export const categoriaFrmInit = {
+export const categoriaFormInit = {
   id: 0,
   nombre: "",
   descripcion: "",
@@ -23,7 +23,7 @@ export const categoriaFrmInit = {
 
 export default function Categorias() {
   const [categoriasTree, setCategoriasTree] = useState<Categoria[] | null>(null)
-  const [categoriaFrm, setCategoriaFrm] = useState<Categoria>(categoriaFrmInit)
+  const [categoriaForm, setCategoriaForm] = useState<Categoria>(categoriaFormInit)
   const [padres, setPadres] = useState<Padre[] | null>(null)
   const [showIconsModal, setShowIconsModal] = useState(false);
   const darkMode = useLayoutStore(state => state.layout.darkMode)
@@ -57,13 +57,13 @@ export default function Categorias() {
 
   const toEdit = (id: number) => {
     const categoriaActual = data_getCategorias?.find((el: Categoria) => el.id === id) as Categoria
-    setCategoriaFrm(categoriaActual)
+    setCategoriaForm(categoriaActual)
     actualizarPadres(id)
   }
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    if(!categoriaFrm.descripcion.trim()){
+    if(!categoriaForm.descripcion.trim()){
       toast.warning("Ingrese la descripcion", {
         autoClose: 3000,
         transition: Bounce,
@@ -81,10 +81,10 @@ export default function Categorias() {
       }
     }).then((result) => {
       if (result.isConfirmed) {
-        if(categoriaFrm.id){
-          updateCategoria(categoriaFrm)
+        if(categoriaForm.id){
+          updateCategoria(categoriaForm)
         }else{
-          createCategoria(categoriaFrm)
+          createCategoria(categoriaForm)
         }
       }
     });
@@ -92,16 +92,16 @@ export default function Categorias() {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const {name, value} = e.currentTarget
-    setCategoriaFrm({...categoriaFrm, [name]: value})
+    setCategoriaForm({...categoriaForm, [name]: value})
   }
 
   const handleResetForm = () => {
-    setCategoriaFrm(categoriaFrmInit)
+    setCategoriaForm(categoriaFormInit)
     actualizarPadres(0)
   }
 
   const handleDelete = () => {
-    const {id} = categoriaFrm
+    const {id} = categoriaForm
     if(!id){
       toast.warning("Seleccione una categoría de la lista!", {
         autoClose: 3000,
@@ -136,11 +136,11 @@ export default function Categorias() {
 
   const handleChangeSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const {name, value} = e.currentTarget
-    setCategoriaFrm({...categoriaFrm, [name]: value})
+    setCategoriaForm({...categoriaForm, [name]: value})
   }
 
   const onChooseIcon = (nameIcon: string) => {
-    setCategoriaFrm({...categoriaFrm, icon: nameIcon})
+    setCategoriaForm({...categoriaForm, icon: nameIcon})
   }
 
   useEffect(()=>{
@@ -156,7 +156,7 @@ export default function Categorias() {
       transition: Bounce,
     })
     if(data_mutate?.msgType == "success"){
-      setCategoriaFrm(categoriaFrmInit)
+      setCategoriaForm(categoriaFormInit)
     }
     getCategorias()
   }, [data_mutate])
@@ -192,8 +192,8 @@ export default function Categorias() {
         <Col className="mb-3">
           <Card>
             {
-              Boolean(categoriaFrm.id)
-              ? <Card.Header>Edición - {categoriaFrm.descripcion}</Card.Header>
+              Boolean(categoriaForm.id)
+              ? <Card.Header>Edición - {categoriaForm.descripcion}</Card.Header>
               : <Card.Header>Nueva categoría</Card.Header>
             }
             <Card.Body>
@@ -205,7 +205,7 @@ export default function Categorias() {
                       <Form.Control
                         type="text"
                         name="descripcion"
-                        value={categoriaFrm.descripcion}
+                        value={categoriaForm.descripcion}
                         onChange={handleChange}
                       />
                     </Form.Group>
@@ -215,7 +215,7 @@ export default function Categorias() {
                       <Form.Label>Padre</Form.Label>
                       <Form.Select 
                         name="padre_id"
-                        value={categoriaFrm.padre_id}
+                        value={categoriaForm.padre_id}
                         onChange={handleChangeSelect}
                       >
                         <option value="0"> - Sin padre -</option>
@@ -234,9 +234,9 @@ export default function Categorias() {
                       <Form.Control 
                         type="text" 
                         name="nombre"
-                        value={categoriaFrm.nombre}
+                        value={categoriaForm.nombre}
                         onChange={handleChange}
-                        disabled={categoriaFrm.nombre == "" && categoriaFrm.id != 0}
+                        disabled={categoriaForm.nombre == "" && categoriaForm.id != 0}
                       />
                     </Form.Group>
                   </Col>
@@ -244,7 +244,7 @@ export default function Categorias() {
                     <Form.Group className="mb-3 d-flex gap-3 align-items-center">
                       <div>Icono</div>
                       <Nav.Link href="#" onClick={() => setShowIconsModal(true)}>
-                        <DynaIcon name={categoriaFrm.icon} />
+                        <DynaIcon name={categoriaForm.icon} />
                       </Nav.Link>
                       
                     </Form.Group>

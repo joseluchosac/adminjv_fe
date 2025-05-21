@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import { Accordion, Button, Col, Form, Row } from "react-bootstrap"
 import { FormControlElement } from "../../core/types"
-import { useMutationConfiguracionesQuery } from "../../core/hooks/useConfiguracionesQuery"
+import { useMutationConfigQuery } from "../../core/hooks/useConfigQuery"
 import { ConfirmPass } from "../../core/components/ConfirmsMdl"
 import { Bounce, toast } from "react-toastify"
 import { LdsBar } from "../../core/components/Loaders"
@@ -27,12 +27,12 @@ export default function ApisConsulta() {
     data: dataGetApisNroDoc,
     isPending: isPendingGetApisNroDoc,
     getApisNroDoc
-  } = useMutationConfiguracionesQuery()
+  } = useMutationConfigQuery()
   const {
     data: dataUpdateApisNroDoc,
     isPending: isPendingUpdateApisNroDoc,
     updateApisNroDoc
-  } = useMutationConfiguracionesQuery()
+  } = useMutationConfigQuery()
 
 
   const handleChange = (e: React.ChangeEvent<FormControlElement>) => {

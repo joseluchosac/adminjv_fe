@@ -1,3 +1,4 @@
+const apiDOCS = import.meta.env.VITE_DOCS_URL;
 import { useEffect, useRef, useState } from "react";
 import { Badge, Button, Card, Col, Container, Form, Row, Stack } from "react-bootstrap";
 import { Bounce, toast } from "react-toastify";
@@ -12,7 +13,6 @@ import UserFormMdl from "./UserFormMdl";
 import UsersTbl from "./UsersTbl";
 import DynaIcon from "../../core/components/DynaComponents";
 import { UserT } from "../../core/types";
-const beURL = import.meta.env.VITE_BE_URL;
 
 export default function Users(){
   const filterParamsUsers = useUsersStore(state => state.filterParamsUsers)
@@ -92,7 +92,7 @@ export default function Users(){
 
   const handleTraerTodo = () => {
     const param = objToUriBase64(filterParamsUsers)
-    window.open(beURL+"docs/pdf/?action=users_report&p=" + param)
+    window.open(apiDOCS+"pdf/?action=users_report&p=" + param)
   }
 
   useEffect(()=>{

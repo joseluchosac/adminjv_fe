@@ -1,4 +1,4 @@
-const beURL = import.meta.env.VITE_BE_URL;
+const apiURL = import.meta.env.VITE_API_URL;
 import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import useSessionStore from "../store/useSessionStore"
 import useUsersStore, { usersStoreInit } from "../store/useUsersStore"
@@ -114,7 +114,7 @@ export const useMutationUsersQuery = () => {
 
   const filterUserFull = () => {// Sin Paginacion
     const params = {
-      url: beURL + "api/users/filter_users_full",
+      url: apiURL + "users/filter_users_full",
       method: "POST",
       headers:{ 
         Authorization,
@@ -127,7 +127,7 @@ export const useMutationUsersQuery = () => {
 
   const getUser = (id: number) => {
     const params = {
-      url: beURL + "api/users/get_user",
+      url: apiURL + "users/get_user",
       method: "POST",
       headers:{ 
         Authorization,
@@ -140,7 +140,7 @@ export const useMutationUsersQuery = () => {
 
   const getUserSession = (id: number) => {
     const params = {
-      url: beURL + "api/users/get_user_session",
+      url: apiURL + "users/get_user_session",
       method: "POST",
       headers:{ 
         Authorization,
@@ -153,7 +153,7 @@ export const useMutationUsersQuery = () => {
 
   const createUser = (param: UserFormT) => {
     const params = {
-      url: beURL + "api/users/create_user",
+      url: apiURL + "users/create_user",
       method: "POST",
       headers:{ 
         Authorization,
@@ -166,7 +166,7 @@ export const useMutationUsersQuery = () => {
 
   const signUp = (param: RegisterForm) => { // registrarse
     const params = {
-      url: beURL + "api/users/sign_up",
+      url: apiURL + "users/sign_up",
       method: "POST",
       // contentType: "application/json",
       body: JSON.stringify(param),
@@ -176,7 +176,7 @@ export const useMutationUsersQuery = () => {
 
   const updateUser = (param: UserFormT) => {
     const params = {
-      url: beURL + "api/users/update_user",
+      url: apiURL + "users/update_user",
       method: "PUT",
       headers:{ 
         Authorization,
@@ -189,7 +189,7 @@ export const useMutationUsersQuery = () => {
 
   const updateUserSession = (param: UserFormT) => {
     const params = {
-      url: beURL + "api/users/update_user_session",
+      url: apiURL + "users/update_user_session",
       method: "PUT",
       headers:{ 
         Authorization,
@@ -202,7 +202,7 @@ export const useMutationUsersQuery = () => {
 
   const deleteUser = (id: number) => {
     const params = {
-      url: beURL + "api/users/delete_user",
+      url: apiURL + "users/delete_user",
       method: "DELETE",
       headers:{ 
         Authorization,
@@ -215,7 +215,7 @@ export const useMutationUsersQuery = () => {
 
   const signIn = (param: LoginForm) => { // iniciar sesion
     const params = {
-      url: beURL + "api/users/sign_in",
+      url: apiURL + "users/sign_in",
       method: "POST",
       // contentType: "application/json",
       body: JSON.stringify(param),
@@ -225,7 +225,7 @@ export const useMutationUsersQuery = () => {
 
   const checkAuth = () => {
     const params = {
-      url: beURL + "api/users/check_auth",
+      url: apiURL + "users/check_auth",
       method: "POST",
       headers:{ 
         Authorization,
@@ -236,7 +236,7 @@ export const useMutationUsersQuery = () => {
 
   const checkPassword = (password: string) => { // En modal confirmacion con password
     const params = {
-      url: beURL + "api/users/check_password",
+      url: apiURL + "users/check_password",
       method: "POST",
       headers:{ 
         Authorization,
@@ -249,7 +249,7 @@ export const useMutationUsersQuery = () => {
 
   const getEmailByUsername = (username: string) => {
     const params = {
-      url: beURL + "api/users/get_email_by_username",
+      url: apiURL + "users/get_email_by_username",
       method: "POST",
       // contentType: "application/json",
       body: JSON.stringify({username}),
@@ -259,7 +259,7 @@ export const useMutationUsersQuery = () => {
 
   const sendCodeRestoration = (param: {email: string, username: string}) => {
     const params = {
-      url: beURL + "api/users/send_code_restoration",
+      url: apiURL + "users/send_code_restoration",
       method: "POST",
       // contentType: "application/json",
       body: JSON.stringify(param),
@@ -269,7 +269,7 @@ export const useMutationUsersQuery = () => {
   
   const restorePassword = (param: any) => {
     const params = {
-      url: beURL + "api/users/restore_password",
+      url: apiURL + "users/restore_password",
       method: "POST",
       // contentType: "application/json",
       body: JSON.stringify(param),

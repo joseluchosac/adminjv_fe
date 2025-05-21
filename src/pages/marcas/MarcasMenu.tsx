@@ -6,7 +6,7 @@ import { LdsBar } from "../../core/components/Loaders";
 import { useFilterMarcasQuery } from "../../core/hooks/useMarcasQuery";
 import useMarcasStore, { marcasStoreInit } from "../../core/store/useMarcasStore";
 import DynaIcon from "../../core/components/DynaComponents";
-import MarcaFrm from "./MarcaFrm";
+import MarcaForm from "./MarcaForm";
 import { useMarcas } from "./context/MarcasContext";
 
 export default function MarcasMenu() {
@@ -14,7 +14,7 @@ export default function MarcasMenu() {
   const filterMarcasCurrent = useMarcasStore(state => state.filterMarcasCurrent)
   const filterParamsMarcas = useMarcasStore(state => state.filterParamsMarcas)
   const setFilterParamsMarcas = useMarcasStore(state => state.setFilterParamsMarcas)
-  const {setShowMarcaFrm, setCurrentMarcaId} = useMarcas()
+  const {setShowMarcaForm, setCurrentMarcaId} = useMarcas()
   const {isFetching} = useFilterMarcasQuery();
 
   useDebounce(() => { 
@@ -28,7 +28,7 @@ export default function MarcasMenu() {
 
   const handleNuevo = () => {
     setCurrentMarcaId(0)
-    setShowMarcaFrm(true);
+    setShowMarcaForm(true);
   };
 
   useEffect(()=>{
@@ -84,7 +84,7 @@ export default function MarcasMenu() {
           </Col>
         </Row>
       </Container>
-      <MarcaFrm />
+      <MarcaForm />
     </>
   )
 }

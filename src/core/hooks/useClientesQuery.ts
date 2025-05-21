@@ -1,4 +1,4 @@
-const beURL = import.meta.env.VITE_BE_URL;
+const apiURL = import.meta.env.VITE_API_URL;
 import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import useSessionStore from "../store/useSessionStore"
 import { useEffect, useState } from "react"
@@ -86,7 +86,7 @@ export const useMutationClientesQuery = () => {
 
   const filterClientesFull = () => {// Sin Paginacion
     const params = {
-      url: beURL + "api/clientes/filter_clientes_full",
+      url: apiURL + "clientes/filter_clientes_full",
       method: "POST",
       headers:{ 
         Authorization,
@@ -99,7 +99,7 @@ export const useMutationClientesQuery = () => {
 
   const getCliente = (id: number) => {
     const params = {
-      url: beURL + "api/clientes/get_cliente",
+      url: apiURL + "clientes/get_cliente",
       method: "POST",
       headers:{ 
         Authorization,
@@ -112,7 +112,7 @@ export const useMutationClientesQuery = () => {
 
   const createCliente = (param: Cliente) => {
     const params = {
-      url: beURL + "api/clientes/create_cliente",
+      url: apiURL + "clientes/create_cliente",
       method: "POST",
       headers:{ 
         Authorization,
@@ -126,7 +126,7 @@ export const useMutationClientesQuery = () => {
 
   const updateCliente = (param: Cliente) => {
     const params = {
-      url: beURL + "api/clientes/update_cliente",
+      url: apiURL + "clientes/update_cliente",
       method: "PUT",
       headers:{ 
         Authorization,
@@ -139,7 +139,7 @@ export const useMutationClientesQuery = () => {
 
   const deleteCliente = (id: number) => {
     const params = {
-      url: beURL + "api/clientes/delete_cliente",
+      url: apiURL + "clientes/delete_cliente",
       method: "DELETE",
       headers:{ 
         Authorization,
@@ -152,7 +152,7 @@ export const useMutationClientesQuery = () => {
 
   const consultarNroDocumento = (param: any) => {
     const params = {
-      url: beURL + "api/clientes/consultar_nro_documento",
+      url: apiURL + "clientes/consultar_nro_documento",
       method: "POST",
       headers:{ 
         Authorization,

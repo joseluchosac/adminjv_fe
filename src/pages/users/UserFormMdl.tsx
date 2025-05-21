@@ -63,7 +63,7 @@ function FormUser({setTitle}: Props){
       showCancelButton: true,
       confirmButtonText: "Sí",
       cancelButtonText: 'Cancelar',
-      target: document.getElementById('frm_users'),
+      target: document.getElementById('form_users'),
       customClass: { 
         popup: darkMode ? 'swal-dark' : ''
       }
@@ -85,7 +85,7 @@ function FormUser({setTitle}: Props){
       showCancelButton: true,
       confirmButtonText: "Sí",
       cancelButtonText: 'Cancelar',
-      target: document.getElementById('frm_users'),
+      target: document.getElementById('form_users'),
       customClass: { 
         popup: darkMode ? 'swal-dark' : ''
       }
@@ -145,7 +145,7 @@ function FormUser({setTitle}: Props){
   }, [dataOnMutate])
 
   return (
-    <Form onSubmit={handleSubmit(submit)} id="frm_users">
+    <Form onSubmit={handleSubmit(submit)} id="form_users">
       {isPendingOnMutate && <LdsBar />}
       <Row>
         <Form.Group as={Col} md={6} xl={4} className="mb-3">

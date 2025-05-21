@@ -21,7 +21,7 @@ type Producto = {
   estado: number;
 }
 
-const productoFrmInit = {
+const productoFormInit = {
   id: 0,
   descripcion: "",
   marca_id: null,
@@ -56,34 +56,34 @@ function Formulario() {
     setValue,
     control,
     clearErrors
-  } = useForm<Producto>({defaultValues: productoFrmInit})
+  } = useForm<Producto>({defaultValues: productoFormInit})
 
 
-  const abortLaboratoriosControllerRef = useRef<AbortController | null>(null);
-  const abortMarcasControllerRef = useRef<AbortController | null>(null);
+  const abortLaboratorios = useRef<AbortController | null>(null);
+  const abortMarcas = useRef<AbortController | null>(null);
 
   useEffect(() => {
     return () => {
-      abortLaboratoriosControllerRef.current?.abort(); // ✅ Cancela la petición al desmontar
-      abortMarcasControllerRef.current?.abort();
+      abortLaboratorios.current?.abort(); // ✅ Cancela la petición al desmontar
+      abortMarcas.current?.abort();
     };
   }, []);
 
   const loadMarcasOptions =  debounce((search: string, callback: any) => {
-    abortMarcasControllerRef.current?.abort(); // ✅ Cancela la petición anterior
-    abortMarcasControllerRef.current = new AbortController();
+    abortMarcas.current?.abort(); // ✅ Cancela la petición anterior
+    abortMarcas.current = new AbortController();
     const filtered = {...filterParamsMarcas, search}
-    filterMarcasFetch({filterParamsMarcas: filtered, pageParam:1, token: tknSession, signal: abortMarcasControllerRef.current.signal })
+    filterMarcasFetch({filterParamsMarcas: filtered, pageParam:1, token: tknSession, signal: abortMarcas.current.signal })
     .then(data=>{
       callback(data.filas.map(el=>({value:el.id, label:el.nombre})))
     })
   },500)
 
   const loadLaboratoriosOptions =  debounce((search: string, callback: any) => {
-    abortLaboratoriosControllerRef.current?.abort(); // ✅ Cancela la petición anterior
-    abortLaboratoriosControllerRef.current = new AbortController();
+    abortLaboratorios.current?.abort(); // ✅ Cancela la petición anterior
+    abortLaboratorios.current = new AbortController();
     const filtered = {...filterParamsLaboratorios, search}
-    filterLaboratoriosFetch({filterParamsLaboratorios: filtered, pageParam:1, token: tknSession, signal: abortLaboratoriosControllerRef.current.signal })
+    filterLaboratoriosFetch({filterParamsLaboratorios: filtered, pageParam:1, token: tknSession, signal: abortLaboratorios.current.signal })
     .then(data=>{
       callback(data.filas.map(el=>({value:el.id, label:el.nombre})))
     })
@@ -171,7 +171,7 @@ function Formulario() {
         reset(unProducto)
       }}>set producto</button>
       <button onClick={()=>{
-        reset(productoFrmInit)
+        reset(productoFormInit)
       }}>reset</button>
     </Container>
   )

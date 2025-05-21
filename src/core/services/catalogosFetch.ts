@@ -1,4 +1,4 @@
-const apiURL = import.meta.env.VITE_BE_URL + "api/"
+const apiURL = import.meta.env.VITE_API_URL
 
 export const getCatalogosFetch = async ({token, signal}: any) => {
   const options: RequestInit = {

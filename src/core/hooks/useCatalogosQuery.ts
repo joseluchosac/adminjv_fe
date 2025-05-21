@@ -1,3 +1,4 @@
+const apiURL = import.meta.env.VITE_API_URL
 import { useMutation, useQuery } from "@tanstack/react-query"
 import useSessionStore from "../store/useSessionStore"
 import { useEffect, useRef } from "react"
@@ -6,7 +7,6 @@ import useCatalogosStore from "../store/useCatalogosStore"
 import { mutationFetch } from "../services/mutationFecth"
 import { useNavigate } from "react-router-dom"
 import { Catalogos, TipoComprobante } from "../types/catalogosTypes"
-const apiURL = import.meta.env.VITE_BE_URL + "api/"
 
 type GetProvincias = {departamento:string}
 type GetDistritos = {departamento: string, provincia: string}

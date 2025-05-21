@@ -55,7 +55,7 @@ export default function TiposComprobante() {
       showCancelButton: true,
       confirmButtonText: "Sí",
       cancelButtonText: 'Cancelar',
-      // target: document.getElementById('frm_users'),
+      // target: document.getElementById('form_users'),
       customClass: { 
         popup: darkMode ? 'swal-dark' : ''
       }
@@ -82,7 +82,7 @@ export default function TiposComprobante() {
       showCancelButton: true,
       confirmButtonText: "Sí",
       cancelButtonText: 'Cancelar',
-      // target: document.getElementById('frm_users'),
+      // target: document.getElementById('form_users'),
       customClass: { 
         popup: darkMode ? 'swal-dark' : ''
       }

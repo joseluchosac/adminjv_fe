@@ -104,7 +104,7 @@ export default function ClienteFormMdl({onChooseCliente}: Props) {
       showCancelButton: true,
       confirmButtonText: "Sí",
       cancelButtonText: 'Cancelar',
-      target: document.getElementById('frm_cliente'),
+      target: document.getElementById('form_cliente'),
       customClass: { 
         popup: darkMode ? 'swal-dark' : ''
       }
@@ -213,7 +213,7 @@ export default function ClienteFormMdl({onChooseCliente}: Props) {
           <Modal.Title>{currentClienteId ? "Editar cliente" : "Nuevo cliente"}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <Form onSubmit={handleSubmit(submit)} id="frm_cliente">
+          <Form onSubmit={handleSubmit(submit)} id="form_cliente">
             {isPendingMutate && <LdsBar />}
             {isPendingConsultarNroDocumento && <LdsBar />}
             <Row>

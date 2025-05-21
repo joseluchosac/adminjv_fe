@@ -14,13 +14,13 @@ interface Props {
 
 function MarcasTblRow({ marca, camposMarca }: Props) {
   const darkMode = useLayoutStore(state => state.layout.darkMode)
-  const {setShowMarcaFrm, setCurrentMarcaId} = useMarcas()
+  const {setShowMarcaForm, setCurrentMarcaId} = useMarcas()
   const {data, deleteMarca, updateMarca} = useMutationMarcasQuery()
 
   const handleToEdit = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
     e.preventDefault()
     setCurrentMarcaId(marca.id)
-    setShowMarcaFrm(true)
+    setShowMarcaForm(true)
   }
 
   const handleDelete = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {

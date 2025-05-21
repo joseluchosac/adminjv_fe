@@ -1,5 +1,5 @@
+const apiURL = import.meta.env.VITE_API_URL;
 import { FilterParams } from "../types";
-const beURL = import.meta.env.VITE_BE_URL;
 
 type FilterFetch = {
   pageParam: number;
@@ -21,7 +21,7 @@ export const filterProveedoresFetch = async({filterParamsProveedores, pageParam,
   if(token){
     options.headers = {...options.headers, Authorization: "Bearer " + token}
   }
-  const res = await fetch(`${beURL}api/proveedores/filter_proveedores?page=${pageParam}`, options)
+  const res = await fetch(`${apiURL}proveedores/filter_proveedores?page=${pageParam}`, options)
   return res.json()
 }
 

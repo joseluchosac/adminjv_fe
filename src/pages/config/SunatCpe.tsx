@@ -1,17 +1,17 @@
 import { useEffect, useRef, useState } from "react";
 import { Accordion, Button, Col, Form, Row } from "react-bootstrap";
 import { FormControlElement } from "../../core/types";
-import { useMutationConfiguracionesQuery } from "../../core/hooks/useConfiguracionesQuery";
+import { useMutationConfigQuery } from "../../core/hooks/useConfigQuery";
 import { ConfirmPass } from "../../core/components/ConfirmsMdl";
 import { Bounce, toast } from "react-toastify";
 import { LdsBar } from "../../core/components/Loaders";
 
-const cpeFactInit = {
+const formCpeFactInit = {
   desarrollo: "",
   produccion: "",
   default: "",
 }
-const cpeGuiaInit = {
+const formCpeGuiaInit = {
   desarrollo_client_id: "",
   produccion_client_id: "",
   desarrollo_client_secret: "",
@@ -23,55 +23,43 @@ const cpeGuiaInit = {
   default: "",
 }
 
-const usuarioSolSecInit = {
+const formUsuarioSolSecInit = {
   usuario_sol: "",
   clave_sol: ""
 }
 
 export default function SunatCpe() {
-  const [formCpeFact, setFormCpeFact] = useState(cpeFactInit)
-  const [formCpeGuia, setFormCpeGuia] = useState(cpeGuiaInit)
-  const [formUsuarioSolSec, setFormUsuarioSolSec] = useState(usuarioSolSecInit)
+  const [formCpeFact, setFormCpeFact] = useState(formCpeFactInit)
+  const [formCpeGuia, setFormCpeGuia] = useState(formCpeGuiaInit)
+  const [formUsuarioSolSec, setFormUsuarioSolSec] = useState(formUsuarioSolSecInit)
   const [showConfirmPass, setShowConfirmPass] = useState(false)
 
   const formActual = useRef('')
 
   const {
-    data: dataGetCpeFact,
-    isPending: isPendingGetCpeFact,
-    getCpeFact
-  } = useMutationConfiguracionesQuery()
+    data: cpeFact,
+    isPending: isPending_cpeFact,
+    getCpeFact,
+  } = useMutationConfigQuery()
+  const {
+    data: cpeGuia,
+    isPending: isPending_cpeGuia,
+    getCpeGuia,
+  } = useMutationConfigQuery()
+  const {
+    data: usuarioSolSec,
+    isPending: isPending_usuarioSolSec,
+    getUsuarioSolSec,
+  } = useMutationConfigQuery()
 
   const {
-    data: dataUpdateCpeFact,
-    isPending: isPendingUpdateCpeFact,
-    updateCpeFact
-  } = useMutationConfiguracionesQuery()
-
-  const {
-    data: dataGetCpeGuia,
-    isPending: isPendingGetCpeGuia,
-    getCpeGuia
-  } = useMutationConfiguracionesQuery()
-
-  const {
-    data: dataUpdateCpeGuia,
-    isPending: isPendingUpdateCpeGuia,
-    updateCpeGuia
-  } = useMutationConfiguracionesQuery()
-
-  const {
-    data: dataGetUsuarioSolSec,
-    isPending: isPendingGetUsuarioSolSec,
-    getUsuarioSolSec
-  } = useMutationConfiguracionesQuery()
-
-  const {
-    data: dataUpdateUsuarioSolSec,
-    isPending: isPendingUpdateUsuarioSolSec,
-    updateUsuarioSolSec
-  } = useMutationConfiguracionesQuery()
-
+    data,
+    isPending,
+    updateCpeFact,
+    updateCpeGuia,
+    updateUsuarioSolSec,
+    typeAction
+  } = useMutationConfigQuery()
 
   const handleChange = (e: React.ChangeEvent<FormControlElement>) => {
     const {name, value} = e.target
@@ -109,46 +97,29 @@ export default function SunatCpe() {
   },[])
 
   useEffect(() => {
-    if(!dataGetCpeFact) return
-    setFormCpeFact(JSON.parse(dataGetCpeFact.doc_value))
-  },[dataGetCpeFact])
-  
+    if(!cpeFact) return
+    setFormCpeFact(JSON.parse(cpeFact.doc_value))
+  },[cpeFact])
   useEffect(() => {
-    if(!dataGetCpeGuia) return
-    setFormCpeGuia(JSON.parse(dataGetCpeGuia.doc_value))
-  },[dataGetCpeGuia])
+    if(!cpeGuia) return
+    setFormCpeGuia(JSON.parse(cpeGuia.doc_value))
+  },[cpeGuia])
+  useEffect(() => {
+    if(!usuarioSolSec) return
+    setFormUsuarioSolSec(JSON.parse(usuarioSolSec.doc_value))
+  },[usuarioSolSec])
 
   useEffect(() => {
-    if(!dataGetUsuarioSolSec) return
-    setFormUsuarioSolSec(JSON.parse(dataGetUsuarioSolSec.doc_value))
-  },[dataGetUsuarioSolSec])
+    if(!data) return
+    if(typeAction.includes("mutate")){
+      toast(data?.msg, {
+        type: data?.msgType,
+        autoClose: 3000,
+        transition: Bounce,
+      })
+    }
+  },[data])
 
-  useEffect(() => {
-    if(!dataUpdateCpeFact) return
-    toast(dataUpdateCpeFact?.msg, {
-      type: dataUpdateCpeFact?.msgType,
-      autoClose: 3000,
-      transition: Bounce,
-    })
-  },[dataUpdateCpeFact])
-
-  useEffect(() => {
-    if(!dataUpdateCpeGuia) return
-    toast(dataUpdateCpeGuia?.msg, {
-      type: dataUpdateCpeGuia?.msgType,
-      autoClose: 3000,
-      transition: Bounce,
-    })
-  },[dataUpdateCpeGuia])
-
-  useEffect(() => {
-    if(!dataUpdateUsuarioSolSec) return
-    toast(dataUpdateUsuarioSolSec?.msg, {
-      type: dataUpdateUsuarioSolSec?.msgType,
-      autoClose: 3000,
-      transition: Bounce,
-    })
-  },[dataUpdateUsuarioSolSec])
 
   return (
     <div className='position-relative'>
@@ -156,7 +127,7 @@ export default function SunatCpe() {
         <Accordion.Item eventKey="0">
           <Accordion.Header>MODO FACTURACIÓN / WEBSERVICE SUNAT</Accordion.Header>
           <Accordion.Body className="position-relative">
-            {(isPendingGetCpeFact || isPendingUpdateCpeFact) && <LdsBar />}
+            {(isPending_cpeFact || isPending && typeAction==="mutate_cpe_fact") && <LdsBar />}
             <Form className='mx-4' onSubmit={handleSubmit} data-form="formCpeFact">
               <Form.Group as={Row} className="mb-3">
                 <Form.Label column sm="2">Desarrollo</Form.Label>
@@ -200,7 +171,7 @@ export default function SunatCpe() {
         <Accordion.Item eventKey="1">
           <Accordion.Header>MODO GUÍA DE REMISIÓN / API SUNAT</Accordion.Header>
           <Accordion.Body className="position-relative">
-            {(isPendingGetCpeGuia || isPendingUpdateCpeGuia) && <LdsBar />}
+            {(isPending_cpeGuia || isPending && typeAction==="mutate_cpe_guia") && <LdsBar />}
             <Form className='mx-4' onSubmit={handleSubmit} data-form="formCpeGuia">
               <Form.Group as={Row} className="mb-3">
                 <Form.Label column sm="3">Client Id desarrollo</Form.Label>
@@ -303,7 +274,7 @@ export default function SunatCpe() {
         <Accordion.Item eventKey="2">
           <Accordion.Header>USUARIO SOL SECUNDARIO</Accordion.Header>
           <Accordion.Body className="position-relative">
-            {(isPendingGetUsuarioSolSec || isPendingUpdateUsuarioSolSec) && <LdsBar />}
+            {(isPending_usuarioSolSec || isPending && typeAction==="mutate_usuario_sol_sec") && <LdsBar />}
             <Form className='mx-4' onSubmit={handleSubmit} data-form="formUsuarioSolSec">
               <Form.Group as={Row} className="mb-3">
                 <Form.Label column sm="3">Usuario SOL</Form.Label>

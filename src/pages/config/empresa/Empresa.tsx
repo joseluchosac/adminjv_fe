@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import useSessionStore from "../../../core/store/useSessionStore"
-import { useMutationConfiguracionesQuery } from "../../../core/hooks/useConfiguracionesQuery"
+import { useMutationConfigQuery } from "../../../core/hooks/useConfigQuery"
 import { useForm, useWatch } from "react-hook-form"
 import { type Empresa } from "../../../core/types"
 import { Ubigeo } from "../../../core/types/catalogosTypes"
@@ -22,14 +22,14 @@ export default function Empresa() {
       // isError: isErrorGetEmpresa, 
       isPending: isPendingGetEmpresa, 
       getEmpresa,
-      resetValues: resetEmpresa,
-    } = useMutationConfiguracionesQuery()
+      reset: resetEmpresa,
+    } = useMutationConfigQuery()
     const {
       data: dataUpdateEmpresa,
       // isError: isErrorActualizar, 
       isPending: isPendingUpdateEmpresa, 
       updateEmpresa 
-    } = useMutationConfiguracionesQuery()
+    } = useMutationConfigQuery()
     const {
       register, 
       formState, 

@@ -104,7 +104,7 @@ export default function ProveedorFormMdl({onChooseProveedor}: Props) {
       showCancelButton: true,
       confirmButtonText: "Sí",
       cancelButtonText: 'Cancelar',
-      target: document.getElementById('frm_proveedor'),
+      target: document.getElementById('form_proveedor'),
       customClass: { 
         popup: darkMode ? 'swal-dark' : ''
       }
@@ -213,7 +213,7 @@ export default function ProveedorFormMdl({onChooseProveedor}: Props) {
           <Modal.Title>{currentProveedorId ? "Editar proveedor" : "Nuevo proveedor"}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <Form onSubmit={handleSubmit(submit)} id="frm_proveedor">
+          <Form onSubmit={handleSubmit(submit)} id="form_proveedor">
             {isPendingMutate && <LdsBar />}
             {isPendingConsultarNroDocumento && <LdsBar />}
             <Row>

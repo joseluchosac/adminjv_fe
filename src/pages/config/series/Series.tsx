@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { useMutationConfiguracionesQuery } from "../../../core/hooks/useConfiguracionesQuery"
+import { useMutationConfigQuery } from "../../../core/hooks/useConfigQuery"
 import { Button, Card, Col, Form, InputGroup, ListGroup, Row, Table } from "react-bootstrap"
 import { Establecimiento, SerieEstablecimiento } from "../../../core/types/catalogosTypes"
 import { FaSave, FaUndo } from "react-icons/fa";
@@ -20,12 +20,12 @@ export default function Series() {
   const {
     data: data_getEstablecimientos, 
     getEstablecimientos
-  }: DataEstablecimientos  = useMutationConfiguracionesQuery()
+  }: DataEstablecimientos  = useMutationConfigQuery()
 
   const {
     data: data_getSeriesEstablecimiento, 
     getSeriesEstablecimiento
-  }: DataSeriesEstablecimiento = useMutationConfiguracionesQuery()
+  }: DataSeriesEstablecimiento = useMutationConfigQuery()
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const {idx, prefix} = e.currentTarget.dataset

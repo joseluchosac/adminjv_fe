@@ -52,7 +52,7 @@ export default function LaboratorioFormMdl({onChooseLaboratorio}: Props) {
       showCancelButton: true,
       confirmButtonText: "Sí",
       cancelButtonText: 'Cancelar',
-      target: document.getElementById('frm_laboratorio'),
+      target: document.getElementById('form_laboratorio'),
       customClass: { 
         popup: darkMode ? 'swal-dark' : ''
       }
@@ -128,7 +128,7 @@ export default function LaboratorioFormMdl({onChooseLaboratorio}: Props) {
           <Modal.Title>{currentLaboratorioId ? "Editar laboratorio" : "Nuevo laboratorio"}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <Form onSubmit={handleSubmit(submit)} id="frm_laboratorio">
+          <Form onSubmit={handleSubmit(submit)} id="form_laboratorio">
             {isPendingMutate && <LdsBar />}
             <Row>
               <Form.Group as={Col} md={12} className="mb-3">

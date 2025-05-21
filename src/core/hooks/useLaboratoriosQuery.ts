@@ -1,23 +1,26 @@
-const beURL = import.meta.env.VITE_BE_URL;
+const apiURL = import.meta.env.VITE_API_URL;
+import { useEffect, useState } from "react"
+import { useNavigate } from "react-router-dom";
 import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import useSessionStore from "../store/useSessionStore"
-import { useEffect, useState } from "react"
-import { mutationFetch } from "../services/mutationFecth"
-import { useNavigate } from "react-router-dom";
 import useLaboratoriosStore, { laboratoriosStoreInit } from "../store/useLaboratoriosStore";
+import { mutationFetch } from "../services/mutationFecth"
 import { filterLaboratoriosFetch } from "../services/laboratoriosFetch";
 import { Laboratorio } from "../types";
 
+type TypeAction = 
+  "filter_full" 
+  | "get_laboratorio" 
+  | "mutate_laboratorio"
 
 // ****** FILTRAR  ******
 export const useFilterLaboratoriosQuery = () => {
-  // const navigate = useNavigate()
   const [isEnabledQuery, setIsEnabledQuery] = useState(false)
   const tknSession = useSessionStore(state => state.tknSession)
   const filterParamsLaboratorios = useLaboratoriosStore(state => state.filterParamsLaboratorios)
-  const queryClient = useQueryClient()
   const setFilterParamsLaboratorios = useLaboratoriosStore(state => state.setFilterParamsLaboratorios)
-
+  const navigate = useNavigate()
+  const queryClient = useQueryClient()
 
   const {fetchNextPage, data, refetch, isError, isLoading, isFetching, hasNextPage} = useInfiniteQuery({
     queryKey: ['laboratorios'],
@@ -49,11 +52,11 @@ export const useFilterLaboratoriosQuery = () => {
     }
   }, [filterParamsLaboratorios])
 
-  // useEffect(()=>{
-  //   if(data?.pages[data?.pages.length-1].msgType === "errorToken"){
-  //     navigate("/auth")
-  //   }
-  // },[data])
+  useEffect(()=>{
+    if(data?.pages[data?.pages.length-1].msgType === "errorToken"){
+      navigate("/auth")
+    }
+  },[data])
 
   return {
     data,
@@ -65,8 +68,9 @@ export const useFilterLaboratoriosQuery = () => {
   }
 }
 
-// ****** MUTATION CLIENTES ******
+// ****** MUTATION ******
 export const useMutationLaboratoriosQuery = () => {
+  const [typeAction, setTypeAction] = useState<TypeAction | "">("")
   const resetSessionStore = useSessionStore(state => state.resetSessionStore)
   const navigate = useNavigate()
   const tknSession = useSessionStore(state => state.tknSession)
@@ -85,8 +89,9 @@ export const useMutationLaboratoriosQuery = () => {
   })
 
   const filterLaboratoriosFull = () => {// Sin Paginacion
+    setTypeAction("filter_full")
     const params = {
-      url: beURL + "api/laboratorios/filter_laboratorios_full",
+      url: apiURL + "laboratorios/filter_laboratorios_full",
       method: "POST",
       headers:{ 
         Authorization,
@@ -98,8 +103,9 @@ export const useMutationLaboratoriosQuery = () => {
   }
 
   const getLaboratorio = (id: number) => {
+    setTypeAction("get_laboratorio")
     const params = {
-      url: beURL + "api/laboratorios/get_laboratorio",
+      url: apiURL + "laboratorios/get_laboratorio",
       method: "POST",
       headers:{ 
         Authorization,
@@ -110,55 +116,44 @@ export const useMutationLaboratoriosQuery = () => {
     mutate(params)
   }
 
-  const createLaboratorio = (param: Laboratorio) => {
+  const createLaboratorio = (laboratorio: Laboratorio) => {
+    setTypeAction("mutate_laboratorio")
     const params = {
-      url: beURL + "api/laboratorios/create_laboratorio",
+      url: apiURL + "laboratorios/create_laboratorio",
       method: "POST",
       headers:{ 
         Authorization,
         'nombre-modulo': nombreModulo,
       },
-      body: JSON.stringify(param),
+      body: JSON.stringify(laboratorio),
     }
     mutate(params)
   }
 
-
-  const updateLaboratorio = (param: Laboratorio) => {
+  const updateLaboratorio = (laboratorio: Laboratorio) => {
+    setTypeAction("mutate_laboratorio")
     const params = {
-      url: beURL + "api/laboratorios/update_laboratorio",
+      url: apiURL + "laboratorios/update_laboratorio",
       method: "PUT",
       headers:{ 
         Authorization,
         'nombre-modulo': nombreModulo,
       },
-      body: JSON.stringify(param),
+      body: JSON.stringify(laboratorio),
     }
     mutate(params)
   }
 
   const deleteLaboratorio = (id: number) => {
+    setTypeAction("mutate_laboratorio")
     const params = {
-      url: beURL + "api/laboratorios/delete_laboratorio",
+      url: apiURL + "laboratorios/delete_laboratorio",
       method: "DELETE",
       headers:{ 
         Authorization,
         'nombre-modulo': nombreModulo,
       },
       body: JSON.stringify({id}),
-    }
-    mutate(params)
-  }
-
-  const consultarNroDocumento = (param: any) => {
-    const params = {
-      url: beURL + "api/laboratorios/consultar_nro_documento",
-      method: "POST",
-      headers:{ 
-        Authorization,
-        'nombre-modulo': nombreModulo,
-      },
-      body: JSON.stringify(param),
     }
     mutate(params)
   }
@@ -183,8 +178,8 @@ export const useMutationLaboratoriosQuery = () => {
     createLaboratorio,
     updateLaboratorio,
     deleteLaboratorio,
-    consultarNroDocumento,
-    reset
+    typeAction,
+    reset,
   }
 }
 

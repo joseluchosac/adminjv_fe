@@ -1,4 +1,4 @@
-const beURL = import.meta.env.VITE_BE_URL;
+const apiURL = import.meta.env.VITE_API_URL;
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import useSessionStore from "../store/useSessionStore"
 import { ModuloForm, ModuloT } from "../types"
@@ -24,7 +24,7 @@ export const useMutateModulosQuery = () => {
 
   const getModulos = () => {
     const params = {
-      url: beURL + "api/modulos/get_modulos",
+      url: apiURL + "modulos/get_modulos",
       method: "POST",
       headers:{ 
         Authorization,
@@ -36,7 +36,7 @@ export const useMutateModulosQuery = () => {
 
   const getModulosSession = () => {
     const params = {
-      url: beURL + "api/modulos/get_modulos_sesion",
+      url: apiURL + "modulos/get_modulos_sesion",
       method: "POST",
       headers:{ 
         Authorization,
@@ -48,7 +48,7 @@ export const useMutateModulosQuery = () => {
 
   const getModuloRol = (rol_id: number) => {
     const params = {
-      url: beURL + "api/modulos/get_modulo_rol",
+      url: apiURL + "modulos/get_modulo_rol",
       method: "POST",
       headers:{ 
         Authorization,
@@ -61,7 +61,7 @@ export const useMutateModulosQuery = () => {
 
   const sortModulos = (orderedItems: ModuloT[]) => {
     const params = {
-      url: beURL + "api/modulos/sort_modulos",
+      url: apiURL + "modulos/sort_modulos",
       method: "PUT",
       headers:{ 
         Authorization,
@@ -74,7 +74,7 @@ export const useMutateModulosQuery = () => {
 
   const updateModulo = (param: ModuloForm) => {
     const params = {
-      url: beURL + "api/modulos/update_modulo",
+      url: apiURL + "modulos/update_modulo",
       method: "PUT",
       headers:{ 
         Authorization,
@@ -87,7 +87,7 @@ export const useMutateModulosQuery = () => {
 
   const createModulo = (param:  ModuloForm) => {
     const params = {
-      url: beURL + "api/modulos/create_modulo",
+      url: apiURL + "modulos/create_modulo",
       method: "POST",
       headers:{ 
         Authorization,
@@ -100,7 +100,7 @@ export const useMutateModulosQuery = () => {
 
   const deleteModulo = (id: number) => {
     const params = {
-      url: beURL + "api/modulos/delete_modulo",
+      url: apiURL + "modulos/delete_modulo",
       method: "DELETE",
       headers:{ 
         Authorization,
@@ -113,7 +113,7 @@ export const useMutateModulosQuery = () => {
 
   const updateModulosRoles = (param: any) => {
     const params = {
-      url: beURL + "api/modulos/update_modulos_roles",
+      url: apiURL + "modulos/update_modulos_roles",
       method: "POST",
       headers:{ 
         Authorization,

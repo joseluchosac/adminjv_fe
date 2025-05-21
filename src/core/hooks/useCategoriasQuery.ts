@@ -1,4 +1,4 @@
-const beURL = import.meta.env.VITE_BE_URL;
+const apiURL = import.meta.env.VITE_API_URL;
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import useSessionStore from "../store/useSessionStore"
 import { Categoria } from "../types"
@@ -24,7 +24,7 @@ export const useMutateCategoriasQuery = () => {
 
   const getCategorias = () => {
     const params = {
-      url: beURL + "api/categorias/get_categorias",
+      url: apiURL + "categorias/get_categorias",
       method: "POST",
       headers:{ 
         Authorization,
@@ -36,7 +36,7 @@ export const useMutateCategoriasQuery = () => {
 
   const sortCategorias = (orderedItems: Categoria[]) => {
     const params = {
-      url: beURL + "api/categorias/sort_categorias",
+      url: apiURL + "categorias/sort_categorias",
       method: "PUT",
       headers:{ 
         Authorization,
@@ -49,7 +49,7 @@ export const useMutateCategoriasQuery = () => {
 
   const createCategoria = (categoria:  Categoria) => {
     const params = {
-      url: beURL + "api/categorias/create_categoria",
+      url: apiURL + "categorias/create_categoria",
       method: "POST",
       headers:{ 
         Authorization,
@@ -62,7 +62,7 @@ export const useMutateCategoriasQuery = () => {
 
   const updateCategoria = (categoria: Categoria) => {
     const params = {
-      url: beURL + "api/categorias/update_categoria",
+      url: apiURL + "categorias/update_categoria",
       method: "PUT",
       headers:{ 
         Authorization,
@@ -75,7 +75,7 @@ export const useMutateCategoriasQuery = () => {
 
   const deleteCategoria = (id: number) => {
     const params = {
-      url: beURL + "api/categorias/delete_categoria",
+      url: apiURL + "categorias/delete_categoria",
       method: "DELETE",
       headers:{ 
         Authorization,

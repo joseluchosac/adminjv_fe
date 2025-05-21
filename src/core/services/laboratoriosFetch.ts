@@ -1,5 +1,5 @@
+const apiURL = import.meta.env.VITE_API_URL;
 import { FilterParams, Laboratorio } from "../types";
-const beURL = import.meta.env.VITE_BE_URL;
 
 type FilterFetch = {
   filterParamsLaboratorios: FilterParams;
@@ -39,7 +39,7 @@ export const filterLaboratoriosFetch = async ({
   if(token){
     options.headers = {...options.headers, Authorization: "Bearer " + token}
   }
-  const res = await fetch(`${beURL}api/laboratorios/filter_laboratorios?page=${pageParam}`, options)
+  const res = await fetch(`${apiURL}laboratorios/filter_laboratorios?page=${pageParam}`, options)
   return res.json()
 }
 
