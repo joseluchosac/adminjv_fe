@@ -4,7 +4,7 @@ import { FormControlElement } from "../../../core/types"
 import { LdsBar } from "../../../core/components/Loaders"
 import { Button, Col, Form, Row } from "react-bootstrap"
 
-const emailConfigInit = {
+const emailConfigFormInit = {
   host: "",
   username: "",
   password: "",
@@ -14,29 +14,29 @@ const emailConfigInit = {
 }
 
 export default function Emails() {
-  const [formEmailConfig, setFormEmailConfig] = useState(emailConfigInit)
+  const [emailConfigForm, setEmailConfigForm] = useState(emailConfigFormInit)
   
   const {
-    data: dataGetEmailConfig,
-    isPending: isPendingGetEmailConfig,
+    data: emailConfig,
+    isPending: isPendingEmailConfig,
     getEmailConfig
   } = useMutationConfigQuery()
 
   const {
-    data: dataUpdateEmailConfig,
-    isPending: isPendingUpdateEmailConfig,
+    data: mutation,
+    isPending: isPendingMutation,
     updateEmailConfig
   } = useMutationConfigQuery()
 
 
   const handleChange = (e: React.ChangeEvent<FormControlElement>) => {
     const {name, value} = e.target
-    setFormEmailConfig({...formEmailConfig, [name]: value})
+    setEmailConfigForm({...emailConfigForm, [name]: value})
   }
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    updateEmailConfig(formEmailConfig)
+    updateEmailConfig(emailConfigForm)
   }
 
   useEffect(() => {
@@ -44,25 +44,25 @@ export default function Emails() {
   }, [])
 
   useEffect(()=>{
-    if(!dataGetEmailConfig) return
-    setFormEmailConfig(JSON.parse(dataGetEmailConfig.doc_value))
-  },[dataGetEmailConfig])
+    if(!emailConfig) return
+    setEmailConfigForm(JSON.parse(emailConfig.doc_value))
+  },[emailConfig])
 
   useEffect(()=>{
-    if(!dataUpdateEmailConfig) return
-    console.log(dataUpdateEmailConfig)
-  },[dataUpdateEmailConfig])
+    if(!mutation) return
+    console.log(mutation)
+  },[mutation])
 
   return (
     <div>
-      {(isPendingGetEmailConfig || isPendingUpdateEmailConfig) && <LdsBar />}
+      {(isPendingEmailConfig || isPendingMutation) && <LdsBar />}
       <Form className='mx-4' onSubmit={handleSubmit} data-form="formCpeFact">
         <Form.Group as={Row} className="mb-3">
           <Form.Label column sm="2">Host</Form.Label>
           <Col sm="10">
             <Form.Control 
               name="host"
-              value={formEmailConfig?.host}
+              value={emailConfigForm?.host}
               onChange={handleChange}
             />
           </Col>
@@ -72,7 +72,7 @@ export default function Emails() {
           <Col sm="10">
             <Form.Control 
               name="username"
-              value={formEmailConfig?.username}
+              value={emailConfigForm?.username}
               onChange={handleChange}
             />
           </Col>
@@ -82,7 +82,7 @@ export default function Emails() {
           <Col sm="10">
             <Form.Control 
               name="password"
-              value={formEmailConfig?.password}
+              value={emailConfigForm?.password}
               onChange={handleChange}
             />
           </Col>
@@ -92,7 +92,7 @@ export default function Emails() {
           <Col sm="10">
             <Form.Control 
               name="smtp_secure"
-              value={formEmailConfig?.smtp_secure}
+              value={emailConfigForm?.smtp_secure}
               onChange={handleChange}
             />
           </Col>
@@ -102,7 +102,7 @@ export default function Emails() {
           <Col sm="10">
             <Form.Control 
               name="port"
-              value={formEmailConfig?.port}
+              value={emailConfigForm?.port}
               onChange={handleChange}
             />
           </Col>
@@ -112,7 +112,7 @@ export default function Emails() {
           <Col sm="10">
             <Form.Control 
               name="empresa"
-              value={formEmailConfig?.empresa}
+              value={emailConfigForm?.empresa}
               onChange={handleChange}
             />
           </Col>

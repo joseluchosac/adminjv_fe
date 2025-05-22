@@ -18,12 +18,12 @@ export default function Series() {
   const [seriesEstablecimientoLst, setSeriesEstablecimientoLst] = useState<SerieEstablecimiento[] | null>(null)
   const [hasEdited, setHasEdited] = useState(false)
   const {
-    data: data_getEstablecimientos, 
+    data: establecimientos, 
     getEstablecimientos
   }: DataEstablecimientos  = useMutationConfigQuery()
 
   const {
-    data: data_getSeriesEstablecimiento, 
+    data: seriesEstablecimiento, 
     getSeriesEstablecimiento
   }: DataSeriesEstablecimiento = useMutationConfigQuery()
 
@@ -57,10 +57,10 @@ export default function Series() {
   }, [activeEstablecimiento])
 
   useEffect(() => {
-    if(!data_getSeriesEstablecimiento) return
-    setSeriesEstablecimientoLst(data_getSeriesEstablecimiento)
+    if(!seriesEstablecimiento) return
+    setSeriesEstablecimientoLst(seriesEstablecimiento)
     setHasEdited(false)
-  }, [data_getSeriesEstablecimiento])
+  }, [seriesEstablecimiento])
 
 
   return (
@@ -69,7 +69,7 @@ export default function Series() {
         <Col md={3}>
           <h5>Sucursales</h5>
           <ListGroup>
-            {data_getEstablecimientos && data_getEstablecimientos.filter((x)=>x.tipo === "SUCURSAL").map((el) => 
+            {establecimientos && establecimientos.filter((x)=>x.tipo === "SUCURSAL").map((el) => 
               <ListGroup.Item 
                 key={el.id} 
                 onClick={() => setActiveEstablecimiento(el.id)}

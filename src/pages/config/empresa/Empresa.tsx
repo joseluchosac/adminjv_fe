@@ -18,16 +18,14 @@ export default function Empresa() {
     const [showConfirmPass, setShowConfirmPass] = useState(false)
     const setEmpresaSession = useSessionStore(state=>state.setEmpresaSession)
     const {
-      data: dataEmpresa,
-      // isError: isErrorGetEmpresa, 
-      isPending: isPendingGetEmpresa, 
+      data: empresa,
+      isPending: isPendingEmpresa, 
       getEmpresa,
       reset: resetEmpresa,
     } = useMutationConfigQuery()
     const {
-      data: dataUpdateEmpresa,
-      // isError: isErrorActualizar, 
-      isPending: isPendingUpdateEmpresa, 
+      data: mutation,
+      isPending: isPendingMutation, 
       updateEmpresa 
     } = useMutationConfigQuery()
     const {
@@ -65,12 +63,12 @@ export default function Empresa() {
   
     const handleResetLogoFile = () => {
       setValue("fileLogo", null)
-      setValue("logo", dataEmpresa.logo)
-      setUrlLogoPreview(dataEmpresa.urlLogo)
+      setValue("logo", empresa.logo)
+      setUrlLogoPreview(empresa.urlLogo)
     }
     
     const handleQuitarLogo = () => {
-      setUrlLogoPreview(dataEmpresa.urlNoImage)
+      setUrlLogoPreview(empresa.urlNoImage)
       setValue("logo", "",{shouldDirty: true})
     }
   
@@ -80,7 +78,7 @@ export default function Empresa() {
     
     const handleReset = () => {
       reset()
-      setUrlLogoPreview(dataEmpresa.urlLogo)
+      setUrlLogoPreview(empresa.urlLogo)
     }
     
     const onChooseUbigeo = (ubigeo: Ubigeo) => {
@@ -98,20 +96,20 @@ export default function Empresa() {
     },[])
   
     useEffect(()=>{
-      if(dataEmpresa){
-        reset(dataEmpresa as Empresa)
-        setUrlLogoPreview(dataEmpresa.urlLogo)
+      if(empresa){
+        reset(empresa as Empresa)
+        setUrlLogoPreview(empresa.urlLogo)
   
       }
-    },[dataEmpresa])
+    },[empresa])
   
     useEffect(() => {
-      if(!dataEmpresa) return
+      if(!empresa) return
       if(!watchLogoFile || !watchLogoFile.length){
-        setUrlLogoPreview(dataEmpresa.urlLogo)
+        setUrlLogoPreview(empresa.urlLogo)
       }else{
         if(!watchLogoFile[0].type.includes("image/")){
-          setUrlLogoPreview(dataEmpresa.urlLogo)
+          setUrlLogoPreview(empresa.urlLogo)
           setValue("fileLogo", null)
         }else{
           const reader = new FileReader()
@@ -119,15 +117,15 @@ export default function Empresa() {
             setUrlLogoPreview(reader.result as string)
           }
           reader.readAsDataURL(watchLogoFile[0])
-          setValue("logo", dataEmpresa.logo)
+          setValue("logo", empresa.logo)
         }
       }
     }, [watchLogoFile])
   
     useEffect(()=>{
-      if(!dataUpdateEmpresa) return
-      if(dataUpdateEmpresa?.msgType === "success"){
-        resetEmpresa(dataUpdateEmpresa.registro)
+      if(!mutation) return
+      if(mutation?.msgType === "success"){
+        resetEmpresa(mutation.registro)
         const {
           razon_social,
           nombre_comercial,
@@ -139,7 +137,7 @@ export default function Empresa() {
           telefono,
           email,
           urlLogo,
-        } = dataUpdateEmpresa.registro
+        } = mutation.registro
         setEmpresaSession({
           razon_social,
           nombre_comercial,
@@ -154,13 +152,13 @@ export default function Empresa() {
         })
       setValue("fileLogo", null) 
       }
-      toast(dataUpdateEmpresa?.msg, {
-        type: dataUpdateEmpresa?.msgType,
+      toast(mutation?.msg, {
+        type: mutation?.msgType,
         autoClose: 3000,
         transition: Bounce,
       })
-      // console.log(dataUpdateEmpresa)
-    },[dataUpdateEmpresa])
+      // console.log(mutation)
+    },[mutation])
 
 
   return (
@@ -352,7 +350,7 @@ export default function Empresa() {
             Guardar datos de la Empresa
           </Button>
         </div>
-        {(isPendingGetEmpresa || isPendingUpdateEmpresa) && <LdsEllipsisCenter />}
+        {(isPendingEmpresa || isPendingMutation) && <LdsEllipsisCenter />}
       </Form>
       <UbigeosMdl
         show={showUbigeos} 

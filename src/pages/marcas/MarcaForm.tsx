@@ -7,23 +7,40 @@ import { useForm } from "react-hook-form";
 import { LdsBar, LdsEllipsisCenter } from "../../core/components/Loaders";
 import useLayoutStore from "../../core/store/useLayoutStore";
 import { useMutationMarcasQuery } from "../../core/hooks/useMarcasQuery";
-import { Marca } from "../../core/types";
+import { Marca, ResponseQuery } from "../../core/types";
 import { useMarcas } from "./context/MarcasContext";
+interface DataGetMarca extends ResponseQuery {
+  content: Marca | null;
+}
+type GetMarcaQuery = {
+  data: DataGetMarca | null ;
+  isPending: boolean;
+  isError: boolean;
+  getMarca: (id: number) => void
+}
 
 const marcaFormInit = {id: 0, nombre: "", estado: 1,}
 
 export default function MarcaForm() {
-  const darkMode = useLayoutStore(state => state.layout.darkMode)
   const {showMarcaForm, setShowMarcaForm, currentMarcaId} = useMarcas()
+  const darkMode = useLayoutStore(state => state.layout.darkMode)
+
   const {
-    data,
-    isPending,
-    isError,
+    data: marca,
+    isPending: isPendingMarca,
+    isError: isErrorMarca,
     getMarca,
+  }: GetMarcaQuery = useMutationMarcasQuery()
+
+  const {
+    data: mutation,
+    isPending: isPendingMutation,
+    isError: isErrorMutation,
     createMarca, 
     updateMarca,
     typeAction,
   } = useMutationMarcasQuery()
+
   const {
     register, 
     formState: {errors, isDirty}, 
@@ -40,7 +57,7 @@ export default function MarcaForm() {
       showCancelButton: true,
       confirmButtonText: "Sí",
       cancelButtonText: 'Cancelar',
-      target: document.getElementById('form_marca'),
+      target: document.getElementById('marca_form'),
       customClass: {popup: darkMode ? 'swal-dark' : ''}
     }).then((result) => {
       if (result.isConfirmed) {
@@ -62,32 +79,42 @@ export default function MarcaForm() {
   }, [showMarcaForm])
 
   useEffect(() => {
-    if(!data) return
-    if(typeAction==="get_marca"){
-      if(data.error){
-        toast.error("Error al obtener los datos", {
-          autoClose: 3000, transition: Bounce,
-        })
-        setShowMarcaForm(false);
-      }else{
-        if(data) reset(data)
-      }
+    if(!marca) return
+    console.log(marca)
+    if(marca.error){
+      toast(marca.msg, {
+        type: marca.msgType, autoClose: 3000, transition: Bounce,
+      })
+      setShowMarcaForm(false);
+    }else{
+      if(marca.content) reset(marca?.content)
     }
+  }, [marca])
+  
+  useEffect(() => {
+    if(!mutation) return
     if(typeAction==="mutate_marca"){
-      if(!data.error) setShowMarcaForm(false);
-      toast(data.msg, {
-        type: data.msgType, autoClose: 3000, transition: Bounce,
+      if(!mutation.error) setShowMarcaForm(false);
+      toast(mutation.msg, {
+        type: mutation.msgType, autoClose: 3000, transition: Bounce,
       })
     }
-  }, [data])
+  }, [mutation])
 
   useEffect(() => {
-    if(!isError) return
-    toast.error("Error de conexion", {
+    if(!isErrorMarca) return
+    toast.error("Error al obtener datos", {
       autoClose: 3000, transition: Bounce,
     })
-    if(typeAction==="get_marca") setShowMarcaForm(false)
-  }, [isError])
+    setShowMarcaForm(false)
+  }, [isErrorMarca])
+
+  useEffect(() => {
+    if(!isErrorMutation) return
+    toast.error("Error al procesar solicitud", {
+      autoClose: 3000, transition: Bounce,
+    })
+  }, [isErrorMutation])
 
 
   return (
@@ -97,8 +124,8 @@ export default function MarcaForm() {
           <Modal.Title>{currentMarcaId ? "Editar marca" : "Nuevo marca"}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <Form onSubmit={handleSubmit(submit)} id="form_marca">
-            {(isPending && typeAction==="mutate_marca") && <LdsBar />}
+          <Form onSubmit={handleSubmit(submit)} id="marca_form">
+            {(isPendingMutation && typeAction==="mutate_marca") && <LdsBar />}
             <Row>
               <Form.Group as={Col} md={12} className="mb-3">
                 <Form.Label htmlFor="nombre">Marca</Form.Label>
@@ -130,9 +157,9 @@ export default function MarcaForm() {
               <Button 
                 variant="primary" 
                 type="submit"
-                disabled={(isPending && typeAction==="mutate_marca") ? true : isDirty ? false : true}
+                disabled={(isPendingMutation && typeAction==="mutate_marca") ? true : isDirty ? false : true}
               >
-                {(isPending && typeAction==="mutate_marca") &&
+                {(isPendingMutation && typeAction==="mutate_marca") &&
                   <Spinner
                     as="span"
                     animation="border"
@@ -146,7 +173,7 @@ export default function MarcaForm() {
             </div>
           </Form>
         </Modal.Body>
-        {(isPending && typeAction==="get_marca") && <LdsEllipsisCenter/>}
+        {isPendingMarca  && <LdsEllipsisCenter/>}
       </Modal>
     </div>
   );

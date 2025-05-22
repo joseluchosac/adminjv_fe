@@ -2,7 +2,7 @@ const apiURL = import.meta.env.VITE_API_URL;
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import useSessionStore from "../store/useSessionStore"
 import { mutationFetch } from "../services/mutationFecth";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 type TypeAction = 
@@ -15,14 +15,14 @@ type TypeAction =
   
 // ****** MUTATION ******
 export const useMutationConfigQuery = () => {
-  const [typeAction, setTypeAction] = useState<TypeAction | "">("")
+  // const [typeAction, setTypeAction] = useState<TypeAction | "">("")
   const resetSessionStore = useSessionStore(state => state.resetSessionStore)
   const navigate = useNavigate()
-  
   const tknSession = useSessionStore(state => state.tknSession)
   const nombreModulo = useSessionStore(state => state.moduloActual?.nombre)
   const Authorization = "Bearer " + tknSession
   const queryClient = useQueryClient()
+  const typeActionRef = useRef<TypeAction | "">("")
 
   const {data, isPending, isError, mutate,} = useMutation({
     mutationFn: mutationFetch,
@@ -44,7 +44,7 @@ export const useMutationConfigQuery = () => {
   }
   
   const updateEmpresa = (formData: FormData) => {
-    setTypeAction("mutate_empresa")
+    typeActionRef.current = "mutate_empresa"
     const params = {
       url: apiURL + "config/update_empresa",
       method: "POST",
@@ -70,7 +70,7 @@ export const useMutationConfigQuery = () => {
   }
 
   const updateApisNroDoc = (form: any) => {
-    setTypeAction("mutate_apis_nro_doc")
+    typeActionRef.current = "mutate_apis_nro_doc"
     const params = {
       url: apiURL + "config/update_apis_nro_doc",
       method: "POST",
@@ -96,7 +96,7 @@ export const useMutationConfigQuery = () => {
   }
 
   const updateCpeFact = (form: any) => {
-    setTypeAction("mutate_cpe_fact")
+    typeActionRef.current = "mutate_cpe_fact"
     const params = {
       url: apiURL + "config/update_cpe_fact",
       method: "POST",
@@ -122,7 +122,7 @@ export const useMutationConfigQuery = () => {
   }
   
   const updateCpeGuia = (form: any) => {
-    setTypeAction("mutate_cpe_guia")
+    typeActionRef.current = "mutate_cpe_guia"
     const params = {
       url: apiURL + "config/update_cpe_guia",
       method: "POST",
@@ -148,7 +148,7 @@ export const useMutationConfigQuery = () => {
   }
   
   const updateUsuarioSolSec = (form: any) => {
-    setTypeAction("mutate_usuario_sol_sec")
+    typeActionRef.current = "mutate_usuario_sol_sec"
     const params = {
       url: apiURL + "config/update_usuario_sol_sec",
       method: "POST",
@@ -174,7 +174,7 @@ export const useMutationConfigQuery = () => {
   }
   
   const updateEmailConfig = (form: any) => {
-    setTypeAction("mutate_email_config")
+    typeActionRef.current = "mutate_email_config"
     const params = {
       url: apiURL + "config/update_email_config",
       method: "POST",
@@ -241,7 +241,7 @@ export const useMutationConfigQuery = () => {
     updateEmailConfig,
     getEstablecimientos,
     getSeriesEstablecimiento,
-    typeAction,
+    typeAction: typeActionRef.current,
     reset,
   }
 }

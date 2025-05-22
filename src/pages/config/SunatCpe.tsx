@@ -6,12 +6,12 @@ import { ConfirmPass } from "../../core/components/ConfirmsMdl";
 import { Bounce, toast } from "react-toastify";
 import { LdsBar } from "../../core/components/Loaders";
 
-const formCpeFactInit = {
+const cpeFactFormInit = {
   desarrollo: "",
   produccion: "",
   default: "",
 }
-const formCpeGuiaInit = {
+const cpeGuiaFormInit = {
   desarrollo_client_id: "",
   produccion_client_id: "",
   desarrollo_client_secret: "",
@@ -23,38 +23,38 @@ const formCpeGuiaInit = {
   default: "",
 }
 
-const formUsuarioSolSecInit = {
+const usuarioSolSecFormInit = {
   usuario_sol: "",
   clave_sol: ""
 }
 
 export default function SunatCpe() {
-  const [formCpeFact, setFormCpeFact] = useState(formCpeFactInit)
-  const [formCpeGuia, setFormCpeGuia] = useState(formCpeGuiaInit)
-  const [formUsuarioSolSec, setFormUsuarioSolSec] = useState(formUsuarioSolSecInit)
+  const [cpeFactForm, setCpeFactForm] = useState(cpeFactFormInit)
+  const [cpeGuiaForm, setCpeGuiaForm] = useState(cpeGuiaFormInit)
+  const [usuarioSolSecForm, setUsuarioSolSecForm] = useState(usuarioSolSecFormInit)
   const [showConfirmPass, setShowConfirmPass] = useState(false)
 
   const formActual = useRef('')
 
   const {
     data: cpeFact,
-    isPending: isPending_cpeFact,
+    isPending: isPendingCpeFact,
     getCpeFact,
   } = useMutationConfigQuery()
   const {
     data: cpeGuia,
-    isPending: isPending_cpeGuia,
+    isPending: isPendingCpeGuia,
     getCpeGuia,
   } = useMutationConfigQuery()
   const {
     data: usuarioSolSec,
-    isPending: isPending_usuarioSolSec,
+    isPending: isPendingUsuarioSolSec,
     getUsuarioSolSec,
   } = useMutationConfigQuery()
 
   const {
-    data,
-    isPending,
+    data: mutation,
+    isPending: isPendingMutation,
     updateCpeFact,
     updateCpeGuia,
     updateUsuarioSolSec,
@@ -64,22 +64,22 @@ export default function SunatCpe() {
   const handleChange = (e: React.ChangeEvent<FormControlElement>) => {
     const {name, value} = e.target
     const form = e.target.closest('form')?.dataset.form as string
-    if(form === "formCpeFact"){
-      setFormCpeFact({...formCpeFact, [name]:value})
-    }else if(form === "formCpeGuia"){
-      setFormCpeGuia({...formCpeGuia, [name]:value})
-    }else if(form === "formUsuarioSolSec"){
-      setFormUsuarioSolSec({...formUsuarioSolSec, [name]:value})
+    if(form === "cpeFactForm"){
+      setCpeFactForm({...cpeFactForm, [name]:value})
+    }else if(form === "cpeGuiaForm"){
+      setCpeGuiaForm({...cpeGuiaForm, [name]:value})
+    }else if(form === "usuarioSolSecForm"){
+      setUsuarioSolSecForm({...usuarioSolSecForm, [name]:value})
     }
   }
 
   const onSuccessConfirmPass = () => {
-    if(formActual.current === "formCpeFact"){
-      updateCpeFact(formCpeFact)
-    }else if(formActual.current === "formCpeGuia"){
-      updateCpeGuia(formCpeGuia)
-    }else if(formActual.current === "formUsuarioSolSec"){
-      updateUsuarioSolSec(formUsuarioSolSec)
+    if(formActual.current === "cpeFactForm"){
+      updateCpeFact(cpeFactForm)
+    }else if(formActual.current === "cpeGuiaForm"){
+      updateCpeGuia(cpeGuiaForm)
+    }else if(formActual.current === "usuarioSolSecForm"){
+      updateUsuarioSolSec(usuarioSolSecForm)
     }
   }
 
@@ -98,27 +98,29 @@ export default function SunatCpe() {
 
   useEffect(() => {
     if(!cpeFact) return
-    setFormCpeFact(JSON.parse(cpeFact.doc_value))
+    setCpeFactForm(JSON.parse(cpeFact.doc_value))
   },[cpeFact])
+
   useEffect(() => {
     if(!cpeGuia) return
-    setFormCpeGuia(JSON.parse(cpeGuia.doc_value))
+    setCpeGuiaForm(JSON.parse(cpeGuia.doc_value))
   },[cpeGuia])
+  
   useEffect(() => {
     if(!usuarioSolSec) return
-    setFormUsuarioSolSec(JSON.parse(usuarioSolSec.doc_value))
+    setUsuarioSolSecForm(JSON.parse(usuarioSolSec.doc_value))
   },[usuarioSolSec])
 
   useEffect(() => {
-    if(!data) return
+    if(!mutation) return
     if(typeAction.includes("mutate")){
-      toast(data?.msg, {
-        type: data?.msgType,
+      toast(mutation?.msg, {
+        type: mutation?.msgType,
         autoClose: 3000,
         transition: Bounce,
       })
     }
-  },[data])
+  },[mutation])
 
 
   return (
@@ -127,14 +129,14 @@ export default function SunatCpe() {
         <Accordion.Item eventKey="0">
           <Accordion.Header>MODO FACTURACIÓN / WEBSERVICE SUNAT</Accordion.Header>
           <Accordion.Body className="position-relative">
-            {(isPending_cpeFact || isPending && typeAction==="mutate_cpe_fact") && <LdsBar />}
-            <Form className='mx-4' onSubmit={handleSubmit} data-form="formCpeFact">
+            {(isPendingCpeFact || isPendingMutation && typeAction==="mutate_cpe_fact") && <LdsBar />}
+            <Form className='mx-4' onSubmit={handleSubmit} data-form="cpeFactForm">
               <Form.Group as={Row} className="mb-3">
                 <Form.Label column sm="2">Desarrollo</Form.Label>
                 <Col sm="10">
                   <Form.Control 
                     name="desarrollo"
-                    value={formCpeFact?.desarrollo}
+                    value={cpeFactForm?.desarrollo}
                     onChange={handleChange}
                   />
                 </Col>
@@ -144,7 +146,7 @@ export default function SunatCpe() {
                 <Col sm="10">
                   <Form.Control 
                     name="produccion"
-                    value={formCpeFact?.produccion}
+                    value={cpeFactForm?.produccion}
                     onChange={handleChange}
                   />
                 </Col>
@@ -154,7 +156,7 @@ export default function SunatCpe() {
                 <Col sm="10">
                   <Form.Select 
                     name="default"
-                    value={formCpeFact?.default}
+                    value={cpeFactForm?.default}
                     onChange={handleChange}
                   >
                     <option value="desarrollo">DESARROLLO</option>
@@ -171,14 +173,14 @@ export default function SunatCpe() {
         <Accordion.Item eventKey="1">
           <Accordion.Header>MODO GUÍA DE REMISIÓN / API SUNAT</Accordion.Header>
           <Accordion.Body className="position-relative">
-            {(isPending_cpeGuia || isPending && typeAction==="mutate_cpe_guia") && <LdsBar />}
-            <Form className='mx-4' onSubmit={handleSubmit} data-form="formCpeGuia">
+            {(isPendingCpeGuia || isPendingMutation && typeAction==="mutate_cpe_guia") && <LdsBar />}
+            <Form className='mx-4' onSubmit={handleSubmit} data-form="cpeGuiaForm">
               <Form.Group as={Row} className="mb-3">
                 <Form.Label column sm="3">Client Id desarrollo</Form.Label>
                 <Col sm="9">
                   <Form.Control 
                     name="desarrollo_client_id"
-                    value={formCpeGuia?.desarrollo_client_id}
+                    value={cpeGuiaForm?.desarrollo_client_id}
                     onChange={handleChange}/>
                 </Col>
               </Form.Group>
@@ -187,7 +189,7 @@ export default function SunatCpe() {
                 <Col sm="9">
                   <Form.Control 
                     name="produccion_client_id"
-                    value={formCpeGuia?.produccion_client_id}
+                    value={cpeGuiaForm?.produccion_client_id}
                     onChange={handleChange}
                   />
                 </Col>
@@ -197,7 +199,7 @@ export default function SunatCpe() {
                 <Col sm="9">
                   <Form.Control 
                     name="desarrollo_client_secret"
-                    value={formCpeGuia?.desarrollo_client_secret}
+                    value={cpeGuiaForm?.desarrollo_client_secret}
                     onChange={handleChange}
                   />
                 </Col>
@@ -207,7 +209,7 @@ export default function SunatCpe() {
                 <Col sm="9">
                   <Form.Control 
                     name="produccion_client_secret"
-                    value={formCpeGuia?.produccion_client_secret}
+                    value={cpeGuiaForm?.produccion_client_secret}
                     onChange={handleChange}
                   />
                 </Col>
@@ -217,7 +219,7 @@ export default function SunatCpe() {
                 <Col sm="9">
                   <Form.Control 
                     name="desarrollo_client_auth"
-                    value={formCpeGuia?.desarrollo_client_auth}
+                    value={cpeGuiaForm?.desarrollo_client_auth}
                     onChange={handleChange}
                   />
                 </Col>
@@ -227,7 +229,7 @@ export default function SunatCpe() {
                 <Col sm="9">
                   <Form.Control 
                     name="produccion_client_auth"
-                    value={formCpeGuia?.produccion_client_auth}
+                    value={cpeGuiaForm?.produccion_client_auth}
                     onChange={handleChange}
                   />
                 </Col>
@@ -237,7 +239,7 @@ export default function SunatCpe() {
                 <Col sm="9">
                   <Form.Control 
                     name="desarrollo_client_cpe"
-                    value={formCpeGuia?.desarrollo_client_cpe}
+                    value={cpeGuiaForm?.desarrollo_client_cpe}
                     onChange={handleChange}
                   />
                 </Col>
@@ -247,7 +249,7 @@ export default function SunatCpe() {
                 <Col sm="9">
                   <Form.Control 
                     name="produccion_client_cpe"
-                    value={formCpeGuia?.produccion_client_cpe}
+                    value={cpeGuiaForm?.produccion_client_cpe}
                     onChange={handleChange}
                   />
                 </Col>
@@ -257,7 +259,7 @@ export default function SunatCpe() {
                 <Col sm="9">
                   <Form.Select 
                     name="default"
-                    value={formCpeGuia?.default}
+                    value={cpeGuiaForm?.default}
                     onChange={handleChange}
                   >
                     <option value="desarrollo">DESARROLLO</option>
@@ -274,14 +276,14 @@ export default function SunatCpe() {
         <Accordion.Item eventKey="2">
           <Accordion.Header>USUARIO SOL SECUNDARIO</Accordion.Header>
           <Accordion.Body className="position-relative">
-            {(isPending_usuarioSolSec || isPending && typeAction==="mutate_usuario_sol_sec") && <LdsBar />}
-            <Form className='mx-4' onSubmit={handleSubmit} data-form="formUsuarioSolSec">
+            {(isPendingUsuarioSolSec || isPendingMutation && typeAction==="mutate_usuario_sol_sec") && <LdsBar />}
+            <Form className='mx-4' onSubmit={handleSubmit} data-form="usuarioSolSecForm">
               <Form.Group as={Row} className="mb-3">
                 <Form.Label column sm="3">Usuario SOL</Form.Label>
                 <Col sm="9">
                   <Form.Control 
                     name="usuario_sol"
-                    value={formUsuarioSolSec?.usuario_sol}
+                    value={usuarioSolSecForm?.usuario_sol}
                     onChange={handleChange}
                     />
                 </Col>
@@ -291,7 +293,7 @@ export default function SunatCpe() {
                 <Col sm="9">
                   <Form.Control 
                     name="clave_sol"
-                    value={formUsuarioSolSec?.clave_sol}
+                    value={usuarioSolSecForm?.clave_sol}
                     onChange={handleChange}
                   />
                 </Col>

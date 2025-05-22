@@ -73,7 +73,7 @@ function UbigeosMdl({show, setShow, onChooseUbigeo}: Props) {
         <Modal.Title>Ubigeos</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <Form  onSubmit={handleChooseUbigeo}>
+        <Form onSubmit={handleChooseUbigeo}>
           <Form.Group className="mb-3">
             <Form.Label htmlFor="departamento">Departamento</Form.Label>
             <Form.Select 

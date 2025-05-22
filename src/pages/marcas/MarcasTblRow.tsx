@@ -64,10 +64,10 @@ function MarcasTblRow({ marca, camposMarca }: Props) {
               return <td key={campo_name}>
                 {marca.estado == 0
                   ? <div role="button" onClick={toggleEstado} title="Habilitar" data-estado="0">
-                      <FaToggleOff className="text-muted" size={"1.5rem"} />
+                      <FaToggleOff className="text-muted" size={"1.3rem"} />
                     </div>
                   : <div role="button" onClick={toggleEstado} title="Deshabilitar" data-estado="1">
-                      <FaToggleOn className="text-primary" size={"1.5rem"} />
+                      <FaToggleOn className="text-primary" size={"1.3rem"} />
                     </div>
                 }
                 </td>

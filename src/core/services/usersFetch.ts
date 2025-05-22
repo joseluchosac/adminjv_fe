@@ -1,10 +1,10 @@
-import { FilterParamsUsers } from "../types";
+import { FilterParams } from "../types";
 const apiURL = import.meta.env.VITE_API_URL;
 
 type FilterUsersFetch = {
   pageParam: number;
   token: string | null;
-  filterParamsUsers: FilterParamsUsers;
+  filterParamsUsers: FilterParams;
   signal: AbortSignal
 }
 

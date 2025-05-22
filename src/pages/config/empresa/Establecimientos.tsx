@@ -3,15 +3,14 @@ import { useMutationConfigQuery } from "../../../core/hooks/useConfigQuery"
 import { Table } from "react-bootstrap"
 
 export default function Locales() {
-  const {data, getEstablecimientos} = useMutationConfigQuery()
+  const {
+    data: establecimientos, 
+    getEstablecimientos
+  } = useMutationConfigQuery()
 
   useEffect(() => {
     getEstablecimientos()
   }, [])
-
-  useEffect(() => {
-
-  }, [data])
 
   return (
     <Table>
@@ -25,7 +24,7 @@ export default function Locales() {
         </tr>
       </thead>
       <tbody>
-        {data && data.map((el: any)=>(
+        {establecimientos && establecimientos.map((el: any)=>(
           <tr key={el.id}>
             <td>{el.tipo}</td>
             <td>{el.nombre}</td>

@@ -1,15 +1,15 @@
 import { create } from "zustand";
-import { CampoUserT, FilterParamsUsers, FilterUsersCurrent } from "../types";
+import { CampoUserT, FilterCurrent, FilterParams } from "../types";
 
 interface UseUsersStore {
   currentUserId: number;
   camposUser: CampoUserT[];
-  filterParamsUsers: FilterParamsUsers;
-  filterUsersCurrent: FilterUsersCurrent;
+  filterParamsUsers: FilterParams;
+  filterUsersCurrent: FilterCurrent;
   showUserFormMdl: boolean;
   showUsersFilterMdl: boolean;
   setShowUserFormMdl: (bool:boolean) => void;
-  setFilterParamsUsers: (params:FilterParamsUsers) => void;
+  setFilterParamsUsers: (params:FilterParams) => void;
   setFilterUsersCurrent: () => void;
   setShowUsersFilterMdl: (p: boolean) => void;
   setCurrentUserId: (userId: number) => void;

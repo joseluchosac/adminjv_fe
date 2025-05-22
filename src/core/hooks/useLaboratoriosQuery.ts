@@ -1,5 +1,5 @@
 const apiURL = import.meta.env.VITE_API_URL;
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useNavigate } from "react-router-dom";
 import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import useSessionStore from "../store/useSessionStore"
@@ -9,8 +9,7 @@ import { filterLaboratoriosFetch } from "../services/laboratoriosFetch";
 import { Laboratorio } from "../types";
 
 type TypeAction = 
-  "filter_full" 
-  | "get_laboratorio" 
+  "filter_full"
   | "mutate_laboratorio"
 
 // ****** FILTRAR  ******
@@ -70,15 +69,14 @@ export const useFilterLaboratoriosQuery = () => {
 
 // ****** MUTATION ******
 export const useMutationLaboratoriosQuery = () => {
-  const [typeAction, setTypeAction] = useState<TypeAction | "">("")
   const resetSessionStore = useSessionStore(state => state.resetSessionStore)
   const navigate = useNavigate()
   const tknSession = useSessionStore(state => state.tknSession)
   const nombreModulo = useSessionStore(state => state.moduloActual?.nombre)
   const Authorization = "Bearer " + tknSession
   const filterParamsLaboratorios = useLaboratoriosStore(state => state.filterParamsLaboratorios)
-
   const queryClient = useQueryClient()
+  const typeActionRef = useRef<TypeAction | "">("")
 
   const {data, isPending, isError, mutate, } = useMutation({
     mutationFn: mutationFetch,
@@ -89,7 +87,7 @@ export const useMutationLaboratoriosQuery = () => {
   })
 
   const filterLaboratoriosFull = () => {// Sin Paginacion
-    setTypeAction("filter_full")
+    typeActionRef.current = "filter_full"
     const params = {
       url: apiURL + "laboratorios/filter_laboratorios_full",
       method: "POST",
@@ -103,7 +101,6 @@ export const useMutationLaboratoriosQuery = () => {
   }
 
   const getLaboratorio = (id: number) => {
-    setTypeAction("get_laboratorio")
     const params = {
       url: apiURL + "laboratorios/get_laboratorio",
       method: "POST",
@@ -117,7 +114,7 @@ export const useMutationLaboratoriosQuery = () => {
   }
 
   const createLaboratorio = (laboratorio: Laboratorio) => {
-    setTypeAction("mutate_laboratorio")
+    typeActionRef.current = "mutate_laboratorio"
     const params = {
       url: apiURL + "laboratorios/create_laboratorio",
       method: "POST",
@@ -131,7 +128,7 @@ export const useMutationLaboratoriosQuery = () => {
   }
 
   const updateLaboratorio = (laboratorio: Laboratorio) => {
-    setTypeAction("mutate_laboratorio")
+    typeActionRef.current = "mutate_laboratorio"
     const params = {
       url: apiURL + "laboratorios/update_laboratorio",
       method: "PUT",
@@ -145,7 +142,7 @@ export const useMutationLaboratoriosQuery = () => {
   }
 
   const deleteLaboratorio = (id: number) => {
-    setTypeAction("mutate_laboratorio")
+    typeActionRef.current = "mutate_laboratorio"
     const params = {
       url: apiURL + "laboratorios/delete_laboratorio",
       method: "DELETE",
@@ -178,7 +175,7 @@ export const useMutationLaboratoriosQuery = () => {
     createLaboratorio,
     updateLaboratorio,
     deleteLaboratorio,
-    typeAction,
+    typeAction: typeActionRef.current,
     reset,
   }
 }

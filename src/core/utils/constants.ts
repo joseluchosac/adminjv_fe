@@ -1,7 +1,3 @@
-import { SingleValue, StylesConfig } from "react-select";
-
-interface ColourOption { value: any; label: any }
-
 
 export const selectDark = {
   control: (styles: any) => ({ ...styles, backgroundColor: '#212529', borderColor: '#495057' }),

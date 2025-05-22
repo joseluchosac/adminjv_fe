@@ -1,5 +1,5 @@
 const apiURL = import.meta.env.VITE_API_URL;
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useNavigate } from "react-router-dom";
 import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import useSessionStore from "../store/useSessionStore"
@@ -10,7 +10,6 @@ import { Marca } from "../types";
 
 type TypeAction = 
   "filter_full" 
-  | "get_marca" 
   | "mutate_marca"
 
 // ****** FILTRAR ******
@@ -70,7 +69,6 @@ export const useFilterMarcasQuery = () => {
 
 // ****** MUTATION ******
 export const useMutationMarcasQuery = () => {
-  const [typeAction, setTypeAction] = useState<TypeAction | "">("")
   const resetSessionStore = useSessionStore(state => state.resetSessionStore)
   const navigate = useNavigate()
   const tknSession = useSessionStore(state => state.tknSession)
@@ -78,6 +76,7 @@ export const useMutationMarcasQuery = () => {
   const Authorization = "Bearer " + tknSession
   const filterParamsMarcas = useMarcasStore(state => state.filterParamsMarcas)
   const queryClient = useQueryClient()
+  const typeActionRef = useRef<TypeAction | "">("")
 
   const {data, isPending, isError, mutate, } = useMutation({
     mutationFn: mutationFetch,
@@ -88,7 +87,7 @@ export const useMutationMarcasQuery = () => {
   })
 
   const filterMarcasFull = () => {// Sin Paginacion
-    setTypeAction("filter_full")
+    typeActionRef.current = "filter_full"
     const params = {
       url: apiURL + "marcas/filter_marcas_full",
       method: "POST",
@@ -102,7 +101,6 @@ export const useMutationMarcasQuery = () => {
   }
 
   const getMarca = (id: number) => {
-    setTypeAction("get_marca")
     const params = {
       url: apiURL + "marcas/get_marca",
       method: "POST",
@@ -116,7 +114,7 @@ export const useMutationMarcasQuery = () => {
   }
 
   const createMarca = (marca: Marca) => {
-    setTypeAction("mutate_marca")
+    typeActionRef.current = "mutate_marca"
     const params = {
       url: apiURL + "marcas/create_marca",
       method: "POST",
@@ -130,7 +128,7 @@ export const useMutationMarcasQuery = () => {
   }
 
   const updateMarca = (marca: Marca) => {
-    setTypeAction("mutate_marca")
+    typeActionRef.current = "mutate_marca"
     const params = {
       url: apiURL + "marcas/update_marca",
       method: "PUT",
@@ -144,7 +142,7 @@ export const useMutationMarcasQuery = () => {
   }
 
   const deleteMarca = (id: number) => {
-    setTypeAction("mutate_marca")
+    typeActionRef.current = "mutate_marca"
     const params = {
       url: apiURL + "marcas/delete_marca",
       method: "DELETE",
@@ -177,7 +175,7 @@ export const useMutationMarcasQuery = () => {
     createMarca,
     updateMarca,
     deleteMarca,
-    typeAction,
+    typeAction: typeActionRef.current,
     reset,
   }
 }

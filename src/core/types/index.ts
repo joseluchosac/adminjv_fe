@@ -1,7 +1,8 @@
-//--> TIPOS PARA EL MODULO AUTH
-
+// ✅ TIPO PARA EL EVENTO ON CHANGE DE UN ELEMENTO DE FORMULARIO
 export declare type FormControlElement = HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement;
 
+
+// ✅ TIPO PARA EL MODULO AUTH
 // *****************************************************
 export type FormsAuth = {
   formOfLogin: string; formOfForgot: string;
@@ -13,35 +14,8 @@ export type RestoreForm = {
   code:string; new_password:string; new_password_repeat:string;
 }
 
-//--> TIPOS PARA LA TABLA USUARIOS
+// ✅ TIPOS PARA LA TABLA USUARIOS
 // *****************************************************
-
-export interface FilterParamsUsers {
-  offset: number;
-  search: string;
-  equals: FilterParamsUsersEqual[];
-  between: FilterParamsUsersBetween;
-  orders: FilterParamsUsersOrder[];
-}
-export type FilterUsersCurrent = Omit<FilterParamsUsers, "offset" | "search">
-export type FilterParamsUsersEqual = {
-  campo_name: string;
-  value: string;
-  text: string;
-  campo_text: string
-}
-
-export type FilterParamsUsersBetween = {
-  campo_name: string;
-  campo_text: string;
-  range: string
-}
-
-export type FilterParamsUsersOrder = {
-  campo_name: string;
-  order_dir: string;
-  text: string
-}
 
 export type User = {
   id: number;
@@ -79,129 +53,12 @@ export interface RegisterForm {
   password_repeat: string;
 }
 
-
-//--> TIPOS PARA CATALOGOS
-// *****************************************************
-// export interface Catalogos {
-//   cajas: Caja[];
-//   formas_pago: FormaPago[];
-//   impuestos: Impuesto[];
-//   motivos_nota: MotivoNota[];
-//   roles: Rol[];
-//   tipos_comprobante: TipoComprobante[];
-//   tipos_documento: TipoDocumento[];
-//   tipos_moneda: TipoMoneda[];
-//   tipos_movimiento_caja: TipoMovimientoCaja[];
-//   tipos_movimiento_producto: TipoMovimientoProducto[];
-//   tipos_operacion: TipoOperacion[];
-//   unidades_medida: UnidadMedida[];
-//   departamentos: Departamento[];
-// }
-// export type Caja = {
-//   id: number;
-//   descripcion: string;
-//   estado: number;
-// }
-// export type FormaPago = {
-//   id: number;
-//   descripcion: string;
-//   estado: number;
-// }
-// export type Impuesto = {
-//   id: number;
-//   afectacion_igv_cod: string;
-//   afectacion_igv_desc: string;
-//   letra_tributo: string;
-//   codigo_tributo: string;
-//   nombre_tributo: string;
-//   tipo_tributo: string;
-//   porcentaje: number;
-//   importe: number;
-//   estado: number
-// }
-// export type MotivoNota = {
-//   codigo : string;
-//   descripcion : string; 
-//   estado : number; 
-//   id : number;
-//   tipo : string;
-//   tipo_comprobante_cod : string
-// }
-// export type Rol = {
-//   id: number;
-//   rol: string;
-//   estado?: number
-// }
-// export type TipoComprobante = {
-//   id: number;
-//   codigo: string;
-//   descripcion: string;
-//   estado: number
-// }
-// export type TipoDocumento = {
-//   id: number;
-//   codigo: string;
-//   descripcion: string;
-//   descripcion_abv: string;
-//   estado: number;
-// }
-// export type TipoMoneda = {
-//   id: number;
-//   codigo: string;
-//   descripcion: string;
-//   simbolo: string;
-//   estado: number;
-// }
-// export type TipoMovimientoCaja = {
-//   id: number;
-//   descripcion: string;
-//   estado: number
-// }
-// export type TipoMovimientoProducto = {
-//   id: number;
-//   codigo: string;
-//   tipo: string;
-//   tipo_operacion_cod: string;
-//   descripcion: string;
-//   documento: string;
-//   estado: number
-// }
-// export type TipoOperacion = {
-//   codigo: string;
-//   descripcion: string;
-//   estado: number
-// }
-// export type UnidadMedida = {
-//   codigo: string;
-//   descripcion: string;
-//   descripcion_abv: string;
-//   estado: number
-// }
-// export type Ubigeo = {
-//   ubigeo_inei: string;
-//   departamento: string;
-//   provincia: string;
-//   distrito: string;
-// }
-// export type Departamento = {
-//   departamento: string;
-// }
-// export type Provincia = {
-//   provincia: string;
-// }
-// export type Distrito = {
-//   distrito: string;
-//   ubigeo_inei: string;
-// }
-
-//--> TIPOS PARA LA TABLA CAJAS
-// *****************************************************
+// ✅ TIPOS PARA LA TABLA CAJAS
 export interface CajaT {
   id: number;
   descripcion: string
 }
-//--> TIPOS PARA LA TABLA MODULOS
-// *****************************************************
+// ✅ TIPOS PARA LA TABLA MODULOS
 export interface ModuloT {
   id: number;
   nombre: string;
@@ -226,16 +83,14 @@ export interface Padre {
   descripcion: string;
 }
 
-// TIPOS PARA LA TABLA TAREAS
-// *****************************************************
+// ✅ TIPOS PARA LA TABLA TAREAS
 export interface TareaT {
   id: number;
   descripcion: string;
   encargado: string;
 }
 
-//--> TIPOS PARA LA TABLA CONFIGURACIONES
-// *****************************************************
+// ✅ TIPOS PARA LA TABLA CONFIGURACIONES
 export type Empresa = {
   razon_social: string;
   nombre_comercial: string;
@@ -274,9 +129,7 @@ export type EmpresaSession = { // para la sesion
 
 
 
-//--> TIPOS PARA FILTROS GENERALES
-// *****************************************************
-
+// ✅ TIPOS PARA FILTROS GENERALES
 export interface FilterParams {
   offset: number;
   search: string;
@@ -284,7 +137,7 @@ export interface FilterParams {
   between: FilterParamsBetween;
   orders: FilterParamsOrder[];
 }
-export type FilterCurrent = Omit<FilterParamsUsers, "offset" | "search">
+export type FilterCurrent = Omit<FilterParams, "offset" | "search">
 export type FilterParamsEqual = {
   campo_name: string;
   value: string;
@@ -304,7 +157,7 @@ export type FilterParamsOrder = {
   text: string
 }
 
-//--> TIPOS PARA EL CAMPO DE UNA TABLA
+// ✅ TIPOS PARA EL CAMPO DE UNA TABLA
 // *****************************************************
 export type CampoTable = {
   campo_name: string;
@@ -314,8 +167,7 @@ export type CampoTable = {
   show: boolean
 }
 
-//--> TIPOS PARA CATEGORIAS
-// 
+// ✅ TIPOS PARA CATEGORIAS
 export interface Categoria {
   id: number;
   nombre: string;
@@ -326,22 +178,22 @@ export interface Categoria {
   estado: number;
   children?: any;
 }
-//--> TIPOS PARA TABLA LABORATORIOS
-// 
+// ✅ TIPOS PARA TABLA LABORATORIOS
 export interface Laboratorio {
   id: number;
   nombre: string;
   estado: number;
 }
-//--> TIPOS PARA TABLA MARCAS
-// 
+// ✅TIPOS PARA TABLA MARCAS 
 export interface Marca {
   id: number;
   nombre: string;
   estado: number;
 }
 
-export type OptionSelect = {
-  value: number;
-  label: string
+// ✅ TIPOS PARA LAS RESPUESTAS DE LA API (el content se le agrega despues)
+export type ResponseQuery = {
+  error?: boolean;
+  msg?: string;
+  msgType?: "default" | "error" | "info" | "success" | "warning";
 }

@@ -21,16 +21,16 @@ const apisNroDocInit = {
 }
 
 export default function ApisConsulta() {
-  const [formApisNroDoc, setFormApisNroDoc] = useState(apisNroDocInit)
+  const [apisNroDocForm, setApisNroDocForm] = useState(apisNroDocInit)
   const [showConfirmPass, setShowConfirmPass] = useState(false)
   const {
-    data: dataGetApisNroDoc,
-    isPending: isPendingGetApisNroDoc,
+    data: apisNroDoc,
+    isPending: isPendingApisNroDoc,
     getApisNroDoc
   } = useMutationConfigQuery()
   const {
-    data: dataUpdateApisNroDoc,
-    isPending: isPendingUpdateApisNroDoc,
+    data: mutationApisNroDoc,
+    isPending: isPendingMutationApisNroDoc,
     updateApisNroDoc
   } = useMutationConfigQuery()
 
@@ -38,11 +38,11 @@ export default function ApisConsulta() {
   const handleChange = (e: React.ChangeEvent<FormControlElement>) => {
     const {name, value} = e.target
     if(name === "default"){
-      setFormApisNroDoc({...formApisNroDoc, default:value})
+      setApisNroDocForm({...apisNroDocForm, default:value})
     }else{
       const serv = name.split("_")[0] as "apisnetpe" | "apisperucom"
       const campo = name.split("_")[1]
-      setFormApisNroDoc({...formApisNroDoc, [serv]:{...formApisNroDoc[serv], [campo]:value}})
+      setApisNroDocForm({...apisNroDocForm, [serv]:{...apisNroDocForm[serv], [campo]:value}})
     }
   }
 
@@ -52,7 +52,7 @@ export default function ApisConsulta() {
   }
   
   const onSuccessConfirmPass = () => {
-    updateApisNroDoc(formApisNroDoc)
+    updateApisNroDoc(apisNroDocForm)
   }
 
   useEffect(() => {
@@ -60,19 +60,19 @@ export default function ApisConsulta() {
   }, [])
   
   useEffect(()=>{
-    if(!dataGetApisNroDoc) return
-    const obj = JSON.parse(dataGetApisNroDoc.doc_value)
-    setFormApisNroDoc(obj)
-  },[dataGetApisNroDoc])
+    if(!apisNroDoc) return
+    const obj = JSON.parse(apisNroDoc.doc_value)
+    setApisNroDocForm(obj)
+  },[apisNroDoc])
 
   useEffect(()=>{
-    if(!dataUpdateApisNroDoc) return
-    toast(dataUpdateApisNroDoc?.msg, {
-      type: dataUpdateApisNroDoc?.msgType,
+    if(!mutationApisNroDoc) return
+    toast(mutationApisNroDoc?.msg, {
+      type: mutationApisNroDoc?.msgType,
       autoClose: 3000,
       transition: Bounce,
     })
-  },[dataUpdateApisNroDoc])
+  },[mutationApisNroDoc])
 
   return (
     <div>
@@ -80,7 +80,7 @@ export default function ApisConsulta() {
         <Accordion.Item eventKey="0">
           <Accordion.Header>DNI, RUC</Accordion.Header>
           <Accordion.Body className="position-relative">
-            {(isPendingGetApisNroDoc || isPendingUpdateApisNroDoc) && <LdsBar />}
+            {(isPendingApisNroDoc || isPendingMutationApisNroDoc) && <LdsBar />}
             <Form onSubmit={handleSubmit}>
               <Row>
                 <h6 className="mb-3">APIS.NET.PE</h6>
@@ -91,7 +91,7 @@ export default function ApisConsulta() {
                       onChange={handleChange}
                       id="apisnetpe_dni"
                       name="apisnetpe_dni"
-                      value={formApisNroDoc.apisnetpe.dni}
+                      value={apisNroDocForm.apisnetpe.dni}
                     />
                   </Col>
                 </Form.Group>
@@ -102,7 +102,7 @@ export default function ApisConsulta() {
                       onChange={handleChange}
                       id="apisnetpe_ruc"
                       name="apisnetpe_ruc"
-                      value={formApisNroDoc.apisnetpe.ruc}
+                      value={apisNroDocForm.apisnetpe.ruc}
                     />
                   </Col>
                 </Form.Group>
@@ -113,7 +113,7 @@ export default function ApisConsulta() {
                       id="apisnetpe_token"
                       name="apisnetpe_token"
                       onChange={handleChange}
-                      value={formApisNroDoc.apisnetpe.token}
+                      value={apisNroDocForm.apisnetpe.token}
                     />
                   </Col>
                 </Form.Group>
@@ -125,7 +125,7 @@ export default function ApisConsulta() {
                       id="apisperucom_dni"
                       name="apisperucom_dni"
                       onChange={handleChange}
-                      value={formApisNroDoc.apisperucom.dni}
+                      value={apisNroDocForm.apisperucom.dni}
                     />
                   </Col>
                 </Form.Group>
@@ -136,7 +136,7 @@ export default function ApisConsulta() {
                       id="apisperucom_ruc"
                       name="apisperucom_ruc"
                       onChange={handleChange}
-                      value={formApisNroDoc.apisperucom.ruc}
+                      value={apisNroDocForm.apisperucom.ruc}
                     />
                   </Col>
                 </Form.Group>
@@ -147,7 +147,7 @@ export default function ApisConsulta() {
                       id="apisperucom_token"
                       name="apisperucom_token"
                       onChange={handleChange}
-                      value={formApisNroDoc.apisperucom.token}
+                      value={apisNroDocForm.apisperucom.token}
                     />
                   </Col>
                 </Form.Group>
@@ -158,7 +158,7 @@ export default function ApisConsulta() {
                       id="default"
                       name="default"
                       onChange={handleChange}
-                      value={formApisNroDoc.default}
+                      value={apisNroDocForm.default}
                     >
                       <option value="">-Seleccione-</option>
                       <option value="apisnetpe">apis.net.pe</option>
