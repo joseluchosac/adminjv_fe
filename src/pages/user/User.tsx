@@ -2,7 +2,7 @@ import { useQueryClient } from "@tanstack/react-query"
 import useSessionStore from "../../core/store/useSessionStore"
 import { Button, Card, Col, Container, Form, Row } from "react-bootstrap"
 import { useEffect, useRef, useState } from "react"
-import type { CajaT } from "../../core/types"
+import type { Caja } from "../../core/types"
 import Swal from "sweetalert2"
 import useLayoutStore from "../../core/store/useLayoutStore"
 import { Bounce, toast } from "react-toastify"
@@ -30,7 +30,7 @@ const User: React.FC = () => {
   const userSession = useSessionStore(state => state.userSession)
   const setUserSession = useSessionStore(state => state.setUserSession)
   const darkMode = useLayoutStore(state => state.layout.darkMode)
-  const cajas = queryClient.getQueryData(["cajas"]) as CajaT[]
+  const cajas = queryClient.getQueryData(["cajas"]) as Caja[]
   const roles = queryClient.getQueryData(["roles"]) as Rol[]
   const [userForm, setUserForm] = useState(userFormInit)
 

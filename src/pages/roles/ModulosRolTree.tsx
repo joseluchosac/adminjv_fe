@@ -1,10 +1,10 @@
 import { useRef } from 'react';
 // import Sortable from 'sortablejs';
 import DynaIcon from '../../core/components/DynaComponents';
-import { ModuloT } from '../../core/types';
+import { Modulo } from '../../core/types';
 interface Props {
-  itemsTree: ModuloT[];
-  setItemsTree: React.Dispatch<React.SetStateAction<ModuloT[] | null>>;
+  itemsTree: Modulo[];
+  setItemsTree: React.Dispatch<React.SetStateAction<Modulo[] | null>>;
   toggleAssign: (id:number) => void;
 }
 

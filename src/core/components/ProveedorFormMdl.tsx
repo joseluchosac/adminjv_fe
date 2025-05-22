@@ -8,11 +8,11 @@ import { Bounce, toast } from "react-toastify";
 import useCatalogosStore from "../store/useCatalogosStore";
 import { useForm } from "react-hook-form";
 import useProveedoresStore from "../store/useProveedoresStore";
-import {type Proveedor } from "../types/proveedoresTypes";
 import { useMutationProveedoresQuery } from "../hooks/useProveedoresQuery";
 import { FaEdit, FaSearch, FaTrash } from "react-icons/fa";
 import UbigeosMdl from "./UbigeosMdl";
 import { Ubigeo } from "../types/catalogosTypes";
+import { Proveedor } from "../types";
 const proveedorForm_init = {
   id: 0,
   tipo_documento_cod: "0",

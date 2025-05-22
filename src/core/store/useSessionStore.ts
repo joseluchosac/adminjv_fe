@@ -1,17 +1,17 @@
 import { create } from "zustand";
-import { EmpresaSession, ModuloT, UserT } from "../types";
-import { lsTknSessionKey } from "../types/initials";
+import { EmpresaSession, Modulo, User } from "../types";
+import { lsTknSessionKey } from "../utils/constants";
 
 interface UseSessionStore {
   tknSession: string | null;
   empresaSession: EmpresaSession | null;
-  userSession: UserT | null;
-  modulosSesion: ModuloT[] | null;
-  moduloActual: ModuloT | null;
-  setModuloActual: (modulo: ModuloT | undefined) => void;
+  userSession: User | null;
+  modulosSesion: Modulo[] | null;
+  moduloActual: Modulo | null;
+  setModuloActual: (modulo: Modulo | undefined) => void;
   setTknSession: (newTknSession:string) => void;
   setEmpresaSession: (newEmpresaSession:EmpresaSession) => void;
-  setUserSession: (newUserSession:UserT) => void;
+  setUserSession: (newUserSession:User) => void;
   resetSessionStore: () => void;
   setModulosSesion: (newModulosRolSesion: any) => void;
   reset: () => void;

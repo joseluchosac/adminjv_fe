@@ -28,31 +28,31 @@ const MarcasTbl: React.FC = () => {
   } = useFilterMarcasQuery();
 
   const handleSort = (e: React.MouseEvent<HTMLTableCellElement, MouseEvent>) => {
-    let campo_name = e.currentTarget.dataset.campo as string;
+    let fieldname = e.currentTarget.dataset.campo as string;
     let text = e.currentTarget.textContent as string;
-    const orderIdx = filterParamsMarcas.orders.findIndex(el => el.campo_name === campo_name)
+    const orderIdx = filterParamsMarcas.orders.findIndex(el => el.fieldname === fieldname)
     if(e.ctrlKey){
       if(orderIdx === -1){
-        const newOrder = {campo_name, order_dir: "ASC", text}
+        const newOrder = {fieldname, order_dir: "ASC", text}
         setFilterParamsMarcas({...filterParamsMarcas, orders: [...filterParamsMarcas.orders, newOrder]})
       }else{
         let newOrders = structuredClone(filterParamsMarcas.orders)
         if(newOrders[orderIdx].order_dir == "ASC"){
-          newOrders[orderIdx] = {campo_name, order_dir: "DESC", text}
+          newOrders[orderIdx] = {fieldname, order_dir: "DESC", text}
           setFilterParamsMarcas({...filterParamsMarcas, orders: newOrders})
         }else{
-          newOrders = newOrders.filter(el=>el.campo_name !== campo_name)
+          newOrders = newOrders.filter(el=>el.fieldname !== fieldname)
           setFilterParamsMarcas({...filterParamsMarcas, orders: newOrders})
         }
       }
     }else{
       if(orderIdx === -1){
-        const newOrder = {campo_name, order_dir: "ASC", text}
+        const newOrder = {fieldname, order_dir: "ASC", text}
         setFilterParamsMarcas({...filterParamsMarcas, orders: [newOrder]})
       }else{
         let newOrders = structuredClone(filterParamsMarcas.orders)
         if(newOrders[orderIdx].order_dir == "ASC"){
-          const newOrder = {campo_name, order_dir: "DESC", text}
+          const newOrder = {fieldname, order_dir: "DESC", text}
           setFilterParamsMarcas({...filterParamsMarcas, orders: [newOrder]})
         }else{
           setFilterParamsMarcas({...filterParamsMarcas, orders: []})
@@ -92,11 +92,11 @@ const MarcasTbl: React.FC = () => {
                     {camposMarca && camposMarca.map((el) => {
                       return ( el.show && (
                         <th
-                          key={el.campo_name}
+                          key={el.fieldname}
                           onClick={handleSort}
-                          data-campo={el.campo_name}
+                          data-campo={el.fieldname}
                           role="button"
-                          style={el.campo_name=="acciones" ? {position: "sticky", left: 0} : {}}
+                          style={el.fieldname=="acciones" ? {position: "sticky", left: 0} : {}}
                         >
                           <div className="d-flex gap-1">
                             <div>{el.text}</div>

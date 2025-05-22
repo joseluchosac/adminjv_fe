@@ -1,9 +1,21 @@
 // ✅ TIPO PARA EL EVENTO ON CHANGE DE UN ELEMENTO DE FORMULARIO
 export declare type FormControlElement = HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement;
 
-
+// ✅ TIPOS PARA LAS RESPUESTAS DE LA API (el content se le agrega despues)
+export type ResponseQuery = {
+  error?: boolean;
+  msg?: string;
+  msgType?: "default" | "error" | "info" | "success" | "warning";
+}
+// ✅ TIPOS PARA EL CAMPO DE UNA TABLA
+export type CampoTable = {
+  fieldname: string;
+  text: string;
+  orderable?: boolean;
+  order_dir: string;
+  show: boolean
+}
 // ✅ TIPO PARA EL MODULO AUTH
-// *****************************************************
 export type FormsAuth = {
   formOfLogin: string; formOfForgot: string;
 }
@@ -15,8 +27,6 @@ export type RestoreForm = {
 }
 
 // ✅ TIPOS PARA LA TABLA USUARIOS
-// *****************************************************
-
 export type User = {
   id: number;
   nombres: string;
@@ -24,25 +34,18 @@ export type User = {
   username: string;
   email: string;
   rol_id: number;
-  rol: string;
+  rol?: string;
   caja_id: number;
-  caja: string;
-  created_at: string;
-  updated_at: string;
+  caja?: string;
   estado: number;
+  created_at?: string;
+  updated_at?: string;
+}
+export interface UserForm extends User {
   password: string;
   password_repeat: string;
 }
 
-export type UserFormT = Omit<User, "rol" | "caja">
-export type UserT = Omit<User,"password" | "password_repeat">
-
-export type CampoUserT = {
-  campo_name: string;
-  text: string;
-  order_dir: string;
-  show: boolean
-}
 
 export interface RegisterForm {
   nombres: string;
@@ -54,12 +57,12 @@ export interface RegisterForm {
 }
 
 // ✅ TIPOS PARA LA TABLA CAJAS
-export interface CajaT {
+export interface Caja {
   id: number;
   descripcion: string
 }
 // ✅ TIPOS PARA LA TABLA MODULOS
-export interface ModuloT {
+export interface Modulo {
   id: number;
   nombre: string;
   descripcion: string;
@@ -68,14 +71,6 @@ export interface ModuloT {
   orden: number;
   assign?: boolean;
   children?: any;
-}
-export type ModuloForm = {
-  id: number;
-  descripcion: string;
-  icon_menu: string;
-  nombre: string;
-  padre_id: number;
-  orden: number;
 }
 
 export interface Padre {
@@ -137,35 +132,29 @@ export interface FilterParams {
   between: FilterParamsBetween;
   orders: FilterParamsOrder[];
 }
+
 export type FilterCurrent = Omit<FilterParams, "offset" | "search">
-export type FilterParamsEqual = {
-  campo_name: string;
+
+type FilterParamsEqual = {
+  fieldname: string;
   value: string;
   text: string;
   campo_text: string
 }
 
-export type FilterParamsBetween = {
-  campo_name: string;
+type FilterParamsBetween = {
+  fieldname: string;
   campo_text: string;
   range: string
 }
 
-export type FilterParamsOrder = {
-  campo_name: string;
+type FilterParamsOrder = {
+  fieldname: string;
   order_dir: string;
   text: string
 }
 
-// ✅ TIPOS PARA EL CAMPO DE UNA TABLA
-// *****************************************************
-export type CampoTable = {
-  campo_name: string;
-  text: string;
-  orderable?: boolean;
-  order_dir: string;
-  show: boolean
-}
+
 
 // ✅ TIPOS PARA CATEGORIAS
 export interface Categoria {
@@ -191,9 +180,40 @@ export interface Marca {
   estado: number;
 }
 
-// ✅ TIPOS PARA LAS RESPUESTAS DE LA API (el content se le agrega despues)
-export type ResponseQuery = {
-  error?: boolean;
-  msg?: string;
-  msgType?: "default" | "error" | "info" | "success" | "warning";
+
+
+// ✅ TIPOS PARA PROVEEDOR
+export type Proveedor = {
+  id: number;
+  tipo_documento_cod: string;
+  tipo_documento: string;
+  nro_documento: string;
+  nombre_razon_social: string;
+  direccion: string;
+  ubigeo_inei: string;
+  departamento: string;
+  provincia: string;
+  distrito: string;
+  email: string;
+  telefono: string;
+  api?: number;
+  estado?: number;
+}
+
+// ✅ TIPOS PARA CLIENTE
+export type Cliente = {
+  id: number;
+  tipo_documento_cod: string;
+  tipo_documento: string;
+  nro_documento: string;
+  nombre_razon_social: string;
+  direccion: string;
+  ubigeo_inei: string;
+  departamento: string;
+  provincia: string;
+  distrito: string;
+  email: string;
+  telefono: string;
+  api?: number;
+  estado?: number;
 }

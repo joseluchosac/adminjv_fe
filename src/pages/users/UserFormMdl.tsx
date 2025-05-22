@@ -4,27 +4,26 @@ import { Button, Col, Form, Row, Spinner } from "react-bootstrap";
 import { LdsBar, LdsEllipsisCenter } from "../../core/components/Loaders";
 import useLayoutStore from "../../core/store/useLayoutStore";
 import { useEffect, useState } from "react";
-import { UserFormT } from "../../core/types";
+import { UserForm } from "../../core/types";
 import { useMutationUsersQuery } from "../../core/hooks/useUsersQuery";
 import Swal from "sweetalert2";
 import { Bounce, toast } from "react-toastify";
 import useCatalogosStore from "../../core/store/useCatalogosStore";
 import { useForm } from "react-hook-form";
-const user_init = {
+const userFormInit = {
   id: 0,
   nombres: "",
   apellidos: "",
   username: "",
-  password: '',
   email: "",
   rol_id: 2,
   caja_id: 1,
-  created_at: '',
-  updated_at: '',
   estado: 1,
+  password: '',
   password_repeat: '',
 }
 type Props = {setTitle: (title:string)=>void;}
+
 function FormUser({setTitle}: Props){
   const currentUserId = useUsersStore(state => state.currentUserId)
   const darkMode = useLayoutStore(state => state.layout.darkMode)
@@ -37,8 +36,8 @@ function FormUser({setTitle}: Props){
     handleSubmit, 
     reset,
     watch,
-  } = useForm<UserFormT>({defaultValues: user_init})
-
+  } = useForm<UserForm>({defaultValues: userFormInit})
+  
   const {
     data: dataGetUser,
     isPending: isPendingGetUser,
@@ -54,7 +53,7 @@ function FormUser({setTitle}: Props){
     deleteUser, 
   } = useMutationUsersQuery()
   
-  const submit = (data: UserFormT) => {
+  const submit = (data: UserForm) => {
     Swal.fire({
       icon: 'question',
       text: data.id

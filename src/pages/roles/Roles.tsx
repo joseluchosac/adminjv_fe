@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react"
 import { Button, Card, Col, Container, Form, Row, Table } from "react-bootstrap"
-import { ModuloT } from "../../core/types"
+import { Modulo } from "../../core/types"
 import ModulosRolTree from "./ModulosRolTree"
 import { getModulosTree } from "../../core/utils/funciones"
-import { rolFormInit } from "../../core/types/initials"
 import { useMutateModulosQuery } from "../../core/hooks/useModulosQuery"
 import DynaIcon from "../../core/components/DynaComponents"
 import { LdsBar } from "../../core/components/Loaders"
@@ -14,11 +13,12 @@ import useCatalogosStore from "../../core/store/useCatalogosStore"
 import { Bounce, toast } from "react-toastify"
 import { useMutateRolesQuery } from "../../core/hooks/useRolesQuery"
 import { Rol } from "../../core/types/catalogosTypes"
+import { rolFormInit } from "../../core/utils/constants"
 
 const Roles: React.FC = () => {
   const [rolForm, setRolForm] = useState<Rol>(rolFormInit)
-  const [modulosRol, setModulosRol] = useState<ModuloT[] | null>(null)
-  const [itemsTree, setItemsTree] = useState<ModuloT[] | null>(null)
+  const [modulosRol, setModulosRol] = useState<Modulo[] | null>(null)
+  const [itemsTree, setItemsTree] = useState<Modulo[] | null>(null)
   const darkMode = useLayoutStore(state => state.layout.darkMode)
   const setModulosSesion = useSessionStore(state => state.setModulosSesion)
   const catalogos = useCatalogosStore(state => state.catalogos)

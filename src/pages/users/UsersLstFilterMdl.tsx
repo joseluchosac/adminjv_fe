@@ -15,7 +15,7 @@ import {
 import useCatalogosStore from "../../core/store/useCatalogosStore";
 // import { setDate } from "date-fns/fp";
 
-const dateRangeInit = { campo_name: "", campo_text: "", date_from: "", date_to: "" };
+const dateRangeInit = { fieldname: "", campo_text: "", date_from: "", date_to: "" };
 const equalFormInit = { rol_id: "", caja_id: "", estado: ""}
 
 const UsersLstFilterMdl: React.FC = () => {
@@ -41,32 +41,32 @@ const UsersLstFilterMdl: React.FC = () => {
 
   const handleEqual = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const campo_text = e.currentTarget.previousElementSibling?.textContent || ""
-    const { name: campo_name, value } = e.currentTarget;
+    const { name: fieldname, value } = e.currentTarget;
     const text = e.currentTarget.options[e.currentTarget.selectedIndex].textContent || ""
-    setEqualForm({...equalForm, [campo_name]:value})
-    // equal({campo_name, value, text, campo_text})
+    setEqualForm({...equalForm, [fieldname]:value})
+    // equal({fieldname, value, text, campo_text})
     let { equals } = filterParamsUsers;
-    const idx = equals.findIndex(el => el.campo_name === campo_name)
+    const idx = equals.findIndex(el => el.fieldname === fieldname)
     if(!value){
-      equals = equals.filter(el => el.campo_name !== campo_name)
+      equals = equals.filter(el => el.fieldname !== fieldname)
     }else{
       if(idx === -1){
-        equals = [ ...equals, {campo_name: campo_name, value: value, text, campo_text} ]
+        equals = [ ...equals, {fieldname: fieldname, value: value, text, campo_text} ]
       }else{
-        equals[idx] = {campo_name: campo_name, value: value, text, campo_text}
+        equals[idx] = {fieldname: fieldname, value: value, text, campo_text}
       }
     }
     setFilterParamsUsers({ ...filterParamsUsers, equals: [...equals] });
   }
 
   const handleSelectCampoRange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const campo_name = e.currentTarget.value;
+    const fieldname = e.currentTarget.value;
     const campo_text = e.currentTarget.options[e.currentTarget.selectedIndex].textContent || ""
-    if (!campo_name) {
+    if (!fieldname) {
       setDateRange(dateRangeInit);
       setRangeName("")
     } else {
-      setDateRange({ ...dateRange, campo_name, campo_text });
+      setDateRange({ ...dateRange, fieldname, campo_text });
     }
   };
 
@@ -86,7 +86,7 @@ const UsersLstFilterMdl: React.FC = () => {
 
   const handleRangePred = (e: React.MouseEvent<HTMLElement>) => {
     const { range_name } = e.currentTarget.dataset;
-    if (!dateRange.campo_name) return;
+    if (!dateRange.fieldname) return;
     let startDate = new Date();
     let endDate = new Date();
     if (range_name === "lastWeek") {
@@ -111,27 +111,27 @@ const UsersLstFilterMdl: React.FC = () => {
   };
 
   const handleFilterBetween = () => {
-    if(!dateRange.campo_name || !dateRange.date_from || !dateRange.date_to) return
+    if(!dateRange.fieldname || !dateRange.date_from || !dateRange.date_to) return
     const newBetween = {
-      campo_name: dateRange.campo_name,
+      fieldname: dateRange.fieldname,
       campo_text: dateRange.campo_text,
       range:
         (dateRange.date_from ? dateRange.date_from + " 00:00:00, " : "") +
         (dateRange.date_to ? dateRange.date_to + " 23:59:59" : ""),
     };
     if (
-      filterParamsUsers.between.campo_name == newBetween.campo_name &&
+      filterParamsUsers.between.fieldname == newBetween.fieldname &&
       filterParamsUsers.between.range == newBetween.range
     ) return;
     // between(newBetween)
-    // const newBetween = {campo_name, campo_text, range}
+    // const newBetween = {fieldname, campo_text, range}
     setFilterParamsUsers({ ...filterParamsUsers, between: newBetween });
   };
 
   const handleUnbetween = () => {
     setDateRange(dateRangeInit);
     setRangeName("")
-    if(!filterParamsUsers.between.campo_name) return
+    if(!filterParamsUsers.between.fieldname) return
     // unbetween()
     setFilterParamsUsers({...filterParamsUsers, between: usersStoreInit.filterParamsUsers.between})
     
@@ -142,17 +142,17 @@ const UsersLstFilterMdl: React.FC = () => {
 
   useEffect(() => {
     if(showUsersFilterMdl){
-      if(!filterParamsUsers.between.campo_name){
+      if(!filterParamsUsers.between.fieldname){
         handleUnbetween()
       }
-      const {range, campo_name, campo_text} = filterParamsUsers.between
+      const {range, fieldname, campo_text} = filterParamsUsers.between
       const date_from = range ? range.split(", ")[0].split(" ")[0] : ""
       const date_to = range ? range.split(", ")[1].split(" ")[0] : ""
-      setDateRange({campo_name, campo_text, date_from, date_to})
+      setDateRange({fieldname, campo_text, date_from, date_to})
       const newEqualForm = structuredClone(equalFormInit)
       for (const el of filterParamsUsers.equals) {
-        const campo_name = el.campo_name as keyof typeof equalFormInit
-        newEqualForm[campo_name] = el.value
+        const fieldname = el.fieldname as keyof typeof equalFormInit
+        newEqualForm[fieldname] = el.value
       }
       setEqualForm(newEqualForm)
     }
@@ -223,8 +223,8 @@ const UsersLstFilterMdl: React.FC = () => {
               <Form.Label htmlFor="f_entre">Rango de fechas</Form.Label>
               <Form.Select
                 id="f_entre"
-                name="campo_name"
-                value={dateRange.campo_name}
+                name="fieldname"
+                value={dateRange.fieldname}
                 onChange={handleSelectCampoRange}
               >
                 <option value="">Ninguno</option>
@@ -238,7 +238,7 @@ const UsersLstFilterMdl: React.FC = () => {
               </Form.Label>
               <Col sm="5">
                 <Form.Control
-                  disabled={!Boolean(dateRange.campo_name)}
+                  disabled={!Boolean(dateRange.fieldname)}
                   type="date"
                   name="date_from"
                   value={dateRange.date_from}

@@ -1,9 +1,9 @@
 import { create } from "zustand";
-import { CampoUserT, FilterCurrent, FilterParams } from "../types";
+import { CampoTable, FilterCurrent, FilterParams } from "../types";
 
 interface UseUsersStore {
   currentUserId: number;
-  camposUser: CampoUserT[];
+  camposUser: CampoTable[];
   filterParamsUsers: FilterParams;
   filterUsersCurrent: FilterCurrent;
   showUserFormMdl: boolean;
@@ -19,29 +19,29 @@ interface UseUsersStore {
 export const usersStoreInit = {
   currentUserId: 0,
   camposUser: [
-    {campo_name: "id", text:"Id", order_dir:"", show: false},
-    {campo_name: "nombres", text:"Nombres", order_dir:"", show: true},
-    {campo_name: "apellidos", text:"Apellidos", order_dir:"", show: true},
-    {campo_name: "username", text:"Usuario", order_dir:"", show: true},
-    {campo_name: "email", text:"Email", order_dir:"", show: true},
-    {campo_name: "estado", text:"Estado", order_dir:"", show: true},
-    {campo_name: "rol", text:"Rol", order_dir:"", show: true},
-    {campo_name: "rol_id", text:"Rol Id", order_dir:"", show: false},
-    {campo_name: "caja", text:"Caja", order_dir:"", show: true},
-    {campo_name: "caja_id", text:"Caja ID", order_dir:"", show: false},
-    {campo_name: "created_at", text:"F creación", order_dir:"", show: true},
-    {campo_name: "updated_at", text:"F actualización", order_dir:"", show: true},
+    {show: false, orderable: true, order_dir:"", fieldname: "id", text:"Id",  },
+    {show: true, orderable: true, order_dir:"", fieldname: "nombres", text:"Nombres",  },
+    {show: true, orderable: true, order_dir:"", fieldname: "apellidos", text:"Apellidos",  },
+    {show: true, orderable: true, order_dir:"", fieldname: "username", text:"Usuario",  },
+    {show: true, orderable: true, order_dir:"", fieldname: "email", text:"Email",  },
+    {show: true, orderable: true, order_dir:"", fieldname: "estado", text:"Estado",  },
+    {show: true, orderable: true, order_dir:"", fieldname: "rol", text:"Rol",  },
+    {show: false, orderable: true, order_dir:"", fieldname: "rol_id", text:"Rol Id",  },
+    {show: true, orderable: true, order_dir:"", fieldname: "caja", text:"Caja",  },
+    {show: false, orderable: true, order_dir:"", fieldname: "caja_id", text:"CajaID",  },
+    {show: true, orderable: true, order_dir:"", fieldname: "created_at", text:"F creación",  },
+    {show: true, orderable: true, order_dir:"", fieldname: "updated_at", text:"F actualización",  },
   ],
   filterParamsUsers: {
     offset: 25,
     search: "",
-    equals: [], // [{campo_name: "sucursal_id", value: "1", text:"principal", campo_text: "Sucursal"}]
-    between: {campo_name: "", campo_text: "", range: ""}, // {campo_name: "created_at", campo_text:"Creado", range: "2024-12-18 00:00:00, 2024-12-19 23:59:59"}
-    orders: [], // [{campo_name: "nombres", order_dir: "ASC", text: "Nombres"}]
+    equals: [], // [{fieldname: "sucursal_id", value: "1", text:"principal", campo_text: "Sucursal"}]
+    between: {fieldname: "", campo_text: "", range: ""}, // {fieldname: "created_at", campo_text:"Creado", range: "2024-12-18 00:00:00, 2024-12-19 23:59:59"}
+    orders: [], // [{fieldname: "nombres", order_dir: "ASC", text: "Nombres"}]
   },
   filterUsersCurrent: {
     equals: [],
-    between: {campo_name: "", campo_text: "", range: ""},
+    between: {fieldname: "", campo_text: "", range: ""},
     orders: [], 
   },
   showUserFormMdl: false,
@@ -58,7 +58,7 @@ const useUsersStore = create<UseUsersStore>(( set, get ) => ({
   setFilterUsersCurrent: () => {
     const {equals, between, orders} = get().filterParamsUsers
     const newCamposUsers = get().camposUser.map(el=>{
-      const order = orders.find(order => order.campo_name === el.campo_name)
+      const order = orders.find(order => order.fieldname === el.fieldname)
       return order ? {...el, order_dir: order?.order_dir} : {...el, order_dir: ""}
     })
     // console.log(newCamposUsers)

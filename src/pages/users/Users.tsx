@@ -12,7 +12,7 @@ import { LdsBar, LdsEllipsisCenter } from "../../core/components/Loaders";
 import UserFormMdl from "./UserFormMdl";
 import UsersTbl from "./UsersTbl";
 import DynaIcon from "../../core/components/DynaComponents";
-import { UserT } from "../../core/types";
+import { User } from "../../core/types";
 
 export default function Users(){
   const filterParamsUsers = useUsersStore(state => state.filterParamsUsers)
@@ -22,7 +22,7 @@ export default function Users(){
   const setCurrentUserId = useUsersStore(state => state.setCurrentUserId)
 
   const [inputSearch, setInputSearch] = useState("")
-  const [filas, setFilas] = useState<UserT[] | null>(null)
+  const [filas, setFilas] = useState<User[] | null>(null)
 
   const {
     data,
@@ -52,10 +52,10 @@ export default function Users(){
   };
 
   const handleUnequal = (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
-    const {campo_name} = e.currentTarget.dataset
-    if(campo_name){
+    const {fieldname} = e.currentTarget.dataset
+    if(fieldname){
       let { equals } = filterParamsUsers;
-      equals = equals.filter(el => el.campo_name !== campo_name)
+      equals = equals.filter(el => el.fieldname !== fieldname)
       setFilterParamsUsers({ ...filterParamsUsers, equals: [...equals] });
     }
   };
@@ -79,7 +79,7 @@ export default function Users(){
 
   const getDateRangeInfo = () => {
     const {between} = filterParamsUsers
-    if(!between.campo_name) return ""
+    if(!between.fieldname) return ""
     let date_from = between.range.split(",")[0].split(" ")[0]
     let date_to = between.range.split(",")[1].trim().split(" ")[0]
     date_from = date_from.split("-").reverse().join("/")
@@ -97,12 +97,12 @@ export default function Users(){
 
   useEffect(()=>{
     setInputSearch(filterParamsUsers.search)
-    // setFilterParamsUsers({...filterParamsUsers, orders: [{campo_name: "created_at", order_dir: "DESC", text: "F Creación"}]})
+    // setFilterParamsUsers({...filterParamsUsers, orders: [{fieldname: "created_at", order_dir: "DESC", text: "F Creación"}]})
   }, [])
   
   useEffect(()=>{
     if(data?.pages[0].error || !data?.pages[0].filas) return
-    const newFilas = data?.pages.flatMap(el => el.filas) as UserT[];
+    const newFilas = data?.pages.flatMap(el => el.filas) as User[];
     setFilas([...newFilas])
   },[data])
 
@@ -188,7 +188,7 @@ export default function Users(){
                       </div>
                   </Badge>
                 </Stack>
-                  {(filterUsersCurrent.between.campo_name.length !== 0) &&
+                  {(filterUsersCurrent.between.fieldname.length !== 0) &&
                     <Stack direction="horizontal" gap={2} className="flex-wrap">
                       <Badge bg="secondary" role="button" onClick={handleUnbetween} className="d-flex gap-1">
                         <DynaIcon name="FaCircleXmark"  className="pr-4" />
@@ -206,7 +206,7 @@ export default function Users(){
                         onClick={handleUnequal} 
                         className="d-flex gap-1" 
                         key={idx}
-                        data-campo_name={el.campo_name}
+                        data-fieldname={el.fieldname}
                       >
                         <DynaIcon name="FaCircleXmark"  className="pr-4" />
                         <div>{el.campo_text}: {el.text}</div>

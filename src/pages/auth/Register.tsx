@@ -4,9 +4,9 @@ import "./auth.css";
 import { useMutationUsersQuery } from "../../core/hooks/useUsersQuery";
 import { LdsBar } from "../../core/components/Loaders";
 import { Link } from "react-router-dom";
-import { registerFormInit } from "../../core/types/initials";
 import useRegisterFormValidate from "./hooks/useRegisterFormValidate";
 import useSessionStore from "../../core/store/useSessionStore";
+import { registerFormInit } from "../../core/utils/constants";
 
 const Register: React.FC = () => {
   const [registerForm, setRegisterForm] = useState(registerFormInit);

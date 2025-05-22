@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react"
-import { UserFormT } from "../../../core/types"
+import { UserForm } from "../../../core/types"
 
 const feedbkInit = {
   nombres: "",
@@ -10,7 +10,7 @@ const feedbkInit = {
   password_repeat: ""
 }
 
-function useUserFormValidate(userForm: UserFormT) {
+function useUserFormValidate(userForm: UserForm) {
   const [validated, setValidated] = useState(false)
   const [feedbk, setFeedbk] = useState(feedbkInit)
   const [validateErr, setValidateErr] = useState(false)

@@ -1,11 +1,11 @@
 import { useEffect, useRef } from 'react';
 import Sortable from 'sortablejs';
 import DynaIcon from '../../core/components/DynaComponents';
-import { ModuloT } from '../../core/types';
+import { Modulo } from '../../core/types';
 interface Props {
-  modulosTree: ModuloT[];
+  modulosTree: Modulo[];
   toEdit: (id: number) => void;
-  sortModulos: (itemsOrdered: ModuloT[]) => void;
+  sortModulos: (itemsOrdered: Modulo[]) => void;
 }
 
 const ModulosTree: React.FC<Props> = ({modulosTree, toEdit, sortModulos}) => {

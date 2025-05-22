@@ -3,7 +3,7 @@ import { Outlet, useNavigate } from "react-router-dom";
 import { useMutationUsersQuery } from "../hooks/useUsersQuery";
 import useSessionStore from "../store/useSessionStore";
 import { useMutateModulosQuery } from "../hooks/useModulosQuery";
-import { ModuloT } from "../types";
+import { Modulo } from "../types";
 import { LdsDots11 } from "../components/Loaders";
 
 interface Props { redirectTo: string; }
@@ -56,7 +56,7 @@ const PrivateRoutes: React.FC<Props> = ({ redirectTo }) => {
     const nombreModulo = location.pathname.split("/").filter(Boolean).pop();
     if(!nombreModulo) navigate("/home")
     if(!modulosSesion) return
-    const idx = modulosSesion.findIndex((el: ModuloT) => el.nombre === nombreModulo)
+    const idx = modulosSesion.findIndex((el: Modulo) => el.nombre === nombreModulo)
     if(idx === -1){
       setAccessModulo(false)
       navigate("/home")

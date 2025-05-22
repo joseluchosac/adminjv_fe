@@ -1,7 +1,7 @@
 const apiURL = import.meta.env.VITE_API_URL;
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import useSessionStore from "../store/useSessionStore"
-import { ModuloForm, ModuloT } from "../types"
+import { Modulo } from "../types"
 import { mutationFetch } from "../services/mutationFecth";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
@@ -59,7 +59,7 @@ export const useMutateModulosQuery = () => {
     mutate(params)
   }
 
-  const sortModulos = (orderedItems: ModuloT[]) => {
+  const sortModulos = (orderedItems: Modulo[]) => {
     const params = {
       url: apiURL + "modulos/sort_modulos",
       method: "PUT",
@@ -72,7 +72,7 @@ export const useMutateModulosQuery = () => {
     mutate(params)
   }
 
-  const updateModulo = (param: ModuloForm) => {
+  const updateModulo = (modulo: Modulo) => {
     const params = {
       url: apiURL + "modulos/update_modulo",
       method: "PUT",
@@ -80,12 +80,12 @@ export const useMutateModulosQuery = () => {
         Authorization,
         'nombre-modulo': nombreModulo,
       },
-      body: JSON.stringify(param),
+      body: JSON.stringify(modulo),
     }
     mutate(params)
   }
 
-  const createModulo = (param:  ModuloForm) => {
+  const createModulo = (param:  Modulo) => {
     const params = {
       url: apiURL + "modulos/create_modulo",
       method: "POST",

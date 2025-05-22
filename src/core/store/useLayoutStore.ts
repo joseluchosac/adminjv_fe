@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { ls_layoutKey } from "../types/initials";
+import { ls_layoutKey } from "../utils/constants";
 
 const layoutInit = {
   darkMode: false,

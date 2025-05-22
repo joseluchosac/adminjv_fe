@@ -1,7 +1,7 @@
 import { Button } from "react-bootstrap";
 import useClientesStore from "../../core/store/useClientesStore";
 import ClienteFormMdl from "../../core/components/ClienteFormMdl";
-import { Cliente } from "../../core/types/clientesTypes";
+import { Cliente } from "../../core/types";
 
 export default function Comprobantes() {
   const setShowClienteFormMdl = useClientesStore(state => state.setShowClienteFormMdl)

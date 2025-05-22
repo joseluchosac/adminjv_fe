@@ -7,11 +7,11 @@ import { useMutateModulosQuery } from "../../core/hooks/useModulosQuery"
 import { Bounce, toast } from "react-toastify"
 import Swal from "sweetalert2"
 import useModulos from "./hooks/useModulos"
-import { moduloFormInit } from "../../core/types/initials"
 import DynaIcon from "../../core/components/DynaComponents"
 import IconsModal from "../../core/components/IconsModal"
 import useSessionStore from "../../core/store/useSessionStore"
 import { LdsBar } from "../../core/components/Loaders"
+import { moduloFormInit } from "../../core/utils/constants"
 
 const Modulos:React.FC = () => {
   const [showIconsModal, setShowIconsModal] = useState(false);

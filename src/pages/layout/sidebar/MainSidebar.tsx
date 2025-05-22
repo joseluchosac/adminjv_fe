@@ -7,7 +7,7 @@ import { LdsEllipsisCenter } from '../../../core/components/Loaders';
 import useLayoutStore from '../../../core/store/useLayoutStore';
 import DynaIcon from '../../../core/components/DynaComponents';
 import useSessionStore from '../../../core/store/useSessionStore';
-import { ModuloT } from '../../../core/types';
+import { Modulo } from '../../../core/types';
 
 const MainSidebar:React.FC = () => {
   const [modulosSesionTree, setModulosSesionTree] = useState<any>(null)
@@ -42,7 +42,7 @@ const MainSidebar:React.FC = () => {
 
   const activarItem = () => {
     const nombreModulo = location.pathname.split("/").filter(Boolean).pop();
-    const moduloActual = modulosSesion?.find((el: ModuloT) => el.nombre === nombreModulo)
+    const moduloActual = modulosSesion?.find((el: Modulo) => el.nombre === nombreModulo)
 
     const navLinks = navSidebarRef.current?.querySelectorAll('.nav-link')
     navLinks?.forEach(el=>{

@@ -18,7 +18,7 @@ import Proveedores from './pages/proveedores/Proveedores';
 import Catalogos from './pages/catalogos/Catalogos';
 import Categorias from './pages/categorias/Categorias';
 import Laboratorios from './pages/laboratorios/Laboratorios';
-import Marcas from './pages/marcas/marcas';
+import Marcas from './pages/marcas/Marcas';
 
 const Tareas = lazy(() => import("./pages/tareas/Tareas"));
 const Users = lazy(() => import("./pages/users/Users"));

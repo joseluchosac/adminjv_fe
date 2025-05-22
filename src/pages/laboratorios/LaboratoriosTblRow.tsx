@@ -59,17 +59,17 @@ function LaboratoriosTblRow({ laboratorio, camposLaboratorio }: Props) {
   return (
     <tr className="text-nowrap">
       {camposLaboratorio.map((el) => {
-        const {campo_name, show} = el
+        const {fieldname, show} = el
         if(show){
-          switch (campo_name) {
+          switch (fieldname) {
             case "estado":{
-              return <td key={campo_name}> {laboratorio.estado == 0
+              return <td key={fieldname}> {laboratorio.estado == 0
                 ? <Badge bg="danger">Deshabilitdo</Badge>
                 : <Badge bg="success">Habilitado</Badge>} </td>
             }
             case "acciones":{
               return (
-                <td key={campo_name}>
+                <td key={fieldname}>
                   <div className="d-flex gap-2 justify-content-start">
                     <a onClick={handleToEdit} href="#" className="p-1" title="Editar">
                       <FaEdit />
@@ -83,9 +83,9 @@ function LaboratoriosTblRow({ laboratorio, camposLaboratorio }: Props) {
             } 
             default:{
               return (
-                <td key={campo_name}>
+                <td key={fieldname}>
                   <div className="text-wrap">
-                    {laboratorio[campo_name as keyof Laboratorio]}
+                    {laboratorio[fieldname as keyof Laboratorio]}
                   </div>
                 </td>
               )

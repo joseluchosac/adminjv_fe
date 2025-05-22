@@ -1,11 +1,11 @@
 // Genera arbol a partir de un arreglo de objetos
 
-import { Categoria, ModuloT } from "../types";
+import { Categoria, Modulo } from "../types";
 
 
-export function getModulosTree(data: ModuloT[]): ModuloT[] {
+export function getModulosTree(data: Modulo[]): Modulo[] {
   const mapa = new Map();
-  const raiz: ModuloT[] = [];
+  const raiz: Modulo[] = [];
   // Crear un mapa de los elementos
   data.forEach(item => {
     mapa.set(item.id, { ...item, children: [] });

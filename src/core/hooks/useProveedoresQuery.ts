@@ -6,7 +6,7 @@ import { mutationFetch } from "../services/mutationFecth"
 import { useNavigate } from "react-router-dom";
 import { filterProveedoresFetch } from "../services/proveedoresFetch";
 import useProveedoresStore, { proveedoresStoreInit } from "../store/useProveedoresStore";
-import { Proveedor } from "../types/proveedoresTypes";
+import { Proveedor } from "../types";
 
 
 // ****** FILTRAR CLIENTES ******
@@ -110,7 +110,7 @@ export const useMutationProveedoresQuery = () => {
     mutate(params)
   }
 
-  const createProveedor = (param: Proveedor) => {
+  const createProveedor = (proveedor: Proveedor) => {
     const params = {
       url: apiURL + "proveedores/create_proveedor",
       method: "POST",
@@ -118,7 +118,7 @@ export const useMutationProveedoresQuery = () => {
         Authorization,
         'nombre-modulo': nombreModulo,
       },
-      body: JSON.stringify(param),
+      body: JSON.stringify(proveedor),
     }
     mutate(params)
   }

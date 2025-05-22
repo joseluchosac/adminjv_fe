@@ -4,7 +4,7 @@ import useSessionStore from "../store/useSessionStore"
 import useUsersStore, { usersStoreInit } from "../store/useUsersStore"
 import { useEffect, useState } from "react"
 import { filterUsersFetch } from "../services/usersFetch"
-import { LoginForm, RegisterForm, UserFormT } from "../types"
+import { LoginForm, RegisterForm, UserForm } from "../types"
 import { mutationFetch } from "../services/mutationFecth"
 import { useNavigate } from "react-router-dom";
 // ****** FILTRAR USUARIOS ******
@@ -84,7 +84,7 @@ export const useMutationUsersQuery = () => {
       // queryClient.setQueryData(["users"], (oldData: InfiniteData<any, unknown> | undefined) => {
       //   let newData = structuredClone(oldData)
       //   oldData?.pages.forEach((page, idxPage) => { 
-      //     const idxUser = page.filas.findIndex((el: UserT)=>el.id === param.id)
+      //     const idxUser = page.filas.findIndex((el: User)=>el.id === param.id)
       //     if(idxUser !== -1 && newData){
       //       newData.pages[idxPage].filas[idxUser] = param
       //     }
@@ -99,7 +99,7 @@ export const useMutationUsersQuery = () => {
       // queryClient.setQueryData(["users"], (oldData: InfiniteData<any, unknown> | undefined) => {
       //   let newData = structuredClone(oldData)
       //   oldData?.pages.forEach((page, idxPage) => { 
-      //     const idxUser = page.filas.findIndex((el: UserT)=>el.id === resp.registro.id)
+      //     const idxUser = page.filas.findIndex((el: User)=>el.id === resp.registro.id)
       //     if(idxUser !== -1 && newData){
       //       newData.pages[idxPage].filas[idxUser] = resp.registro
       //     }
@@ -151,7 +151,7 @@ export const useMutationUsersQuery = () => {
     mutate(params)
   }
 
-  const createUser = (param: UserFormT) => {
+  const createUser = (param: UserForm) => {
     const params = {
       url: apiURL + "users/create_user",
       method: "POST",
@@ -174,7 +174,7 @@ export const useMutationUsersQuery = () => {
     mutate(params)
   }
 
-  const updateUser = (param: UserFormT) => {
+  const updateUser = (user: UserForm) => {
     const params = {
       url: apiURL + "users/update_user",
       method: "PUT",
@@ -182,12 +182,12 @@ export const useMutationUsersQuery = () => {
         Authorization,
         'nombre-modulo': nombreModulo,
       },
-      body: JSON.stringify(param),
+      body: JSON.stringify(user),
     }
     mutate(params)
   }
 
-  const updateUserSession = (param: UserFormT) => {
+  const updateUserSession = (user: UserForm) => {
     const params = {
       url: apiURL + "users/update_user_session",
       method: "PUT",
@@ -195,7 +195,7 @@ export const useMutationUsersQuery = () => {
         Authorization,
         'nombre-modulo': nombreModulo,
       },
-      body: JSON.stringify(param),
+      body: JSON.stringify(user),
     }
     mutate(params)
   }

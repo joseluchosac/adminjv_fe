@@ -8,11 +8,11 @@ import { Bounce, toast } from "react-toastify";
 import useCatalogosStore from "../store/useCatalogosStore";
 import { useForm } from "react-hook-form";
 import useClientesStore from "../store/useClientesStore";
-import {type Cliente } from "../types/clientesTypes";
 import { useMutationClientesQuery } from "../hooks/useClientesQuery";
 import { FaEdit, FaSearch, FaTrash } from "react-icons/fa";
 import UbigeosMdl from "./UbigeosMdl";
 import { Ubigeo } from "../types/catalogosTypes";
+import { Cliente } from "../types";
 const clienteForm_init = {
   id: 0,
   tipo_documento_cod: "0",

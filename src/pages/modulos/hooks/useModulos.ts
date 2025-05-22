@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react"
-import { ModuloForm, ModuloT, Padre } from "../../../core/types"
+import { Modulo, Padre } from "../../../core/types"
 import { moduloFormInit } from "../../../core/types/initials"
 import { getModulosTree } from "../../../core/utils/funciones"
 import { useMutateModulosQuery } from "../../../core/hooks/useModulosQuery"
 
 const useModulos = () => {
-  const [modulosTree, setModulosTree] = useState<ModuloT[] | null>(null)
-  const [moduloForm, setModuloForm] = useState<ModuloForm>(moduloFormInit)
+  const [modulosTree, setModulosTree] = useState<Modulo[] | null>(null)
+  const [moduloForm, setModuloForm] = useState<Modulo>(moduloFormInit)
   const [padres, setPadres] = useState<Padre[] | null>(null)
   const {
     isPending: isPendingGetModulos,
@@ -15,7 +15,7 @@ const useModulos = () => {
   } = useMutateModulosQuery()
 
   const toEdit = (id: number) => {
-    const moduloActual = modulos?.find((el: ModuloT) => el.id === id) as ModuloT
+    const moduloActual = modulos?.find((el: Modulo) => el.id === id) as Modulo
     setModuloForm(moduloActual)
     if(moduloActual.nombre == ""){
       setPadres(null)
@@ -29,7 +29,7 @@ const useModulos = () => {
     const modulosTree = getModulosTree(modulos)
     let nuevosPadres = modulosTree
       .filter((el:any) => (el.nombre == "" || el.nombre == null))
-      .map((el: ModuloT) => {
+      .map((el: Modulo) => {
         const {id, descripcion} = el
         return {id, descripcion}
       }

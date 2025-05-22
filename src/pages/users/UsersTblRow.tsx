@@ -1,11 +1,11 @@
 import useUsersStore from "../../core/store/useUsersStore";
 import { Badge } from "react-bootstrap";
-import { CampoUserT, UserT } from "../../core/types";
+import { CampoTable, User } from "../../core/types";
 import { format, isValid, parseISO } from "date-fns";
 
 interface UsersTblRowProps {
-  user: UserT ;
-  camposUser: CampoUserT[]
+  user: User ;
+  camposUser: CampoTable[]
 }
 
 function UsersTblRow({ user, camposUser }: UsersTblRowProps) {
@@ -14,7 +14,8 @@ function UsersTblRow({ user, camposUser }: UsersTblRowProps) {
   const setShowUserFormMdl = useUsersStore(state => state.setShowUserFormMdl)
 
 
-  const validDate = (date:string, formato = "dd/MM/yyyy") => {
+  const validDate = (date:string | undefined, formato = "dd/MM/yyyy") => {
+    if(!date) return ''
     return isValid(parseISO(date)) ? format(date, formato) : ''
   }
 
@@ -26,17 +27,17 @@ function UsersTblRow({ user, camposUser }: UsersTblRowProps) {
   return (
     <tr className="text-nowrap" onClick={handleToEdit}>
       {camposUser.map(el => {
-        const {campo_name, show} = el
+        const {fieldname, show} = el
 
         if(show){
-          if(campo_name === "estado"){
-            return <td key={campo_name}> {user.estado == 0
+          if(fieldname === "estado"){
+            return <td key={fieldname}> {user.estado == 0
               ? <Badge bg="danger">Deshabilitdo</Badge>
               : <Badge bg="success">Habilitado</Badge>} </td>
-          }else if(campo_name === "created_at" || campo_name === "updated_at" ){
-            return <td key={campo_name}>{validDate(user[campo_name], 'dd/MM/yyyy')}</td>
+          }else if(fieldname === "created_at" || fieldname === "updated_at" ){
+            return <td key={fieldname}>{validDate(user[fieldname], 'dd/MM/yyyy')}</td>
           }else{
-            return <td key={campo_name}>{user[campo_name as keyof UserT]}</td>
+            return <td key={fieldname}>{user[fieldname as keyof User]}</td>
           }
         }
       })}

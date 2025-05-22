@@ -1,11 +1,11 @@
-import { UserT } from "../../core/types";
+import { User } from "../../core/types";
 import UsersTblRow from "./UsersTblRow";
 import useUsersStore from "../../core/store/useUsersStore";
 import DynaIcon from "../../core/components/DynaComponents";
 import { Table } from "react-bootstrap";
 
 interface Props {
-  filas: UserT[];
+  filas: User[];
 }
 
 const UsersTbl: React.FC<Props> = ({filas}) => {
@@ -14,31 +14,31 @@ const UsersTbl: React.FC<Props> = ({filas}) => {
   const setFilterParamsUsers = useUsersStore(state => state.setFilterParamsUsers)
   
   const handleSort = (e: React.MouseEvent<HTMLTableCellElement, MouseEvent>) => {
-    let campo_name = e.currentTarget.dataset.campo as string;
+    let fieldname = e.currentTarget.dataset.campo as string;
     let text = e.currentTarget.textContent as string;
-    const orderIdx = filterParamsUsers.orders.findIndex(el => el.campo_name === campo_name)
+    const orderIdx = filterParamsUsers.orders.findIndex(el => el.fieldname === fieldname)
     if(e.ctrlKey){
       if(orderIdx === -1){
-        const newOrder = {campo_name, order_dir: "ASC", text}
+        const newOrder = {fieldname, order_dir: "ASC", text}
         setFilterParamsUsers({...filterParamsUsers, orders: [...filterParamsUsers.orders, newOrder]})
       }else{
         let newOrders = structuredClone(filterParamsUsers.orders)
         if(newOrders[orderIdx].order_dir == "ASC"){
-          newOrders[orderIdx] = {campo_name, order_dir: "DESC", text}
+          newOrders[orderIdx] = {fieldname, order_dir: "DESC", text}
           setFilterParamsUsers({...filterParamsUsers, orders: newOrders})
         }else{
-          newOrders = newOrders.filter(el=>el.campo_name !== campo_name)
+          newOrders = newOrders.filter(el=>el.fieldname !== fieldname)
           setFilterParamsUsers({...filterParamsUsers, orders: newOrders})
         }
       }
     }else{
       if(orderIdx === -1){
-        const newOrder = {campo_name, order_dir: "ASC", text}
+        const newOrder = {fieldname, order_dir: "ASC", text}
         setFilterParamsUsers({...filterParamsUsers, orders: [newOrder]})
       }else{
         let newOrders = structuredClone(filterParamsUsers.orders)
         if(newOrders[orderIdx].order_dir == "ASC"){
-          const newOrder = {campo_name, order_dir: "DESC", text}
+          const newOrder = {fieldname, order_dir: "DESC", text}
           setFilterParamsUsers({...filterParamsUsers, orders: [newOrder]})
         }else{
           setFilterParamsUsers({...filterParamsUsers, orders: []})
@@ -55,9 +55,9 @@ const UsersTbl: React.FC<Props> = ({filas}) => {
         {camposUser && camposUser.map((el) => {
           return ( el.show && (
             <th
-              key={el.campo_name}
+              key={el.fieldname}
               onClick={handleSort}
-              data-campo={el.campo_name}
+              data-campo={el.fieldname}
               role="button"
             >
               <div className="d-flex gap-1">
@@ -78,7 +78,7 @@ const UsersTbl: React.FC<Props> = ({filas}) => {
       </tr>
     </thead>
     <tbody>
-      {filas && filas.map((user: UserT) => (
+      {filas && filas.map((user: User) => (
         <UsersTblRow key={user.id} user={user} camposUser={camposUser}/>
       ))}
     </tbody>

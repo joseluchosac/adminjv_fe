@@ -1,6 +1,5 @@
 import { Badge, NavDropdown } from "react-bootstrap";
-import { CampoTable} from "../../core/types";
-import { Proveedor } from "../../core/types/proveedoresTypes";
+import { CampoTable, Proveedor} from "../../core/types";
 import useProveedoresStore from "../../core/store/useProveedoresStore";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import { useMutationProveedoresQuery } from "../../core/hooks/useProveedoresQuery";
@@ -64,32 +63,32 @@ function ProveedoresTblRow({ proveedor, camposProveedor }: Props) {
   return (
     <tr className="text-nowrap">
       {camposProveedor.map((el) => {
-        const {campo_name, show} = el
+        const {fieldname, show} = el
         if(show){
-          switch (campo_name) {
+          switch (fieldname) {
             case "nro_documento":{
               return (
-                <td key={campo_name}>
+                <td key={fieldname}>
                   <div>
-                    {proveedor.tipo_documento + ' ' + proveedor[campo_name as keyof Proveedor] }
+                    {proveedor.tipo_documento + ' ' + proveedor[fieldname as keyof Proveedor] }
                   </div>
                 </td>
               )
             }
             case "nombre_razon_social":{
               return (
-                <td key={campo_name} style={{minWidth: "200px"}}>
+                <td key={fieldname} style={{minWidth: "200px"}}>
                   <div className="text-wrap" style={{minWidth: "200px"}}>
-                    {proveedor[campo_name as keyof Proveedor]}
+                    {proveedor[fieldname as keyof Proveedor]}
                   </div>
                 </td>
               )
             }
             case "direccion":{
               return (
-                <td key={campo_name}>
+                <td key={fieldname}>
                   <div className="text-wrap">
-                    {proveedor[campo_name as keyof Proveedor]}
+                    {proveedor[fieldname as keyof Proveedor]}
                   </div>
                   <small>
                     {proveedor.departamento +', '+ proveedor.provincia +', '+ proveedor.distrito}
@@ -98,13 +97,13 @@ function ProveedoresTblRow({ proveedor, camposProveedor }: Props) {
               )
             }
             case "estado":{
-              return <td key={campo_name}> {proveedor.estado == 0
+              return <td key={fieldname}> {proveedor.estado == 0
                 ? <Badge bg="danger">Deshabilitdo</Badge>
                 : <Badge bg="success">Habilitado</Badge>} </td>
             }
             case "acciones":{
               return (
-                <td key={campo_name}>
+                <td key={fieldname}>
                   <div className="d-flex gap-2 justify-content-center">
                     <NavDropdown title={<div className="p-1"></div>}>
                       <NavDropdown.Item onClick={handleDelete}  className="d-flex gap-2 align-middle" href="#">
@@ -121,9 +120,9 @@ function ProveedoresTblRow({ proveedor, camposProveedor }: Props) {
             } 
             default:{
               return (
-                <td key={campo_name}>
+                <td key={fieldname}>
                   <div className="text-wrap">
-                    {proveedor[campo_name as keyof Proveedor]}
+                    {proveedor[fieldname as keyof Proveedor]}
                   </div>
                 </td>
               )

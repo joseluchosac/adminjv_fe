@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react"
 import useClientesStore, { clientesStoreInit } from "../../core/store/useClientesStore"
-import {type Cliente } from "../../core/types/clientesTypes"
 import { useFilterClientesQuery } from "../../core/hooks/useClientesQuery"
 import { useDebounce } from "react-use"
 import { Bounce, toast } from "react-toastify"
@@ -12,6 +11,7 @@ import ClientesTbl from "./ClientesTbl"
 import ClienteFormMdl from "../../core/components/ClienteFormMdl"
 import { BsSearch } from "react-icons/bs"
 import { FiFilter } from "react-icons/fi"
+import { Cliente } from "../../core/types"
 
 export default function Clientes() {
   const filterParamsClientes = useClientesStore(state => state.filterParamsClientes)
@@ -56,10 +56,10 @@ export default function Clientes() {
   };
 
   const handleUnequal = (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
-    const {campo_name} = e.currentTarget.dataset
-    if(campo_name){
+    const {fieldname} = e.currentTarget.dataset
+    if(fieldname){
       let { equals } = filterParamsClientes;
-      equals = equals.filter(el => el.campo_name !== campo_name)
+      equals = equals.filter(el => el.fieldname !== fieldname)
       setFilterParamsClientes({ ...filterParamsClientes, equals: [...equals] });
     }
   };
@@ -83,7 +83,7 @@ export default function Clientes() {
 
   const getDateRangeInfo = () => {
     const {between} = filterParamsClientes
-    if(!between.campo_name) return ""
+    if(!between.fieldname) return ""
     let date_from = between.range.split(",")[0].split(" ")[0]
     let date_to = between.range.split(",")[1].trim().split(" ")[0]
     date_from = date_from.split("-").reverse().join("/")
@@ -212,7 +212,7 @@ export default function Clientes() {
                     </div>
                 </Badge>
               </Stack>
-                {(filterClientesCurrent.between.campo_name.length !== 0) &&
+                {(filterClientesCurrent.between.fieldname.length !== 0) &&
                   <Stack direction="horizontal" gap={2} className="flex-wrap">
                     <Badge bg="secondary" role="button" onClick={handleUnbetween} className="d-flex gap-1">
                       <DynaIcon name="FaCircleXmark"  className="pr-4" />
@@ -230,7 +230,7 @@ export default function Clientes() {
                       onClick={handleUnequal} 
                       className="d-flex gap-1" 
                       key={idx}
-                      data-campo_name={el.campo_name}
+                      data-fieldname={el.fieldname}
                     >
                       <DynaIcon name="FaCircleXmark"  className="pr-4" />
                       <div>{el.campo_text}: {el.text}</div>
