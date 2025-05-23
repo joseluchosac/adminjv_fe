@@ -121,7 +121,7 @@ export default function MarcaForm() {
     <div>
       <Modal show={showMarcaForm} onHide={()=>setShowMarcaForm(false)} backdrop="static" size="md" >
         <Modal.Header closeButton className="py-2">
-          <Modal.Title>{currentMarcaId ? "Editar marca" : "Nuevo marca"}</Modal.Title>
+          <Modal.Title>{currentMarcaId ? "Editar marca" : "Nueva marca"}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Form onSubmit={handleSubmit(submit)} id="marca_form">

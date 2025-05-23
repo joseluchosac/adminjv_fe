@@ -62,7 +62,7 @@ const LaboratoriosTbl: React.FC<Props> = ({filas}) => {
               style={el.fieldname=="acciones" ? {position: "sticky", left: 0} : {}}
             >
               <div className="d-flex gap-1">
-                <div>{el.text}</div>
+                <div>{el.label}</div>
                 <div>
                   {el.order_dir == "ASC" 
                     ? (<DynaIcon className="text-warning" name="FaArrowDownAZ" />) 

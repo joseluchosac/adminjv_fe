@@ -1,5 +1,5 @@
 import Modal from "react-bootstrap/Modal";
-import useUsersStore, { usersStoreInit } from "../../core/store/useUsersStore";
+import useUsersStore from "../../core/store/useUsersStore";
 import { Badge, Button, Col, Form, Row, Tab, Tabs } from "react-bootstrap";
 import { useEffect, useState } from "react";
 import {
@@ -13,6 +13,7 @@ import {
 } from "date-fns";
 // import { useFilterUsersQuery } from "../../core/hooks/useUsersQuery";
 import useCatalogosStore from "../../core/store/useCatalogosStore";
+import { filterParamsInit } from "../../core/utils/constants";
 // import { setDate } from "date-fns/fp";
 
 const dateRangeInit = { fieldname: "", campo_text: "", date_from: "", date_to: "" };
@@ -44,7 +45,6 @@ const UsersLstFilterMdl: React.FC = () => {
     const { name: fieldname, value } = e.currentTarget;
     const text = e.currentTarget.options[e.currentTarget.selectedIndex].textContent || ""
     setEqualForm({...equalForm, [fieldname]:value})
-    // equal({fieldname, value, text, campo_text})
     let { equals } = filterParamsUsers;
     const idx = equals.findIndex(el => el.fieldname === fieldname)
     if(!value){
@@ -56,6 +56,7 @@ const UsersLstFilterMdl: React.FC = () => {
         equals[idx] = {fieldname: fieldname, value: value, text, campo_text}
       }
     }
+    console.log(equals)
     setFilterParamsUsers({ ...filterParamsUsers, equals: [...equals] });
   }
 
@@ -133,7 +134,7 @@ const UsersLstFilterMdl: React.FC = () => {
     setRangeName("")
     if(!filterParamsUsers.between.fieldname) return
     // unbetween()
-    setFilterParamsUsers({...filterParamsUsers, between: usersStoreInit.filterParamsUsers.between})
+    setFilterParamsUsers({...filterParamsUsers, between: filterParamsInit.between})
     
   }
   useEffect(() => {
@@ -258,48 +259,48 @@ const UsersLstFilterMdl: React.FC = () => {
                 />
               </Col>
             </Form.Group>
-              <div className="d-flex gap-3 my-3 flex-wrap">
-                <Badge
-                  bg={rangeName === "lastMonth" ? "success" : ""}
-                  role="button"
-                  onClick={handleRangePred}
-                  data-range_name="lastMonth"
-                  >
-                  Mes pasado
-                </Badge>
-                <Badge
-                  bg={rangeName === "lastWeek" ? "success" : ""}
-                  role="button"
-                  onClick={handleRangePred}
-                  data-range_name="lastWeek"
-                  >
-                  Semana pasada
-                </Badge>
-                <Badge 
-                  bg={rangeName === "today" ? "success" : ""}
-                  role="button" 
-                  onClick={handleRangePred} 
-                  data-range_name="today"
-                  >
-                  Hoy
-                </Badge>
-                <Badge
-                  bg={rangeName === "thisWeek" ? "success" : ""}
-                  role="button"
-                  onClick={handleRangePred}
-                  data-range_name="thisWeek"
-                  >
-                  Esta semana
-                </Badge>
-                <Badge
-                  bg={rangeName === "thisMonth" ? "success" : ""}
-                  role="button"
-                  onClick={handleRangePred}
-                  data-range_name="thisMonth"
+            <div className="d-flex gap-3 my-3 flex-wrap">
+              <Badge
+                bg={rangeName === "lastMonth" ? "success" : ""}
+                role="button"
+                onClick={handleRangePred}
+                data-range_name="lastMonth"
                 >
-                  Este mes
-                </Badge>
-              </div>
+                Mes pasado
+              </Badge>
+              <Badge
+                bg={rangeName === "lastWeek" ? "success" : ""}
+                role="button"
+                onClick={handleRangePred}
+                data-range_name="lastWeek"
+                >
+                Semana pasada
+              </Badge>
+              <Badge 
+                bg={rangeName === "today" ? "success" : ""}
+                role="button" 
+                onClick={handleRangePred} 
+                data-range_name="today"
+                >
+                Hoy
+              </Badge>
+              <Badge
+                bg={rangeName === "thisWeek" ? "success" : ""}
+                role="button"
+                onClick={handleRangePred}
+                data-range_name="thisWeek"
+                >
+                Esta semana
+              </Badge>
+              <Badge
+                bg={rangeName === "thisMonth" ? "success" : ""}
+                role="button"
+                onClick={handleRangePred}
+                data-range_name="thisMonth"
+              >
+                Este mes
+              </Badge>
+            </div>
             <Form.Group className="mt-4">
               <Col className="text-end">
                 <Button onClick={handleUnbetween} variant="secondary" className="mx-3">Eliminar rango</Button>

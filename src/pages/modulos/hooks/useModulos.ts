@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react"
 import { Modulo, Padre } from "../../../core/types"
-import { moduloFormInit } from "../../../core/types/initials"
 import { getModulosTree } from "../../../core/utils/funciones"
 import { useMutateModulosQuery } from "../../../core/hooks/useModulosQuery"
+import { moduloFormInit } from "../../../core/utils/constants"
 
 const useModulos = () => {
   const [modulosTree, setModulosTree] = useState<Modulo[] | null>(null)

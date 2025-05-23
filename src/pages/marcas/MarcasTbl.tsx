@@ -10,11 +10,11 @@ import { Marca } from "../../core/types";
 import { LdsEllipsisCenter } from "../../core/components/Loaders";
 
 const MarcasTbl: React.FC = () => {
-  const {marcas, setMarcas} = useMarcas()
+  const {marcas, setMarcas, setFilterMarcasCurrent} = useMarcas()
   const camposMarca = useMarcasStore(state => state.camposMarca)
+  const setCamposMarca = useMarcasStore(state => state.setCamposMarca)
   const filterParamsMarcas = useMarcasStore(state => state.filterParamsMarcas)
   const setFilterParamsMarcas = useMarcasStore(state => state.setFilterParamsMarcas)
-  const setFilterMarcasCurrent = useMarcasStore(state => state.setFilterMarcasCurrent)
   const tableRef = useRef<HTMLDivElement | null>(null)
   const ldsEllipsisRef = useRef<HTMLDivElement | null>(null)
 
@@ -70,7 +70,15 @@ const MarcasTbl: React.FC = () => {
 
   useEffect(()=>{
     if(data?.pages[0].error || isError) return
-    if(!isFetching) setFilterMarcasCurrent()
+    if(!isFetching) {
+      const {equals, between, orders} = filterParamsMarcas
+      setFilterMarcasCurrent({equals, between, orders})
+      const newCamposMarcas = camposMarca.map(el=>{
+        const order = orders.find(order => order.fieldname === el.fieldname)
+        return order ? {...el, order_dir: order?.order_dir} : {...el, order_dir: ""}
+      })
+    setCamposMarca(newCamposMarcas)
+    }
   },[data, isFetching])
 
   useEffect(() => {
@@ -99,7 +107,7 @@ const MarcasTbl: React.FC = () => {
                           style={el.fieldname=="acciones" ? {position: "sticky", left: 0} : {}}
                         >
                           <div className="d-flex gap-1">
-                            <div>{el.text}</div>
+                            <div>{el.label}</div>
                             <div>
                               {el.order_dir == "ASC" 
                                 ? (<DynaIcon className="text-warning" name="FaArrowDownAZ" />) 

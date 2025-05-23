@@ -2,9 +2,8 @@ import { useEffect, useRef } from "react"
 import { Button, Col, Container, Form, Row } from "react-bootstrap"
 import { Controller, useForm } from "react-hook-form"
 import SelectAsync from "react-select/async"
-import useMarcasStore from "../../core/store/useMarcasStore"
 import useLayoutStore from "../../core/store/useLayoutStore"
-import { selectDark } from "../../core/utils/constants"
+import { filterParamsInit, selectDark } from "../../core/utils/constants"
 import useLaboratoriosStore from "../../core/store/useLaboratoriosStore"
 import { filterLaboratoriosFetch } from "../../core/services/laboratoriosFetch"
 import useSessionStore from "../../core/store/useSessionStore"
@@ -43,7 +42,6 @@ const unProducto = {
 
 function Formulario() {
   const filterParamsLaboratorios = useLaboratoriosStore(state => state.filterParamsLaboratorios)
-  const filterParamsMarcas = useMarcasStore(state => state.filterParamsMarcas)
   const darkMode = useLayoutStore(state => state.layout.darkMode)
   const tknSession = useSessionStore(state => state.tknSession)
 
@@ -72,7 +70,7 @@ function Formulario() {
   const loadMarcasOptions =  debounce((search: string, callback: any) => {
     abortMarcas.current?.abort(); // ✅ Cancela la petición anterior
     abortMarcas.current = new AbortController();
-    const filtered = {...filterParamsMarcas, search}
+    const filtered = {...filterParamsInit, search}
     filterMarcasFetch({filterParamsMarcas: filtered, pageParam:1, token: tknSession, signal: abortMarcas.current.signal })
     .then(data=>{
       callback(data.filas.map(el=>({value:el.id, label:el.nombre})))

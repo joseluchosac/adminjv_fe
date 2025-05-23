@@ -1,11 +1,13 @@
 import { MarcasProvider} from "./context/MarcasContext";
-import MarcasMenu from "./MarcasMenu";
+import MarcaForm from "./MarcaForm";
+import MarcasHead from "./MarcasHead";
 import MarcasTbl from "./MarcasTbl";
 export default function Marcas() {
   return (
     <MarcasProvider>
-      <MarcasMenu />
+      <MarcasHead />
       <MarcasTbl />
+      <MarcaForm />
     </MarcasProvider>
   )
 }

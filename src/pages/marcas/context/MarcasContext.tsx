@@ -1,5 +1,11 @@
 import { createContext, useContext, useState } from "react";
-import { Marca } from "../../../core/types";
+import { FilterCurrent, Marca } from "../../../core/types";
+
+const filterMarcasCurrentInit: FilterCurrent = {
+  equals: [],
+  between: {fieldname: "", campo_text: "", range: ""},
+  orders: [], 
+}
 
 export interface MarcasContextType {
   marcas: Marca[] | null;
@@ -8,6 +14,8 @@ export interface MarcasContextType {
   setShowMarcaForm: React.Dispatch<React.SetStateAction<boolean>>;
   currentMarcaId: number;
   setCurrentMarcaId: React.Dispatch<React.SetStateAction<number>>;
+  filterMarcasCurrent: FilterCurrent;
+  setFilterMarcasCurrent: React.Dispatch<React.SetStateAction<FilterCurrent>>;
 }
 
 // Crear el contexto con un valor por defecto
@@ -18,6 +26,7 @@ export const MarcasProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [marcas, setMarcas] = useState<Marca[] | null>(null);
   const [showMarcaForm, setShowMarcaForm] = useState(false);
   const [currentMarcaId, setCurrentMarcaId] = useState(0);
+  const [filterMarcasCurrent, setFilterMarcasCurrent] = useState(filterMarcasCurrentInit);
 
   return (
     <MarcasContext.Provider value={{ 
@@ -26,7 +35,9 @@ export const MarcasProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       showMarcaForm, 
       setShowMarcaForm,
       currentMarcaId,
-      setCurrentMarcaId
+      setCurrentMarcaId,
+      filterMarcasCurrent,
+      setFilterMarcasCurrent
     }}>
       {children}
     </MarcasContext.Provider>

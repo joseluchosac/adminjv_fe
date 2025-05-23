@@ -2,17 +2,32 @@ import { User } from "../../core/types";
 import UsersTblRow from "./UsersTblRow";
 import useUsersStore from "../../core/store/useUsersStore";
 import DynaIcon from "../../core/components/DynaComponents";
-import { Table } from "react-bootstrap";
+import { Card, Table } from "react-bootstrap";
+import { useFilterUsersQuery } from "../../core/hooks/useUsersQuery";
+import { useEffect, useRef } from "react";
+import { LdsEllipsisCenter } from "../../core/components/Loaders";
+import { Bounce, toast } from "react-toastify";
+import { useUsers } from "./context/UsersContext";
 
-interface Props {
-  filas: User[];
-}
 
-const UsersTbl: React.FC<Props> = ({filas}) => {
+const UsersTbl: React.FC = () => {
   const camposUser = useUsersStore(state => state.camposUser)
+  const setCamposUser = useUsersStore(state => state.setCamposUser)
   const filterParamsUsers = useUsersStore(state => state.filterParamsUsers)
   const setFilterParamsUsers = useUsersStore(state => state.setFilterParamsUsers)
+  const {users, setUsers, setFilterUsersCurrent,} = useUsers()
   
+  const {
+    data,
+    fetchNextPage,
+    isLoading,
+    isFetching,
+    isError,
+    hasNextPage,
+  } = useFilterUsersQuery();
+  const tableRef = useRef<HTMLDivElement | null>(null)
+  const ldsEllipsisRef = useRef<HTMLDivElement | null>(null)
+
   const handleSort = (e: React.MouseEvent<HTMLTableCellElement, MouseEvent>) => {
     let fieldname = e.currentTarget.dataset.campo as string;
     let text = e.currentTarget.textContent as string;
@@ -47,42 +62,97 @@ const UsersTbl: React.FC<Props> = ({filas}) => {
 
     }
   };
- 
-  return (
-    <Table striped hover className="mb-1">
-    <thead className="sticky-top">
-      <tr className="text-nowrap">
-        {camposUser && camposUser.map((el) => {
-          return ( el.show && (
-            <th
-              key={el.fieldname}
-              onClick={handleSort}
-              data-campo={el.fieldname}
-              role="button"
-            >
-              <div className="d-flex gap-1">
-                <div>{el.text}</div>
-                <div>
-                  {el.order_dir == "ASC" 
-                    ? (<DynaIcon className="text-warning" name="FaArrowDownAZ" />) 
-                    : el.order_dir == "DESC"
-                      ? (<DynaIcon className="text-warning" name="FaArrowDownZA" />)
-                      : ("")
-                  }
+  const handleNextPage = () => {
+    fetchNextPage();
+  };
 
+
+  useEffect(()=>{
+    if(data?.pages[0].error || !data?.pages[0].filas) return
+    const newUsers = data?.pages.flatMap(el => el.filas) as User[];
+    setUsers([...newUsers])
+  },[data])
+
+  useEffect(()=>{
+    if(data?.pages[0].error || isError) return
+    if(!isFetching) {
+      const {equals, between, orders} = filterParamsUsers
+      setFilterUsersCurrent({equals, between, orders})
+      const newCamposMarcas = camposUser.map(el=>{
+        const order = orders.find(order => order.fieldname === el.fieldname)
+        return order ? {...el, order_dir: order?.order_dir} : {...el, order_dir: ""}
+      })
+      setCamposUser(newCamposMarcas)
+    }
+  },[data, isFetching])
+
+  useEffect(() => {
+    if(data?.pages[0].error || isError){
+      toast.error("Error al obtener registros", {
+        autoClose: 3000,
+        transition: Bounce,
+      })
+    }
+  }, [data, isError])
+  return (
+
+      <Card className="overflow-hidden">
+        <div className="position-relative">
+          <div className="table-responsive" style={{ height: "73vh" }} ref={tableRef}>
+            <Table striped hover className="mb-1">
+              <thead className="sticky-top">
+                <tr className="text-nowrap">
+                  {camposUser && camposUser.map((el) => {
+                    return ( el.show && (
+                      <th
+                        key={el.fieldname}
+                        onClick={handleSort}
+                        data-campo={el.fieldname}
+                        role="button"
+                      >
+                        <div className="d-flex gap-1">
+                          <div>{el.label}</div>
+                          <div>
+                            {el.order_dir == "ASC" 
+                              ? (<DynaIcon className="text-warning" name="FaArrowDownAZ" />) 
+                              : el.order_dir == "DESC"
+                                ? (<DynaIcon className="text-warning" name="FaArrowDownZA" />)
+                                : ("")
+                            }
+
+                          </div>
+                        </div>
+                      </th>
+                    ));
+                  })}
+                </tr>
+              </thead>
+              <tbody>
+                {users && users.map((user: User) => (
+                  <UsersTblRow key={user.id} user={user} camposUser={camposUser}/>
+                ))}
+              </tbody>
+            </Table>
+            <div className="position-relative">
+              {hasNextPage &&
+                <div className="m-3">
+                  <button onClick={handleNextPage} className="btn btn-success">Cargar mas registros</button>
                 </div>
-              </div>
-            </th>
-          ));
-        })}
-      </tr>
-    </thead>
-    <tbody>
-      {filas && filas.map((user: User) => (
-        <UsersTblRow key={user.id} user={user} camposUser={camposUser}/>
-      ))}
-    </tbody>
-  </Table>
+              }
+              {(users?.length === 0) && <div>No hay registros para mostrar</div>}
+            </div>
+          </div>
+          {isLoading && <LdsEllipsisCenter innerRef={ldsEllipsisRef}/>}
+          {isError && <div className="text-danger">Error de conexion</div>}
+        </div>
+      </Card>
+
+
+
+
+
+
+
   )
 }
 

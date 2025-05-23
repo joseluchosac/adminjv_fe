@@ -1,3 +1,5 @@
+import { FilterParams } from "../types";
+
 //--> CLAVES PARA LOCAL STORAGE
 export const ls_layoutKey = "ls_layout"
 export const selectDark = {
@@ -37,24 +39,6 @@ export const selectDark = {
 
 export const lsTknSessionKey = "lsTknSession"
 
-//--> USERS
-// *****************************************************
-
-
-// export const camposUserInit = [
-//   {fieldname: "id", text:"Id", order_dir:"", show: false},
-//   {fieldname: "nombres", text:"Nombres", order_dir:"", show: true},
-//   {fieldname: "apellidos", text:"Apellidos", order_dir:"", show: true},
-//   {fieldname: "username", text:"Nombre de usuario", order_dir:"", show: true},
-//   {fieldname: "email", text:"Email", order_dir:"", show: true},
-//   {fieldname: "estado", text:"Estado", order_dir:"", show: true},
-//   {fieldname: "rol", text:"Rol", order_dir:"", show: true},
-//   {fieldname: "rol_id", text:"Rol Id", order_dir:"", show: false},
-//   {fieldname: "caja", text:"Caja", order_dir:"", show: true},
-//   {fieldname: "caja_id", text:"Caja ID", order_dir:"", show: false},
-//   {fieldname: "created_at", text:"Fecha creación", order_dir:"", show: true},
-//   {fieldname: "updated_at", text:"Fecha actualización", order_dir:"", show: true},
-// ]
 
 export const registerFormInit = {
   nombres: "",
@@ -81,4 +65,12 @@ export const moduloFormInit = {
 export const rolFormInit = {
   id: 0,
   rol: "",
+}
+
+export const filterParamsInit: FilterParams = {
+    offset: 25,
+    search: "",
+    equals: [], // [{fieldname: "sucursal_id", value: "1", text:"principal", campo_text: "Sucursal"}]
+    between: {fieldname: "", campo_text: "", range: ""}, // {fieldname: "created_at", campo_text:"Creado", range: "2024-12-18 00:00:00, 2024-12-19 23:59:59"}
+    orders: [], // [{fieldname: "nombres", order_dir: "ASC", text: "Nombres"}]
 }

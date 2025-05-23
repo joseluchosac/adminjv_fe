@@ -1,13 +1,15 @@
 const apiURL = import.meta.env.VITE_API_URL;
 import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import useSessionStore from "../store/useSessionStore"
-import useUsersStore, { usersStoreInit } from "../store/useUsersStore"
+import useUsersStore from "../store/useUsersStore"
 import { useEffect, useState } from "react"
 import { filterUsersFetch } from "../services/usersFetch"
 import { LoginForm, RegisterForm, UserForm } from "../types"
 import { mutationFetch } from "../services/mutationFecth"
 import { useNavigate } from "react-router-dom";
-// ****** FILTRAR USUARIOS ******
+import { filterParamsInit } from "../utils/constants";
+
+// ****** FILTRAR ******
 export const useFilterUsersQuery = () => {
   const resetSessionStore = useSessionStore(state => state.resetSessionStore)
   const navigate = useNavigate()
@@ -16,7 +18,6 @@ export const useFilterUsersQuery = () => {
   const filterParamsUsers = useUsersStore(state => state.filterParamsUsers)
   const queryClient = useQueryClient()
   const setFilterParamsUsers = useUsersStore(state => state.setFilterParamsUsers)
-
 
   const {fetchNextPage, data, refetch, isError, isLoading, isFetching, hasNextPage,  } = useInfiniteQuery({
     queryKey: ['users'],
@@ -36,7 +37,7 @@ export const useFilterUsersQuery = () => {
     queryClient.resetQueries({ queryKey: ['users'], exact: true });
     return () => {
       queryClient.setQueryData(['users'], () => null)
-      setFilterParamsUsers(usersStoreInit.filterParamsUsers)
+      setFilterParamsUsers(filterParamsInit)
     }
   },[])
   
@@ -65,7 +66,7 @@ export const useFilterUsersQuery = () => {
   }
 }
 
-// ****** MUTATION USUARIOS ******
+// ****** MUTATION ******
 export const useMutationUsersQuery = () => {
   const resetSessionStore = useSessionStore(state => state.resetSessionStore)
   const navigate = useNavigate()
@@ -73,6 +74,7 @@ export const useMutationUsersQuery = () => {
   const nombreModulo = useSessionStore(state => state.moduloActual?.nombre)
   const Authorization = "Bearer " + tknSession
   const filterParamsUsers = useUsersStore(state => state.filterParamsUsers)
+
 
   const queryClient = useQueryClient()
 

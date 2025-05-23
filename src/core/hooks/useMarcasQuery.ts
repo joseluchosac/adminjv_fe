@@ -3,10 +3,11 @@ import { useEffect, useRef, useState } from "react"
 import { useNavigate } from "react-router-dom";
 import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import useSessionStore from "../store/useSessionStore"
-import useMarcasStore, { marcasStoreInit } from "../store/useMarcasStore";
+import useMarcasStore from "../store/useMarcasStore";
 import { mutationFetch } from "../services/mutationFecth"
 import { filterMarcasFetch } from "../services/marcasFetch";
 import { Marca } from "../types";
+import { filterParamsInit } from "../utils/constants";
 
 type TypeAction = 
   "filter_full" 
@@ -39,7 +40,7 @@ export const useFilterMarcasQuery = () => {
     queryClient.resetQueries({ queryKey: ['marcas'], exact: true });
     return () => {
       queryClient.setQueryData(['marcas'], () => null)
-      setFilterParamsMarcas(marcasStoreInit.filterParamsMarcas)
+      setFilterParamsMarcas(filterParamsInit)
     }
   },[])
   

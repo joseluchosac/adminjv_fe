@@ -1,7 +1,7 @@
-import useUsersStore from "../../core/store/useUsersStore";
 import { Badge } from "react-bootstrap";
 import { CampoTable, User } from "../../core/types";
 import { format, isValid, parseISO } from "date-fns";
+import { useUsers } from "./context/UsersContext";
 
 interface UsersTblRowProps {
   user: User ;
@@ -10,9 +10,7 @@ interface UsersTblRowProps {
 
 function UsersTblRow({ user, camposUser }: UsersTblRowProps) {
 
-  const setCurrentUserId = useUsersStore(state => state.setCurrentUserId)
-  const setShowUserFormMdl = useUsersStore(state => state.setShowUserFormMdl)
-
+  const {setCurrentUserId, setShowUserForm} = useUsers()
 
   const validDate = (date:string | undefined, formato = "dd/MM/yyyy") => {
     if(!date) return ''
@@ -21,7 +19,7 @@ function UsersTblRow({ user, camposUser }: UsersTblRowProps) {
 
   const handleToEdit = () => {
     setCurrentUserId(user.id)
-    setShowUserFormMdl(true)
+    setShowUserForm(true)
   }
 
   return (

@@ -10,7 +10,7 @@ export type ResponseQuery = {
 // ✅ TIPOS PARA EL CAMPO DE UNA TABLA
 export type CampoTable = {
   fieldname: string;
-  text: string;
+  label: string;
   orderable?: boolean;
   order_dir: string;
   show: boolean
@@ -133,7 +133,6 @@ export interface FilterParams {
   orders: FilterParamsOrder[];
 }
 
-export type FilterCurrent = Omit<FilterParams, "offset" | "search">
 
 type FilterParamsEqual = {
   fieldname: string;
@@ -154,6 +153,7 @@ type FilterParamsOrder = {
   text: string
 }
 
+export type FilterCurrent = Omit<FilterParams, "offset" | "search">
 
 
 // ✅ TIPOS PARA CATEGORIAS
