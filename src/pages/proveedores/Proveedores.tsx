@@ -208,7 +208,7 @@ export default function Proveedores() {
                   <DynaIcon name="FaCircleXmark"  className="pr-4" />
                     ORDEN:
                     <div className="text-wrap">
-                      {filterProveedoresCurrent.orders.map((el) => el.text).join(", ")}
+                      {filterProveedoresCurrent.orders.map((el) => el.field_label).join(", ")}
                     </div>
                 </Badge>
               </Stack>
@@ -216,7 +216,7 @@ export default function Proveedores() {
                   <Stack direction="horizontal" gap={2} className="flex-wrap">
                     <Badge bg="secondary" role="button" onClick={handleUnbetween} className="d-flex gap-1">
                       <DynaIcon name="FaCircleXmark"  className="pr-4" />
-                      {`${filterProveedoresCurrent.between.campo_text}: `}
+                      {`${filterProveedoresCurrent.between.field_label}: `}
                       <div className="text-wrap">{getDateRangeInfo()}</div>
                     </Badge>
                   </Stack>

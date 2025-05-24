@@ -17,21 +17,21 @@ interface UseLaboratoriosStore {
 export const laboratoriosStoreInit = {
   currentLaboratorioId: 0,
   camposLaboratorio: [
-    {show: true, orderable: false, order_dir:"", field_name: "acciones", label:"Acciones",},
-    {show: false, orderable: true, order_dir:"", field_name: "id", label:"Id",},
-    {show: true, orderable: true, order_dir:"", field_name: "nombre", label:"Nombre",},
-    {show: true, orderable: true, order_dir:"", field_name: "estado", label:"Estado",},
+    {show: true, orderable: false, order_dir:"", field_name: "acciones", field_label:"Acciones",},
+    {show: false, orderable: true, order_dir:"", field_name: "id", field_label:"Id",},
+    {show: true, orderable: true, order_dir:"", field_name: "nombre", field_label:"Nombre",},
+    {show: true, orderable: true, order_dir:"", field_name: "estado", field_label:"Estado",},
   ],
   filterParamsLaboratorios: {
     offset: 25,
     search: "",
-    equals: [], // [{field_name: "sucursal_id", value: "1", text:"principal", campo_text: "Sucursal"}]
-    between: {field_name: "", campo_text: "", range: ""}, // {field_name: "created_at", campo_text:"Creado", range: "2024-12-18 00:00:00, 2024-12-19 23:59:59"}
-    orders: [], // [{field_name: "nombres", order_dir: "ASC", label: "Nombres"}]
+    equals: [],
+    between: {field_name: "", field_label: "", range: ""},
+    orders: [],
   },
   filterLaboratoriosCurrent: {
     equals: [],
-    between: {field_name: "", campo_text: "", range: ""},
+    between: {field_name: "", field_label: "", range: ""},
     orders: [], 
   },
   showLaboratorioFormMdl: false,

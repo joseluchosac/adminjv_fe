@@ -12,10 +12,10 @@ interface UseMarcasStore {
 
 const marcasStoreInit = {
   camposMarca: [
-    {show: true, orderable: false, order_dir:"", field_name: "acciones", label:"Acciones",  },
-    {show: false, orderable: true, order_dir:"", field_name: "id", label:"Id",  },
-    {show: true, orderable: true, order_dir:"", field_name: "nombre", label:"Nombre",  },
-    {show: true, orderable: true, order_dir:"", field_name: "estado", label:"Estado",  },
+    {show: true, orderable: false, order_dir:"", field_name: "acciones", field_label:"Acciones",  },
+    {show: false, orderable: true, order_dir:"", field_name: "id", field_label:"Id",  },
+    {show: true, orderable: true, order_dir:"", field_name: "nombre", field_label:"Nombre",  },
+    {show: true, orderable: true, order_dir:"", field_name: "estado", field_label:"Estado",  },
   ],
   filterParamsMarcas: filterParamsInit,
 

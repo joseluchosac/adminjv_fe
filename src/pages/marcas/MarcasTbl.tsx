@@ -29,16 +29,16 @@ const MarcasTbl: React.FC = () => {
 
   const handleSort = (e: React.MouseEvent<HTMLTableCellElement, MouseEvent>) => {
     let field_name = e.currentTarget.dataset.campo as string;
-    let text = e.currentTarget.textContent as string;
+    let field_label = e.currentTarget.textContent as string;
     const orderIdx = filterParamsMarcas.orders.findIndex(el => el.field_name === field_name)
     if(e.ctrlKey){
       if(orderIdx === -1){
-        const newOrder = {field_name, order_dir: "ASC", text}
+        const newOrder = {field_name, order_dir: "ASC", field_label}
         setFilterParamsMarcas({...filterParamsMarcas, orders: [...filterParamsMarcas.orders, newOrder]})
       }else{
         let newOrders = structuredClone(filterParamsMarcas.orders)
         if(newOrders[orderIdx].order_dir == "ASC"){
-          newOrders[orderIdx] = {field_name, order_dir: "DESC", text}
+          newOrders[orderIdx] = {field_name, order_dir: "DESC", field_label}
           setFilterParamsMarcas({...filterParamsMarcas, orders: newOrders})
         }else{
           newOrders = newOrders.filter(el=>el.field_name !== field_name)
@@ -47,12 +47,12 @@ const MarcasTbl: React.FC = () => {
       }
     }else{
       if(orderIdx === -1){
-        const newOrder = {field_name, order_dir: "ASC", text}
+        const newOrder = {field_name, order_dir: "ASC", field_label}
         setFilterParamsMarcas({...filterParamsMarcas, orders: [newOrder]})
       }else{
         let newOrders = structuredClone(filterParamsMarcas.orders)
         if(newOrders[orderIdx].order_dir == "ASC"){
-          const newOrder = {field_name, order_dir: "DESC", text}
+          const newOrder = {field_name, order_dir: "DESC", field_label}
           setFilterParamsMarcas({...filterParamsMarcas, orders: [newOrder]})
         }else{
           setFilterParamsMarcas({...filterParamsMarcas, orders: []})
@@ -107,7 +107,7 @@ const MarcasTbl: React.FC = () => {
                           style={el.field_name=="acciones" ? {position: "sticky", left: 0} : {}}
                         >
                           <div className="d-flex gap-1">
-                            <div>{el.label}</div>
+                            <div>{el.field_label}</div>
                             <div>
                               {el.order_dir == "ASC" 
                                 ? (<DynaIcon className="text-warning" name="FaArrowDownAZ" />) 

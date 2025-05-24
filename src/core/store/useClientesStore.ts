@@ -19,24 +19,24 @@ interface UseClientesStore {
 export const clientesStoreInit = {
   currentClienteId: 0,
   camposCliente: [
-    {show: true, orderable: false, order_dir: "", field_name: "acciones", label:"",},
-    {show: false, orderable: true, order_dir: "", field_name: "id", label:"Id",},
-    {show: true, orderable: true, order_dir: "", field_name: "nro_documento", label:"Nro Doc",},
-    {show: true, orderable: true, order_dir: "", field_name: "nombre_razon_social", label:"Cliente",},
-    {show: true, orderable: true, order_dir: "", field_name: "direccion", label:"Dirección",},
-    {show: true, orderable: true, order_dir: "", field_name: "email", label:"Correo",},
-    {show: true, orderable: true, order_dir: "", field_name: "telefono", label:"Teléf.",},
+    {show: true, orderable: false, order_dir: "", field_name: "acciones", field_label:"",},
+    {show: false, orderable: true, order_dir: "", field_name: "id", field_label:"Id",},
+    {show: true, orderable: true, order_dir: "", field_name: "nro_documento", field_label:"Nro Doc",},
+    {show: true, orderable: true, order_dir: "", field_name: "nombre_razon_social", field_label:"Cliente",},
+    {show: true, orderable: true, order_dir: "", field_name: "direccion", field_label:"Dirección",},
+    {show: true, orderable: true, order_dir: "", field_name: "email", field_label:"Correo",},
+    {show: true, orderable: true, order_dir: "", field_name: "telefono", field_label:"Teléf.",},
   ],
   filterParamsClientes: {
     offset: 25,
     search: "",
-    equals: [], // [{field_name: "sucursal_id", value: "1", text:"principal", campo_text: "Sucursal"}]
-    between: {field_name: "", campo_text: "", range: ""}, // {field_name: "created_at", campo_text:"Creado", range: "2024-12-18 00:00:00, 2024-12-19 23:59:59"}
-    orders: [], // [{field_name: "nombres", order_dir: "ASC", label: "Nombres"}]
+    equals: [],
+    between: {field_name: "", field_label: "", range: ""}, 
+    orders: [],
   },
   filterClientesCurrent: {
     equals: [],
-    between: {field_name: "", campo_text: "", range: ""},
+    between: {field_name: "", field_label: "", range: ""},
     orders: [], 
   },
   showClienteFormMdl: false,

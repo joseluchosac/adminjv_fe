@@ -10,7 +10,7 @@ export type ResponseQuery = {
 // ✅ TIPOS PARA EL CAMPO DE UNA TABLA
 export type CampoTable = {
   field_name: string;
-  label: string;
+  field_label: string;
   orderable?: boolean;
   order_dir: string;
   show: boolean
@@ -142,14 +142,14 @@ type FilterParamsEqual = {
 
 type FilterParamsBetween = {
   field_name: string;
-  campo_text: string;
+  field_label: string;
   range: string
 }
 
 type FilterParamsOrder = {
   field_name: string;
   order_dir: string;
-  text: string
+  field_label: string
 }
 
 export type FilterCurrent = Omit<FilterParams, "offset" | "search">
