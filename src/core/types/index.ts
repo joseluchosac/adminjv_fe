@@ -9,7 +9,7 @@ export type ResponseQuery = {
 }
 // ✅ TIPOS PARA EL CAMPO DE UNA TABLA
 export type CampoTable = {
-  fieldname: string;
+  field_name: string;
   label: string;
   orderable?: boolean;
   order_dir: string;
@@ -40,11 +40,12 @@ export type User = {
   estado: number;
   created_at?: string;
   updated_at?: string;
-}
-export interface UserForm extends User {
   password: string;
   password_repeat: string;
 }
+
+// export interface UserForm extends User {
+// }
 
 
 export interface RegisterForm {
@@ -57,10 +58,10 @@ export interface RegisterForm {
 }
 
 // ✅ TIPOS PARA LA TABLA CAJAS
-export interface Caja {
-  id: number;
-  descripcion: string
-}
+// export interface Caja {
+//   id: number;
+//   descripcion: string
+// }
 // ✅ TIPOS PARA LA TABLA MODULOS
 export interface Modulo {
   id: number;
@@ -122,8 +123,6 @@ export type EmpresaSession = { // para la sesion
   urlLogo: string;
 }
 
-
-
 // ✅ TIPOS PARA FILTROS GENERALES
 export interface FilterParams {
   offset: number;
@@ -133,22 +132,22 @@ export interface FilterParams {
   orders: FilterParamsOrder[];
 }
 
-
 type FilterParamsEqual = {
-  fieldname: string;
-  value: string;
-  text: string;
-  campo_text: string
+  field_name: string;
+  field_value: string; //antes value
+  label_name: string; // antes text
+  label_value: string // antes campo_text
 }
 
+
 type FilterParamsBetween = {
-  fieldname: string;
+  field_name: string;
   campo_text: string;
   range: string
 }
 
 type FilterParamsOrder = {
-  fieldname: string;
+  field_name: string;
   order_dir: string;
   text: string
 }

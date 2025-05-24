@@ -9,9 +9,7 @@ import { filterMarcasFetch } from "../services/marcasFetch";
 import { Marca } from "../types";
 import { filterParamsInit } from "../utils/constants";
 
-type TypeAction = 
-  "filter_full" 
-  | "mutate_marca"
+type TypeAction = "filter_full" | "mutate_marca"
 
 // ****** FILTRAR ******
 export const useFilterMarcasQuery = () => {

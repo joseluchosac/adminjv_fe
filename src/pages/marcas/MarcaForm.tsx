@@ -9,6 +9,7 @@ import useLayoutStore from "../../core/store/useLayoutStore";
 import { useMutationMarcasQuery } from "../../core/hooks/useMarcasQuery";
 import { Marca, ResponseQuery } from "../../core/types";
 import { useMarcas } from "./context/MarcasContext";
+
 interface DataGetMarca extends ResponseQuery {
   content: Marca | null;
 }

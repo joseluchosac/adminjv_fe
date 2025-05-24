@@ -38,7 +38,7 @@ export default function Laboratorios() {
   useDebounce(() => { 
     if (inputSearch.toLowerCase().trim() == filterParamsLaboratorios.search.toLowerCase().trim()) return
     setFilterParamsLaboratorios({ ...filterParamsLaboratorios, search: inputSearch.trim() });
-  }, 1000, [inputSearch]);
+  }, 500, [inputSearch]);
 
   const handleNextPage = () => {
     fetchNextPage();

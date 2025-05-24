@@ -11,12 +11,11 @@ import {
   subMonths,
   subWeeks,
 } from "date-fns";
-// import { useFilterUsersQuery } from "../../core/hooks/useUsersQuery";
 import useCatalogosStore from "../../core/store/useCatalogosStore";
 import { filterParamsInit } from "../../core/utils/constants";
-// import { setDate } from "date-fns/fp";
+import { useUsers } from "./context/UsersContext";
 
-const dateRangeInit = { fieldname: "", campo_text: "", date_from: "", date_to: "" };
+const dateRangeInit = { field_name: "", campo_text: "", date_from: "", date_to: "" };
 const equalFormInit = { rol_id: "", caja_id: "", estado: ""}
 
 const UsersLstFilterMdl: React.FC = () => {
@@ -24,50 +23,39 @@ const UsersLstFilterMdl: React.FC = () => {
   const [dateRange, setDateRange] = useState(dateRangeInit);
   const [rangeName, setRangeName] = useState("")
   const [equalForm, setEqualForm] = useState(equalFormInit)
-  const roles = useCatalogosStore(state => state.catalogos?.roles)
-  const cajas = useCatalogosStore(state => state.catalogos?.cajas)
-  const showUsersFilterMdl = useUsersStore(
-    (state) => state.showUsersFilterMdl
-  );
-  const setShowUsersFilterMdl = useUsersStore(
-    (state) => state.setShowUsersFilterMdl
-  );
+  const {showUsersFilterMdl, setShowUsersFilterMdl} = useUsers()
   const filterParamsUsers = useUsersStore((state) => state.filterParamsUsers);
   const setFilterParamsUsers = useUsersStore(state => state.setFilterParamsUsers)
-
-  const handleClose = () => {
-    setShowUsersFilterMdl(false);
-  };
-
+  const roles = useCatalogosStore(state => state.catalogos?.roles)
+  const cajas = useCatalogosStore(state => state.catalogos?.cajas)
 
   const handleEqual = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const campo_text = e.currentTarget.previousElementSibling?.textContent || ""
-    const { name: fieldname, value } = e.currentTarget;
-    const text = e.currentTarget.options[e.currentTarget.selectedIndex].textContent || ""
-    setEqualForm({...equalForm, [fieldname]:value})
+    const label_name = e.currentTarget.previousElementSibling?.textContent || ""
+    const { name: field_name, value: field_value } = e.currentTarget;
+    const label_value = e.currentTarget.options[e.currentTarget.selectedIndex].textContent || ""
+    setEqualForm({...equalForm, [field_name]:field_value})
     let { equals } = filterParamsUsers;
-    const idx = equals.findIndex(el => el.fieldname === fieldname)
-    if(!value){
-      equals = equals.filter(el => el.fieldname !== fieldname)
+    const idx = equals.findIndex(el => el.field_name === field_name)
+    if(!field_value){
+      equals = equals.filter(el => el.field_name !== field_name)
     }else{
       if(idx === -1){
-        equals = [ ...equals, {fieldname: fieldname, value: value, text, campo_text} ]
+        equals = [ ...equals, {field_name, field_value, label_name, label_value} ]
       }else{
-        equals[idx] = {fieldname: fieldname, value: value, text, campo_text}
+        equals[idx] = {field_name, field_value, label_name, label_value}
       }
     }
-    console.log(equals)
     setFilterParamsUsers({ ...filterParamsUsers, equals: [...equals] });
   }
 
   const handleSelectCampoRange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const fieldname = e.currentTarget.value;
+    const field_name = e.currentTarget.value;
     const campo_text = e.currentTarget.options[e.currentTarget.selectedIndex].textContent || ""
-    if (!fieldname) {
+    if (!field_name) {
       setDateRange(dateRangeInit);
       setRangeName("")
     } else {
-      setDateRange({ ...dateRange, fieldname, campo_text });
+      setDateRange({ ...dateRange, field_name, campo_text });
     }
   };
 
@@ -87,7 +75,7 @@ const UsersLstFilterMdl: React.FC = () => {
 
   const handleRangePred = (e: React.MouseEvent<HTMLElement>) => {
     const { range_name } = e.currentTarget.dataset;
-    if (!dateRange.fieldname) return;
+    if (!dateRange.field_name) return;
     let startDate = new Date();
     let endDate = new Date();
     if (range_name === "lastWeek") {
@@ -112,57 +100,56 @@ const UsersLstFilterMdl: React.FC = () => {
   };
 
   const handleFilterBetween = () => {
-    if(!dateRange.fieldname || !dateRange.date_from || !dateRange.date_to) return
+    if(!dateRange.field_name || !dateRange.date_from || !dateRange.date_to) return
     const newBetween = {
-      fieldname: dateRange.fieldname,
+      field_name: dateRange.field_name,
       campo_text: dateRange.campo_text,
       range:
         (dateRange.date_from ? dateRange.date_from + " 00:00:00, " : "") +
         (dateRange.date_to ? dateRange.date_to + " 23:59:59" : ""),
     };
     if (
-      filterParamsUsers.between.fieldname == newBetween.fieldname &&
+      filterParamsUsers.between.field_name == newBetween.field_name &&
       filterParamsUsers.between.range == newBetween.range
     ) return;
-    // between(newBetween)
-    // const newBetween = {fieldname, campo_text, range}
     setFilterParamsUsers({ ...filterParamsUsers, between: newBetween });
   };
 
   const handleUnbetween = () => {
     setDateRange(dateRangeInit);
     setRangeName("")
-    if(!filterParamsUsers.between.fieldname) return
-    // unbetween()
+    if(!filterParamsUsers.between.field_name) return
     setFilterParamsUsers({...filterParamsUsers, between: filterParamsInit.between})
     
   }
-  useEffect(() => {
-
-  },[filterParamsUsers])
 
   useEffect(() => {
     if(showUsersFilterMdl){
-      if(!filterParamsUsers.between.fieldname){
+      if(!filterParamsUsers.between.field_name){
         handleUnbetween()
       }
-      const {range, fieldname, campo_text} = filterParamsUsers.between
+      const {range, field_name, campo_text} = filterParamsUsers.between
       const date_from = range ? range.split(", ")[0].split(" ")[0] : ""
       const date_to = range ? range.split(", ")[1].split(" ")[0] : ""
-      setDateRange({fieldname, campo_text, date_from, date_to})
+      setDateRange({field_name, campo_text, date_from, date_to})
       const newEqualForm = structuredClone(equalFormInit)
       for (const el of filterParamsUsers.equals) {
-        const fieldname = el.fieldname as keyof typeof equalFormInit
-        newEqualForm[fieldname] = el.value
+        const field_name = el.field_name as keyof typeof equalFormInit
+        newEqualForm[field_name] = el.field_value
       }
       setEqualForm(newEqualForm)
     }
   },[showUsersFilterMdl])
 
+  // useEffect(() => {
+  //   console.log(filterParamsUsers)
+  
+  // }, [filterParamsUsers])
+  
   return (
     <Modal 
       show={showUsersFilterMdl} 
-      onHide={handleClose}
+      onHide={()=>setShowUsersFilterMdl(false)}
     >
       <Modal.Body>
         <Tabs
@@ -224,8 +211,8 @@ const UsersLstFilterMdl: React.FC = () => {
               <Form.Label htmlFor="f_entre">Rango de fechas</Form.Label>
               <Form.Select
                 id="f_entre"
-                name="fieldname"
-                value={dateRange.fieldname}
+                name="field_name"
+                value={dateRange.field_name}
                 onChange={handleSelectCampoRange}
               >
                 <option value="">Ninguno</option>
@@ -239,7 +226,7 @@ const UsersLstFilterMdl: React.FC = () => {
               </Form.Label>
               <Col sm="5">
                 <Form.Control
-                  disabled={!Boolean(dateRange.fieldname)}
+                  disabled={!Boolean(dateRange.field_name)}
                   type="date"
                   name="date_from"
                   value={dateRange.date_from}

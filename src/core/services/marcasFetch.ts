@@ -24,8 +24,8 @@ type FilterMarcasFetchResp = {
 export const filterMarcasFetch = async({
     filterParamsMarcas, 
     pageParam, 
+    token = null,
     signal = null, 
-    token = null
   }: FilterFetch): Promise<FilterMarcasFetchResp> => {
   let options: RequestInit  = {
     method: "POST",

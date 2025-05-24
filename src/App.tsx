@@ -6,8 +6,6 @@ import PublicRoutes from "./core/routes/PublicRoutes";
 import Home from "./pages/home/Home";
 import "./index.css";
 import Modulos from './pages/modulos/Modulos';
-
-import User from './pages/user/User';
 import Register from './pages/auth/Register';
 import Auth from './pages/auth/Auth';
 import Config from './pages/config/Config';
@@ -18,7 +16,8 @@ import Proveedores from './pages/proveedores/Proveedores';
 import Catalogos from './pages/catalogos/Catalogos';
 import Categorias from './pages/categorias/Categorias';
 import Laboratorios from './pages/laboratorios/Laboratorios';
-import Marcas from './pages/marcas/marcas';
+import Profile from './pages/profile/Profile';
+import Marcas from './pages/marcas/Marcas';
 
 
 const Tareas = lazy(() => import("./pages/tareas/Tareas"));
@@ -52,7 +51,7 @@ function App() {
           <Route path="modulos" element={<Modulos />} />
           <Route path="roles" element={<Roles />} />
           <Route path="config" element={<Config />} />
-          <Route path="user" element={<User />} />
+          <Route path="profile" element={<Profile />} />
         </Route>
       </Route>
       <Route path="*" element={<div>404 NOT FOUND</div>} />

@@ -63,32 +63,32 @@ function ClientesTblRow({ cliente, camposCliente }: Props) {
   return (
     <tr className="text-nowrap">
       {camposCliente.map((el) => {
-        const {fieldname, show} = el
+        const {field_name, show} = el
         if(show){
-          switch (fieldname) {
+          switch (field_name) {
             case "nro_documento":{
               return (
-                <td key={fieldname}>
+                <td key={field_name}>
                   <div>
-                    {cliente.tipo_documento + ' ' + cliente[fieldname as keyof Cliente] }
+                    {cliente.tipo_documento + ' ' + cliente[field_name as keyof Cliente] }
                   </div>
                 </td>
               )
             }
             case "nombre_razon_social":{
               return (
-                <td key={fieldname} style={{minWidth: "200px"}}>
+                <td key={field_name} style={{minWidth: "200px"}}>
                   <div className="text-wrap" style={{minWidth: "200px"}}>
-                    {cliente[fieldname as keyof Cliente]}
+                    {cliente[field_name as keyof Cliente]}
                   </div>
                 </td>
               )
             }
             case "direccion":{
               return (
-                <td key={fieldname}>
+                <td key={field_name}>
                   <div className="text-wrap">
-                    {cliente[fieldname as keyof Cliente]}
+                    {cliente[field_name as keyof Cliente]}
                   </div>
                   <small>
                     {cliente.departamento +', '+ cliente.provincia +', '+ cliente.distrito}
@@ -97,13 +97,13 @@ function ClientesTblRow({ cliente, camposCliente }: Props) {
               )
             }
             case "estado":{
-              return <td key={fieldname}> {cliente.estado == 0
+              return <td key={field_name}> {cliente.estado == 0
                 ? <Badge bg="danger">Deshabilitdo</Badge>
                 : <Badge bg="success">Habilitado</Badge>} </td>
             }
             case "acciones":{
               return (
-                <td key={fieldname}>
+                <td key={field_name}>
                   <div className="d-flex gap-2 justify-content-center">
                     <NavDropdown title={<div className="p-1"></div>}>
                       <NavDropdown.Item onClick={handleDelete}  className="d-flex gap-2 align-middle" href="#">
@@ -120,9 +120,9 @@ function ClientesTblRow({ cliente, camposCliente }: Props) {
             } 
             default:{
               return (
-                <td key={fieldname}>
+                <td key={field_name}>
                   <div className="text-wrap">
-                    {cliente[fieldname as keyof Cliente]}
+                    {cliente[field_name as keyof Cliente]}
                   </div>
                 </td>
               )

@@ -3,7 +3,7 @@ import { FilterCurrent, User } from "../../../core/types";
 
 const filterUsersCurrentInit: FilterCurrent = {
   equals: [],
-  between: {fieldname: "", campo_text: "", range: ""},
+  between: {field_name: "", campo_text: "", range: ""},
   orders: [], 
 }
 
@@ -12,6 +12,8 @@ export interface UsersContextType {
   setUsers: React.Dispatch<React.SetStateAction<User[] | null>>;
   showUserForm: boolean;
   setShowUserForm: React.Dispatch<React.SetStateAction<boolean>>;
+  showUsersFilterMdl: boolean;
+  setShowUsersFilterMdl: React.Dispatch<React.SetStateAction<boolean>>;
   currentUserId: number;
   setCurrentUserId: React.Dispatch<React.SetStateAction<number>>;
   filterUsersCurrent: FilterCurrent;
@@ -27,6 +29,7 @@ export const UsersProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [showUserForm, setShowUserForm] = useState(false);
   const [currentUserId, setCurrentUserId] = useState(0);
   const [filterUsersCurrent, setFilterUsersCurrent] = useState(filterUsersCurrentInit);
+  const [showUsersFilterMdl, setShowUsersFilterMdl] = useState(false);
 
   return (
     <UsersContext.Provider value={{ 
@@ -34,6 +37,8 @@ export const UsersProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       setUsers, 
       showUserForm, 
       setShowUserForm,
+      showUsersFilterMdl,
+      setShowUsersFilterMdl,
       currentUserId,
       setCurrentUserId,
       filterUsersCurrent,

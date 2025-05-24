@@ -3,7 +3,7 @@ import { FilterCurrent, Marca } from "../../../core/types";
 
 const filterMarcasCurrentInit: FilterCurrent = {
   equals: [],
-  between: {fieldname: "", campo_text: "", range: ""},
+  between: {field_name: "", campo_text: "", range: ""},
   orders: [], 
 }
 

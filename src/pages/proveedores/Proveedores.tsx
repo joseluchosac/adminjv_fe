@@ -41,7 +41,7 @@ export default function Proveedores() {
   useDebounce(() => { 
     if (inputSearch.toLowerCase().trim() == filterParamsProveedores.search.toLowerCase().trim()) return
     setFilterParamsProveedores({ ...filterParamsProveedores, search: inputSearch.trim() });
-  }, 1000, [inputSearch]);
+  }, 500, [inputSearch]);
 
   const handleNextPage = () => {
     fetchNextPage();
@@ -56,10 +56,10 @@ export default function Proveedores() {
   };
 
   const handleUnequal = (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
-    const {fieldname} = e.currentTarget.dataset
-    if(fieldname){
+    const {field_name} = e.currentTarget.dataset
+    if(field_name){
       let { equals } = filterParamsProveedores;
-      equals = equals.filter(el => el.fieldname !== fieldname)
+      equals = equals.filter(el => el.field_name !== field_name)
       setFilterParamsProveedores({ ...filterParamsProveedores, equals: [...equals] });
     }
   };
@@ -83,7 +83,7 @@ export default function Proveedores() {
 
   const getDateRangeInfo = () => {
     const {between} = filterParamsProveedores
-    if(!between.fieldname) return ""
+    if(!between.field_name) return ""
     let date_from = between.range.split(",")[0].split(" ")[0]
     let date_to = between.range.split(",")[1].trim().split(" ")[0]
     date_from = date_from.split("-").reverse().join("/")
@@ -212,7 +212,7 @@ export default function Proveedores() {
                     </div>
                 </Badge>
               </Stack>
-                {(filterProveedoresCurrent.between.fieldname.length !== 0) &&
+                {(filterProveedoresCurrent.between.field_name.length !== 0) &&
                   <Stack direction="horizontal" gap={2} className="flex-wrap">
                     <Badge bg="secondary" role="button" onClick={handleUnbetween} className="d-flex gap-1">
                       <DynaIcon name="FaCircleXmark"  className="pr-4" />
@@ -230,10 +230,10 @@ export default function Proveedores() {
                       onClick={handleUnequal} 
                       className="d-flex gap-1" 
                       key={idx}
-                      data-fieldname={el.fieldname}
+                      data-field_name={el.field_name}
                     >
                       <DynaIcon name="FaCircleXmark"  className="pr-4" />
-                      <div>{el.campo_text}: {el.text}</div>
+                      <div>{el.label_name}: {el.label_value}</div>
                     </Badge>
                   )
                 })}

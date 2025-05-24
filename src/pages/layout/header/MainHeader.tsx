@@ -33,7 +33,7 @@ function MainHeader () {
 
   const handleMisDatos = (e:React.MouseEvent) => {
     e.preventDefault()
-    navigate("/user")
+    navigate("/profile")
   }
 
   const handleHeaderFixed = (e:React.MouseEvent) => {
@@ -75,7 +75,7 @@ function MainHeader () {
               style={{zIndex:"1035"}}
             >
               <NavDropdown.Item href="#" onClick={handleMisDatos} className="d-flex align-items-center gap-2">
-                <FaUserEdit /> <span>Mis datos</span>
+                <FaUserEdit /> <span>Mi perfil</span>
               </NavDropdown.Item>
               <NavDropdown.Item href="" onClick={handleLogout} className="d-flex align-items-center gap-2">
                 <FaDoorOpen /> <span>Cerrar sesión</span>

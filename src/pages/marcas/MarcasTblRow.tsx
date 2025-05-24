@@ -57,11 +57,11 @@ function MarcasTblRow({ marca, camposMarca }: Props) {
   return (
     <tr className="text-nowrap">
       {camposMarca.map((el) => {
-        const {fieldname, show} = el
+        const {field_name, show} = el
         if(show){
-          switch (fieldname) {
+          switch (field_name) {
             case "estado":{
-              return <td key={fieldname}>
+              return <td key={field_name}>
                 {marca.estado == 0
                   ? <div role="button" onClick={toggleEstado} title="Habilitar" data-estado="0">
                       <FaToggleOff className="text-muted" size={"1.3rem"} />
@@ -74,13 +74,13 @@ function MarcasTblRow({ marca, camposMarca }: Props) {
             }
             case "acciones":{
               return (
-                <td key={fieldname}>
+                <td key={field_name}>
                   <div className="d-flex gap-2 justify-content-start">
                     <a onClick={handleToEdit} href="#" className="p-1" title="Editar">
                       <FaEdit />
                     </a>
                     <a onClick={handleDelete} href="#" className="p-1" title="Eliminar">
-                      <FaTrash className="text-danger mb-1"/>
+                      <FaTrash className="text-danger"/>
                     </a>
                   </div>
                 </td>
@@ -88,9 +88,9 @@ function MarcasTblRow({ marca, camposMarca }: Props) {
             } 
             default:{
               return (
-                <td key={fieldname}>
+                <td key={field_name}>
                   <div className="text-wrap">
-                    {marca[fieldname as keyof Marca]}
+                    {marca[field_name as keyof Marca]}
                   </div>
                 </td>
               )

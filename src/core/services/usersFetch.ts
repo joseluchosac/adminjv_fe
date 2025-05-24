@@ -1,14 +1,30 @@
-import { FilterParams } from "../types";
+import { FilterParams, User } from "../types";
 const apiURL = import.meta.env.VITE_API_URL;
 
 type FilterUsersFetch = {
-  pageParam: number;
-  token: string | null;
   filterParamsUsers: FilterParams;
-  signal: AbortSignal
+  pageParam: number;
+  token?: string | null;
+  signal?: AbortSignal | null
 }
-
-export const filterUsersFetch = async({filterParamsUsers, pageParam, signal, token = null}: FilterUsersFetch) => {
+type FilterUsersFetchResp = {
+  content: User[];
+  next: number;
+  num_regs: number;
+  offset: number;
+  page: number;
+  pages: number;
+  previous: number
+  error: boolean;
+  msg: string;
+  msgType: string
+}
+export const filterUsersFetch = async({
+  filterParamsUsers, 
+  pageParam, 
+  token = null,
+  signal = null, 
+}: FilterUsersFetch): Promise<FilterUsersFetchResp> => {
   let options: RequestInit  = {
     method: "POST",
     headers: {
@@ -16,7 +32,9 @@ export const filterUsersFetch = async({filterParamsUsers, pageParam, signal, tok
     },
     body: JSON.stringify(filterParamsUsers),
     credentials: "include", // envio de cookies
-    signal,
+  }
+  if(signal){
+    options.signal = signal
   }
   if(token){
     options.headers = {...options.headers, Authorization: "Bearer " + token}

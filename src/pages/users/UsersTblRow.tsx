@@ -1,7 +1,12 @@
-import { Badge } from "react-bootstrap";
-import { CampoTable, User } from "../../core/types";
 import { format, isValid, parseISO } from "date-fns";
+import { CampoTable, User } from "../../core/types";
 import { useUsers } from "./context/UsersContext";
+import { FaEdit, FaToggleOff, FaToggleOn, FaTrash } from "react-icons/fa";
+import Swal from "sweetalert2";
+import useLayoutStore from "../../core/store/useLayoutStore";
+import { useMutationUsersQuery } from "../../core/hooks/useUsersQuery";
+import { useEffect } from "react";
+import { Bounce, toast } from "react-toastify";
 
 interface UsersTblRowProps {
   user: User ;
@@ -9,8 +14,15 @@ interface UsersTblRowProps {
 }
 
 function UsersTblRow({ user, camposUser }: UsersTblRowProps) {
-
   const {setCurrentUserId, setShowUserForm} = useUsers()
+  const darkMode = useLayoutStore(state => state.layout.darkMode)
+
+  const {
+    data: mutation,
+    isPending: isPendingMutation,
+    updateUser, 
+    deleteUser, 
+  } = useMutationUsersQuery()
 
   const validDate = (date:string | undefined, formato = "dd/MM/yyyy") => {
     if(!date) return ''
@@ -22,20 +34,67 @@ function UsersTblRow({ user, camposUser }: UsersTblRowProps) {
     setShowUserForm(true)
   }
 
-  return (
-    <tr className="text-nowrap" onClick={handleToEdit}>
-      {camposUser.map(el => {
-        const {fieldname, show} = el
+  const handleDelete = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
+    e.preventDefault()
+    Swal.fire({
+      icon: 'question',
+      text: `¿Desea eliminar al usuario ${user.username}?`,
+      showCancelButton: true,
+      confirmButtonText: "Sí",
+      cancelButtonText: 'Cancelar',
+      customClass: { 
+        popup: darkMode ? 'swal-dark' : ''
+      }
+    }).then((result) => {
+      if (result.isConfirmed) {
+        deleteUser(user.id)
+      }
+    });
+  }
 
-        if(show){
-          if(fieldname === "estado"){
-            return <td key={fieldname}> {user.estado == 0
-              ? <Badge bg="danger">Deshabilitdo</Badge>
-              : <Badge bg="success">Habilitado</Badge>} </td>
-          }else if(fieldname === "created_at" || fieldname === "updated_at" ){
-            return <td key={fieldname}>{validDate(user[fieldname], 'dd/MM/yyyy')}</td>
-          }else{
-            return <td key={fieldname}>{user[fieldname as keyof User]}</td>
+  const toggleEstado = () => {
+    updateUser({...user, estado: user.estado ? 0 : 1})
+  }
+
+
+  useEffect(() => {
+    if(!mutation) return
+    toast(mutation.msg, { type: mutation.msgType, autoClose: 3000, transition: Bounce })
+  }, [mutation])
+
+  return (
+    <tr className="text-nowrap">
+      {camposUser.filter(el=>el.show).map(el => {
+        switch (el.field_name){
+          case "acciones": {
+           if(isPendingMutation) return <td key={el.field_name}>...</td>  
+            return (
+              <td key={el.field_name}>
+                <div className="d-flex gap-2 justify-content-start">
+                  <a onClick={handleToEdit} href="#" className="" title="Editar">
+                    <FaEdit />
+                  </a>
+                  <a onClick={handleDelete} href="#" className="" title="Eliminar">
+                    <FaTrash className="text-danger"/>
+                  </a>
+                  {user.estado == 0
+                    ? <div role="button" className="" onClick={toggleEstado} title="Habilitar" data-estado="0">
+                        <FaToggleOff className="text-muted" size={"1.3rem"} />
+                      </div>
+                    : <div role="button" className="" onClick={toggleEstado} title="Deshabilitar" data-estado="1">
+                        <FaToggleOn className="text-primary" size={"1.3rem"} />
+                      </div>
+                  }
+                </div>
+              </td>
+            )
+          }
+          case "created_at":
+          case "updated_at": {
+            return <td key={el.field_name}>{validDate(user[el.field_name ], 'dd/MM/yyyy')}</td>
+          }
+          default: {
+            return <td key={el.field_name}>{user[el.field_name as keyof User]}</td>
           }
         }
       })}

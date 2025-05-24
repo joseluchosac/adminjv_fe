@@ -14,31 +14,31 @@ const ProveedoresTbl: React.FC<Props> = ({filas}) => {
   const setFilterParamsProveedores = useProveedoresStore(state => state.setFilterParamsProveedores)
   
   const handleSort = (e: React.MouseEvent<HTMLTableCellElement, MouseEvent>) => {
-    let fieldname = e.currentTarget.dataset.campo as string;
+    let field_name = e.currentTarget.dataset.campo as string;
     let text = e.currentTarget.textContent as string;
-    const orderIdx = filterParamsProveedores.orders.findIndex(el => el.fieldname === fieldname)
+    const orderIdx = filterParamsProveedores.orders.findIndex(el => el.field_name === field_name)
     if(e.ctrlKey){
       if(orderIdx === -1){
-        const newOrder = {fieldname, order_dir: "ASC", text}
+        const newOrder = {field_name, order_dir: "ASC", text}
         setFilterParamsProveedores({...filterParamsProveedores, orders: [...filterParamsProveedores.orders, newOrder]})
       }else{
         let newOrders = structuredClone(filterParamsProveedores.orders)
         if(newOrders[orderIdx].order_dir == "ASC"){
-          newOrders[orderIdx] = {fieldname, order_dir: "DESC", text}
+          newOrders[orderIdx] = {field_name, order_dir: "DESC", text}
           setFilterParamsProveedores({...filterParamsProveedores, orders: newOrders})
         }else{
-          newOrders = newOrders.filter(el=>el.fieldname !== fieldname)
+          newOrders = newOrders.filter(el=>el.field_name !== field_name)
           setFilterParamsProveedores({...filterParamsProveedores, orders: newOrders})
         }
       }
     }else{
       if(orderIdx === -1){
-        const newOrder = {fieldname, order_dir: "ASC", text}
+        const newOrder = {field_name, order_dir: "ASC", text}
         setFilterParamsProveedores({...filterParamsProveedores, orders: [newOrder]})
       }else{
         let newOrders = structuredClone(filterParamsProveedores.orders)
         if(newOrders[orderIdx].order_dir == "ASC"){
-          const newOrder = {fieldname, order_dir: "DESC", text}
+          const newOrder = {field_name, order_dir: "DESC", text}
           setFilterParamsProveedores({...filterParamsProveedores, orders: [newOrder]})
         }else{
           setFilterParamsProveedores({...filterParamsProveedores, orders: []})
@@ -55,11 +55,11 @@ const ProveedoresTbl: React.FC<Props> = ({filas}) => {
         {camposProveedor && camposProveedor.map((el) => {
           return ( el.show && (
             <th
-              key={el.fieldname}
+              key={el.field_name}
               onClick={handleSort}
-              data-campo={el.fieldname}
+              data-campo={el.field_name}
               role="button"
-              style={el.fieldname=="acciones" ? {position: "sticky", left: 0} : {}}
+              style={el.field_name=="acciones" ? {position: "sticky", left: 0} : {}}
             >
               <div className="d-flex gap-1">
                 <div>{el.label}</div>

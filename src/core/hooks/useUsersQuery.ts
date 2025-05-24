@@ -1,23 +1,34 @@
 const apiURL = import.meta.env.VITE_API_URL;
+import { useEffect, useRef, useState } from "react"
+import { useNavigate } from "react-router-dom";
 import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import useSessionStore from "../store/useSessionStore"
 import useUsersStore from "../store/useUsersStore"
-import { useEffect, useState } from "react"
 import { filterUsersFetch } from "../services/usersFetch"
-import { LoginForm, RegisterForm, UserForm } from "../types"
+import { LoginForm, RegisterForm, User } from "../types"
 import { mutationFetch } from "../services/mutationFecth"
-import { useNavigate } from "react-router-dom";
 import { filterParamsInit } from "../utils/constants";
+
+type TypeAction = 
+"filter_full" 
+| "mutate_user" 
+| "mutate_profile" 
+| "sign_up"
+| "login"
+| "check_auth"
+| "check_password"
+| "send_code_restoration"
+| "restore_password"
 
 // ****** FILTRAR ******
 export const useFilterUsersQuery = () => {
-  const resetSessionStore = useSessionStore(state => state.resetSessionStore)
-  const navigate = useNavigate()
   const [isEnabledQuery, setIsEnabledQuery] = useState(false)
+  // const resetSessionStore = useSessionStore(state => state.resetSessionStore)
+  const setFilterParamsUsers = useUsersStore(state => state.setFilterParamsUsers)
   const tknSession = useSessionStore(state => state.tknSession)
   const filterParamsUsers = useUsersStore(state => state.filterParamsUsers)
+  const navigate = useNavigate()
   const queryClient = useQueryClient()
-  const setFilterParamsUsers = useUsersStore(state => state.setFilterParamsUsers)
 
   const {fetchNextPage, data, refetch, isError, isLoading, isFetching, hasNextPage,  } = useInfiniteQuery({
     queryKey: ['users'],
@@ -51,18 +62,18 @@ export const useFilterUsersQuery = () => {
 
   useEffect(()=>{
     if(data?.pages[data?.pages.length-1].msgType === "errorToken"){
-      resetSessionStore()
+      // resetSessionStore()
       navigate("/auth")
     }
   },[data])
 
   return {
     data,
-    fetchNextPage, 
     isError, 
     isLoading, 
     isFetching, 
     hasNextPage, 
+    fetchNextPage, 
   }
 }
 
@@ -74,9 +85,8 @@ export const useMutationUsersQuery = () => {
   const nombreModulo = useSessionStore(state => state.moduloActual?.nombre)
   const Authorization = "Bearer " + tknSession
   const filterParamsUsers = useUsersStore(state => state.filterParamsUsers)
-
-
   const queryClient = useQueryClient()
+  const typeActionRef = useRef<TypeAction | "">("")
 
   const {data, isPending, isError, mutate, } = useMutation({
     mutationFn: mutationFetch,
@@ -86,9 +96,9 @@ export const useMutationUsersQuery = () => {
       // queryClient.setQueryData(["users"], (oldData: InfiniteData<any, unknown> | undefined) => {
       //   let newData = structuredClone(oldData)
       //   oldData?.pages.forEach((page, idxPage) => { 
-      //     const idxUser = page.filas.findIndex((el: User)=>el.id === param.id)
+      //     const idxUser = page.content.findIndex((el: User)=>el.id === param.id)
       //     if(idxUser !== -1 && newData){
-      //       newData.pages[idxPage].filas[idxUser] = param
+      //       newData.pages[idxPage].content[idxUser] = param
       //     }
       //   })
       //   return {...newData, pages: newData?.pages}
@@ -96,25 +106,26 @@ export const useMutationUsersQuery = () => {
     // },
     onSuccess: (resp) => {
       if(resp.msgType !== 'success') return
+      queryClient.invalidateQueries({queryKey:["users"]})
 
       // 1: Actualizando la lista manualmente
       // queryClient.setQueryData(["users"], (oldData: InfiniteData<any, unknown> | undefined) => {
       //   let newData = structuredClone(oldData)
       //   oldData?.pages.forEach((page, idxPage) => { 
-      //     const idxUser = page.filas.findIndex((el: User)=>el.id === resp.registro.id)
+      //     const idxUser = page.content.findIndex((el: User)=>el.id === resp.registro.id)
       //     if(idxUser !== -1 && newData){
-      //       newData.pages[idxPage].filas[idxUser] = resp.registro
+      //       newData.pages[idxPage].content[idxUser] = resp.registro
       //     }
       //   })
       //   return {...newData, pages: newData?.pages}
       // })
 
       // 2: Haciendo refetch de la lista
-      queryClient.invalidateQueries({queryKey:["users"]})
     }
   })
 
   const filterUserFull = () => {// Sin Paginacion
+    typeActionRef.current = "filter_full"
     const params = {
       url: apiURL + "users/filter_users_full",
       method: "POST",
@@ -140,9 +151,9 @@ export const useMutationUsersQuery = () => {
     mutate(params)
   }
 
-  const getUserSession = (id: number) => {
+  const getProfile = (id: number) => {
     const params = {
-      url: apiURL + "users/get_user_session",
+      url: apiURL + "users/get_profile",
       method: "POST",
       headers:{ 
         Authorization,
@@ -153,7 +164,8 @@ export const useMutationUsersQuery = () => {
     mutate(params)
   }
 
-  const createUser = (param: UserForm) => {
+  const createUser = (user: User) => {
+    typeActionRef.current = "mutate_user"
     const params = {
       url: apiURL + "users/create_user",
       method: "POST",
@@ -161,22 +173,23 @@ export const useMutationUsersQuery = () => {
         Authorization,
         'nombre-modulo': nombreModulo,
       },
-      body: JSON.stringify(param),
+      body: JSON.stringify(user),
     }
     mutate(params)
   }
 
   const signUp = (param: RegisterForm) => { // registrarse
+    typeActionRef.current = "sign_up"
     const params = {
       url: apiURL + "users/sign_up",
       method: "POST",
-      // contentType: "application/json",
       body: JSON.stringify(param),
     }
     mutate(params)
   }
 
-  const updateUser = (user: UserForm) => {
+  const updateUser = (user: User) => {
+    typeActionRef.current = "mutate_user"
     const params = {
       url: apiURL + "users/update_user",
       method: "PUT",
@@ -189,9 +202,10 @@ export const useMutationUsersQuery = () => {
     mutate(params)
   }
 
-  const updateUserSession = (user: UserForm) => {
+  const updateProfile = (user: User) => {
+    typeActionRef.current = "mutate_profile"
     const params = {
-      url: apiURL + "users/update_user_session",
+      url: apiURL + "users/update_profile",
       method: "PUT",
       headers:{ 
         Authorization,
@@ -203,6 +217,7 @@ export const useMutationUsersQuery = () => {
   }
 
   const deleteUser = (id: number) => {
+    typeActionRef.current = "mutate_user"
     const params = {
       url: apiURL + "users/delete_user",
       method: "DELETE",
@@ -216,16 +231,17 @@ export const useMutationUsersQuery = () => {
   }
 
   const signIn = (param: LoginForm) => { // iniciar sesion
+    typeActionRef.current = "login"
     const params = {
       url: apiURL + "users/sign_in",
       method: "POST",
-      // contentType: "application/json",
       body: JSON.stringify(param),
     }
     mutate(params)
   }
 
   const checkAuth = () => {
+    typeActionRef.current = "check_auth"
     const params = {
       url: apiURL + "users/check_auth",
       method: "POST",
@@ -237,12 +253,12 @@ export const useMutationUsersQuery = () => {
   }
 
   const checkPassword = (password: string) => { // En modal confirmacion con password
+    typeActionRef.current = "check_password"
     const params = {
       url: apiURL + "users/check_password",
       method: "POST",
       headers:{ 
         Authorization,
-        // 'nombre-modulo': nombreModulo,
       },
       body: JSON.stringify({password}),
     }
@@ -253,27 +269,26 @@ export const useMutationUsersQuery = () => {
     const params = {
       url: apiURL + "users/get_email_by_username",
       method: "POST",
-      // contentType: "application/json",
       body: JSON.stringify({username}),
     }
     mutate(params)
   }
 
   const sendCodeRestoration = (param: {email: string, username: string}) => {
+    typeActionRef.current = "send_code_restoration"
     const params = {
       url: apiURL + "users/send_code_restoration",
       method: "POST",
-      // contentType: "application/json",
       body: JSON.stringify(param),
     }
     mutate(params)
   }
   
   const restorePassword = (param: any) => {
+    typeActionRef.current = "restore_password"
     const params = {
       url: apiURL + "users/restore_password",
       method: "POST",
-      // contentType: "application/json",
       body: JSON.stringify(param),
     }
     mutate(params)
@@ -292,11 +307,11 @@ export const useMutationUsersQuery = () => {
     isError,
     filterUserFull,
     getUser,
-    getUserSession,
+    getProfile,
     createUser,
     signUp,
     updateUser,
-    updateUserSession,
+    updateProfile,
     deleteUser,
     signIn,
     checkAuth,

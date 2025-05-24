@@ -12,33 +12,29 @@ import { objToUriBase64 } from '../../core/utils/funciones'
 import { useUsers } from './context/UsersContext';
 
 export default function UsersHead() {
-
   const [inputSearch, setInputSearch] = useState("")
   const filterParamsUsers = useUsersStore(state => state.filterParamsUsers)
   const setFilterParamsUsers = useUsersStore(state => state.setFilterParamsUsers)
-  const setShowUsersFilterMdl = useUsersStore(state => state.setShowUsersFilterMdl)
-  const {filterUsersCurrent, setCurrentUserId, setShowUserForm,} = useUsers()
 
   const {
-    isFetching,
-  } = useFilterUsersQuery();
-  
+    filterUsersCurrent, 
+    setCurrentUserId, 
+    setShowUserForm, 
+    setShowUsersFilterMdl 
+  } = useUsers()
+
+  const { isFetching: isFetchingUsers } = useFilterUsersQuery();
 
   useDebounce(() => { 
     if (inputSearch.toLowerCase().trim() == filterParamsUsers.search.toLowerCase().trim()) return
     setFilterParamsUsers({ ...filterParamsUsers, search: inputSearch.trim() });
-  }, 1000, [inputSearch]);
-
-
-  const handleInputSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setInputSearch(e.target.value)
-  };
+  }, 500, [inputSearch]);
 
   const handleUnequal = (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
-    const {fieldname} = e.currentTarget.dataset
-    if(fieldname){
+    const {field_name} = e.currentTarget.dataset
+    if(field_name){
       let { equals } = filterParamsUsers;
-      equals = equals.filter(el => el.fieldname !== fieldname)
+      equals = equals.filter(el => el.field_name !== field_name)
       setFilterParamsUsers({ ...filterParamsUsers, equals: [...equals] });
     }
   };
@@ -56,13 +52,9 @@ export default function UsersHead() {
     setShowUserForm(true);
   };
 
-  const handleShowFilterMdl = () => {
-    setShowUsersFilterMdl(true);
-  };
-
   const getDateRangeInfo = () => {
     const {between} = filterParamsUsers
-    if(!between.fieldname) return ""
+    if(!between.field_name) return ""
     let date_from = between.range.split(",")[0].split(" ")[0]
     let date_to = between.range.split(",")[1].trim().split(" ")[0]
     date_from = date_from.split("-").reverse().join("/")
@@ -85,7 +77,7 @@ export default function UsersHead() {
 
   return (
       <Container className="mb-2 pt-2 position-relative">
-          {isFetching && <LdsBar />}
+          {isFetchingUsers && <LdsBar />}
         <Row className="align-items-center">
           <Col sm className="text-center text-sm-start">
             <h5>Lista de Usuarios</h5>
@@ -95,7 +87,7 @@ export default function UsersHead() {
               type="search"
               placeholder="Buscar"
               value={inputSearch}
-              onChange={handleInputSearch}
+              onChange={(e)=>setInputSearch(e.target.value)}
               />
           </Col>
           <Col className="text-center flex-sm-grow-0">
@@ -120,7 +112,7 @@ export default function UsersHead() {
               </div>
               <div
                 role="button"
-                onClick={handleShowFilterMdl}
+                onClick={()=>setShowUsersFilterMdl(true)}
                 className="px-1"
                 title="Filtros"
               >
@@ -148,7 +140,7 @@ export default function UsersHead() {
                     </div>
                 </Badge>
               </Stack>
-                {(filterUsersCurrent.between.fieldname.length !== 0) &&
+                {(filterUsersCurrent.between.field_name.length !== 0) &&
                   <Stack direction="horizontal" gap={2} className="flex-wrap">
                     <Badge bg="secondary" role="button" onClick={handleUnbetween} className="d-flex gap-1">
                       <DynaIcon name="FaCircleXmark"  className="pr-4" />
@@ -166,10 +158,10 @@ export default function UsersHead() {
                       onClick={handleUnequal} 
                       className="d-flex gap-1" 
                       key={idx}
-                      data-fieldname={el.fieldname}
+                      data-field_name={el.field_name}
                     >
                       <DynaIcon name="FaCircleXmark"  className="pr-4" />
-                      <div>{el.campo_text}: {el.text}</div>
+                      <div>{el.label_name}: {el.label_value}</div>
                     </Badge>
                   )
                 })}

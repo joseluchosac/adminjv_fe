@@ -63,32 +63,32 @@ function ProveedoresTblRow({ proveedor, camposProveedor }: Props) {
   return (
     <tr className="text-nowrap">
       {camposProveedor.map((el) => {
-        const {fieldname, show} = el
+        const {field_name, show} = el
         if(show){
-          switch (fieldname) {
+          switch (field_name) {
             case "nro_documento":{
               return (
-                <td key={fieldname}>
+                <td key={field_name}>
                   <div>
-                    {proveedor.tipo_documento + ' ' + proveedor[fieldname as keyof Proveedor] }
+                    {proveedor.tipo_documento + ' ' + proveedor[field_name as keyof Proveedor] }
                   </div>
                 </td>
               )
             }
             case "nombre_razon_social":{
               return (
-                <td key={fieldname} style={{minWidth: "200px"}}>
+                <td key={field_name} style={{minWidth: "200px"}}>
                   <div className="text-wrap" style={{minWidth: "200px"}}>
-                    {proveedor[fieldname as keyof Proveedor]}
+                    {proveedor[field_name as keyof Proveedor]}
                   </div>
                 </td>
               )
             }
             case "direccion":{
               return (
-                <td key={fieldname}>
+                <td key={field_name}>
                   <div className="text-wrap">
-                    {proveedor[fieldname as keyof Proveedor]}
+                    {proveedor[field_name as keyof Proveedor]}
                   </div>
                   <small>
                     {proveedor.departamento +', '+ proveedor.provincia +', '+ proveedor.distrito}
@@ -97,13 +97,13 @@ function ProveedoresTblRow({ proveedor, camposProveedor }: Props) {
               )
             }
             case "estado":{
-              return <td key={fieldname}> {proveedor.estado == 0
+              return <td key={field_name}> {proveedor.estado == 0
                 ? <Badge bg="danger">Deshabilitdo</Badge>
                 : <Badge bg="success">Habilitado</Badge>} </td>
             }
             case "acciones":{
               return (
-                <td key={fieldname}>
+                <td key={field_name}>
                   <div className="d-flex gap-2 justify-content-center">
                     <NavDropdown title={<div className="p-1"></div>}>
                       <NavDropdown.Item onClick={handleDelete}  className="d-flex gap-2 align-middle" href="#">
@@ -120,9 +120,9 @@ function ProveedoresTblRow({ proveedor, camposProveedor }: Props) {
             } 
             default:{
               return (
-                <td key={fieldname}>
+                <td key={field_name}>
                   <div className="text-wrap">
-                    {proveedor[fieldname as keyof Proveedor]}
+                    {proveedor[field_name as keyof Proveedor]}
                   </div>
                 </td>
               )

@@ -70,7 +70,7 @@ export const rolFormInit = {
 export const filterParamsInit: FilterParams = {
     offset: 25,
     search: "",
-    equals: [], // [{fieldname: "sucursal_id", value: "1", text:"principal", campo_text: "Sucursal"}]
-    between: {fieldname: "", campo_text: "", range: ""}, // {fieldname: "created_at", campo_text:"Creado", range: "2024-12-18 00:00:00, 2024-12-19 23:59:59"}
-    orders: [], // [{fieldname: "nombres", order_dir: "ASC", text: "Nombres"}]
+    equals: [], // [{field_name: "sucursal_id", value: "1", text:"principal", campo_text: "Sucursal"}]
+    between: {field_name: "", campo_text: "", range: ""}, // {field_name: "created_at", campo_text:"Creado", range: "2024-12-18 00:00:00, 2024-12-19 23:59:59"}
+    orders: [], // [{field_name: "nombres", order_dir: "ASC", text: "Nombres"}]
 }
