@@ -55,7 +55,7 @@ export const moduloFormInit = {
   id: 0,
   nombre: "",
   descripcion: "",
-  icon_menu: "FaRegCircle",
+  icon_menu: "GoDot",
   padre_id: 0,
   orden: 0,
 }

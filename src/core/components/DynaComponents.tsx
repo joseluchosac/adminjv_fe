@@ -21,7 +21,8 @@ import {
   FaHandHoldingUsd,
   FaFileAlt,
 } from 'react-icons/fa';
-import { FaArrowDownAZ, FaArrowDownZA, FaCircleXmark, FaFileInvoice } from 'react-icons/fa6';
+import { FaArrowDownAZ, FaArrowDownZA, FaCircleXmark, FaFileInvoice, FaShield } from 'react-icons/fa6';
+import { GoDot } from 'react-icons/go';
 import { GrShieldSecurity } from 'react-icons/gr';
 import { HiCash } from 'react-icons/hi';
 import { LuRectangleEllipsis } from 'react-icons/lu';
@@ -58,6 +59,8 @@ export const iconsMap: { [key: string]: React.FC<any> } = {
   FaFileInvoice,
   FaHandHoldingUsd,
   FaFileAlt,
+  FaShield,
+  GoDot,
 };
 
 interface Props { 

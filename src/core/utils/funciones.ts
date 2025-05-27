@@ -129,3 +129,42 @@ export function objToUriBase64(par:any){
 export async function delay(ms: number){
   return new Promise(resolve => setTimeout(resolve,ms))
 }
+
+// ✅ FUNCION RECURSIVA QUE DEVUELVE UN NUEVO ARREGLO DE LOS ANCESTROS DE UN
+// ELEMENTO A PARTIR DE UN ARREGLO DE ELEMENTOS
+// [..., elementoAbuelo, elementoPadre, ElementoHijo]
+type elemento = {
+  id: number;
+  descripcion: string;
+  padre_id: number
+}
+export function getBranch(id: number, arreglo: elemento[], branch: elemento[]=[]){
+    const elemento = arreglo.find((el)=>el.id === id) as elemento
+        branch.unshift(elemento)
+    if(elemento?.padre_id){
+        return getBranch(elemento.padre_id, arreglo, branch)
+    }else{
+        return branch
+    }
+}
+// utilidades
+// const texto = "-2,-13,-8,"
+// console.log(texto.split(",").filter(el=>el).map(el=>parseInt(el.slice(1))));
+
+// const arreglo = [ 2, 13, 8 ]
+// console.log(arreglo.map(el=>"-"+el+",").join(''))
+
+// ✅ FUNCION QUE DEVUELVE UN SLUG A PARTIR DE UN STRING
+// const titulo = "Este es un Título con Espacios y Caracteres Especiales";
+// const slug = generarSlug(titulo);
+// console.log(slug); // Output: este-es-un-titulo-con-espacios-y-caracteres-especiales
+export function generarSlug(texto: string) {
+  texto = texto.trim();  // Eliminar espacios al principio y al final
+  texto = texto.toLowerCase();  // Convertir a minúsculas
+  texto = texto.normalize('NFD').replace(/[\u0300-\u036f]/g, '');  // Reemplazar caracteres especiales y acentos
+  texto = texto.replace(/\s+/g, '-');  // Reemplazar espacios por guiones
+  texto = texto.replace(/[^a-z0-9-]/g, '');  // Eliminar caracteres no alfanuméricos ni guiones
+  texto = texto.replace(/-+/g, '-');  // Eliminar guiones duplicados
+  texto = texto.replace(/^-+|-+$/g, '');  // Eliminar guiones al principio y al final
+  return texto;
+}

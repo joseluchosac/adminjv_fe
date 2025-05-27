@@ -57,11 +57,6 @@ export interface RegisterForm {
   password_repeat: string;
 }
 
-// ✅ TIPOS PARA LA TABLA CAJAS
-// export interface Caja {
-//   id: number;
-//   descripcion: string
-// }
 // ✅ TIPOS PARA LA TABLA MODULOS
 export interface Modulo {
   id: number;
@@ -132,29 +127,49 @@ export interface FilterParams {
   orders: FilterParamsOrder[];
 }
 
+type FilterParamsOrder = {
+  field_name: string;
+  order_dir: string;
+  field_label: string
+}
 type FilterParamsEqual = {
   field_name: string;
   field_value: string; //antes value
   label_name: string; // antes text
   label_value: string // antes campo_text
 }
-
-
 type FilterParamsBetween = {
   field_name: string;
   field_label: string;
   range: string
 }
 
-type FilterParamsOrder = {
-  field_name: string;
-  order_dir: string;
-  field_label: string
-}
 
 export type FilterCurrent = Omit<FilterParams, "offset" | "search">
 
 
+// ✅ TIPOS PARA PRODUCTO
+export interface Producto {
+  id: number;
+  codigo: string;
+  barcode: string;
+  categoria_ids: string;
+  descripcion: string;
+  unidad_medida_cod: string;
+  tipo_moneda_cod: string;
+  precio_venta: number;
+  precio_costo: number;
+  impuesto_id_igv: number;
+  impuesto_id_icbper: number;
+  inventareable: number;
+  lotizable: number;
+  stock: number;
+  stock_min: number;
+  imagen: string;
+  estado: number;
+  created_at: string;
+  updated_at: string;
+}
 // ✅ TIPOS PARA CATEGORIAS
 export interface Categoria {
   id: number;

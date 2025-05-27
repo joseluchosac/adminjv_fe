@@ -6,6 +6,7 @@ const IconsModal: BsPrefixRefForwardingComponent<"div", ModalProps> = ({show, se
   const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
     const {name_icon} = e.currentTarget.dataset
     onChooseIcon(name_icon)
+    setShow(false)
   }
   const handleClose = () => setShow(false);
 

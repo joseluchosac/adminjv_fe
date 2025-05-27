@@ -4,59 +4,60 @@ import { Badge, Button, Col, Container, Dropdown, Form, Row, Stack } from 'react
 import { LdsBar } from '../../core/components/Loaders'
 import { FaFileExcel, FaFilePdf, FaFilter } from 'react-icons/fa'
 import DynaIcon from '../../core/components/DynaComponents'
-import useUsersStore from '../../core/store/useUsersStore'
-import { useFilterUsersQuery } from '../../core/hooks/useUsersQuery'
+import useProductosStore from '../../core/store/useProductosStore'
+import { useFilterProductosQuery } from '../../core/hooks/useProductosQuery'
 import { useDebounce } from 'react-use'
 import { filterParamsInit } from '../../core/utils/constants'
 import { objToUriBase64 } from '../../core/utils/funciones'
-import { useUsers } from './context/UsersContext';
+import { useProductos } from './context/ProductosContext';
 
-export default function UsersHead() {
+export default function ProductosLstHead() {
   const [inputSearch, setInputSearch] = useState("")
-  const filterParamsUsers = useUsersStore(state => state.filterParamsUsers)
-  const setFilterParamsUsers = useUsersStore(state => state.setFilterParamsUsers)
+  const filterParamsProductos = useProductosStore(state => state.filterParamsProductos)
+  const setFilterParamsProductos = useProductosStore(state => state.setFilterParamsProductos)
 
   const {
-    filterUsersCurrent, 
-    setCurrentUserId, 
-    setShowUserForm, 
-    setShowUsersFilterMdl 
-  } = useUsers()
+    filterProductosCurrent, 
+    setCurrentProductoId, 
+    setShowProductosFilterMdl,
+    mode,
+    setMode,
+  } = useProductos()
 
-  const { isFetching: isFetchingUsers } = useFilterUsersQuery();
+  const { isFetching: isFetchingProductos } = useFilterProductosQuery();
 
   useDebounce(() => { 
-    if (inputSearch.toLowerCase().trim() == filterParamsUsers.search.toLowerCase().trim()) return
-    setFilterParamsUsers({ ...filterParamsUsers, search: inputSearch.trim() });
+    if (inputSearch.toLowerCase().trim() == filterParamsProductos.search.toLowerCase().trim()) return
+    setFilterParamsProductos({ ...filterParamsProductos, search: inputSearch.trim() });
   }, 500, [inputSearch]);
-  const handleSetShowUsersFilterMdl = (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
+  const handleSetShowProductosFilterMdl = (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
     e.preventDefault()
-    setShowUsersFilterMdl(true)
+    setShowProductosFilterMdl(true)
   }
   const handleUnequal = (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
     const {field_name} = e.currentTarget.dataset
     if(field_name){
-      let { equals } = filterParamsUsers;
+      let { equals } = filterParamsProductos;
       equals = equals.filter(el => el.field_name !== field_name)
-      setFilterParamsUsers({ ...filterParamsUsers, equals: [...equals] });
+      setFilterParamsProductos({ ...filterParamsProductos, equals: [...equals] });
     }
   };
   
   const handleUnsort = () => {
-    setFilterParamsUsers({...filterParamsUsers, orders: filterParamsInit.orders})
+    setFilterParamsProductos({...filterParamsProductos, orders: filterParamsInit.orders})
   };
 
   const handleUnbetween = () => {
-    setFilterParamsUsers({...filterParamsUsers, between: filterParamsInit.between})
+    setFilterParamsProductos({...filterParamsProductos, between: filterParamsInit.between})
   }
 
   const handleNuevo = () => {
-    setCurrentUserId(0)
-    setShowUserForm(true);
+    setCurrentProductoId(0)
+    setMode("edit")
   };
 
   const getDateRangeInfo = () => {
-    const {between} = filterParamsUsers
+    const {between} = filterParamsProductos
     if(!between.field_name) return ""
     let date_from = between.range.split(",")[0].split(" ")[0]
     let date_to = between.range.split(",")[1].trim().split(" ")[0]
@@ -69,18 +70,18 @@ export default function UsersHead() {
   }
 
   const handleTraerTodo = () => {
-    const param = objToUriBase64(filterParamsUsers)
-    window.open(apiDOCS+"pdf/?action=users_report&p=" + param)
+    const param = objToUriBase64(filterParamsProductos)
+    window.open(apiDOCS+"pdf/?action=productos_report&p=" + param)
   }
 
   useEffect(()=>{
-    setInputSearch(filterParamsUsers.search)
+    setInputSearch(filterParamsProductos.search)
   }, [])
 
 
   return (
-      <Container className="mb-2 pt-2 position-relative">
-          {isFetchingUsers && <LdsBar />}
+      <Container className={`mb-2 pt-2 position-relative ${mode === "edit" ? "d-none" : ""}`}>
+          {isFetchingProductos && <LdsBar />}
         <Row className="align-items-center">
           <Col sm className="text-center text-sm-start">
             <h5>Lista de Usuarios</h5>
@@ -116,7 +117,7 @@ export default function UsersHead() {
               <Dropdown style={{zIndex:"1035"}}>
                 <Dropdown.Toggle split  variant="outline-secondary" />
                 <Dropdown.Menu>
-                  <Dropdown.Item href="#" onClick={handleSetShowUsersFilterMdl} className='d-flex gap-2 align-items-center'>
+                  <Dropdown.Item href="#" onClick={handleSetShowProductosFilterMdl} className='d-flex gap-2 align-items-center'>
                     <FaFilter/><div>Mostrar filtros</div>
                   </Dropdown.Item>
                 </Dropdown.Menu>                
@@ -133,27 +134,27 @@ export default function UsersHead() {
               <Stack
                 direction="horizontal"
                 gap={2}
-                className={`${filterUsersCurrent.orders.length ? "" : "d-none"}`}
+                className={`${filterProductosCurrent.orders.length ? "" : "d-none"}`}
               >
                 <Badge bg="secondary" role="button" onClick={handleUnsort} className="d-flex gap-1">
                   <DynaIcon name="FaCircleXmark"  className="pr-4" />
                     ORDEN:
                     <div className="text-wrap">
-                      {filterUsersCurrent.orders.map((el) => el.field_label).join(", ")}
+                      {filterProductosCurrent.orders.map((el) => el.field_label).join(", ")}
                     </div>
                 </Badge>
               </Stack>
-                {(filterUsersCurrent.between.field_name.length !== 0) &&
+                {(filterProductosCurrent.between.field_name.length !== 0) &&
                   <Stack direction="horizontal" gap={2} className="flex-wrap">
                     <Badge bg="secondary" role="button" onClick={handleUnbetween} className="d-flex gap-1">
                       <DynaIcon name="FaCircleXmark"  className="pr-4" />
-                      {`${filterUsersCurrent.between.field_label}: `}
+                      {`${filterProductosCurrent.between.field_label}: `}
                       <div className="text-wrap">{getDateRangeInfo()}</div>
                     </Badge>
                   </Stack>
                 }
               <Stack direction="horizontal" gap={2}>
-                {filterUsersCurrent.equals.map((el, idx) => {
+                {filterProductosCurrent.equals.map((el, idx) => {
                   return (
                     <Badge 
                       bg="secondary" 

@@ -1,15 +1,15 @@
-import { FilterParams, User } from "../types";
+import { FilterParams, Producto } from "../types";
 const apiURL = import.meta.env.VITE_API_URL;
 
-type FilterUsersFetch = {
-  filterParamsUsers: FilterParams;
+type FilterProductosFetch = {
+  filterParamsProductos: FilterParams;
   pageParam: number;
   token?: string | null;
   signal?: AbortSignal | null
 }
 
-type FilterUsersFetchResp = {
-  content: User[];
+type FilterProductosFetchResp = {
+  content: Producto[];
   next: number;
   num_regs: number;
   offset: number;
@@ -21,18 +21,18 @@ type FilterUsersFetchResp = {
   msgType: string
 }
 
-export const filterUsersFetch = async({
-  filterParamsUsers, 
+export const filterProductosFetch = async({
+  filterParamsProductos, 
   pageParam, 
   token = null,
   signal = null, 
-}: FilterUsersFetch): Promise<FilterUsersFetchResp> => {
+}: FilterProductosFetch): Promise<FilterProductosFetchResp> => {
   let options: RequestInit  = {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify(filterParamsUsers),
+    body: JSON.stringify(filterParamsProductos),
     credentials: "include", // envio de cookies
   }
   if(signal){
@@ -41,7 +41,7 @@ export const filterUsersFetch = async({
   if(token){
     options.headers = {...options.headers, Authorization: "Bearer " + token}
   }
-  const res = await fetch(`${apiURL}users/filter_users?page=${pageParam}`, options)
+  const res = await fetch(`${apiURL}productos/filter_productos?page=${pageParam}`, options)
   return res.json()
 }
 

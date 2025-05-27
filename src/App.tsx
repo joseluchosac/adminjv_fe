@@ -18,6 +18,7 @@ import Categorias from './pages/categorias/Categorias';
 import Laboratorios from './pages/laboratorios/Laboratorios';
 import Profile from './pages/profile/Profile';
 import Marcas from './pages/marcas/Marcas';
+import ProductosPWrap from './pages/productos/ProductosPWrap';
 
 
 const Tareas = lazy(() => import("./pages/tareas/Tareas"));
@@ -44,6 +45,7 @@ function App() {
           />
           <Route path="clientes" element={<Clientes />} />
           <Route path="proveedores" element={<Proveedores />} />
+          <Route path="productos" element={<ProductosPWrap />} />
           <Route path="categorias" element={<Categorias />} />
           <Route path="marcas" element={<Marcas />} />
           <Route path="laboratorios" element={<Laboratorios />} />

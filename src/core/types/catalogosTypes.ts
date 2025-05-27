@@ -33,6 +33,7 @@ export type Impuesto = {
   tipo_tributo: string;
   porcentaje: number;
   importe: number;
+  pred:number;
   estado: number
 }
 export type MotivoNota = {
@@ -66,6 +67,7 @@ export type TipoMoneda = {
   codigo: string;
   descripcion: string;
   simbolo: string;
+  pred: number;
   estado: number;
 }
 export type TipoMovimientoCaja = {
