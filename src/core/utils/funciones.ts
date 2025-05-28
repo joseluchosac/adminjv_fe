@@ -1,6 +1,6 @@
 // Genera arbol a partir de un arreglo de objetos
 
-import { Categoria, Modulo } from "../types";
+import { Categoria, CategoriaProductoOpc, Modulo } from "../types";
 
 
 export function getModulosTree(data: Modulo[]): Modulo[] {
@@ -39,6 +39,27 @@ export function getModulosTree(data: Modulo[]): Modulo[] {
 export function getCategoriasTree(data: Categoria[]): Categoria[] {
   const mapa = new Map();
   const raiz: Categoria[] = [];
+  // Crear un mapa de los elementos
+  data.forEach(item => {
+    mapa.set(item.id, { ...item, children: [] });
+  });
+
+  // Construir el árbol
+  data.forEach(item => {
+    if (item.padre_id === 0) {
+      raiz.push(mapa.get(item.id));
+    } else {
+      const padre = mapa.get(item.padre_id);
+      if (padre) {
+        padre.children.push(mapa.get(item.id));
+      }
+    }
+  });
+  return raiz;
+}
+export function generateCategoriasProductoOpcTree(data: CategoriaProductoOpc[]): CategoriaProductoOpc[] {
+  const mapa = new Map();
+  const raiz: CategoriaProductoOpc[] = [];
   // Crear un mapa de los elementos
   data.forEach(item => {
     mapa.set(item.id, { ...item, children: [] });
@@ -132,7 +153,8 @@ export async function delay(ms: number){
 
 // ✅ FUNCION RECURSIVA QUE DEVUELVE UN NUEVO ARREGLO DE LOS ANCESTROS DE UN
 // ELEMENTO A PARTIR DE UN ARREGLO DE ELEMENTOS
-// [..., elementoAbuelo, elementoPadre, ElementoHijo]
+// del areglo: [elemento1, elemento2, elemento3, ...]
+// devielve: [..., elementoAbuelo, elementoPadre, ElementoActual]
 type elemento = {
   id: number;
   descripcion: string;
@@ -147,12 +169,13 @@ export function getBranch(id: number, arreglo: elemento[], branch: elemento[]=[]
         return branch
     }
 }
-// utilidades
-// const texto = "-2,-13,-8,"
-// console.log(texto.split(",").filter(el=>el).map(el=>parseInt(el.slice(1))));
 
-// const arreglo = [ 2, 13, 8 ]
-// console.log(arreglo.map(el=>"-"+el+",").join(''))
+// ✅ UTILIDADES PARA CAMBIAR EL TEXTO A ARREGLO Y VICEVERSA DEL CAMPO categoria_ids DE LA TABLA productos
+// const texto = ",7,2,13,4,"
+// console.log(texto.split(",").filter(el=>el).map(el=>parseInt(el)));
+
+// const arreglo = [ 7, 2, 13, 4 ]
+// console.log(`,${arreglo.join(",")},`)
 
 // ✅ FUNCION QUE DEVUELVE UN SLUG A PARTIR DE UN STRING
 // const titulo = "Este es un Título con Espacios y Caracteres Especiales";

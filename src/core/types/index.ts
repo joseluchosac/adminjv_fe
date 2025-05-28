@@ -170,6 +170,13 @@ export interface Producto {
   created_at: string;
   updated_at: string;
 }
+export type CategoriaProductoOpc = {
+  id: number;
+  descripcion:string;
+  padre_id: number;
+  chked: boolean;
+  children?: any;
+}
 // ✅ TIPOS PARA CATEGORIAS
 export interface Categoria {
   id: number;

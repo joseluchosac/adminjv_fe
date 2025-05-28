@@ -1,5 +1,5 @@
 import { createContext, useContext, useState } from "react";
-import { FilterCurrent, Producto } from "../../../core/types";
+import { CategoriaProductoOpc, FilterCurrent, Producto } from "../../../core/types";
 
 const filterProductosCurrentInit: FilterCurrent = {
   equals: [],
@@ -18,6 +18,8 @@ export interface ProductosContextType {
   setCurrentProductoId: React.Dispatch<React.SetStateAction<number>>;
   filterProductosCurrent: FilterCurrent;
   setFilterProductosCurrent: React.Dispatch<React.SetStateAction<FilterCurrent>>;
+  categoriasProductoOpc: CategoriaProductoOpc[] | null;
+  setCategoriasProductoOpc: React.Dispatch<React.SetStateAction<CategoriaProductoOpc[] | null>>;
 }
 
 // Crear el contexto con un valor por defecto
@@ -30,6 +32,7 @@ export const ProductosProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const [currentProductoId, setCurrentProductoId] = useState(0);
   const [filterProductosCurrent, setFilterProductosCurrent] = useState(filterProductosCurrentInit);
   const [showProductosFilterMdl, setShowProductosFilterMdl] = useState(false);
+  const [categoriasProductoOpc, setCategoriasProductoOpc] = useState<CategoriaProductoOpc[] | null>(null);
 
   return (
     <ProductosContext.Provider value={{ 
@@ -42,7 +45,9 @@ export const ProductosProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       currentProductoId,
       setCurrentProductoId,
       filterProductosCurrent,
-      setFilterProductosCurrent
+      setFilterProductosCurrent,
+      categoriasProductoOpc,
+      setCategoriasProductoOpc,
     }}>
       {children}
     </ProductosContext.Provider>
