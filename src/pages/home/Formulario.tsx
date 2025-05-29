@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react"
 import { Button, Col, Container, Form, Row } from "react-bootstrap"
 import { Controller, useForm } from "react-hook-form"
 import SelectAsync from "react-select/async"
+import Select from "react-select"
 import useLayoutStore from "../../core/store/useLayoutStore"
 import { filterParamsInit, selectDark } from "../../core/utils/constants"
 import useLaboratoriosStore from "../../core/store/useLaboratoriosStore"
@@ -9,6 +10,12 @@ import { filterLaboratoriosFetch } from "../../core/services/laboratoriosFetch"
 import useSessionStore from "../../core/store/useSessionStore"
 import { debounce } from "../../core/utils/funciones"
 import { filterMarcasFetch } from "../../core/services/marcasFetch"
+const opciones = [
+  {value:1, label:"opcion 1"},
+  {value:2, label:"opcion 2"},
+  {value:3, label:"opcion 3"},
+  {value:4, label:"opcion 4"},
+]
 
 type Producto = {
   id: number;
@@ -18,6 +25,7 @@ type Producto = {
   laboratorio_id: number | null;
   laboratorio: string;
   estado: number;
+  categorias: any;
 }
 
 const productoFormInit = {
@@ -28,6 +36,7 @@ const productoFormInit = {
   laboratorio_id: null,
   laboratorio: "",
   estado: 1,
+  categorias: []
 }
 
 const unProducto = {
@@ -171,6 +180,11 @@ function Formulario() {
       <button onClick={()=>{
         reset(productoFormInit)
       }}>reset</button>
+      <Select
+        options={opciones}
+        isMulti
+        value={[{value:3, label:"opcion 2"}]}
+      />
     </Container>
   )
 }

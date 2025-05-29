@@ -1,9 +1,10 @@
 import { create } from "zustand";
-import { Catalogos, Rol } from "../types/catalogosTypes";
+import { Catalogos, Categoria, Rol } from "../types/catalogosTypes";
 
 interface UseCatalogosStore {
   catalogos: Catalogos | null;
   setCatalogos: (newCatalogos: Catalogos) => void;
+  setCatalogosCategoriasTree: (categorias_tree: Categoria[]) => void;
   createRolStore: (rol: Rol) => void;
   updateRolStore: (rol: Rol) => void;
   deleteRolStore: (rol_id: number) => void;
@@ -17,6 +18,9 @@ const useCatalogosStore = create<UseCatalogosStore>((set, get) => {
     ...initialState,
     setCatalogos: (newCatalogos) => {
       set({catalogos: newCatalogos})
+    },
+    setCatalogosCategoriasTree: (categorias_tree) => {
+      set({catalogos: {...get().catalogos as Catalogos, categorias_tree}})
     },
     createRolStore: (rol) => {
       const catalogos = get().catalogos

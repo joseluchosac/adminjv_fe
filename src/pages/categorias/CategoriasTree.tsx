@@ -1,22 +1,17 @@
 import { useEffect, useRef } from "react";
 import DynaIcon from "../../core/components/DynaComponents";
-import { Categoria } from "../../core/types"
 import Sortable from "sortablejs";
+import { Categoria } from "../../core/types/catalogosTypes";
 
 type Props = {
   categoriasTree: Categoria[];
-  toEdit: (id: number) => void;
+  toEdit: (categoria: Categoria) => void;
   sortCategorias: (orderedItems: Categoria[]) => void;
 }
 
 export default function CategoriasTree({categoriasTree,  toEdit, sortCategorias}: Props) {
 
   const listRef = useRef<HTMLUListElement>(null);
-
-  const handleEdit = (e: React.MouseEvent<HTMLSpanElement, MouseEvent>) => {
-    e.preventDefault()
-    toEdit(parseInt(e.currentTarget.dataset.id as string))
-  }
 
   useEffect(() => {
     if (listRef.current) {
@@ -50,12 +45,18 @@ export default function CategoriasTree({categoriasTree,  toEdit, sortCategorias}
               el.children.length === 0
               ? <div className='d-flex gap-2 mb-1'>
                   <div>&nbsp;&nbsp;&nbsp;{el.descripcion}</div>
-                  <span onClick={handleEdit} data-id={el.id} role='button'><DynaIcon name='FaEdit' className='text-success' /></span>
+                  <span onClick={(e)=>{
+                    e.preventDefault()
+                    toEdit(el)
+                  }} role='button'><DynaIcon name='FaEdit' className='text-success' /></span>
                 </div>
               : <details>
                   <summary className='d-flex gap-2 mb-1'>
                     <div>+ {el.descripcion}</div>
-                    <span onClick={handleEdit} data-id={el.id}><DynaIcon name='FaEdit' className='text-success' /></span>
+                    <span onClick={(e)=>{
+                    e.preventDefault()
+                    toEdit(el)
+                  }} data-id={el.id}><DynaIcon name='FaEdit' className='text-success' /></span>
                   </summary>
                   <CategoriasTree
                     categoriasTree={el.children}

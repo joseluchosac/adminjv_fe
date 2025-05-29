@@ -12,6 +12,7 @@ export interface Catalogos {
   tipos_operacion: TipoOperacion[];
   unidades_medida: UnidadMedida[];
   departamentos: Departamento[];
+  categorias_tree: Categoria[];
 }
 export type Caja = {
   id: number;
@@ -89,6 +90,7 @@ export type TipoOperacion = {
   descripcion: string;
   estado: number
 }
+
 export type UnidadMedida = {
   codigo: string;
   descripcion: string;
@@ -134,4 +136,11 @@ export type SerieEstablecimiento = {
   serie_suffix: string;
   correlativo: string;
   estado: number;
+}
+export type Categoria = {
+  id: number;
+  descripcion: string;
+  padre_id: number;
+  orden: number;
+  children?: any;
 }

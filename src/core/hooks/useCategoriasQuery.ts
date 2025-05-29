@@ -1,10 +1,10 @@
 const apiURL = import.meta.env.VITE_API_URL;
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import useSessionStore from "../store/useSessionStore"
-import { Categoria } from "../types"
 import { mutationFetch } from "../services/mutationFecth";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { Categoria } from "../types/catalogosTypes";
 
 // ****** MUTATION ******
 export const useMutateCategoriasQuery = () => {
@@ -25,6 +25,17 @@ export const useMutateCategoriasQuery = () => {
   const getCategorias = () => {
     const params = {
       url: apiURL + "categorias/get_categorias",
+      method: "POST",
+      headers:{ 
+        Authorization,
+        'nombre-modulo': nombreModulo,
+      },
+    }
+    mutate(params)
+  }
+  const getCategoriasTree = () => {
+    const params = {
+      url: apiURL + "categorias/get_categorias_tree",
       method: "POST",
       headers:{ 
         Authorization,
@@ -98,6 +109,7 @@ export const useMutateCategoriasQuery = () => {
     data, 
     isPending, 
     getCategorias,
+    getCategoriasTree,
     sortCategorias,
     createCategoria, 
     updateCategoria, 

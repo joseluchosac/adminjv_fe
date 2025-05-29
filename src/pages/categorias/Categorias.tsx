@@ -1,42 +1,35 @@
 import { useEffect, useState } from "react"
-import { useMutateCategoriasQuery } from "../../core/hooks/useCategoriasQuery"
-import { getCategoriasTree } from "../../core/utils/funciones"
-import { Categoria, Padre } from "../../core/types"
-import CategoriasTree from "./CategoriasTree"
-import { Button, Card, Col, Container, Form, Nav, Row } from "react-bootstrap"
-import { LdsBar } from "../../core/components/Loaders"
-import DynaIcon from "../../core/components/DynaComponents"
-import IconsModal from "../../core/components/IconsModal"
-import { Bounce, toast } from "react-toastify"
 import Swal from "sweetalert2"
+import { Bounce, toast } from "react-toastify"
+import { Button, Card, Col, Container, Form, Row } from "react-bootstrap"
+import { useMutateCategoriasQuery } from "../../core/hooks/useCategoriasQuery"
+import { flattenTree } from "../../core/utils/funciones"
+import CategoriasTree from "./CategoriasTree"
+import { LdsBar } from "../../core/components/Loaders"
 import useLayoutStore from "../../core/store/useLayoutStore"
+import { Categoria } from "../../core/types/catalogosTypes"
+import { Padre } from "../../core/types"
+import useCatalogosStore from "../../core/store/useCatalogosStore"
 
 export const categoriaFormInit = {
   id: 0,
   nombre: "",
   descripcion: "",
   padre_id: 0,
-  icon: "FaRegCircle",
   orden: 0,
   estado: 1
 }
 
 export default function Categorias() {
-  const [categoriasTree, setCategoriasTree] = useState<Categoria[] | null>(null)
   const [categoriaForm, setCategoriaForm] = useState<Categoria>(categoriaFormInit)
   const [padres, setPadres] = useState<Padre[] | null>(null)
-  const [showIconsModal, setShowIconsModal] = useState(false);
   const darkMode = useLayoutStore(state => state.layout.darkMode)
+  const categoriasTree = useCatalogosStore(state => state.catalogos?.categorias_tree)
+  const setCatalogosCategoriasTree = useCatalogosStore(state => state.setCatalogosCategoriasTree)
 
   const {
-    data: data_getCategorias, 
-    isPending: isPending_getCategorias, 
-    getCategorias
-  } = useMutateCategoriasQuery()
-
-  const {
-    data: data_mutate, 
-    isPending: isPending_mutate, 
+    data: mutated, 
+    isPending: isPendingMutate, 
     sortCategorias, 
     createCategoria, 
     updateCategoria, 
@@ -44,8 +37,8 @@ export default function Categorias() {
   } = useMutateCategoriasQuery()
 
   const actualizarPadres = (id: number) => {
-    if(!data_getCategorias) return
-    let nuevosPadres = data_getCategorias
+    if(!categoriasTree) return
+    let nuevosPadres = flattenTree(categoriasTree)
       .filter((el: any)=> el.id != id)
       .map((el: any) => {
         const {id, descripcion} = el
@@ -55,10 +48,9 @@ export default function Categorias() {
     setPadres(nuevosPadres)
   }
 
-  const toEdit = (id: number) => {
-    const categoriaActual = data_getCategorias?.find((el: Categoria) => el.id === id) as Categoria
-    setCategoriaForm(categoriaActual)
-    actualizarPadres(id)
+  const toEdit = (categoria: Categoria) => {
+    setCategoriaForm(categoria)
+    actualizarPadres(categoria.id)
   }
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -109,7 +101,7 @@ export default function Categorias() {
       })
       return
     }
-    const item = categoriasTree?.find(el => el.id === id)
+    const item = categoriasTree?.find((el: any) => el.id === id)
     if(item?.children.length){
       toast.warning("No se puede eliminar categorías que tienen hijos", {
         autoClose: 3000,
@@ -139,32 +131,27 @@ export default function Categorias() {
     setCategoriaForm({...categoriaForm, [name]: value})
   }
 
-  const onChooseIcon = (nameIcon: string) => {
-    setCategoriaForm({...categoriaForm, icon: nameIcon})
-  }
-
-  useEffect(()=>{
-    getCategorias()
-  },[])
-
   useEffect(() => {
-    if(!data_mutate) return
-    if(!data_mutate?.msgType || !data_mutate?.msg) return
-    toast(data_mutate.msg, {
-      type: data_mutate?.msgType,
+    if(!mutated) return
+    if(!mutated?.msgType || !mutated?.msg) return
+    toast(mutated.msg, {
+      type: mutated?.msgType,
       autoClose: 3000,
       transition: Bounce,
     })
-    if(data_mutate?.msgType == "success"){
+    if(mutated?.msgType == "success"){
       setCategoriaForm(categoriaFormInit)
     }
-    getCategorias()
-  }, [data_mutate])
+    if(mutated.content){
+      setCatalogosCategoriasTree(mutated.content)
+    }
+  }, [mutated])
     
+
   useEffect(()=>{
-    if(!data_getCategorias) return
-    setCategoriasTree(getCategoriasTree(data_getCategorias))
-  }, [data_getCategorias])
+    if(!categoriasTree) return
+    actualizarPadres(0)
+  }, [categoriasTree])
 
   return (
     <Container>
@@ -173,11 +160,11 @@ export default function Categorias() {
           <Card>
             <Card.Header>Categorías</Card.Header>
             <Card.Body className="position-relative">
-              {(isPending_getCategorias || isPending_mutate) && <LdsBar />}
+              {(isPendingMutate) && <LdsBar />}
               <Row>
                 <Col>
                   <div className="mb-2"><small>Arrastre los items para ordenar.</small></div>
-                  {categoriasTree && 
+                  {categoriasTree && categoriasTree && 
                     <CategoriasTree 
                       categoriasTree={categoriasTree} 
                       toEdit={toEdit}
@@ -198,7 +185,7 @@ export default function Categorias() {
             }
             <Card.Body>
               <Form onSubmit={handleSubmit}>
-                <Row>
+                <Row className="mb-3">
                   <Col xl={6}>
                     <Form.Group className="mb-3">
                       <Form.Label>Descripción</Form.Label>
@@ -218,7 +205,7 @@ export default function Categorias() {
                         value={categoriaForm.padre_id}
                         onChange={handleChangeSelect}
                       >
-                        <option value="0"> - Sin padre -</option>
+                        <option value={0}> </option>
                         {padres && padres.map((el: Padre) => 
                           <option key={el.id} value={el.id}
                           >
@@ -226,27 +213,6 @@ export default function Categorias() {
                           </option>
                         )}
                       </Form.Select>
-                    </Form.Group>
-                  </Col>
-                  <Col xl={6}>
-                    <Form.Group className="mb-3">
-                      <Form.Label>Nombre</Form.Label>
-                      <Form.Control 
-                        type="text" 
-                        name="nombre"
-                        value={categoriaForm.nombre}
-                        onChange={handleChange}
-                        disabled={categoriaForm.nombre == "" && categoriaForm.id != 0}
-                      />
-                    </Form.Group>
-                  </Col>
-                  <Col xl={6}>
-                    <Form.Group className="mb-3 d-flex gap-3 align-items-center">
-                      <div>Icono</div>
-                      <Nav.Link href="#" onClick={() => setShowIconsModal(true)}>
-                        <DynaIcon name={categoriaForm.icon} />
-                      </Nav.Link>
-                      
                     </Form.Group>
                   </Col>
                 </Row>
@@ -270,11 +236,6 @@ export default function Categorias() {
           </Card>
         </Col>
       </Row>
-      <IconsModal
-        show={showIconsModal}
-        setShow={setShowIconsModal}
-        onChooseIcon={onChooseIcon}
-      />
     </Container>
   )
 }

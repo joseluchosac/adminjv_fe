@@ -177,17 +177,7 @@ export type CategoriaProductoOpc = {
   chked: boolean;
   children?: any;
 }
-// ✅ TIPOS PARA CATEGORIAS
-export interface Categoria {
-  id: number;
-  nombre: string;
-  descripcion: string;
-  padre_id: number;
-  icon: string;
-  orden: number;
-  estado: number;
-  children?: any;
-}
+
 // ✅ TIPOS PARA TABLA LABORATORIOS
 export interface Laboratorio {
   id: number;
