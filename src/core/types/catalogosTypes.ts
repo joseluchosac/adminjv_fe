@@ -144,3 +144,9 @@ export type Categoria = {
   orden: number;
   children?: any;
 }
+export type CategoriaOpc = {
+  id: number;
+  descripcion: string;
+  nivel: number;
+  checked: false
+}

@@ -15,7 +15,7 @@ const ProductosLst: React.FC = () => {
   const setCamposProducto = useProductosStore(state => state.setCamposProducto)
   const filterParamsProductos = useProductosStore(state => state.filterParamsProductos)
   const setFilterParamsProductos = useProductosStore(state => state.setFilterParamsProductos)
-  const {productos, setProductos, setFilterProductosCurrent, mode} = useProductos()
+  const {productos, setProductos, setFilterProductosCurrent, modo} = useProductos()
   
   const {
     data,
@@ -96,9 +96,9 @@ const ProductosLst: React.FC = () => {
       })
     }
   }, [data, isError])
-  
+
   return (
-    <Card className={`overflow-hidden ${mode === "edit" ? "d-none" : ""}`}>
+    <Card className={`overflow-hidden ${modo.vista === "edit" ? "d-none" : ""}`}>
       <div className="position-relative">
         <div className="table-responsive" style={{ height: "73vh" }} ref={tableRef}>
           <Table striped hover className="mb-1">

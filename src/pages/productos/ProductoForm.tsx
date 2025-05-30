@@ -8,25 +8,27 @@ import useLayoutStore from "../../core/store/useLayoutStore";
 import { useMutationProductosQuery } from "../../core/hooks/useProductosQuery";
 import useCatalogosStore from "../../core/store/useCatalogosStore";
 import { useProductos } from "./context/ProductosContext";
-import { ResponseQuery, Producto, CategoriaProductoOpc } from "../../core/types";
-import CategoriasProductoOpcTree from "./CategoriasProductoOpcTree";
-import { generateCategoriasProductoOpcTree } from "../../core/utils/funciones";
+import { ResponseQuery, Producto } from "../../core/types";
+import CategoriasOpc from "./CategoriasOpc";
+import { CategoriaOpc } from "../../core/types/catalogosTypes";
 
 interface DataGetProducto extends ResponseQuery {
   content: Producto | null;
 }
+
 type GetProductoQuery = {
   data: DataGetProducto | null ;
   isPending: boolean;
   isError: boolean;
   getProducto: (id: number) => void
+  reset: (producto: any) => void
 }
 
 const productoFormInit = {
   id: 0,
   codigo: '',
   barcode: '',
-  categoria_ids: '',
+  categoria_ids: [],
   descripcion: '',
   unidad_medida_cod: 'NIU',
   tipo_moneda_cod: 'PEN',
@@ -43,29 +45,37 @@ const productoFormInit = {
   created_at: '',
   updated_at: '',
 }
+
 const calcInit = {
   valorVenta: 0,
 }
 export default function Productoform(){
   const [calc, setCalc] = useState(calcInit)
-  const [categoriasProductoOpcTree, setCategoriasProductoOpcTree] = useState<CategoriaProductoOpc[] | null>(null)
-  const {setMode, currentProductoId, categoriasProductoOpc, setCategoriasProductoOpc} = useProductos()
   const darkMode = useLayoutStore(state => state.layout.darkMode)
   const catalogos = useCatalogosStore(state => state.catalogos)
+
+  const {
+    modo, 
+    setModo, 
+    categoriasOpc, 
+    setCategoriasOpc,
+    resetCategoriasOpc,
+  } = useProductos()
+
   const {
     register, 
-    formState: {errors, isDirty}, 
+    formState: {errors, isDirty},
+    setValue,
     handleSubmit, 
     reset,
     watch,
-    getValues
   } = useForm<Producto>({defaultValues: productoFormInit})
   
   const {
     data: producto,
     isPending: isPendingProducto,
     isError: isErrorProducto,
-    getProducto
+    getProducto,
   }: GetProductoQuery = useMutationProductosQuery()
 
   const {
@@ -102,18 +112,28 @@ export default function Productoform(){
   };
 
   useEffect(()=>{
-    if(currentProductoId) {
-      getProducto(currentProductoId)
-    }
-    if(categoriasProductoOpc) {
-      setCategoriasProductoOpcTree(generateCategoriasProductoOpcTree(categoriasProductoOpc))
-    }
-    return ()=>{
-      if(categoriasProductoOpc){
-        setCategoriasProductoOpc(categoriasProductoOpc?.map(el=>({...el, chked: false})))
+    if(modo.vista === "edit"){
+      if(modo.productoId) {
+        getProducto(modo.productoId)
+      }
+    }else{
+      reset(productoFormInit)
+      if(categoriasOpc?.findIndex(el=>el.checked) != -1){
+        resetCategoriasOpc()
       }
     }
-  },[])
+  },[modo.vista])
+
+  useEffect(()=>{
+    if(!producto) return
+    const arrCategoriaIds = producto.content?.categoria_ids
+      // ? producto.content?.categoria_ids.split(",").map(el=>parseInt(el))
+      // : []
+    const newCategoriasOpc = categoriasOpc?.map(el=>{
+      return {...el, checked: arrCategoriaIds?.includes(el.id)}
+    }) as CategoriaOpc[]
+    setCategoriasOpc(newCategoriasOpc)
+  },[producto])
 
   useEffect(() => {
     if(!producto) return
@@ -124,20 +144,13 @@ export default function Productoform(){
     }else{
       if(producto.content) {
         reset(producto.content)
-        const categoria_idsArr = producto.content.categoria_ids.split(",").filter(el=>el).map(el=>parseInt(el));
-        const actualizado = categoriasProductoOpc?.map(el=>({...el, chked: categoria_idsArr.includes(el.id)}))
-        if(actualizado){
-          setCategoriasProductoOpc(actualizado)
-        }
       }
     }
   }, [producto])
   
-  useEffect(()=>{
-    if(!categoriasProductoOpc) return
-      setCategoriasProductoOpcTree(generateCategoriasProductoOpcTree(categoriasProductoOpc))
-    
-  },[categoriasProductoOpc])
+  useEffect(() => {
+    // console.log(categoriasOpc?.filter(el=>el.checked))
+  }, [categoriasOpc])
 
   useEffect(()=>{
     const igv = catalogos?.impuestos.find(el=>el.id === watch('impuesto_id_igv'))?.porcentaje
@@ -158,7 +171,7 @@ export default function Productoform(){
 
   useEffect(() => {
     if(!mutation) return
-    if(!mutation.error) setMode("list");
+    if(!mutation.error) setModo((prev)=>({...prev, vista:"list"}));
     toast(mutation.msg, {
       type: mutation.msgType,
       autoClose: 3000,
@@ -167,15 +180,15 @@ export default function Productoform(){
   }, [mutation])
 
   return (
-    <Container>
+    <Container className={`${modo.vista === "list" ? "d-none" : ""}`}>
+      <CategoriasOpc setValue={setValue}/>
       <Form onSubmit={handleSubmit(submit)} id="form_productos">
         {isPendingMutation && <LdsBar />}
-        <CategoriasProductoOpcTree categoriasProductoOpcTree={categoriasProductoOpcTree} />
         <div className="d-flex gap-2 justify-content-end">
           <Button
             variant="seccondary"
             type="button"
-            onClick={()=>setMode("list")}
+            onClick={()=>setModo((prev)=>({...prev, vista:"list"}))}
           >Cerrar</Button>
           <Button 
             variant="primary" 

@@ -1,6 +1,7 @@
 // Genera arbol a partir de un arreglo de objetos
 
-import { CategoriaProductoOpc, Modulo } from "../types";
+import { Modulo } from "../types";
+
 
 
 export function getModulosTree(data: Modulo[]): Modulo[] {
@@ -24,28 +25,8 @@ export function getModulosTree(data: Modulo[]): Modulo[] {
   return raiz;
 }
 
-export function generateCategoriasProductoOpcTree(data: CategoriaProductoOpc[]): CategoriaProductoOpc[] {
-  const mapa = new Map();
-  const raiz: CategoriaProductoOpc[] = [];
-  // Crear un mapa de los elementos
-  data.forEach(item => {
-    mapa.set(item.id, { ...item, children: [] });
-  });
-  // Construir el árbol
-  data.forEach(item => {
-    if (item.padre_id === 0) {
-      raiz.push(mapa.get(item.id));
-    } else {
-      const padre = mapa.get(item.padre_id);
-      if (padre) {
-        padre.children.push(mapa.get(item.id));
-      }
-    }
-  });
-  return raiz;
-}
-
 // ✅ UTILIDADES PARA GENERAR ARBOL DE UN ARREGLO JERARQUIZABLE
+
 interface ArregloBase {
   id: number;
   nombre: string;
@@ -86,18 +67,18 @@ interface ArregloJerarquizado {
   [key: string]: any; // Propiedades adicionales
 }
 
-export function flattenTree(tree: ArregloJerarquizado[], padreId: number = 0): ArregloJerarquizado[] {
+export function flattenTree(tree: ArregloJerarquizado[], padreId: number = 0, nivel: number = 0): ArregloJerarquizado[] {
   let resultado: ArregloJerarquizado[] = [];
   tree.forEach(nodo => {
     // Extraer children y crear copia del nodo sin la propiedad children
     const { children, ...nodoPlano } = nodo;
     // Crear el nodo plano con el padre_id correcto
-    const nodoAplanado = { ...nodoPlano, padre_id: padreId };
+    const nodoAplanado = { ...nodoPlano, padre_id: padreId, nivel };
     resultado.push(nodoAplanado);
     
     // Procesar children recursivamente
     if (children && children.length > 0) {
-      const childrenAplanados = flattenTree(children, nodo.id);
+      const childrenAplanados = flattenTree(children, nodo.id, nivel+1);
       resultado = resultado.concat(childrenAplanados);
     }
   });

@@ -41,10 +41,11 @@ export default function Categorias() {
     let nuevosPadres = flattenTree(categoriasTree)
       .filter((el: any)=> el.id != id)
       .map((el: any) => {
-        const {id, descripcion} = el
-        return {id, descripcion}
+        const {id, descripcion, nivel} = el
+        return {id, descripcion, nivel}
       }
     )
+    console.log(nuevosPadres)
     setPadres(nuevosPadres)
   }
 

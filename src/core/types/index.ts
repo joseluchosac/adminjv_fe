@@ -44,10 +44,6 @@ export type User = {
   password_repeat: string;
 }
 
-// export interface UserForm extends User {
-// }
-
-
 export interface RegisterForm {
   nombres: string;
   apellidos: string;
@@ -126,7 +122,6 @@ export interface FilterParams {
   between: FilterParamsBetween;
   orders: FilterParamsOrder[];
 }
-
 type FilterParamsOrder = {
   field_name: string;
   order_dir: string;
@@ -144,16 +139,14 @@ type FilterParamsBetween = {
   range: string
 }
 
-
 export type FilterCurrent = Omit<FilterParams, "offset" | "search">
-
 
 // ✅ TIPOS PARA PRODUCTO
 export interface Producto {
   id: number;
   codigo: string;
   barcode: string;
-  categoria_ids: string;
+  categoria_ids: number[];
   descripcion: string;
   unidad_medida_cod: string;
   tipo_moneda_cod: string;
@@ -169,13 +162,6 @@ export interface Producto {
   estado: number;
   created_at: string;
   updated_at: string;
-}
-export type CategoriaProductoOpc = {
-  id: number;
-  descripcion:string;
-  padre_id: number;
-  chked: boolean;
-  children?: any;
 }
 
 // ✅ TIPOS PARA TABLA LABORATORIOS

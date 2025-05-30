@@ -18,10 +18,9 @@ export default function ProductosLstHead() {
 
   const {
     filterProductosCurrent, 
-    setCurrentProductoId, 
     setShowProductosFilterMdl,
-    mode,
-    setMode,
+    modo,
+    setModo,
   } = useProductos()
 
   const { isFetching: isFetchingProductos } = useFilterProductosQuery();
@@ -52,8 +51,7 @@ export default function ProductosLstHead() {
   }
 
   const handleNuevo = () => {
-    setCurrentProductoId(0)
-    setMode("edit")
+    setModo(prev=>({...prev, vista:"edit", productoId: 0}))
   };
 
   const getDateRangeInfo = () => {
@@ -80,7 +78,7 @@ export default function ProductosLstHead() {
 
 
   return (
-      <Container className={`mb-2 pt-2 position-relative ${mode === "edit" ? "d-none" : ""}`}>
+      <Container className={`mb-2 pt-2 position-relative ${modo.vista === "edit" ? "d-none" : ""}`}>
           {isFetchingProductos && <LdsBar />}
         <Row className="align-items-center">
           <Col sm className="text-center text-sm-start">

@@ -14,7 +14,7 @@ interface ProductosLstRowProps {
 }
 
 function ProductosLstRow({ producto, camposProducto }: ProductosLstRowProps) {
-  const {setCurrentProductoId, setMode} = useProductos()
+  const {setModo} = useProductos()
   const darkMode = useLayoutStore(state => state.layout.darkMode)
 
   const {
@@ -30,8 +30,7 @@ function ProductosLstRow({ producto, camposProducto }: ProductosLstRowProps) {
   }
 
   const handleToEdit = () => {
-    setCurrentProductoId(producto.id)
-    setMode("edit")
+    setModo(prev=>({...prev, vista:"edit", productoId:producto.id}))
     // setShowProductoForm(true)
   }
 

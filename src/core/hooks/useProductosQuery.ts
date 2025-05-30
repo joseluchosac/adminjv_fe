@@ -157,6 +157,22 @@ export const useMutationProductosQuery = () => {
     mutate(params)
   }
 
+  const reset = (newValues: any) => {
+    mutate({newValues}) // Solo actualiza los datos, solo local
+  }
+
+  // const prueba = () => {
+  //  const params = {
+  //     url: apiURL + "productos/get_arreglo",
+  //     method: "DELETE",
+  //     headers:{ 
+  //       Authorization,
+  //       'nombre-modulo': nombreModulo,
+  //     },
+  //   }
+  //   mutate(params)
+  // }
+
   useEffect(()=>{
     if(data?.msgType === "errorToken"){
       resetSessionStore()
@@ -173,6 +189,7 @@ export const useMutationProductosQuery = () => {
     createProducto,
     updateProducto,
     deleteProducto,
+    reset,
   }
 }
 
