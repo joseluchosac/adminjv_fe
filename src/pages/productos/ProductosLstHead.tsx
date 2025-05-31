@@ -82,7 +82,7 @@ export default function ProductosLstHead() {
           {isFetchingProductos && <LdsBar />}
         <Row className="align-items-center">
           <Col sm className="text-center text-sm-start">
-            <h5>Lista de Usuarios</h5>
+            <h5>Lista de Productos</h5>
           </Col>
           <Col sm className="text-center text-sm-start mb-3 mb-sm-0">
             <Form.Control

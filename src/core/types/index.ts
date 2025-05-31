@@ -154,7 +154,7 @@ export interface Producto {
   precio_costo: number;
   impuesto_id_igv: number;
   impuesto_id_icbper: number;
-  inventareable: number;
+  inventariable: number;
   lotizable: number;
   stock: number;
   stock_min: number;

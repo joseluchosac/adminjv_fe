@@ -143,6 +143,21 @@ export const useMutationProductosQuery = () => {
     mutate(params)
   }
 
+  const updateEstado = (estado: {id:number; estado:number}) => {
+    typeActionRef.current = "mutate_producto"
+    const params = {
+      url: apiURL + "productos/update_estado",
+      method: "PUT",
+      headers:{ 
+        Authorization,
+        'nombre-modulo': nombreModulo,
+      },
+      body: JSON.stringify(estado),
+    }
+    mutate(params)
+  }
+
+
   const deleteProducto = (id: number) => {
     typeActionRef.current = "mutate_producto"
     const params = {
@@ -161,18 +176,6 @@ export const useMutationProductosQuery = () => {
     mutate({newValues}) // Solo actualiza los datos, solo local
   }
 
-  // const prueba = () => {
-  //  const params = {
-  //     url: apiURL + "productos/get_arreglo",
-  //     method: "DELETE",
-  //     headers:{ 
-  //       Authorization,
-  //       'nombre-modulo': nombreModulo,
-  //     },
-  //   }
-  //   mutate(params)
-  // }
-
   useEffect(()=>{
     if(data?.msgType === "errorToken"){
       resetSessionStore()
@@ -188,6 +191,7 @@ export const useMutationProductosQuery = () => {
     getProducto,
     createProducto,
     updateProducto,
+    updateEstado,
     deleteProducto,
     reset,
   }

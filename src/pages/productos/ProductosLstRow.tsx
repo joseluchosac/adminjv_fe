@@ -20,7 +20,7 @@ function ProductosLstRow({ producto, camposProducto }: ProductosLstRowProps) {
   const {
     data: mutation,
     isPending: isPendingMutation,
-    updateProducto, 
+    updateEstado,
     deleteProducto, 
   } = useMutationProductosQuery()
 
@@ -31,14 +31,13 @@ function ProductosLstRow({ producto, camposProducto }: ProductosLstRowProps) {
 
   const handleToEdit = () => {
     setModo(prev=>({...prev, vista:"edit", productoId:producto.id}))
-    // setShowProductoForm(true)
   }
 
   const handleDelete = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
     e.preventDefault()
     Swal.fire({
       icon: 'question',
-      text: `¿Desea eliminar al usuario ${producto.descripcion}?`,
+      text: `¿Desea eliminar el producto ${producto.descripcion}?`,
       showCancelButton: true,
       confirmButtonText: "Sí",
       cancelButtonText: 'Cancelar',
@@ -53,7 +52,7 @@ function ProductosLstRow({ producto, camposProducto }: ProductosLstRowProps) {
   }
 
   const toggleEstado = () => {
-    updateProducto({...producto, estado: producto.estado ? 0 : 1})
+    updateEstado({id: producto.id, estado: producto.estado ? 0 : 1})
   }
 
 
