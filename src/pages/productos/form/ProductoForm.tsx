@@ -3,18 +3,14 @@ import { Button, Card, Col, Container, Form, Row, Spinner } from "react-bootstra
 import { useForm } from "react-hook-form";
 import Swal from "sweetalert2";
 import { Bounce, toast } from "react-toastify";
-import { LdsBar, LdsEllipsisCenter } from "../../core/components/Loaders";
-import useLayoutStore from "../../core/store/useLayoutStore";
-import { useMutationProductosQuery } from "../../core/hooks/useProductosQuery";
-import useCatalogosStore from "../../core/store/useCatalogosStore";
-import { useProductos } from "./context/ProductosContext";
-import { ResponseQuery, Producto } from "../../core/types";
+import { LdsBar, LdsEllipsisCenter } from "../../../core/components/Loaders";
+import useLayoutStore from "../../../core/store/useLayoutStore";
+import { useMutationProductosQuery } from "../../../core/hooks/useProductosQuery";
+import useCatalogosStore from "../../../core/store/useCatalogosStore";
+import { useProductos } from "../context/ProductosContext";
+import { Producto, DataGetProducto } from "../../../core/types";
 import CategoriasOpc from "./CategoriasOpc";
-import { CategoriaOpc } from "../../core/types/catalogosTypes";
-
-interface DataGetProducto extends ResponseQuery {
-  content: Producto | null;
-}
+import { LaboratorioSelect, MarcasSelect } from "./Selects";
 
 type GetProductoQuery = {
   data: DataGetProducto | null ;
@@ -30,6 +26,10 @@ const productoFormInit = {
   barcode: '',
   categoria_ids: [],
   descripcion: '',
+  marca_id: 0,
+  marca: "",
+  laboratorio_id: 0,
+  laboratorio: "",
   unidad_medida_cod: 'NIU',
   tipo_moneda_cod: 'PEN',
   precio_venta: 0,
@@ -54,23 +54,18 @@ export default function Productoform(){
   const [calc, setCalc] = useState(calcInit)
   const darkMode = useLayoutStore(state => state.layout.darkMode)
   const catalogos = useCatalogosStore(state => state.catalogos)
+  const { modo, setModo } = useProductos()
 
   const {
-    modo, 
-    setModo, 
-    categoriasOpc,
-    setCategoriasOpc,
-    resetCategoriasOpc,
-  } = useProductos()
-
-  const {
-    register, 
+    register,
+    control,
     formState: {errors, isDirty},
     setValue,
     getValues,
     handleSubmit, 
     reset,
     watch,
+    clearErrors,
   } = useForm<Producto>({defaultValues: productoFormInit})
   
   const {
@@ -88,6 +83,8 @@ export default function Productoform(){
   } = useMutationProductosQuery()
   
   const submit = (data: Producto) => {
+    // console.log(data)
+    // return
     Swal.fire({
       icon: 'question',
       text: data.id
@@ -112,26 +109,12 @@ export default function Productoform(){
   };
 
   useEffect(()=>{
-    if(modo.vista === "edit"){
-      if(modo.productoId) {
-        getProducto(modo.productoId)
-      }
+    if(modo.vista === "edit" && modo.productoId){
+      getProducto(modo.productoId)
     }else{
       reset(productoFormInit)
-      if(categoriasOpc?.findIndex(el=>el.checked) != -1){
-        resetCategoriasOpc()
-      }
     }
   },[modo.vista])
-
-  useEffect(()=>{
-    if(!producto) return
-    const arrCategoriaIds = producto.content?.categoria_ids
-    const newCategoriasOpc = categoriasOpc?.map(el=>{
-      return {...el, checked: arrCategoriaIds?.includes(el.id)}
-    }) as CategoriaOpc[]
-    setCategoriasOpc(newCategoriasOpc)
-  },[producto])
 
   useEffect(() => {
     if(!producto) return
@@ -173,7 +156,6 @@ export default function Productoform(){
 
   return (
     <Container className={`${modo.vista === "list" ? "d-none" : ""}`}>
-      
       <Form onSubmit={handleSubmit(submit)} id="form_productos">
         {isPendingMutation && <LdsBar />}
         <div className="d-flex gap-2 justify-content-end">
@@ -205,7 +187,7 @@ export default function Productoform(){
               <Card.Header></Card.Header>
               <Card.Body>
                 <Row>
-                  <Form.Group as={Col} lg={12} xl={9} className="mb-3">
+                  <Form.Group as={Col} xl={12} className="mb-3">
                     <Form.Label htmlFor="descripcion">Descripción</Form.Label>
                     <Form.Control
                       id="descripcion"
@@ -242,7 +224,7 @@ export default function Productoform(){
                       <div className="invalid-feedback d-block">{errors.barcode.message}</div>
                     }
                   </Form.Group>
-                  <Form.Group as={Col} sm={4} className="mb-3">
+                  <Form.Group as={Col} lg={4} className="mb-3">
                     <Form.Label htmlFor="unidad_medida_cod">Unidad</Form.Label>
                     <Form.Select
                       id="unidad_medida_cod"
@@ -252,6 +234,22 @@ export default function Productoform(){
                         <option key={el.codigo} value={el.codigo}>{el.descripcion}</option>
                       )}
                     </Form.Select>
+                  </Form.Group>
+                  <Form.Group as={Col} lg={6} className="mb-3">
+                    <MarcasSelect
+                      control={control} 
+                      getValues={getValues} 
+                      setValue={setValue} 
+                      clearErrors={clearErrors}
+                    />
+                  </Form.Group>
+                  <Form.Group as={Col} lg={6} className="mb-3">
+                    <LaboratorioSelect 
+                      control={control} 
+                      getValues={getValues} 
+                      setValue={setValue} 
+                      clearErrors={clearErrors}
+                    />
                   </Form.Group>
                 </Row>
               </Card.Body>
@@ -357,12 +355,22 @@ export default function Productoform(){
                       <div className="invalid-feedback d-block">{errors.stock_min.message}</div>
                     }
                   </Form.Group>
+                  <Form.Group className="mb-3">
+                    <Form.Check {...register('inventariable')} label="Inventariable" />
+                  </Form.Group>
+                  <Form.Group className="mb-3" controlId="formBasicCheckbox">
+                    <Form.Check {...register('lotizable')} label="Lotizable" />
+                  </Form.Group>
                 </Row>
               </Card.Body>
             </Card>
           </Col>
           <Col lg={3}>
-            <CategoriasOpc setValue={setValue} getValues={getValues} />
+            <CategoriasOpc
+              setValue={setValue}
+              getValues={getValues}
+              producto={producto}
+            />
           </Col>
         </Row>
         {isPendingProducto && <LdsEllipsisCenter/>}

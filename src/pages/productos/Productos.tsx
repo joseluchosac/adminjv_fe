@@ -1,4 +1,4 @@
-import Productoform from "./ProductoForm";
+import Productoform from "./form/ProductoForm";
 import ProductosLstHead from "./ProductosLstHead";
 import ProductosLstFilterMdl from "./ProductosLstFilterMdl";
 import ProductosLst from "./ProductosLst";

@@ -7,6 +7,9 @@ export type ResponseQuery = {
   msg?: string;
   msgType?: "default" | "error" | "info" | "success" | "warning";
 }
+export interface DataGetProducto extends ResponseQuery {
+  content: Producto | null;
+}
 // ✅ TIPOS PARA EL CAMPO DE UNA TABLA
 export type CampoTable = {
   field_name: string;
@@ -148,6 +151,10 @@ export interface Producto {
   barcode: string;
   categoria_ids: number[];
   descripcion: string;
+  marca_id: number;
+  marca: string;
+  laboratorio_id: number;
+  laboratorio: string;
   unidad_medida_cod: string;
   tipo_moneda_cod: string;
   precio_venta: number;
