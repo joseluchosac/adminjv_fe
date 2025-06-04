@@ -199,6 +199,18 @@ export const useMutationConfigQuery = () => {
     mutate(params) 
   }
   
+  const getEstablecimiento = (id: number) => {
+    const params = {
+      url: apiURL + "config/get_establecimiento",
+      method: "POST",
+      headers:{ 
+        Authorization,
+        'nombre-modulo': nombreModulo,
+      },
+      body: JSON.stringify({id})
+    }
+    mutate(params) 
+  }
   const getSeriesEstablecimiento = (establecimiento_id: number) => {
     const params = {
       url: apiURL + "config/get_series_establecimiento",
@@ -240,6 +252,7 @@ export const useMutationConfigQuery = () => {
     getEmailConfig,
     updateEmailConfig,
     getEstablecimientos,
+    getEstablecimiento,
     getSeriesEstablecimiento,
     typeAction: typeActionRef.current,
     reset,

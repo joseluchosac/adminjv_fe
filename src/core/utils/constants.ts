@@ -5,7 +5,11 @@ export const ls_layoutKey = "ls_layout"
 export const selectDark = {
   control: (styles: any) => ({ ...styles, backgroundColor: '#212529', borderColor: '#495057' }),
   input: (styles: any) => ({ ...styles, color: 'white' }),
-  singleValue: (styles: any) => ({ ...styles, color: 'white' }),
+  singleValue: (styles: any) => ({ 
+    ...styles, 
+    color: 'white',
+    
+  }),
   menuList: (styles: any) => ({ ...styles, backgroundColor: '#2b3035' }),
 
   option: (styles: any, { isDisabled, isFocused, isSelected }: any) => {
@@ -75,23 +79,22 @@ export const filterParamsInit: FilterParams = {
     orders: [], 
 }
 ///   ejemplo de uso
-const filterParamsInit_: FilterParams = {
-    offset: 25,
-    search: "",
-    orders: [
-      {field_name: "nombres", order_dir: "ASC", field_label: "Nombres"}
-    ],
-    equals: [
-      {
-        field_name: "sucursal_id", 
-        field_value: "1", 
-        label_name: "principal", 
-        label_value: "Sucursal"
-      },
-    ],
-    between: {
-      field_name: "created_at", 
-      field_label:"Creado", 
-      range: "2024-12-18 00:00:00, 2024-12-19 23:59:59"},
-
-}
+// const filterParamsInit_: FilterParams = {
+//     offset: 25,
+//     search: "",
+//     orders: [
+//       {field_name: "nombres", order_dir: "ASC", field_label: "Nombres"}
+//     ],
+//     equals: [
+//       {
+//         field_name: "sucursal_id", 
+//         field_value: "1", 
+//         label_name: "principal", 
+//         label_value: "Sucursal"
+//       },
+//     ],
+//     between: {
+//       field_name: "created_at", 
+//       field_label:"Creado", 
+//       range: "2024-12-18 00:00:00, 2024-12-19 23:59:59"},
+// }

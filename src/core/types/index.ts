@@ -221,3 +221,12 @@ export type Cliente = {
   api?: number;
   estado?: number;
 }
+
+// ✅ TIPOS PARA UBIGEO
+export type Ubigeo = {
+  ubigeo_inei: string;
+  ubigeo_reniec: string;
+  departamento: string;
+  provincia: string;
+  distrito: string
+}

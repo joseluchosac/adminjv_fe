@@ -92,6 +92,18 @@ function ProductosLstRow({ producto, camposProducto }: ProductosLstRowProps) {
           case "updated_at": {
             return <td key={el.field_name}>{validDate(producto[el.field_name ], 'dd/MM/yyyy')}</td>
           }
+          case "descripcion":{
+            return (
+              <td 
+                key={el.field_name}
+                className="overflow-hidden text-wrap"
+                style={{minWidth: "300px", maxWidth:"450px"}}
+                title={producto[el.field_name as keyof Producto] as string}
+              >
+                {producto[el.field_name as keyof Producto]}
+              </td>
+            )
+          }
           default: {
             return <td key={el.field_name}>{producto[el.field_name as keyof Producto]}</td>
           }

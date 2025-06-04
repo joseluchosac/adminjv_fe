@@ -118,7 +118,7 @@ export default function CategoriaOpc({setValue, getValues, producto}:Props) {
             <Collapse in={showNewCategoria}>
               <div>
                 <Form.Group as={Col} xl={12} className="mb-2">
-                  <Form.Label htmlFor="nueve_categoria">Nombre</Form.Label>
+                  <Form.Label htmlFor="nueva_categoria">Nombre</Form.Label>
                   <Form.Control
                     id="nueva_categoria" 
                     size="sm"

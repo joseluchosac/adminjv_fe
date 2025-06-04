@@ -128,7 +128,7 @@ export default function Laboratorios() {
                   <DynaIcon name="FaCircleXmark"  className="pr-4" />
                     ORDEN:
                     <div className="text-wrap">
-                      {filterLaboratoriosCurrent.orders.map((el) => el.text).join(", ")}
+                      {filterLaboratoriosCurrent.orders.map((el) => el.field_name).join(", ")}
                     </div>
                 </Badge>
               </Stack>

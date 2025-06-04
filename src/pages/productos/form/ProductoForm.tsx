@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Button, Card, Col, Container, Form, Row, Spinner } from "react-bootstrap";
+import { Button, Card, Col, Container, Form, Row, Spinner, Tab, Tabs } from "react-bootstrap";
 import { useForm } from "react-hook-form";
 import Swal from "sweetalert2";
 import { Bounce, toast } from "react-toastify";
@@ -52,6 +52,7 @@ const calcInit = {
 
 export default function Productoform(){
   const [calc, setCalc] = useState(calcInit)
+  const [tab, setTab] = useState<string>("precios")
   const darkMode = useLayoutStore(state => state.layout.darkMode)
   const catalogos = useCatalogosStore(state => state.catalogos)
   const { modo, setModo } = useProductos()
@@ -158,7 +159,7 @@ export default function Productoform(){
     <Container className={`${modo.vista === "list" ? "d-none" : ""}`}>
       <Form onSubmit={handleSubmit(submit)} id="form_productos">
         {isPendingMutation && <LdsBar />}
-        <div className="d-flex gap-2 justify-content-end">
+        <div className="py-3 d-flex gap-2 justify-content-end">
           <Button
             variant="seccondary"
             type="button"
@@ -255,113 +256,127 @@ export default function Productoform(){
               </Card.Body>
             </Card>
             <Card className="mb-4">
-              <Card.Header></Card.Header>
+              {/* <Card.Header></Card.Header> */}
               <Card.Body>
-                <Row>
-                  <Form.Group as={Col} sm={4} className="mb-3">
-                    <Form.Label htmlFor="tipo_moneda_cod">Moneda</Form.Label>
-                    <Form.Select
-                      id="tipo_moneda_cod"
-                      {...register('tipo_moneda_cod')}
-                    >
-                      {catalogos?.tipos_moneda.map((el) => 
-                        <option key={el.codigo} value={el.codigo}>{el.descripcion}</option>
-                      )}
-                    </Form.Select>
-                  </Form.Group>
-                  <Form.Group as={Col} sm={4} className="mb-3">
-                    <Form.Label htmlFor="impuesto_id_igv">Afectación IGV</Form.Label>
-                    <Form.Select
-                      id="impuesto_id_igv"
-                      {...register('impuesto_id_igv', {valueAsNumber:true})}
-                    >
-                      {catalogos?.impuestos.filter(el=>el.afectacion_igv_desc != "ICBPER").map((el) => 
-                        <option key={el.id} value={el.id}>{`${el.afectacion_igv_desc} (${el.porcentaje}%)`}</option>
-                      )}
-                    </Form.Select>
-                  </Form.Group>
-                  <Form.Group as={Col} md={4} xl={4} className="mb-3">
-                    <Form.Label htmlFor="precio_venta">precio de venta</Form.Label>
-                    <Form.Control
-                      id="precio_venta"
-                      {...register('precio_venta', {
-                        required: "Este campo es obligatorio",
-                        pattern: {
-                          value: /^[0-9]+(\.[0-9]{1,2})?$/,
-                          message: "Solo se permiten números con hasta 2 decimales",
-                        },
-                      })}
-                    />
-                    {errors.precio_venta && 
-                      <div className="invalid-feedback d-block">{errors.precio_venta.message}</div>
-                    }
-                  </Form.Group>
-                  <Form.Group as={Col} md={4} xl={4} className="mb-3">
-                    <Form.Label htmlFor="valor_venta">Valor venta</Form.Label>
-                    <Form.Control
-                      id="valor_venta"
-                      disabled
-                      readOnly
-                      value={calc.valorVenta}
-                    />
-                  </Form.Group>
-                  <Form.Group as={Col} md={4} xl={4} className="mb-3">
-                    <Form.Label htmlFor="precio_costo">Precio de costo</Form.Label>
-                    <Form.Control
-                      id="precio_costo"
-                      type="number"
-                      step={0.01}
-                      {...register('precio_costo', {valueAsNumber:true})}
-                    />
-                    {errors.precio_costo && 
-                      <div className="invalid-feedback d-block">{errors.precio_costo.message}</div>
-                    }
-                  </Form.Group>
-                  <Form.Group as={Col} md={4} xl={3} className="mb-3">
-                    <Form.Label htmlFor="impuesto_id_icbper">ICBPER</Form.Label>
-                    <Form.Select
-                      id="impuesto_id_icbper"
-                      {...register('impuesto_id_icbper', {valueAsNumber:true})}
-                    >
-                        <option value={0}></option>
-                      {catalogos?.impuestos.filter(el=>el.afectacion_igv_desc === "ICBPER").map((el) => 
-                        <option key={el.id} value={el.id}>
-                          {`${el.afectacion_igv_desc} (${el.importe})`}
-                        </option>
-                      )}
-                    </Form.Select>
-                  </Form.Group>
-                  <Form.Group as={Col} md={4} xl={4} className="mb-3">
-                    <Form.Label htmlFor="stock">Stock</Form.Label>
-                    <Form.Control
-                      id="stock"
-                      type="number"
-                      step={0.01}
-                      {...register('stock', {valueAsNumber:true})}
-                    />
-                    {errors.stock && 
-                      <div className="invalid-feedback d-block">{errors.stock.message}</div>
-                    }
-                  </Form.Group>
-                  <Form.Group as={Col} md={4} xl={4} className="mb-3">
-                    <Form.Label htmlFor="stock_min">Stock mínimo</Form.Label>
-                    <Form.Control
-                      id="stock_min"
-                      type="number"
-                      step={0.01}
-                      {...register('stock_min', {valueAsNumber:true})}
-                    />
-                    {errors.stock_min && 
-                      <div className="invalid-feedback d-block">{errors.stock_min.message}</div>
-                    }
-                  </Form.Group>
-                  <Form.Group className="mb-3">
-                    <Form.Check {...register('inventariable')} label="Inventariable" />
-                  </Form.Group>
-                  <Form.Group className="mb-3" controlId="formBasicCheckbox">
-                    <Form.Check {...register('lotizable')} label="Lotizable" />
-                  </Form.Group>
-                </Row>
+
+                <Tabs
+                  id="controlled-tab-example"
+                  activeKey={tab}
+                  onSelect={(k) => setTab(k as string)}
+                  className="mb-3"
+                >
+                  <Tab eventKey="precios" title="Precios">
+                    <Row>
+                      <Form.Group as={Col} sm={4} className="mb-3">
+                        <Form.Label htmlFor="tipo_moneda_cod">Moneda</Form.Label>
+                        <Form.Select
+                          id="tipo_moneda_cod"
+                          {...register('tipo_moneda_cod')}
+                        >
+                          {catalogos?.tipos_moneda.map((el) => 
+                            <option key={el.codigo} value={el.codigo}>{el.descripcion}</option>
+                          )}
+                        </Form.Select>
+                      </Form.Group>
+                      <Form.Group as={Col} sm={4} className="mb-3">
+                        <Form.Label htmlFor="impuesto_id_igv">Afectación IGV</Form.Label>
+                        <Form.Select
+                          id="impuesto_id_igv"
+                          {...register('impuesto_id_igv', {valueAsNumber:true})}
+                        >
+                          {catalogos?.impuestos.filter(el=>el.afectacion_igv_desc != "ICBPER").map((el) => 
+                            <option key={el.id} value={el.id}>{`${el.afectacion_igv_desc} (${el.porcentaje}%)`}</option>
+                          )}
+                        </Form.Select>
+                      </Form.Group>
+                      <Form.Group as={Col} md={4} xl={4} className="mb-3">
+                        <Form.Label htmlFor="precio_venta">precio de venta</Form.Label>
+                        <Form.Control
+                          id="precio_venta"
+                          {...register('precio_venta', {
+                            required: "Este campo es obligatorio",
+                            pattern: {
+                              value: /^[0-9]+(\.[0-9]{1,2})?$/,
+                              message: "Solo se permiten números con hasta 2 decimales",
+                            },
+                          })}
+                        />
+                        {errors.precio_venta && 
+                          <div className="invalid-feedback d-block">{errors.precio_venta.message}</div>
+                        }
+                      </Form.Group>
+                      <Form.Group as={Col} md={4} xl={4} className="mb-3">
+                        <Form.Label htmlFor="valor_venta">Valor venta</Form.Label>
+                        <Form.Control
+                          id="valor_venta"
+                          disabled
+                          readOnly
+                          value={calc.valorVenta}
+                        />
+                      </Form.Group>
+                      <Form.Group as={Col} md={4} xl={4} className="mb-3">
+                        <Form.Label htmlFor="precio_costo">Precio de costo</Form.Label>
+                        <Form.Control
+                          id="precio_costo"
+                          type="number"
+                          step={0.01}
+                          {...register('precio_costo', {valueAsNumber:true})}
+                        />
+                        {errors.precio_costo && 
+                          <div className="invalid-feedback d-block">{errors.precio_costo.message}</div>
+                        }
+                      </Form.Group>
+                      <Form.Group as={Col} md={4} xl={3} className="mb-3">
+                        <Form.Label htmlFor="impuesto_id_icbper">ICBPER</Form.Label>
+                        <Form.Select
+                          id="impuesto_id_icbper"
+                          {...register('impuesto_id_icbper', {valueAsNumber:true})}
+                        >
+                            <option value={0}></option>
+                          {catalogos?.impuestos.filter(el=>el.afectacion_igv_desc === "ICBPER").map((el) => 
+                            <option key={el.id} value={el.id}>
+                              {`${el.afectacion_igv_desc} (${el.importe})`}
+                            </option>
+                          )}
+                        </Form.Select>
+                      </Form.Group>
+                    </Row>
+                  </Tab>
+                  <Tab eventKey="inventario" title="Inventario">
+                    <Row>
+                      <Form.Group as={Col} md={4} xl={4} className="mb-3">
+                        <Form.Label htmlFor="stock">Stock</Form.Label>
+                        <Form.Control
+                          id="stock"
+                          type="number"
+                          step={0.01}
+                          {...register('stock', {valueAsNumber:true})}
+                        />
+                        {errors.stock && 
+                          <div className="invalid-feedback d-block">{errors.stock.message}</div>
+                        }
+                      </Form.Group>
+                      <Form.Group as={Col} md={4} xl={4} className="mb-3">
+                        <Form.Label htmlFor="stock_min">Stock mínimo</Form.Label>
+                        <Form.Control
+                          id="stock_min"
+                          type="number"
+                          step={0.01}
+                          {...register('stock_min', {valueAsNumber:true})}
+                        />
+                        {errors.stock_min && 
+                          <div className="invalid-feedback d-block">{errors.stock_min.message}</div>
+                        }
+                      </Form.Group>
+                      <Form.Group className="mb-3" controlId="inventariable">
+                        <Form.Check {...register('inventariable')} label="Inventariable" />
+                      </Form.Group>
+                      <Form.Group className="mb-3" controlId="lotizable">
+                        <Form.Check {...register('lotizable')} label="Lotizable" />
+                      </Form.Group>
+                    </Row>
+                  </Tab>
+                </Tabs>
               </Card.Body>
             </Card>
           </Col>

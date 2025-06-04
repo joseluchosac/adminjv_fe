@@ -38,12 +38,13 @@ export function MarcasSelect({control, getValues, setValue, clearErrors}: Select
 
   return (
     <>
-      <Form.Label htmlFor="marca_id">Marca</Form.Label>
+      <Form.Label>Marca</Form.Label>
       <Controller
         name="marca_id"
         control={control}
         render={() => (
           <SelectAsync
+            id="marca_id"
             loadOptions={loadMarcasOptions}
             defaultOptions
             styles={darkMode ? selectDark : undefined}
@@ -79,7 +80,7 @@ export function LaboratorioSelect({control, getValues, setValue, clearErrors}: S
 
   return (
     <>
-      <Form.Label htmlFor="laboratorio_id">Laboratorio</Form.Label>
+      <Form.Label>Laboratorio</Form.Label>
       <Controller
         name="laboratorio_id"
         control={control}

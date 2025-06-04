@@ -116,14 +116,17 @@ export type Distrito = {
 
 export type Establecimiento = {
   id: number;
-  tipo: string;
   codigo_establecimiento: string;
   nombre: string;
-  direccion_sucursal: string;
-  direccion_almacen: string;
+  direccion: string;
   ubigeo_inei: string;
+  departamento: string;
+  provincia: string;
+  distrito: string;
   telefono: string;
   email: string;
+  sucursal: boolean;
+  almacen: boolean;
   estado: number;
 }
 
