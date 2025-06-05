@@ -223,10 +223,8 @@ export type Cliente = {
 }
 
 // ✅ TIPOS PARA UBIGEO
-export type Ubigeo = {
+export interface Ubigeo {
   ubigeo_inei: string;
   ubigeo_reniec: string;
-  departamento: string;
-  provincia: string;
-  distrito: string
+  dis_prov_dep: string;
 }

@@ -2,8 +2,9 @@ const apiURL = import.meta.env.VITE_API_URL;
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import useSessionStore from "../store/useSessionStore"
 import { mutationFetch } from "../services/mutationFecth";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import { Establecimiento } from "../types/catalogosTypes";
 
 type TypeAction = 
   "mutate_empresa"
@@ -12,6 +13,7 @@ type TypeAction =
   | "mutate_cpe_guia"
   | "mutate_usuario_sol_sec"
   | "mutate_email_config"
+  | "mutate_establecimiento"
   
 // ****** MUTATION ******
 export const useMutationConfigQuery = () => {
@@ -211,6 +213,62 @@ export const useMutationConfigQuery = () => {
     }
     mutate(params) 
   }
+
+  const createEstablecimiento = (establecimiento: Establecimiento) => {
+    typeActionRef.current = "mutate_establecimiento"
+    const params = {
+      url: apiURL + "config/create_establecimiento",
+      method: "POST",
+      headers:{ 
+        Authorization,
+        'nombre-modulo': nombreModulo,
+      },
+      body: JSON.stringify(establecimiento)
+    }
+    mutate(params) 
+  }
+
+  const updateEstablecimiento = (establecimiento: Establecimiento) => {
+    typeActionRef.current = "mutate_establecimiento"
+    const params = {
+      url: apiURL + "config/update_establecimiento",
+      method: "PUT",
+      headers:{ 
+        Authorization,
+        'nombre-modulo': nombreModulo,
+      },
+      body: JSON.stringify(establecimiento)
+    }
+    mutate(params) 
+  }
+  const updateEstadoEstablecimiento = (estado: {id:number; estado:number}) => {
+    typeActionRef.current = "mutate_establecimiento"
+    const params = {
+      url: apiURL + "config/update_estado_establecimiento",
+      method: "PUT",
+      headers:{ 
+        Authorization,
+        'nombre-modulo': nombreModulo,
+      },
+      body: JSON.stringify(estado)
+    }
+    mutate(params) 
+  }
+
+  const deleteEstablecimiento = (id: number) => {
+    typeActionRef.current = "mutate_establecimiento"
+    const params = {
+      url: apiURL + "config/delete_establecimiento",
+      method: "DELETE",
+      headers:{ 
+        Authorization,
+        'nombre-modulo': nombreModulo,
+      },
+      body: JSON.stringify({id})
+    }
+    mutate(params) 
+  }
+
   const getSeriesEstablecimiento = (establecimiento_id: number) => {
     const params = {
       url: apiURL + "config/get_series_establecimiento",
@@ -253,6 +311,10 @@ export const useMutationConfigQuery = () => {
     updateEmailConfig,
     getEstablecimientos,
     getEstablecimiento,
+    createEstablecimiento,
+    updateEstablecimiento,
+    updateEstadoEstablecimiento,
+    deleteEstablecimiento,
     getSeriesEstablecimiento,
     typeAction: typeActionRef.current,
     reset,

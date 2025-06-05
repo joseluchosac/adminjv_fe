@@ -3,12 +3,15 @@ import { FilterParams } from "../types";
 //--> CLAVES PARA LOCAL STORAGE
 export const ls_layoutKey = "ls_layout"
 export const selectDark = {
-  control: (styles: any) => ({ ...styles, backgroundColor: '#212529', borderColor: '#495057' }),
+  control: (styles: any) => ({
+    ...styles,
+    backgroundColor: '#212529',
+    borderColor: '#495057',
+  }),
   input: (styles: any) => ({ ...styles, color: 'white' }),
   singleValue: (styles: any) => ({ 
     ...styles, 
     color: 'white',
-    
   }),
   menuList: (styles: any) => ({ ...styles, backgroundColor: '#2b3035' }),
 

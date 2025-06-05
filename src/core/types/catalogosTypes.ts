@@ -120,9 +120,7 @@ export type Establecimiento = {
   nombre: string;
   direccion: string;
   ubigeo_inei: string;
-  departamento: string;
-  provincia: string;
-  distrito: string;
+  dis_prov_dep: string;
   telefono: string;
   email: string;
   sucursal: boolean;
