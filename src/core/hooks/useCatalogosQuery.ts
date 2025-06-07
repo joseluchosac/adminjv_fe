@@ -11,13 +11,18 @@ import { Catalogos, TipoComprobante } from "../types/catalogosTypes"
 type GetProvincias = {departamento:string}
 type GetDistritos = {departamento: string, provincia: string}
 
-
+type GetCatalogosFetch = {
+  content: Catalogos | null;
+  error?: boolean;
+  msg?: string;
+  msgType?: string;
+}
 // ****** GET CATALOGOS ******
 export const useGetCatalogosQuery = () => {
   const tknSession = useSessionStore(state => state.tknSession)
   // const queryClient = useQueryClient()
   const setCatalogos = useCatalogosStore(state => state.setCatalogos)
-  const {data, isLoading, isFetching, isError, refetch } = useQuery<Catalogos, Error>({
+  const {data, isLoading, isFetching, isError, refetch } = useQuery<GetCatalogosFetch, Error>({
     queryKey: ["catalogos"],
     queryFn: ({signal}) => {
       return getCatalogosFetch({token: tknSession, signal})
@@ -36,8 +41,12 @@ export const useGetCatalogosQuery = () => {
   },[])
 
   useEffect(() => {
-    if(data){
-      setCatalogos(data)
+    if(!data) return
+    if(data.error){
+      console.log(data.msg)
+    }
+    if(data.content){
+      setCatalogos(data.content)
     }
   },[data])
   return {isLoading, isFetching, isError, refetch}
@@ -144,12 +153,12 @@ export const useMutationCatalogosQuery = () => {
     switch (fnName.current) {
       case "createTipoComprobante":
       case "updateTipoComprobante":{
-        const tipos_comprobante = data.registro as TipoComprobante[]
+        const tipos_comprobante = data.content as TipoComprobante[]
         if(catalogos) setCatalogos({...catalogos, tipos_comprobante})
         break;
       }
       case "deleteTipoComprobante":{
-        const id = data.id as number
+        const id = data.content.id as number
         const newtiposComprobante = catalogos?.tipos_comprobante.filter(el=>el.id !== id) as TipoComprobante[]
         if(catalogos) setCatalogos({...catalogos, tipos_comprobante: newtiposComprobante})
         break;

@@ -41,8 +41,8 @@ const PrivateRoutes: React.FC<Props> = ({ redirectTo }) => {
       resetSessionStore()
       navigate(redirectTo)
     }else{
-      setUserSession(dataCheckAuth.registro)
-      setEmpresaSession(dataCheckAuth.empresaSession)
+      setUserSession(dataCheckAuth.content.registro)
+      setEmpresaSession(dataCheckAuth.content.empresaSession)
       getModulosSession()
     }
   }, [dataCheckAuth])

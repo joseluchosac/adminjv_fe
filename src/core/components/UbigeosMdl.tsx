@@ -6,6 +6,7 @@ import { useMutationCatalogosQuery } from '../hooks/useCatalogosQuery';
 // import { Distrito, Provincia, Ubigeo } from '../types';
 import useCatalogosStore from '../store/useCatalogosStore';
 import { Distrito, Provincia, Ubigeo } from '../types/catalogosTypes';
+import { toast } from 'react-toastify';
 
 type Props = {
   show: boolean;
@@ -18,12 +19,12 @@ function UbigeosMdl({show, setShow, onChooseUbigeo}: Props) {
   const [form, setForm] = useState(formInit)
   const departamentos = useCatalogosStore(state=>state.catalogos?.departamentos)
   const {
-    data: dataProvincias,
+    data: provincias,
     isPending: isPendingProvincias,
     getProvincias
   } = useMutationCatalogosQuery()
   const {
-    data: dataDistritos,
+    data: distritos,
     isPending: isPendingDistritos,
     getDistritos
   } = useMutationCatalogosQuery()
@@ -54,12 +55,23 @@ function UbigeosMdl({show, setShow, onChooseUbigeo}: Props) {
         break
       }
       case "distrito":{
-        const ubigeo_inei = (dataDistritos as Distrito[]).find((el) => el.distrito === value)?.ubigeo_inei;
+        const ubigeo_inei = (distritos.content as Distrito[]).find((el) => el.distrito === value)?.ubigeo_inei;
         setForm({...form, distrito:value, ubigeo_inei: ubigeo_inei ? ubigeo_inei : ""})
         break
       }
     }
   }
+
+  useEffect(()=>{
+    if(!provincias) return
+    if(provincias.error){toast.error("error al obtener las provincias")}
+    console.log(provincias)
+  },[provincias])
+
+    useEffect(()=>{
+    if(!distritos) return
+    if(distritos.error){toast.error("error al obtener las distritos")}
+  },[distritos])
 
   useEffect(()=>{
     if(show){
@@ -95,7 +107,7 @@ function UbigeosMdl({show, setShow, onChooseUbigeo}: Props) {
               onChange={handleChange}
             >
               <option value="">{isPendingProvincias ? "Espere...":"- Seleccione -"}</option>
-              {dataProvincias?.map((el: Provincia) => 
+              {provincias?.content && provincias.content?.map((el: Provincia) => 
                 <option key={el.provincia} value={el.provincia}>{el.provincia}</option>
               )}
             </Form.Select>
@@ -108,7 +120,7 @@ function UbigeosMdl({show, setShow, onChooseUbigeo}: Props) {
               onChange={handleChange}
             >
               <option value="">{isPendingDistritos ? "Espere...":"- Seleccione -"}</option>
-              {dataDistritos?.map((el: Distrito) => 
+              {distritos?.content && distritos.content?.map((el: Distrito) => 
                 <option key={el.distrito} value={el.distrito}>{el.distrito}</option>
               )}
             </Form.Select>

@@ -45,10 +45,10 @@ const Login: React.FC<LoginProps> = ({
 
   useEffect(() => {
     if(dataSignIn && !dataSignIn?.error){
-      setTknSession(dataSignIn.token)
-      setUserSession(dataSignIn.registro)
-      setModulosSesion(dataSignIn.modulosSesion)
-      setEmpresaSession(dataSignIn.empresaSession)
+      setTknSession(dataSignIn.content.token)
+      setUserSession(dataSignIn.content.registro)
+      setModulosSesion(dataSignIn.content.modulosSesion)
+      setEmpresaSession(dataSignIn.content.empresaSession)
     }
   }, [dataSignIn])
 

@@ -22,28 +22,28 @@ export const useMutateCategoriasQuery = () => {
     }
   })
 
-  const getCategorias = () => {
-    const params = {
-      url: apiURL + "categorias/get_categorias",
-      method: "POST",
-      headers:{ 
-        Authorization,
-        'nombre-modulo': nombreModulo,
-      },
-    }
-    mutate(params)
-  }
-  const getCategoriasTree = () => {
-    const params = {
-      url: apiURL + "categorias/get_categorias_tree",
-      method: "POST",
-      headers:{ 
-        Authorization,
-        'nombre-modulo': nombreModulo,
-      },
-    }
-    mutate(params)
-  }
+  // const getCategorias = () => {
+  //   const params = {
+  //     url: apiURL + "categorias/get_categorias",
+  //     method: "POST",
+  //     headers:{ 
+  //       Authorization,
+  //       'nombre-modulo': nombreModulo,
+  //     },
+  //   }
+  //   mutate(params)
+  // }
+  // const getCategoriasTree = () => {
+  //   const params = {
+  //     url: apiURL + "categorias/get_categorias_tree",
+  //     method: "POST",
+  //     headers:{ 
+  //       Authorization,
+  //       'nombre-modulo': nombreModulo,
+  //     },
+  //   }
+  //   mutate(params)
+  // }
 
   const sortCategorias = (orderedItems: Categoria[]) => {
     const params = {
@@ -108,8 +108,8 @@ export const useMutateCategoriasQuery = () => {
   return {
     data, 
     isPending, 
-    getCategorias,
-    getCategoriasTree,
+    // getCategorias,
+    // getCategoriasTree,
     sortCategorias,
     createCategoria, 
     updateCategoria, 

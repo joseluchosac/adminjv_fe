@@ -51,7 +51,7 @@ export default function ClienteFormMdl({onChooseCliente}: Props) {
   } = useForm<Cliente>({defaultValues: clienteForm_init})
 
   const {
-    data: dataGetCliente,
+    data: cliente,
     isPending: isPendingGetCliente,
     isError: isErrorGetCliente,
     getCliente
@@ -138,7 +138,7 @@ export default function ClienteFormMdl({onChooseCliente}: Props) {
   useEffect(() => {
     if(!dataConsultarNroDocumento) return
     if(!dataConsultarNroDocumento.error){
-      const {tipoDocumento, nombre_razon_social} = dataConsultarNroDocumento
+      const {tipoDocumento, nombre_razon_social} = dataConsultarNroDocumento.content
       setValue("nombre_razon_social", nombre_razon_social)
       setValue("api", 1)
       if(tipoDocumento == "1"){
@@ -146,7 +146,7 @@ export default function ClienteFormMdl({onChooseCliente}: Props) {
         setValue("direccion", "")
         setValue("ubigeo_inei", "",{shouldDirty: true})
       }else if(tipoDocumento == "6"){
-        const {ubigeo, departamento, provincia, distrito, direccion} = dataConsultarNroDocumento
+        const {ubigeo, departamento, provincia, distrito, direccion} = dataConsultarNroDocumento.content
         setLugar(`${departamento} - ${provincia} - ${distrito}`)
         setValue("direccion", direccion)
         setValue("ubigeo_inei", ubigeo,{shouldDirty: true})
@@ -162,18 +162,17 @@ export default function ClienteFormMdl({onChooseCliente}: Props) {
   }, [dataConsultarNroDocumento])
   
   useEffect(() => {
-    if(!dataGetCliente) return
-    if(dataGetCliente.error){
+    if(!cliente) return
+    if(cliente.error){
       toast.error("Error al obtener los datos")
       setShowClienteFormMdl(false);
     }else{
-      if(dataGetCliente){
-        reset(dataGetCliente)
-        setLugar(`${dataGetCliente.departamento} - ${dataGetCliente.provincia} - ${dataGetCliente.distrito}`)
-
+      if(cliente.content){
+        reset(cliente.content)
+        setLugar(`${cliente.content.departamento} - ${cliente.content.provincia} - ${cliente.content.distrito}`)
       }
     }
-  }, [dataGetCliente])
+  }, [cliente])
 
   useEffect(() => {
     if(!isErrorGetCliente) return
@@ -184,7 +183,7 @@ export default function ClienteFormMdl({onChooseCliente}: Props) {
   useEffect(() => {
     if(!dataMutate) return
     if(!dataMutate.error) setShowClienteFormMdl(false);
-    onChooseCliente(dataMutate.registro)
+    onChooseCliente(dataMutate.content)
     toast(dataMutate.msg, {type: dataMutate.msgType})
   }, [dataMutate])
 
@@ -204,7 +203,7 @@ export default function ClienteFormMdl({onChooseCliente}: Props) {
                 <Form.Select
                   id="tipo_documento_cod"
                   {...register('tipo_documento_cod',{valueAsNumber:true})}
-                  disabled={dataConsultarNroDocumento?.nombre_razon_social || currentClienteId 
+                  disabled={dataConsultarNroDocumento?.content.nombre_razon_social || currentClienteId 
                     ? true : false
                   }
                 >
@@ -216,9 +215,9 @@ export default function ClienteFormMdl({onChooseCliente}: Props) {
               <Form.Group as={Col} md={8} className="mb-3">
                 <Form.Label htmlFor="nro_documento" className="d-flex justify-content-between">
                   <div>Nro Doc</div>
-                  { dataConsultarNroDocumento &&
-                    <Badge bg={dataConsultarNroDocumento?.estado == "ACTIVO" ? "success" : "warning"}>
-                      {dataConsultarNroDocumento?.estado}
+                  { dataConsultarNroDocumento?.content &&
+                    <Badge bg={dataConsultarNroDocumento?.content.estado == "ACTIVO" ? "success" : "warning"}>
+                      {dataConsultarNroDocumento?.content.estado}
                     </Badge>
                   }
                 </Form.Label>
@@ -228,7 +227,7 @@ export default function ClienteFormMdl({onChooseCliente}: Props) {
                     {...register('nro_documento',{
                       maxLength: {value: 13, message:"Se permite máximo 13 caracteres"}
                     })}
-                    disabled={dataConsultarNroDocumento?.nombre_razon_social || currentClienteId 
+                    disabled={dataConsultarNroDocumento?.content.nombre_razon_social || currentClienteId 
                       ? true : false
                     }
                   />
@@ -248,7 +247,7 @@ export default function ClienteFormMdl({onChooseCliente}: Props) {
                     minLength: {value: 3, message:"Se permite mínimo 3 caracteres"},
                     maxLength: {value: 150, message:"Se permite máximo 150 caracteres"}
                   })}
-                  disabled={dataConsultarNroDocumento?.nombre_razon_social ? true : false}
+                  disabled={dataConsultarNroDocumento?.content.nombre_razon_social ? true : false}
                 />
                 {errors.nombre_razon_social && 
                   <div className="invalid-feedback d-block">{errors.nombre_razon_social.message}</div>
@@ -257,9 +256,9 @@ export default function ClienteFormMdl({onChooseCliente}: Props) {
               <Form.Group as={Col} md={12} className="mb-3">
                 <Form.Label htmlFor="direccion" className="d-flex justify-content-between">
                   <div>Dirección</div>
-                  { dataConsultarNroDocumento &&
-                    <Badge bg={dataConsultarNroDocumento?.condicion == "HABIDO" ? "success" : "warning"}>
-                      {dataConsultarNroDocumento?.condicion}
+                  { dataConsultarNroDocumento?.content &&
+                    <Badge bg={dataConsultarNroDocumento?.content.condicion == "HABIDO" ? "success" : "warning"}>
+                      {dataConsultarNroDocumento?.content.condicion}
                     </Badge>
                   }
                 </Form.Label>
@@ -269,7 +268,7 @@ export default function ClienteFormMdl({onChooseCliente}: Props) {
                     minLength: {value: 3, message:"Se permite mínimo 3 caracteres"},
                     maxLength: {value: 150, message:"Se permite máximo 150 caracteres"},
                   })}
-                  disabled={dataConsultarNroDocumento?.direccion ? true : false}
+                  disabled={dataConsultarNroDocumento?.content.direccion ? true : false}
                 />
                 {errors.direccion && 
                   <div className="invalid-feedback d-block">{errors.direccion.message}</div>
@@ -282,14 +281,14 @@ export default function ClienteFormMdl({onChooseCliente}: Props) {
                     id="lugar"
                     title={lugar}
                     value={lugar}
-                    disabled={dataConsultarNroDocumento?.ubigeo ? true : false}
+                    disabled={dataConsultarNroDocumento?.content.ubigeo ? true : false}
                     readOnly
                   />
                   <Button 
                     onClick={clearUbigeo}
                     variant="outline-secondary" 
                     title="Eliminar ubigeo"
-                    disabled={dataConsultarNroDocumento?.ubigeo ? true : false}
+                    disabled={dataConsultarNroDocumento?.content.ubigeo ? true : false}
                     >
                     <FaTrash />
                   </Button>
@@ -297,7 +296,7 @@ export default function ClienteFormMdl({onChooseCliente}: Props) {
                     onClick={() => setShowUbigeos(true)} 
                     variant="outline-secondary" 
                     title="Seleccionar ubigeo"
-                    disabled={dataConsultarNroDocumento?.ubigeo ? true : false}
+                    disabled={dataConsultarNroDocumento?.content.ubigeo ? true : false}
                   >
                     <FaEdit />
                   </Button>

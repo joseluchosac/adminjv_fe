@@ -30,7 +30,6 @@ const Register: React.FC = () => {
     if(validateErr) return
     signUp(registerForm)
     console.log(registerForm)
-    // signIn(user)
   };
 
   useEffect(() => {
