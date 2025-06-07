@@ -4,7 +4,7 @@ import { useMutationConfigQuery } from "../../../core/hooks/useConfigQuery"
 import { useForm, useWatch } from "react-hook-form"
 import { type Empresa } from "../../../core/types"
 import { Ubigeo } from "../../../core/types/catalogosTypes"
-import { Bounce, toast } from "react-toastify"
+import { toast } from "react-toastify"
 import { Button, Col, Form, InputGroup, Row } from "react-bootstrap"
 import { MdHideImage, MdImage } from "react-icons/md"
 import { FaUndo } from "react-icons/fa"
@@ -152,12 +152,7 @@ export default function Empresa() {
         })
       setValue("fileLogo", null) 
       }
-      toast(mutation?.msg, {
-        type: mutation?.msgType,
-        autoClose: 3000,
-        transition: Bounce,
-      })
-      // console.log(mutation)
+      toast(mutation?.msg, {type: mutation?.msgType})
     },[mutation])
 
 

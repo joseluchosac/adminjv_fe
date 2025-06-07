@@ -4,7 +4,7 @@ import { LdsBar, LdsEllipsisCenter } from "./Loaders";
 import useLayoutStore from "../store/useLayoutStore";
 import { useEffect } from "react";
 import Swal from "sweetalert2";
-import { Bounce, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import { useForm } from "react-hook-form";
 import useLaboratoriosStore from "../store/useLaboratoriosStore";
 import { useMutationLaboratoriosQuery } from "../hooks/useLaboratoriosQuery";
@@ -89,10 +89,7 @@ export default function LaboratorioFormMdl({onChooseLaboratorio}: Props) {
   useEffect(() => {
     if(!dataGetLaboratorio) return
     if(dataGetLaboratorio.error){
-      toast.error("Error al obtener los datos", {
-        autoClose: 3000,
-        transition: Bounce,
-      })
+      toast.error("Error al obtener los datos")
       setShowLaboratorioFormMdl(false);
     }else{
       if(dataGetLaboratorio){
@@ -103,10 +100,7 @@ export default function LaboratorioFormMdl({onChooseLaboratorio}: Props) {
 
   useEffect(() => {
     if(!isErrorGetLaboratorio) return
-    toast.error("Error de conexion", {
-      autoClose: 3000,
-      transition: Bounce,
-    })
+    toast.error("Error de conexion")
     setShowLaboratorioFormMdl(false);
   }, [isErrorGetLaboratorio])
 
@@ -114,11 +108,7 @@ export default function LaboratorioFormMdl({onChooseLaboratorio}: Props) {
     if(!dataMutate) return
     if(!dataMutate.error) setShowLaboratorioFormMdl(false);
     onChooseLaboratorio(dataMutate.registro)
-    toast(dataMutate.msg, {
-      type: dataMutate.msgType,
-      autoClose: 3000,
-      transition: Bounce,
-    })
+    toast(dataMutate.msg, {type: dataMutate.msgType})
   }, [dataMutate])
 
   return (

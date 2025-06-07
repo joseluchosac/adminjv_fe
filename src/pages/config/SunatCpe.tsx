@@ -3,7 +3,7 @@ import { Accordion, Button, Col, Form, Row } from "react-bootstrap";
 import { FormControlElement } from "../../core/types";
 import { useMutationConfigQuery } from "../../core/hooks/useConfigQuery";
 import { ConfirmPass } from "../../core/components/ConfirmsMdl";
-import { Bounce, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import { LdsBar } from "../../core/components/Loaders";
 
 const cpeFactFormInit = {
@@ -114,11 +114,7 @@ export default function SunatCpe() {
   useEffect(() => {
     if(!mutation) return
     if(typeAction.includes("mutate")){
-      toast(mutation?.msg, {
-        type: mutation?.msgType,
-        autoClose: 3000,
-        transition: Bounce,
-      })
+      toast(mutation?.msg, {type: mutation?.msgType})
     }
   },[mutation])
 

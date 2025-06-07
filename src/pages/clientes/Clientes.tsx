@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react"
 import useClientesStore, { clientesStoreInit } from "../../core/store/useClientesStore"
 import { useFilterClientesQuery } from "../../core/hooks/useClientesQuery"
 import { useDebounce } from "react-use"
-import { Bounce, toast } from "react-toastify"
+import { toast } from "react-toastify"
 import { Badge, Button, Card, Col, Container, Dropdown, Form, InputGroup, Row, Stack } from "react-bootstrap"
 import { LdsBar, LdsEllipsisCenter } from "../../core/components/Loaders"
 import { FaRegFileExcel, FaRegFilePdf, } from "react-icons/fa"
@@ -117,10 +117,7 @@ export default function Clientes() {
 
   useEffect(() => {
     if(data?.pages[0].error || isError){
-      toast.error("Error al obtener registros", {
-        autoClose: 3000,
-        transition: Bounce,
-      })
+      toast.error("Error al obtener registros")
     }
   }, [data, isError])
 

@@ -4,7 +4,7 @@ import { LdsBar, LdsEllipsisCenter } from "./Loaders";
 import useLayoutStore from "../store/useLayoutStore";
 import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
-import { Bounce, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import useCatalogosStore from "../store/useCatalogosStore";
 import { useForm } from "react-hook-form";
 import useProveedoresStore from "../store/useProveedoresStore";
@@ -87,11 +87,7 @@ export default function ProveedorFormMdl({onChooseProveedor}: Props) {
     if(tipo_documento_cod == "1" || tipo_documento_cod == "6"){
       consultarNroDocumento({tipo_documento_cod, nro_documento, api})
     }else{
-      toast("No se puede consultar este número de documento", {
-        type: "warning",
-        autoClose: 3000,
-        transition: Bounce,
-      })
+      toast("No se puede consultar este número de documento", {type: "warning"})
     }
   }
 
@@ -161,21 +157,14 @@ export default function ProveedorFormMdl({onChooseProveedor}: Props) {
       setLugar("")
       setValue("direccion", "")
       setValue("ubigeo_inei", "",{shouldDirty: true})
-      toast(dataConsultarNroDocumento.msg, {
-        type: dataConsultarNroDocumento.msgType,
-        autoClose: 3000,
-        transition: Bounce,
-      })
+      toast(dataConsultarNroDocumento.msg, {type: dataConsultarNroDocumento.msgType})
     }
   }, [dataConsultarNroDocumento])
   
   useEffect(() => {
     if(!dataGetProveedor) return
     if(dataGetProveedor.error){
-      toast.error("Error al obtener los datos", {
-        autoClose: 3000,
-        transition: Bounce,
-      })
+      toast.error("Error al obtener los datos")
       setShowProveedorFormMdl(false);
     }else{
       if(dataGetProveedor){
@@ -188,10 +177,7 @@ export default function ProveedorFormMdl({onChooseProveedor}: Props) {
 
   useEffect(() => {
     if(!isErrorGetProveedor) return
-    toast.error("Error de conexion", {
-      autoClose: 3000,
-      transition: Bounce,
-    })
+    toast.error("Error de conexion")
     setShowProveedorFormMdl(false);
   }, [isErrorGetProveedor])
 
@@ -199,11 +185,7 @@ export default function ProveedorFormMdl({onChooseProveedor}: Props) {
     if(!dataMutate) return
     if(!dataMutate.error) setShowProveedorFormMdl(false);
     onChooseProveedor(dataMutate.registro)
-    toast(dataMutate.msg, {
-      type: dataMutate.msgType,
-      autoClose: 3000,
-      transition: Bounce,
-    })
+    toast(dataMutate.msg, {type: dataMutate.msgType})
   }, [dataMutate])
 
   return (

@@ -95,8 +95,8 @@ export default function CategoriaOpc({setValue, getValues, producto}:Props) {
                   >
                     <div className="d-flex align-items-center gap-1">
                       {el.checked
-                        ? <FaCheckSquare className="text-primary" />
-                        : <FaRegSquare className="text-secondary" />
+                        ? <FaCheckSquare className="text-primary flex-shrink-0" />
+                        : <FaRegSquare className="text-secondary flex-shrink-0" />
                       }            
                       <div className={el.checked ? "text-primary" : ""}>{el.descripcion}</div>
                     </div>

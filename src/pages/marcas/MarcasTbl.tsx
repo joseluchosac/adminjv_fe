@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { Card, Table } from "react-bootstrap";
-import { Bounce, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import DynaIcon from "../../core/components/DynaComponents";
 import useMarcasStore from "../../core/store/useMarcasStore";
 import MarcasTblRow from "./MarcasTblRow";
@@ -83,9 +83,7 @@ const MarcasTbl: React.FC = () => {
 
   useEffect(() => {
     if(data?.pages[0].error || isError){
-      toast.error("Error al obtener registros", {
-        autoClose: 3000, transition: Bounce,
-      })
+      toast.error("Error al obtener registros")
     }
   }, [data, isError])
 

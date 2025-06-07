@@ -6,7 +6,7 @@ import Swal from "sweetalert2";
 import useLayoutStore from "../../core/store/useLayoutStore";
 import { useMutationProductosQuery } from "../../core/hooks/useProductosQuery";
 import { useEffect } from "react";
-import { Bounce, toast } from "react-toastify";
+import { toast } from "react-toastify";
 
 interface ProductosLstRowProps {
   producto: Producto ;
@@ -29,7 +29,8 @@ function ProductosLstRow({ producto, camposProducto }: ProductosLstRowProps) {
     return isValid(parseISO(date)) ? format(date, formato) : ''
   }
 
-  const handleToEdit = () => {
+  const handleToEdit = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
+    e.preventDefault()
     setModo(prev=>({...prev, vista:"edit", productoId:producto.id}))
   }
 
@@ -58,7 +59,7 @@ function ProductosLstRow({ producto, camposProducto }: ProductosLstRowProps) {
 
   useEffect(() => {
     if(!mutation) return
-    toast(mutation.msg, { type: mutation.msgType, autoClose: 3000, transition: Bounce })
+    toast(mutation.msg, { type: mutation.msgType})
   }, [mutation])
 
   return (

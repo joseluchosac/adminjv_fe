@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import Modal from "react-bootstrap/Modal";
 import { Button, Col, Form, Row, Spinner } from "react-bootstrap";
 import Swal from "sweetalert2";
-import { Bounce, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import { useForm } from "react-hook-form";
 import { LdsBar, LdsEllipsisCenter } from "../../core/components/Loaders";
 import useLayoutStore from "../../core/store/useLayoutStore";
@@ -83,9 +83,7 @@ export default function MarcaForm() {
     if(!marca) return
     console.log(marca)
     if(marca.error){
-      toast(marca.msg, {
-        type: marca.msgType, autoClose: 3000, transition: Bounce,
-      })
+      toast(marca.msg, {type: marca.msgType})
       setShowMarcaForm(false);
     }else{
       if(marca.content) reset(marca?.content)
@@ -96,25 +94,19 @@ export default function MarcaForm() {
     if(!mutation) return
     if(typeAction==="mutate_marca"){
       if(!mutation.error) setShowMarcaForm(false);
-      toast(mutation.msg, {
-        type: mutation.msgType, autoClose: 3000, transition: Bounce,
-      })
+      toast(mutation.msg, {type: mutation.msgType})
     }
   }, [mutation])
 
   useEffect(() => {
     if(!isErrorMarca) return
-    toast.error("Error al obtener datos", {
-      autoClose: 3000, transition: Bounce,
-    })
+    toast.error("Error al obtener datos")
     setShowMarcaForm(false)
   }, [isErrorMarca])
 
   useEffect(() => {
     if(!isErrorMutation) return
-    toast.error("Error al procesar solicitud", {
-      autoClose: 3000, transition: Bounce,
-    })
+    toast.error("Error al procesar solicitud")
   }, [isErrorMutation])
 
 

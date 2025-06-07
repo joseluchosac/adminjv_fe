@@ -178,12 +178,12 @@ export const useMutationUsersQuery = () => {
     mutate(params)
   }
 
-  const signUp = (param: RegisterForm) => { // registrarse
+  const signUp = (registro: RegisterForm) => { // registrarse
     typeActionRef.current = "sign_up"
     const params = {
       url: apiURL + "users/sign_up",
       method: "POST",
-      body: JSON.stringify(param),
+      body: JSON.stringify(registro),
     }
     mutate(params)
   }

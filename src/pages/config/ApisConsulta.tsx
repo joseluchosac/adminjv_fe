@@ -3,7 +3,7 @@ import { Accordion, Button, Col, Form, Row } from "react-bootstrap"
 import { FormControlElement } from "../../core/types"
 import { useMutationConfigQuery } from "../../core/hooks/useConfigQuery"
 import { ConfirmPass } from "../../core/components/ConfirmsMdl"
-import { Bounce, toast } from "react-toastify"
+import { toast } from "react-toastify"
 import { LdsBar } from "../../core/components/Loaders"
 
 const apisNroDocInit = {
@@ -67,11 +67,7 @@ export default function ApisConsulta() {
 
   useEffect(()=>{
     if(!mutationApisNroDoc) return
-    toast(mutationApisNroDoc?.msg, {
-      type: mutationApisNroDoc?.msgType,
-      autoClose: 3000,
-      transition: Bounce,
-    })
+    toast(mutationApisNroDoc?.msg, {type: mutationApisNroDoc?.msgType})
   },[mutationApisNroDoc])
 
   return (

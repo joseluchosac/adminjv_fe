@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import Swal from "sweetalert2"
-import { Bounce, toast } from "react-toastify"
+import { toast } from "react-toastify"
 import { Button, Card, Col, Container, Form, Row } from "react-bootstrap"
 import { useMutateCategoriasQuery } from "../../core/hooks/useCategoriasQuery"
 import { flattenTree } from "../../core/utils/funciones"
@@ -45,7 +45,6 @@ export default function Categorias() {
         return {id, descripcion, nivel}
       }
     )
-    console.log(nuevosPadres)
     setPadres(nuevosPadres)
   }
 
@@ -57,10 +56,7 @@ export default function Categorias() {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     if(!categoriaForm.descripcion.trim()){
-      toast.warning("Ingrese la descripcion", {
-        autoClose: 3000,
-        transition: Bounce,
-      })
+      toast.warning("Ingrese la descripcion")
       return
     }
     Swal.fire({
@@ -96,18 +92,12 @@ export default function Categorias() {
   const handleDelete = () => {
     const {id} = categoriaForm
     if(!id){
-      toast.warning("Seleccione una categoría de la lista!", {
-        autoClose: 3000,
-        transition: Bounce,
-      })
+      toast.warning("Seleccione una categoría de la lista!")
       return
     }
     const item = categoriasTree?.find((el: any) => el.id === id)
     if(item?.children.length){
-      toast.warning("No se puede eliminar categorías que tienen hijos", {
-        autoClose: 3000,
-        transition: Bounce,
-      })
+      toast.warning("No se puede eliminar categorías que tienen hijos")
       return
     }
 
@@ -135,11 +125,7 @@ export default function Categorias() {
   useEffect(() => {
     if(!mutated) return
     if(!mutated?.msgType || !mutated?.msg) return
-    toast(mutated.msg, {
-      type: mutated?.msgType,
-      autoClose: 3000,
-      transition: Bounce,
-    })
+    toast(mutated.msg, {type: mutated?.msgType})
     if(mutated?.msgType == "success"){
       setCategoriaForm(categoriaFormInit)
     }

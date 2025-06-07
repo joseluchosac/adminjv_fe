@@ -113,7 +113,7 @@ export default function UsersHead() {
                   <FaFilePdf className="fs-5 text-danger"/>
                 </div>
               </div>
-              <Dropdown style={{zIndex:"1035"}}>
+              <Dropdown style={{zIndex:"1030"}}>
                 <Dropdown.Toggle split  variant="outline-secondary" />
                 <Dropdown.Menu>
                   <Dropdown.Item href="#" onClick={handleSetShowUsersFilterMdl} className='d-flex gap-2 align-items-center'>

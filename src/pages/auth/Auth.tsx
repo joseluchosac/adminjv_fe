@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import "./auth.css";
 import { useMutationUsersQuery } from "../../core/hooks/useUsersQuery";
-import { Bounce, toast, ToastContainer } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
 import useLayoutStore from "../../core/store/useLayoutStore";
 import Login from "./Login";
 import { LoginForm } from "../../core/types";
@@ -15,7 +15,7 @@ const formsAuth = {
 const Auth: React.FC = () => {
   const [loginForm, setLoginForm] = useState<LoginForm>({ username: "", password: "" });
   const [currentForm, setCurrentForm] = useState(formsAuth.formOfLogin)
-  const [email, setEmail] = useState("")
+  // const [email, setEmail] = useState("")
   const darkMode = useLayoutStore(state => state.layout.darkMode)
 
   const {
@@ -29,10 +29,7 @@ const Auth: React.FC = () => {
     const newCurrentForm = e.currentTarget.dataset.form ?? ""
     if(currentForm === formsAuth.formOfLogin){
       if(!loginForm.username){
-        toast.warning("Ingrese el usuario", {
-          autoClose: 3000,
-          transition: Bounce,
-        })
+        toast.warning("Ingrese el usuario")
         return
       }
       getEmailByUsername(loginForm.username)
@@ -44,13 +41,10 @@ const Auth: React.FC = () => {
   useEffect(() => {
     if(!dataEmail) return
     if(!dataEmail.error){
-      setEmail(dataEmail.email)
+      // setEmail(dataEmail.content)
       setCurrentForm(formsAuth.formOfForgot)
     }else{
-      toast.warning(dataEmail.msg, {
-        autoClose: 3000,
-        transition: Bounce,
-      })
+      toast.warning(dataEmail.msg)
     }
   }, [dataEmail])
 
@@ -69,13 +63,14 @@ const Auth: React.FC = () => {
         {(currentForm === formsAuth.formOfForgot) &&
           <RecoveryPassword
             loginForm={loginForm}
-            email={email}
+            email={dataEmail.content}
             handleShowForm={handleShowForm}
             formsAuth={formsAuth}
           />
         }
         <ToastContainer
           theme={darkMode ? 'dark' : 'light'}
+          autoClose={3000}
         />
     </div>
   );

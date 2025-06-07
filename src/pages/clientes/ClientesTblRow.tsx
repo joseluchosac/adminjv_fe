@@ -6,7 +6,7 @@ import { useMutationClientesQuery } from "../../core/hooks/useClientesQuery";
 import Swal from "sweetalert2";
 import useLayoutStore from "../../core/store/useLayoutStore";
 import { useEffect } from "react";
-import { Bounce, toast } from "react-toastify";
+import { toast } from "react-toastify";
 
 interface Props {
   cliente: Cliente ;
@@ -53,11 +53,7 @@ function ClientesTblRow({ cliente, camposCliente }: Props) {
 
   useEffect(() => {
     if (!data) return
-    toast(data.msg, {
-      type: data.msgType,
-      autoClose: 3000,
-      transition: Bounce,
-    })
+    toast(data.msg, {type: data.msgType})
   }, [data])
   
   return (

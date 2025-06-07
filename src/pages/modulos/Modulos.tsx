@@ -4,7 +4,7 @@ import ModulosTree from "./ModulosTree"
 import { Button, Card, Col, Container, Form, Nav, Row } from "react-bootstrap"
 import { Padre } from "../../core/types"
 import { useMutateModulosQuery } from "../../core/hooks/useModulosQuery"
-import { Bounce, toast } from "react-toastify"
+import { toast } from "react-toastify"
 import Swal from "sweetalert2"
 import useModulos from "./hooks/useModulos"
 import DynaIcon from "../../core/components/DynaComponents"
@@ -65,10 +65,7 @@ const Modulos:React.FC = () => {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     if(!moduloForm.descripcion.trim()){
-      toast.warning("Ingrese la descripcion", {
-        autoClose: 3000,
-        transition: Bounce,
-      })
+      toast.warning("Ingrese la descripcion")
       return
     }
     Swal.fire({
@@ -94,18 +91,12 @@ const Modulos:React.FC = () => {
   const handleDelete = () => {
     const {id} = moduloForm
     if(!id){
-      toast.warning("Seleccione un módulo de la lista!", {
-        autoClose: 3000,
-        transition: Bounce,
-      })
+      toast.warning("Seleccione un módulo de la lista!")
       return
     }
     const item = modulosTree?.find(el => el.id === id)
     if(item?.children.length){
-      toast.warning("No se puede eliminar módulos que tienen hijos", {
-        autoClose: 3000,
-        transition: Bounce,
-      })
+      toast.warning("No se puede eliminar módulos que tienen hijos")
       return
     }
 
@@ -128,11 +119,7 @@ const Modulos:React.FC = () => {
   useEffect(() => {
     if(!dataOnMutate) return
     if(!dataOnMutate?.msgType || !dataOnMutate?.msg) return
-    toast(dataOnMutate.msg, {
-      type: dataOnMutate?.msgType,
-      autoClose: 3000,
-      transition: Bounce,
-    })
+    toast(dataOnMutate.msg, {type: dataOnMutate?.msgType})
     if(dataOnMutate?.msgType == "success"){
       setModuloForm(moduloFormInit)
     }

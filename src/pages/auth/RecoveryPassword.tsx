@@ -4,7 +4,7 @@ import { LdsBar } from "../../core/components/Loaders"
 import DynaIcon from "../../core/components/DynaComponents"
 import { FormsAuth, LoginForm } from "../../core/types";
 import { useMutationUsersQuery } from "../../core/hooks/useUsersQuery";
-import { Bounce, toast } from "react-toastify";
+import { toast } from "react-toastify";
 
 type RecoveryPasswordProps = {
   loginForm: LoginForm;
@@ -49,21 +49,12 @@ const RecoveryPassword: React.FC<RecoveryPasswordProps> = ({
 
   useEffect(() => {
     if(!dataSendCode) return
-    toast(dataSendCode.msg, {
-      type: dataSendCode.msgType,
-      autoClose: 3000,
-      transition: Bounce,
-    })
+    toast(dataSendCode.msg, {type: dataSendCode.msgType})
   }, [dataSendCode])
 
   useEffect(() => {
     if(!dataRestore) return
-    toast(dataRestore.msg, {
-      type: dataRestore.msgType,
-      autoClose: 3000,
-      transition: Bounce,
-    })
-    console.log(dataRestore)
+    toast(dataRestore.msg, {type: dataRestore.msgType})
   }, [dataRestore])
 
   return (

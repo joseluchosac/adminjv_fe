@@ -10,7 +10,7 @@ import Swal from "sweetalert2"
 import useLayoutStore from "../../core/store/useLayoutStore"
 import useSessionStore from "../../core/store/useSessionStore"
 import useCatalogosStore from "../../core/store/useCatalogosStore"
-import { Bounce, toast } from "react-toastify"
+import { toast } from "react-toastify"
 import { useMutateRolesQuery } from "../../core/hooks/useRolesQuery"
 import { Rol } from "../../core/types/catalogosTypes"
 import { rolFormInit } from "../../core/utils/constants"
@@ -92,11 +92,7 @@ const Roles: React.FC = () => {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     if(!rolForm.rol.length){
-      toast("Ingrese el rol", {
-        type: "warning",
-        autoClose: 3000,
-        transition: Bounce,
-      })
+      toast("Ingrese el rol", {type: "warning"})
       return
     }
         Swal.fire({
@@ -146,21 +142,13 @@ const Roles: React.FC = () => {
 
   useEffect(() => {
     if(!dataUpdateModulosRoles) return
-    toast(dataUpdateModulosRoles.msg, {
-      type: dataUpdateModulosRoles.msgType,
-      autoClose: 3000,
-      transition: Bounce,
-    })
+    toast(dataUpdateModulosRoles.msg, {type: dataUpdateModulosRoles.msgType})
     getModulosSession()
   }, [dataUpdateModulosRoles])
   
   useEffect(() => {
     if(!dataMutateRol) return
-    toast(dataMutateRol.msg, {
-      type: dataMutateRol.msgType,
-      autoClose: 3000,
-      transition: Bounce,
-    })
+    toast(dataMutateRol.msg, {type: dataMutateRol.msgType})
     if(dataMutateRol.msgType == "success"){
       if(dataMutateRol.accion === "registrar"){
         createRolStore(dataMutateRol.rol)

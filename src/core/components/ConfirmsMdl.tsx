@@ -4,7 +4,7 @@ import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import { useMutationUsersQuery } from '../hooks/useUsersQuery';
 import { LdsBar } from './Loaders';
-import { Bounce, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 
 type ConfirmPassProps = {
   show: boolean;
@@ -38,11 +38,7 @@ function ConfirmPass({show, setShow, onSuccess}: ConfirmPassProps) {
   useEffect(() => {
     if(!data) return
     if(data.error){
-      toast(data?.msg, {
-        type: data?.msgType,
-        autoClose: 3000,
-        transition: Bounce,
-      })
+      toast(data?.msg, {type: data?.msgType})
     }else{
       onSuccess()
       setShow(false)

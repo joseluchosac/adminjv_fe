@@ -3,7 +3,7 @@ import Modal from "react-bootstrap/Modal";
 import { Button, Col, Form, Row, Spinner } from "react-bootstrap";
 import { useForm } from "react-hook-form";
 import Swal from "sweetalert2";
-import { Bounce, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import { LdsBar, LdsEllipsisCenter } from "../../core/components/Loaders";
 import useLayoutStore from "../../core/store/useLayoutStore";
 import { useMutationUsersQuery } from "../../core/hooks/useUsersQuery";
@@ -97,9 +97,7 @@ export default function Userform(){
   useEffect(() => {
     if(!user) return
     if(user.error){
-      toast.error("Error al obtener los datos", {
-        autoClose: 3000, transition: Bounce,
-      })
+      toast.error("Error al obtener los datos")
       setShowUserForm(false);
     }else{
       if(user.content) reset(user.content)
@@ -108,21 +106,14 @@ export default function Userform(){
 
   useEffect(() => {
     if(!isErrorUser) return
-    toast.error("Error de conexion", {
-      autoClose: 3000,
-      transition: Bounce,
-    })
+    toast.error("Error de conexion")
     setShowUserForm(false);
   }, [isErrorUser])
 
   useEffect(() => {
     if(!mutation) return
     if(!mutation.error) setShowUserForm(false);
-    toast(mutation.msg, {
-      type: mutation.msgType,
-      autoClose: 3000,
-      transition: Bounce,
-    })
+    toast(mutation.msg, {type: mutation.msgType})
   }, [mutation])
 
   return (

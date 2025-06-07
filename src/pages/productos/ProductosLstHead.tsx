@@ -112,7 +112,7 @@ export default function ProductosLstHead() {
                   <FaFilePdf className="fs-5 text-danger"/>
                 </div>
               </div>
-              <Dropdown style={{zIndex:"1035"}}>
+              <Dropdown style={{zIndex:"1030"}}>
                 <Dropdown.Toggle split  variant="outline-secondary" />
                 <Dropdown.Menu>
                   <Dropdown.Item href="#" onClick={handleSetShowProductosFilterMdl} className='d-flex gap-2 align-items-center'>

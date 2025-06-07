@@ -14,8 +14,8 @@ const Register: React.FC = () => {
   const {setTknSession, setUserSession, setModulosSesion} = useSessionStore()
 
   const {
-    data: dataSignUp,
-    isPending: isPendingOnMutate ,
+    data: mutation,
+    isPending: isPendingMutation,
     signUp, 
   } = useMutationUsersQuery()
 
@@ -34,12 +34,12 @@ const Register: React.FC = () => {
   };
 
   useEffect(() => {
-    if(dataSignUp && !dataSignUp?.error){
-      setTknSession(dataSignUp.token)
-      setUserSession(dataSignUp.registro)
-      setModulosSesion(dataSignUp.modulosSesion)
+    if(mutation && !mutation?.error){
+      setTknSession(mutation.content.token)
+      setUserSession(mutation.content.registro)
+      setModulosSesion(mutation.content.modulosSesion)
     }
-  }, [dataSignUp])
+  }, [mutation])
   
   return (
     <Container>
@@ -48,14 +48,14 @@ const Register: React.FC = () => {
         <Col sm={10} lg={7} xl={7}>
           <Card className="register-card mt-3 mt-md-5" >
             <Card.Body>
-              { isPendingOnMutate && <LdsBar />}
+              { isPendingMutation && <LdsBar />}
               <div className="text-center mb-3">
                 <h3>REGISTRO</h3>
               </div>
               {
-                dataSignUp?.error && !isPendingOnMutate && 
+                mutation?.error && !isPendingMutation && 
                 <Alert variant="danger" className="p-2 text-wrap text-center">
-                  {dataSignUp.msg}
+                  {mutation.msg}
                 </Alert>
               }
               <Form className="form-register" onSubmit={handleSubmit}>

@@ -17,6 +17,7 @@ const MainContent: React.FC = () => {
         <Outlet />
         <ToastContainer
           theme={darkMode ? 'dark' : 'light'}
+          autoClose={3000}
         />
       </div>
     </>

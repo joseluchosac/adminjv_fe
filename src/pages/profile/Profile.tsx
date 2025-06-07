@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Button, Card, Col, Container, Form, Row } from "react-bootstrap";
-import { Bounce, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import Swal from "sweetalert2";
 import useSessionStore from "../../core/store/useSessionStore";
 import useLayoutStore from "../../core/store/useLayoutStore";
@@ -100,10 +100,7 @@ export default function Profile() {
     useEffect(() => {
       if(!respCheckPassword) return
       if(respCheckPassword.error){
-        toast.error(respCheckPassword.msg, {
-          autoClose: 3000,
-          transition: Bounce,
-        })
+        toast.error(respCheckPassword.msg)
       }else{
         updateProfile(profileForm)
       }
@@ -111,11 +108,7 @@ export default function Profile() {
   
     useEffect(() => {
       if(!mutation) return
-      toast(mutation.msg, {
-        type: mutation.msgType,
-        autoClose: 3000,
-        transition: Bounce,
-      })
+      toast(mutation.msg, {type: mutation.msgType})
       if(!mutation.error){
         setUserSession(mutation.content)
       }

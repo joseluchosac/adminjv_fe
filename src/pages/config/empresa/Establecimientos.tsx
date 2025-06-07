@@ -4,7 +4,7 @@ import { Button, Table } from "react-bootstrap"
 import { FaEdit, FaTrash } from "react-icons/fa"
 import EstablecimientoForm from "./EstablecimientoForm"
 import { Establecimiento } from "../../../core/types/catalogosTypes"
-import { Bounce, toast } from "react-toastify"
+import { toast } from "react-toastify"
 import Swal from "sweetalert2"
 import useLayoutStore from "../../../core/store/useLayoutStore"
 
@@ -56,9 +56,7 @@ export default function Locales() {
 
   useEffect(()=>{
     if(!mutation) return
-    toast(mutation.msg, {
-      type: mutation.msgType, autoClose: 3000, transition: Bounce,
-    })
+    toast(mutation.msg, {type: mutation.msgType})
     getEstablecimientos()
   },[mutation])
 

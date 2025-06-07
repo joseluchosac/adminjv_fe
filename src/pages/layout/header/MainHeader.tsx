@@ -44,7 +44,7 @@ function MainHeader () {
   };
 
   return (
-    <Navbar expand="md" className={`main-header ${layout?.fixedHeader ? 'fixed-top' : ''}`}>
+    <Navbar expand="md" className={`main-header ${layout?.fixedHeader ? 'fixed-top' : ''}`} style={{zIndex:"1035"}}>
       <Container fluid>
         <Navbar.Brand href="#" className="toggle-sidebar" onClick={showSidebar}>
           <DynaIcon name="FaBars" />
@@ -72,7 +72,7 @@ function MainHeader () {
                   <span>{userSession?.username}</span>
                 </div>
               }
-              style={{zIndex:"1035"}}
+              // style={{zIndex:"1035"}}
             >
               <NavDropdown.Item href="#" onClick={handleMisDatos} className="d-flex align-items-center gap-2">
                 <FaUserEdit /> <span>Mi perfil</span>

@@ -11,7 +11,7 @@ import useLayoutStore from "../../../core/store/useLayoutStore";
 import { Producto } from "../../../core/types";
 import useMarcasStore from "../../../core/store/useMarcasStore";
 import { filterMarcasFetch } from "../../../core/services/marcasFetch";
-
+import { FaPlus } from "react-icons/fa6";
 
 type SelectProps = {
   control: Control<Producto, any>;
@@ -20,14 +20,28 @@ type SelectProps = {
   clearErrors: UseFormClearErrors<Producto>
 }
 
-export function MarcasSelect({control, getValues, setValue, clearErrors}: SelectProps) {
+interface SelectPropsMarcas extends SelectProps {
+  setShowMarcaForm: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+interface SelectPropsLaboratorios extends SelectProps {
+  setShowLaboratorioForm: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+export function MarcasSelect({
+    control,
+    getValues,
+    setValue,
+    clearErrors,
+    setShowMarcaForm,
+  }: SelectPropsMarcas) {
   const filterParamsMarcas = useMarcasStore(state => state.filterParamsMarcas)
   const abortMarcas = useRef<AbortController | null>(null);
   const tknSession = useSessionStore(state => state.tknSession)
   const darkMode = useLayoutStore(state => state.layout.darkMode)
 
   const loadMarcasOptions =  debounce((search: string, callback: any) => {
-    abortMarcas.current?.abort(); // ✅ Cancela la petición anterior
+    abortMarcas.current?.abort();
     abortMarcas.current = new AbortController();
     const filtered = {...filterParamsMarcas, search}
     filterMarcasFetch({filterParamsMarcas: filtered, pageParam:1, token: tknSession, signal: abortMarcas.current.signal })
@@ -38,7 +52,17 @@ export function MarcasSelect({control, getValues, setValue, clearErrors}: Select
 
   return (
     <>
-      <Form.Label>Marca</Form.Label>
+      <Form.Label className="d-flex justify-content-between">
+          <div>Marca</div>
+          <div
+            className="text-primary px-2"
+            role="button"
+            title="Crear marca"
+            onClick={()=> setShowMarcaForm(true)}
+          >
+            <FaPlus />
+          </div>
+      </Form.Label>
       <Controller
         name="marca_id"
         control={control}
@@ -62,7 +86,13 @@ export function MarcasSelect({control, getValues, setValue, clearErrors}: Select
   )
 }
 
-export function LaboratorioSelect({control, getValues, setValue, clearErrors}: SelectProps) {
+export function LaboratorioSelect({
+  control, 
+  getValues, 
+  setValue, 
+  clearErrors, 
+  setShowLaboratorioForm
+}: SelectPropsLaboratorios) {
   const filterParamsLaboratorios = useLaboratoriosStore(state => state.filterParamsLaboratorios)
   const abortLaboratorios = useRef<AbortController | null>(null);
   const tknSession = useSessionStore(state => state.tknSession)
@@ -80,8 +110,18 @@ export function LaboratorioSelect({control, getValues, setValue, clearErrors}: S
 
   return (
     <>
-      <Form.Label>Laboratorio</Form.Label>
-      <Controller
+      <Form.Label className="d-flex justify-content-between">
+        <div>Laboratorio</div>
+        <div
+          className="text-primary px-2"
+          role="button"
+          title="Crear laboratorio"
+          onClick={()=> setShowLaboratorioForm(true)}
+        >
+          <FaPlus />
+        </div>
+      </Form.Label>
+      <Controller 
         name="laboratorio_id"
         control={control}
         render={() => (
@@ -102,3 +142,5 @@ export function LaboratorioSelect({control, getValues, setValue, clearErrors}: S
     </>
   )
 }
+
+

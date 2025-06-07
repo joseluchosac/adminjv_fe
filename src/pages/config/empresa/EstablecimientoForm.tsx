@@ -11,7 +11,7 @@ import { filterParamsInit, selectDark } from '../../../core/utils/constants';
 import useSessionStore from '../../../core/store/useSessionStore';
 import useLayoutStore from '../../../core/store/useLayoutStore';
 import { OptionsOrGroups } from 'react-select';
-import { Bounce, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 import Swal from 'sweetalert2';
 
 type Props = {
@@ -65,7 +65,6 @@ export default function EstablecimientoForm({showForm, setShowForm, currentId, s
 
   const {
     data: mutation,
-    isPending: isPendingMutation,
     createEstablecimiento,
     updateEstablecimiento,
   } = useMutationConfigQuery()
@@ -144,9 +143,7 @@ export default function EstablecimientoForm({showForm, setShowForm, currentId, s
   useEffect(()=>{
     if(!mutation) return
     if(!mutation.error) setShowForm(false);
-    toast(mutation.msg, {
-      type: mutation.msgType, autoClose: 3000, transition: Bounce,
-    })
+    toast(mutation.msg, {type: mutation.msgType})
     getEstablecimientos()
   },[mutation])
 
