@@ -29,15 +29,15 @@ export default function LaboratorioFormMdl({onChooseLaboratorio}: Props) {
   } = useForm<Laboratorio>({defaultValues: laboratorioForm_init})
 
   const {
-    data: dataGetLaboratorio,
-    isPending: isPendingGetLaboratorio,
-    isError: isErrorGetLaboratorio,
+    data: laboratorio,
+    isPending: isPendingLaboratorio,
+    isError: isErrorLaboratorio,
     getLaboratorio
   } = useMutationLaboratoriosQuery()
 
   const {
-    data: dataMutate,
-    isPending: isPendingMutate ,
+    data: mutation,
+    isPending: isPendingMutation ,
     createLaboratorio, 
     updateLaboratorio, 
   } = useMutationLaboratoriosQuery()
@@ -87,29 +87,29 @@ export default function LaboratorioFormMdl({onChooseLaboratorio}: Props) {
 
   
   useEffect(() => {
-    if(!dataGetLaboratorio) return
-    if(dataGetLaboratorio.error){
+    if(!laboratorio) return
+    if(laboratorio.error){
       toast.error("Error al obtener los datos")
       setShowLaboratorioFormMdl(false);
     }else{
-      if(dataGetLaboratorio){
-        reset(dataGetLaboratorio)
+      if(laboratorio){
+        reset(laboratorio)
       }
     }
-  }, [dataGetLaboratorio])
+  }, [laboratorio])
 
   useEffect(() => {
-    if(!isErrorGetLaboratorio) return
+    if(!isErrorLaboratorio) return
     toast.error("Error de conexion")
     setShowLaboratorioFormMdl(false);
-  }, [isErrorGetLaboratorio])
+  }, [isErrorLaboratorio])
 
   useEffect(() => {
-    if(!dataMutate) return
-    if(!dataMutate.error) setShowLaboratorioFormMdl(false);
-    onChooseLaboratorio(dataMutate.registro)
-    toast(dataMutate.msg, {type: dataMutate.msgType})
-  }, [dataMutate])
+    if(!mutation) return
+    if(!mutation.error) setShowLaboratorioFormMdl(false);
+    onChooseLaboratorio(mutation.registro)
+    toast(mutation.msg, {type: mutation.msgType})
+  }, [mutation])
 
   return (
     <div>
@@ -119,7 +119,7 @@ export default function LaboratorioFormMdl({onChooseLaboratorio}: Props) {
         </Modal.Header>
         <Modal.Body>
           <Form onSubmit={handleSubmit(submit)} id="form_laboratorio">
-            {isPendingMutate && <LdsBar />}
+            {isPendingMutation && <LdsBar />}
             <Row>
               <Form.Group as={Col} md={12} className="mb-3">
                 <Form.Label htmlFor="nombre">Laboratorio</Form.Label>
@@ -151,9 +151,9 @@ export default function LaboratorioFormMdl({onChooseLaboratorio}: Props) {
               <Button 
                 variant="primary" 
                 type="submit"
-                disabled={isPendingMutate ? true : isDirty ? false : true}
+                disabled={isPendingMutation ? true : isDirty ? false : true}
               >
-                {isPendingMutate &&
+                {isPendingMutation &&
                   <Spinner
                     as="span"
                     animation="border"
@@ -167,7 +167,7 @@ export default function LaboratorioFormMdl({onChooseLaboratorio}: Props) {
             </div>
           </Form>
         </Modal.Body>
-        {isPendingGetLaboratorio && <LdsEllipsisCenter/>}
+        {isPendingLaboratorio && <LdsEllipsisCenter/>}
       </Modal>
     </div>
   );

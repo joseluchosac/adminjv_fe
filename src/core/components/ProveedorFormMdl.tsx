@@ -52,23 +52,23 @@ export default function ProveedorFormMdl({onChooseProveedor}: Props) {
 
   const {
     data: proveedor,
-    isPending: isPendingGetProveedor,
-    isError: isErrorGetProveedor,
+    isPending: isPendingProveedor,
+    isError: isErrorProveedor,
     getProveedor
   } = useMutationProveedoresQuery()
 
   const {
-    data: dataMutate,
-    isPending: isPendingMutate ,
+    data: mutation,
+    isPending: isPendingMutation ,
     createProveedor, 
     updateProveedor, 
   } = useMutationProveedoresQuery()
 
   const {
-    data: dataConsultarNroDocumento,
-    isPending: isPendingConsultarNroDocumento ,
+    data: nroDocumento,
+    isPending: isPendingNroDocumento ,
+    reset: resetNroDocumento,
     consultarNroDocumento,
-    reset: resetDataConsultarNroDocumento
   } = useMutationProveedoresQuery()
 
   const onChooseUbigeo = (ubigeo: Ubigeo) => {
@@ -117,7 +117,7 @@ export default function ProveedorFormMdl({onChooseProveedor}: Props) {
 
   const resetForm = () => {
     reset(proveedorForm_init)
-    resetDataConsultarNroDocumento(null)
+    resetNroDocumento(null)
     setLugar("")
   }
 
@@ -136,9 +136,9 @@ export default function ProveedorFormMdl({onChooseProveedor}: Props) {
   }, [showProveedorFormMdl])
 
   useEffect(() => {
-    if(!dataConsultarNroDocumento) return
-    if(!dataConsultarNroDocumento.error){
-      const {tipoDocumento, nombre_razon_social} = dataConsultarNroDocumento.content
+    if(!nroDocumento) return
+    if(!nroDocumento.error){
+      const {tipoDocumento, nombre_razon_social} = nroDocumento.content
       setValue("nombre_razon_social", nombre_razon_social)
       setValue("api", 1)
       if(tipoDocumento == "1"){
@@ -146,7 +146,7 @@ export default function ProveedorFormMdl({onChooseProveedor}: Props) {
         setValue("direccion", "")
         setValue("ubigeo_inei", "",{shouldDirty: true})
       }else if(tipoDocumento == "6"){
-        const {ubigeo, departamento, provincia, distrito, direccion} = dataConsultarNroDocumento.content
+        const {ubigeo, departamento, provincia, distrito, direccion} = nroDocumento.content
         setLugar(`${departamento} - ${provincia} - ${distrito}`)
         setValue("direccion", direccion)
         setValue("ubigeo_inei", ubigeo,{shouldDirty: true})
@@ -157,9 +157,9 @@ export default function ProveedorFormMdl({onChooseProveedor}: Props) {
       setLugar("")
       setValue("direccion", "")
       setValue("ubigeo_inei", "",{shouldDirty: true})
-      toast(dataConsultarNroDocumento.msg, {type: dataConsultarNroDocumento.msgType})
+      toast(nroDocumento.msg, {type: nroDocumento.msgType})
     }
-  }, [dataConsultarNroDocumento])
+  }, [nroDocumento])
   
   useEffect(() => {
     if(!proveedor) return
@@ -176,17 +176,17 @@ export default function ProveedorFormMdl({onChooseProveedor}: Props) {
   }, [proveedor])
 
   useEffect(() => {
-    if(!isErrorGetProveedor) return
+    if(!isErrorProveedor) return
     toast.error("Error de conexion")
     setShowProveedorFormMdl(false);
-  }, [isErrorGetProveedor])
+  }, [isErrorProveedor])
 
   useEffect(() => {
-    if(!dataMutate) return
-    if(!dataMutate.error) setShowProveedorFormMdl(false);
-    onChooseProveedor(dataMutate.content)
-    toast(dataMutate.msg, {type: dataMutate.msgType})
-  }, [dataMutate])
+    if(!mutation) return
+    if(!mutation.error) setShowProveedorFormMdl(false);
+    onChooseProveedor(mutation.content)
+    toast(mutation.msg, {type: mutation.msgType})
+  }, [mutation])
 
   return (
     <div>
@@ -196,15 +196,15 @@ export default function ProveedorFormMdl({onChooseProveedor}: Props) {
         </Modal.Header>
         <Modal.Body>
           <Form onSubmit={handleSubmit(submit)} id="form_proveedor">
-            {isPendingMutate && <LdsBar />}
-            {isPendingConsultarNroDocumento && <LdsBar />}
+            {isPendingMutation && <LdsBar />}
+            {isPendingNroDocumento && <LdsBar />}
             <Row>
               <Form.Group as={Col} md={4} className="mb-3">
                 <Form.Label htmlFor="tipo_documento_cod">Tipo</Form.Label>
                 <Form.Select
                   id="tipo_documento_cod"
                   {...register('tipo_documento_cod',{valueAsNumber:true})}
-                  disabled={dataConsultarNroDocumento?.content.nombre_razon_social || currentProveedorId 
+                  disabled={nroDocumento?.content.nombre_razon_social || currentProveedorId 
                     ? true : false
                   }
                 >
@@ -216,9 +216,9 @@ export default function ProveedorFormMdl({onChooseProveedor}: Props) {
               <Form.Group as={Col} md={8} className="mb-3">
                 <Form.Label htmlFor="nro_documento" className="d-flex justify-content-between">
                   <div>Nro Doc</div>
-                  { dataConsultarNroDocumento?.content &&
-                    <Badge bg={dataConsultarNroDocumento?.content.estado == "ACTIVO" ? "success" : "warning"}>
-                      {dataConsultarNroDocumento?.content.estado}
+                  { nroDocumento?.content &&
+                    <Badge bg={nroDocumento?.content.estado == "ACTIVO" ? "success" : "warning"}>
+                      {nroDocumento?.content.estado}
                     </Badge>
                   }
                 </Form.Label>
@@ -228,7 +228,7 @@ export default function ProveedorFormMdl({onChooseProveedor}: Props) {
                     {...register('nro_documento',{
                       maxLength: {value: 13, message:"Se permite máximo 13 caracteres"}
                     })}
-                    disabled={dataConsultarNroDocumento?.content.nombre_razon_social || currentProveedorId 
+                    disabled={nroDocumento?.content.nombre_razon_social || currentProveedorId 
                       ? true : false
                     }
                   />
@@ -248,7 +248,7 @@ export default function ProveedorFormMdl({onChooseProveedor}: Props) {
                     minLength: {value: 3, message:"Se permite mínimo 3 caracteres"},
                     maxLength: {value: 150, message:"Se permite máximo 150 caracteres"}
                   })}
-                  disabled={dataConsultarNroDocumento?.content.nombre_razon_social ? true : false}
+                  disabled={nroDocumento?.content.nombre_razon_social ? true : false}
                 />
                 {errors.nombre_razon_social && 
                   <div className="invalid-feedback d-block">{errors.nombre_razon_social.message}</div>
@@ -257,9 +257,9 @@ export default function ProveedorFormMdl({onChooseProveedor}: Props) {
               <Form.Group as={Col} md={12} className="mb-3">
                 <Form.Label htmlFor="direccion" className="d-flex justify-content-between">
                   <div>Dirección</div>
-                  { dataConsultarNroDocumento?.content &&
-                    <Badge bg={dataConsultarNroDocumento?.content.condicion == "HABIDO" ? "success" : "warning"}>
-                      {dataConsultarNroDocumento?.content.condicion}
+                  { nroDocumento?.content &&
+                    <Badge bg={nroDocumento?.content.condicion == "HABIDO" ? "success" : "warning"}>
+                      {nroDocumento?.content.condicion}
                     </Badge>
                   }
                 </Form.Label>
@@ -269,7 +269,7 @@ export default function ProveedorFormMdl({onChooseProveedor}: Props) {
                     minLength: {value: 3, message:"Se permite mínimo 3 caracteres"},
                     maxLength: {value: 150, message:"Se permite máximo 150 caracteres"},
                   })}
-                  disabled={dataConsultarNroDocumento?.content.direccion ? true : false}
+                  disabled={nroDocumento?.content.direccion ? true : false}
                 />
                 {errors.direccion && 
                   <div className="invalid-feedback d-block">{errors.direccion.message}</div>
@@ -282,14 +282,14 @@ export default function ProveedorFormMdl({onChooseProveedor}: Props) {
                     id="lugar"
                     title={lugar}
                     value={lugar}
-                    disabled={dataConsultarNroDocumento?.content.ubigeo ? true : false}
+                    disabled={nroDocumento?.content.ubigeo ? true : false}
                     readOnly
                   />
                   <Button 
                     onClick={clearUbigeo}
                     variant="outline-secondary" 
                     title="Eliminar ubigeo"
-                    disabled={dataConsultarNroDocumento?.content.ubigeo ? true : false}
+                    disabled={nroDocumento?.content.ubigeo ? true : false}
                     >
                     <FaTrash />
                   </Button>
@@ -297,7 +297,7 @@ export default function ProveedorFormMdl({onChooseProveedor}: Props) {
                     onClick={() => setShowUbigeos(true)} 
                     variant="outline-secondary" 
                     title="Seleccionar ubigeo"
-                    disabled={dataConsultarNroDocumento?.content.ubigeo ? true : false}
+                    disabled={nroDocumento?.content.ubigeo ? true : false}
                   >
                     <FaEdit />
                   </Button>
@@ -345,9 +345,9 @@ export default function ProveedorFormMdl({onChooseProveedor}: Props) {
               <Button 
                 variant="primary" 
                 type="submit"
-                disabled={isPendingMutate ? true : isDirty ? false : true}
+                disabled={isPendingMutation ? true : isDirty ? false : true}
               >
-                {isPendingMutate &&
+                {isPendingMutation &&
                   <Spinner
                     as="span"
                     animation="border"
@@ -361,7 +361,7 @@ export default function ProveedorFormMdl({onChooseProveedor}: Props) {
             </div>
           </Form>
         </Modal.Body>
-        {isPendingGetProveedor && <LdsEllipsisCenter/>}
+        {isPendingProveedor && <LdsEllipsisCenter/>}
       </Modal>
       <UbigeosMdl
         show={showUbigeos} 

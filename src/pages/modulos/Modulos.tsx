@@ -16,14 +16,16 @@ import { moduloFormInit } from "../../core/utils/constants"
 const Modulos:React.FC = () => {
   const [showIconsModal, setShowIconsModal] = useState(false);
   const darkMode = useLayoutStore(state => state.layout.darkMode)
+
   const {
-    data: dataOnMutate,
-    isPending: isPending_mutate,
+    data: mutation,
+    isPending: isPendingMutation,
     sortModulos, 
     createModulo, 
     updateModulo, 
     deleteModulo, 
   } = useMutateModulosQuery()
+
   const {
     isPendingGetModulos,
     modulosTree,
@@ -38,7 +40,7 @@ const Modulos:React.FC = () => {
   const setModulosSesion = useSessionStore(state => state.setModulosSesion)
 
   const {
-    data: dataGetModulosSession,
+    data: modulosSession,
     getModulosSession
   } = useMutateModulosQuery()
 
@@ -117,20 +119,22 @@ const Modulos:React.FC = () => {
   }
 
   useEffect(() => {
-    if(!dataOnMutate) return
-    if(!dataOnMutate?.msgType || !dataOnMutate?.msg) return
-    toast(dataOnMutate.msg, {type: dataOnMutate?.msgType})
-    if(dataOnMutate?.msgType == "success"){
+    if(!mutation) return
+    if(!mutation?.msgType || !mutation?.msg) return
+    toast(mutation.msg, {type: mutation?.msgType})
+    if(mutation?.msgType == "success"){
       setModuloForm(moduloFormInit)
     }
     getModulosSession()
     getModulos()
-  }, [dataOnMutate])
+  }, [mutation])
 
   useEffect(() => {
-    if(!dataGetModulosSession) return
-    setModulosSesion(dataGetModulosSession)
-  }, [dataGetModulosSession])
+    if(!modulosSession) return
+    if(modulosSession.content){
+      setModulosSesion(modulosSession.content)
+    }
+  }, [modulosSession])
 
 
   return (
@@ -140,7 +144,7 @@ const Modulos:React.FC = () => {
           <Card>
             <Card.Header>Menú de módulos</Card.Header>
             <Card.Body className="position-relative">
-              {(isPendingGetModulos || isPending_mutate) && <LdsBar />}
+              {(isPendingGetModulos || isPendingMutation) && <LdsBar />}
               <Row>
                 <Col>
                   <div className="mb-2"><small>Arrastre los items para ordenar.</small></div>

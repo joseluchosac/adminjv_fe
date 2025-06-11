@@ -116,17 +116,18 @@ export type Distrito = {
 
 export type Establecimiento = {
   id: number;
-  codigo_establecimiento: string;
-  nombre: string;
+  tipo: string;
+  codigo: string;
+  descripcion: string;
   direccion: string;
   ubigeo_inei: string;
   dis_prov_dep: string;
   telefono: string;
   email: string;
-  sucursal: boolean;
-  almacen: boolean;
   estado: number;
 }
+
+export type Sucursal = Omit<Establecimiento, "tipo">
 
 export type SerieEstablecimiento = {
   id: number;

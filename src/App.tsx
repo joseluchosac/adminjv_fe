@@ -25,7 +25,6 @@ const Tareas = lazy(() => import("./pages/tareas/Tareas"));
 const Users = lazy(() => import("./pages/users/Users"));
 
 function App() {
-  
   return (
     <Routes>
       <Route element={<PublicRoutes redirectTo="/" />}>

@@ -1,13 +1,17 @@
 const apiURL = import.meta.env.VITE_API_URL;
 import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import useSessionStore from "../store/useSessionStore"
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { mutationFetch } from "../services/mutationFecth"
 import { useNavigate } from "react-router-dom";
 import { filterClientesFetch } from "../services/clientesFetch";
 import useClientesStore, { clientesStoreInit } from "../store/useClientesStore";
 import { Cliente } from "../types";
 
+type TypeAction = 
+"filter_full" 
+| "mutate_cliente"
+| "consultar_nro_doc"
 
 // ****** FILTRAR CLIENTES ******
 export const useFilterClientesQuery = () => {
@@ -72,9 +76,9 @@ export const useMutationClientesQuery = () => {
   const tknSession = useSessionStore(state => state.tknSession)
   const nombreModulo = useSessionStore(state => state.moduloActual?.nombre)
   const Authorization = "Bearer " + tknSession
-  const filterParamsClientes = useClientesStore(state => state.filterParamsClientes)
-
+  const filterParamsClientes = useClientesStore(state => state.filterParamsClientes)  
   const queryClient = useQueryClient()
+  const typeActionRef = useRef<TypeAction | "">("")
 
   const {data, isPending, isError, mutate, } = useMutation({
     mutationFn: mutationFetch,
@@ -111,6 +115,7 @@ export const useMutationClientesQuery = () => {
   }
 
   const createCliente = (cliente: Cliente) => {
+    typeActionRef.current = "mutate_cliente"
     const params = {
       url: apiURL + "clientes/create_cliente",
       method: "POST",
@@ -123,8 +128,8 @@ export const useMutationClientesQuery = () => {
     mutate(params)
   }
 
-
   const updateCliente = (cliente: Cliente) => {
+    typeActionRef.current = "mutate_cliente"
     const params = {
       url: apiURL + "clientes/update_cliente",
       method: "PUT",
@@ -138,6 +143,7 @@ export const useMutationClientesQuery = () => {
   }
 
   const deleteCliente = (id: number) => {
+    typeActionRef.current = "mutate_cliente"
     const params = {
       url: apiURL + "clientes/delete_cliente",
       method: "DELETE",
@@ -151,6 +157,7 @@ export const useMutationClientesQuery = () => {
   }
 
   const consultarNroDocumento = (param: any) => {
+    typeActionRef.current = "consultar_nro_doc"
     const params = {
       url: apiURL + "clientes/consultar_nro_documento",
       method: "POST",
@@ -184,6 +191,7 @@ export const useMutationClientesQuery = () => {
     updateCliente,
     deleteCliente,
     consultarNroDocumento,
+    typeAction: typeActionRef.current,
     reset
   }
 }

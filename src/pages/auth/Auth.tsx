@@ -19,7 +19,7 @@ const Auth: React.FC = () => {
   const darkMode = useLayoutStore(state => state.layout.darkMode)
 
   const {
-    data: dataEmail,
+    data: email,
     isPending: isPendingEmail,
     getEmailByUsername
   } = useMutationUsersQuery()
@@ -39,14 +39,13 @@ const Auth: React.FC = () => {
   }
 
   useEffect(() => {
-    if(!dataEmail) return
-    if(!dataEmail.error){
-      // setEmail(dataEmail.content)
+    if(!email) return
+    if(!email.error){
       setCurrentForm(formsAuth.formOfForgot)
     }else{
-      toast.warning(dataEmail.msg)
+      toast.warning(email.msg)
     }
-  }, [dataEmail])
+  }, [email])
 
   return (
     <div className="login-container position-absolute w-100 top-0 start-0">
@@ -63,7 +62,7 @@ const Auth: React.FC = () => {
         {(currentForm === formsAuth.formOfForgot) &&
           <RecoveryPassword
             loginForm={loginForm}
-            email={dataEmail.content}
+            email={email.content}
             handleShowForm={handleShowForm}
             formsAuth={formsAuth}
           />

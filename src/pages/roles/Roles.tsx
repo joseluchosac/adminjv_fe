@@ -22,30 +22,28 @@ const Roles: React.FC = () => {
   const darkMode = useLayoutStore(state => state.layout.darkMode)
   const setModulosSesion = useSessionStore(state => state.setModulosSesion)
   const catalogos = useCatalogosStore(state => state.catalogos)
-  const createRolStore = useCatalogosStore(state => state.createRolStore)
-  const updateRolStore = useCatalogosStore(state => state.updateRolStore)
-  const deleteRolStore = useCatalogosStore(state => state.deleteRolStore)
+  const updateRolesStore = useCatalogosStore(state => state.updateRolesStore)
 
   const {
-    data: dataGetModulosSession,
+    data: modulosSession,
     getModulosSession
   } = useMutateModulosQuery()
 
   const {
-    data: dataGetModuloRol,
-    isPending: isPendingGetModuloRol,
+    data: moduloRol,
+    isPending: isPendingModuloRol,
     getModuloRol
   } = useMutateModulosQuery()
 
   const {
-    data: dataUpdateModulosRoles, 
-    isPending: isPendingUpdateModulosRoles,
+    data: mutationModulosRoles, 
+    isPending: isPendingMutationModulosRoles,
     updateModulosRoles,
   } = useMutateModulosQuery()
 
   const {
-    data: dataMutateRol,
-    isPending: isPendingMutateRol,
+    data: mutationRol,
+    isPending: isPendingMutationRol,
     createRol,
     updateRol,
     deleteRol,
@@ -62,11 +60,10 @@ const Roles: React.FC = () => {
     setItemsTree(null)
   }
 
-  const handleDelete = (e: React.MouseEvent<HTMLDivElement>) => {
-    const {rol_id} = e.currentTarget.dataset
+  const eliminarRol = (rol: Rol) => {
     Swal.fire({
       icon: 'question',
-      text: `¿Desea eliminar al rol ${rolForm.rol}?`,
+      text: `¿Desea eliminar al rol ${rol.rol}?`,
       showCancelButton: true,
       confirmButtonText: "Sí",
       cancelButtonText: 'Cancelar',
@@ -75,18 +72,15 @@ const Roles: React.FC = () => {
       }
     }).then((result) => {
       if (result.isConfirmed) {
-        deleteRol({id: rol_id})
+        deleteRol({id: rol.id})
       }
     });
   }
 
-  const toEditRol = (e: React.MouseEvent<HTMLDivElement>) => {
-    const {rol_id} = e.currentTarget.dataset
-    if(rol_id){
-      const currentRol = catalogos?.roles?.find((el) => el.id === parseInt(rol_id)) as Rol
-      setRolForm(currentRol)
-      getModuloRol(Number(rol_id))
-    }
+  const rolToEdit = (id: number) => {
+    const currentRol = catalogos?.roles?.find((el) => el.id === id) as Rol
+    setRolForm(currentRol)
+    getModuloRol(id)
   }
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -123,12 +117,9 @@ const Roles: React.FC = () => {
     modulosRol[idx].assign = !modulosRol[idx].assign
     const newModulosRol = structuredClone(modulosRol)
     setModulosRol(newModulosRol)
-  }
-
-  const guardarModulosRoles = () => {
-    const newModulosPefilData = modulosRol?.filter((el) => el.assign === true)
+    const newModulosRolData = newModulosRol?.filter((el) => el.assign === true)
       .map((el) => ({modulo_id: el.id}))
-    updateModulosRoles({rol_id: rolForm.id, modulos: newModulosPefilData})
+    updateModulosRoles({rol_id: rolForm.id, modulos: newModulosRolData})
   }
 
   useEffect(() => {
@@ -141,36 +132,35 @@ const Roles: React.FC = () => {
 
 
   useEffect(() => {
-    if(!dataUpdateModulosRoles) return
-    toast(dataUpdateModulosRoles.msg, {type: dataUpdateModulosRoles.msgType})
+    if(!mutationModulosRoles) return
+    toast(mutationModulosRoles.msg, {type: mutationModulosRoles.msgType})
     getModulosSession()
-  }, [dataUpdateModulosRoles])
+  }, [mutationModulosRoles])
   
   useEffect(() => {
-    if(!dataMutateRol) return
-    toast(dataMutateRol.msg, {type: dataMutateRol.msgType})
-    if(dataMutateRol.msgType == "success"){
-      if(dataMutateRol.accion === "registrar"){
-        createRolStore(dataMutateRol.rol)
-      }else if(dataMutateRol.accion === "update"){
-        updateRolStore(dataMutateRol.rol)
-      }else if(dataMutateRol.accion === "eliminar"){
-        deleteRolStore(dataMutateRol.rol_id)
-      }
+    if(!mutationRol) return
+    toast(mutationRol.msg, {type: mutationRol.msgType})
+    if(mutationRol.content){
+      updateRolesStore(mutationRol.content)
       resetForm()
     }
-    // getModulosSession()
-  }, [dataMutateRol])
+  }, [mutationRol])
 
   useEffect(() => {
-    if(!dataGetModulosSession) return
-    setModulosSesion(dataGetModulosSession)
-  }, [dataGetModulosSession])
+    if(!modulosSession) return
+    if(modulosSession.content){
+      setModulosSesion(modulosSession.content)
+    }
+  }, [modulosSession])
 
   useEffect(() => {
-    if(!dataGetModuloRol) return
-    setModulosRol(dataGetModuloRol)
-  }, [dataGetModuloRol])
+    if(!moduloRol) return
+    if(moduloRol.content){
+      setModulosRol(moduloRol.content)
+    }else{
+      toast(moduloRol.msg, {type: moduloRol.msgType})
+    }
+  }, [moduloRol])
 
 
   return (
@@ -180,7 +170,7 @@ const Roles: React.FC = () => {
           <Card>
             <Card.Header>ROLES</Card.Header>
             <Card.Body className="position-relative">
-              {isPendingMutateRol && <LdsBar />}
+              {isPendingMutationRol && <LdsBar />}
               <Form onSubmit={handleSubmit}>
                 <Row>
                   <Col>
@@ -223,15 +213,13 @@ const Roles: React.FC = () => {
                         <div className="d-flex gap-2 justify-content-center">
                           <div role="button"
                             className="text-primary px-2"
-                            onClick={toEditRol}
-                            data-rol_id={el.id}
+                            onClick={() => rolToEdit(el.id)}
                             title="Editar y mostrar módulos"
                             ><DynaIcon name="FaEdit" />
                           </div>
                           <div role="button" 
                             className="text-danger px-2"
-                            onClick={handleDelete}
-                            data-rol_id={el.id}
+                            onClick={()=>eliminarRol(el)}
                             title="Eliminar"
                           ><DynaIcon name="FaTrash" />
                           </div>
@@ -248,25 +236,18 @@ const Roles: React.FC = () => {
           <Card>
             <Card.Header>MÓDULOS {Boolean(rolForm.id) && `PARA:  ${rolForm.rol}`}</Card.Header>
             <Card.Body className="position-relative">
-              {isPendingGetModuloRol && <LdsBar />}
-              {isPendingUpdateModulosRoles && <LdsBar />}
+              {isPendingModuloRol && <LdsBar />}
+              {isPendingMutationModulosRoles && <LdsBar />}
               {itemsTree ? 
-                <>
-                  <Row className="mb-2">
-                    <Col className="d-flex justify-content-center gap-2">
-                      <Button onClick={guardarModulosRoles}>Guardar</Button>
-                    </Col>
-                  </Row>
-                  <Row>
-                    <Col>
-                      <ModulosRolTree 
-                        itemsTree={itemsTree} 
-                        setItemsTree={setItemsTree}
-                        toggleAssign={toggleAssign}
-                      />
-                    </Col>
-                  </Row>
-                </>
+                <Row>
+                  <Col>
+                    <ModulosRolTree 
+                      itemsTree={itemsTree} 
+                      setItemsTree={setItemsTree}
+                      toggleAssign={toggleAssign}
+                    />
+                  </Col>
+                </Row>
                 : <div>Seleccione un rol para asignar sus módulos</div>
               }
             </Card.Body>

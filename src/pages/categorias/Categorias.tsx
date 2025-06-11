@@ -28,8 +28,8 @@ export default function Categorias() {
   const setCatalogosCategoriasTree = useCatalogosStore(state => state.setCatalogosCategoriasTree)
 
   const {
-    data: mutated, 
-    isPending: isPendingMutate, 
+    data: mutation, 
+    isPending: isPendingMutation, 
     sortCategorias, 
     createCategoria, 
     updateCategoria, 
@@ -123,16 +123,16 @@ export default function Categorias() {
   }
 
   useEffect(() => {
-    if(!mutated) return
-    if(!mutated?.msgType || !mutated?.msg) return
-    toast(mutated.msg, {type: mutated?.msgType})
-    if(mutated?.msgType == "success"){
+    if(!mutation) return
+    if(!mutation?.msgType || !mutation?.msg) return
+    toast(mutation.msg, {type: mutation?.msgType})
+    if(mutation?.msgType == "success"){
       setCategoriaForm(categoriaFormInit)
     }
-    if(mutated.content){
-      setCatalogosCategoriasTree(mutated.content)
+    if(mutation.content){
+      setCatalogosCategoriasTree(mutation.content)
     }
-  }, [mutated])
+  }, [mutation])
     
 
   useEffect(()=>{
@@ -147,7 +147,7 @@ export default function Categorias() {
           <Card>
             <Card.Header>Categorías</Card.Header>
             <Card.Body className="position-relative">
-              {(isPendingMutate) && <LdsBar />}
+              {(isPendingMutation) && <LdsBar />}
               <Row>
                 <Col>
                   <div className="mb-2"><small>Arrastre los items para ordenar.</small></div>

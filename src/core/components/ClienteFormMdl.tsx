@@ -52,23 +52,23 @@ export default function ClienteFormMdl({onChooseCliente}: Props) {
 
   const {
     data: cliente,
-    isPending: isPendingGetCliente,
-    isError: isErrorGetCliente,
+    isPending: isPendingCliente,
+    isError: isErrorCliente,
     getCliente
   } = useMutationClientesQuery()
 
   const {
-    data: dataMutate,
-    isPending: isPendingMutate ,
+    data: mutation,
+    isPending: isPendingMutation,
     createCliente, 
     updateCliente, 
   } = useMutationClientesQuery()
 
   const {
-    data: dataConsultarNroDocumento,
-    isPending: isPendingConsultarNroDocumento ,
+    data: nroDocumento,
+    isPending: isPendingNroDocumento,
     consultarNroDocumento,
-    reset: resetDataConsultarNroDocumento
+    reset: resetNroDocumento
   } = useMutationClientesQuery()
 
   const onChooseUbigeo = (ubigeo: Ubigeo) => {
@@ -117,7 +117,7 @@ export default function ClienteFormMdl({onChooseCliente}: Props) {
 
   const resetForm = () => {
     reset(clienteForm_init)
-    resetDataConsultarNroDocumento(null)
+    resetNroDocumento(null)
     setLugar("")
   }
 
@@ -136,9 +136,9 @@ export default function ClienteFormMdl({onChooseCliente}: Props) {
   }, [showClienteFormMdl])
 
   useEffect(() => {
-    if(!dataConsultarNroDocumento) return
-    if(!dataConsultarNroDocumento.error){
-      const {tipoDocumento, nombre_razon_social} = dataConsultarNroDocumento.content
+    if(!nroDocumento) return
+    if(!nroDocumento.error){
+      const {tipoDocumento, nombre_razon_social} = nroDocumento.content
       setValue("nombre_razon_social", nombre_razon_social)
       setValue("api", 1)
       if(tipoDocumento == "1"){
@@ -146,7 +146,7 @@ export default function ClienteFormMdl({onChooseCliente}: Props) {
         setValue("direccion", "")
         setValue("ubigeo_inei", "",{shouldDirty: true})
       }else if(tipoDocumento == "6"){
-        const {ubigeo, departamento, provincia, distrito, direccion} = dataConsultarNroDocumento.content
+        const {ubigeo, departamento, provincia, distrito, direccion} = nroDocumento.content
         setLugar(`${departamento} - ${provincia} - ${distrito}`)
         setValue("direccion", direccion)
         setValue("ubigeo_inei", ubigeo,{shouldDirty: true})
@@ -157,9 +157,9 @@ export default function ClienteFormMdl({onChooseCliente}: Props) {
       setLugar("")
       setValue("direccion", "")
       setValue("ubigeo_inei", "",{shouldDirty: true})
-      toast(dataConsultarNroDocumento.msg, {type: dataConsultarNroDocumento.msgType})
+      toast(nroDocumento.msg, {type: nroDocumento.msgType})
     }
-  }, [dataConsultarNroDocumento])
+  }, [nroDocumento])
   
   useEffect(() => {
     if(!cliente) return
@@ -175,17 +175,17 @@ export default function ClienteFormMdl({onChooseCliente}: Props) {
   }, [cliente])
 
   useEffect(() => {
-    if(!isErrorGetCliente) return
+    if(!isErrorCliente) return
     toast.error("Error de conexion")
     setShowClienteFormMdl(false);
-  }, [isErrorGetCliente])
+  }, [isErrorCliente])
 
   useEffect(() => {
-    if(!dataMutate) return
-    if(!dataMutate.error) setShowClienteFormMdl(false);
-    onChooseCliente(dataMutate.content)
-    toast(dataMutate.msg, {type: dataMutate.msgType})
-  }, [dataMutate])
+    if(!mutation) return
+    if(!mutation.error) setShowClienteFormMdl(false);
+    onChooseCliente(mutation.content)
+    toast(mutation.msg, {type: mutation.msgType})
+  }, [mutation])
 
   return (
     <div>
@@ -195,15 +195,15 @@ export default function ClienteFormMdl({onChooseCliente}: Props) {
         </Modal.Header>
         <Modal.Body>
           <Form onSubmit={handleSubmit(submit)} id="form_cliente">
-            {isPendingMutate && <LdsBar />}
-            {isPendingConsultarNroDocumento && <LdsBar />}
+            {isPendingMutation && <LdsBar />}
+            {isPendingNroDocumento && <LdsBar />}
             <Row>
               <Form.Group as={Col} md={4} className="mb-3">
                 <Form.Label htmlFor="tipo_documento_cod">Tipo</Form.Label>
                 <Form.Select
                   id="tipo_documento_cod"
                   {...register('tipo_documento_cod',{valueAsNumber:true})}
-                  disabled={dataConsultarNroDocumento?.content.nombre_razon_social || currentClienteId 
+                  disabled={nroDocumento?.content.nombre_razon_social || currentClienteId 
                     ? true : false
                   }
                 >
@@ -215,9 +215,9 @@ export default function ClienteFormMdl({onChooseCliente}: Props) {
               <Form.Group as={Col} md={8} className="mb-3">
                 <Form.Label htmlFor="nro_documento" className="d-flex justify-content-between">
                   <div>Nro Doc</div>
-                  { dataConsultarNroDocumento?.content &&
-                    <Badge bg={dataConsultarNroDocumento?.content.estado == "ACTIVO" ? "success" : "warning"}>
-                      {dataConsultarNroDocumento?.content.estado}
+                  { nroDocumento?.content &&
+                    <Badge bg={nroDocumento?.content.estado == "ACTIVO" ? "success" : "warning"}>
+                      {nroDocumento?.content.estado}
                     </Badge>
                   }
                 </Form.Label>
@@ -227,7 +227,7 @@ export default function ClienteFormMdl({onChooseCliente}: Props) {
                     {...register('nro_documento',{
                       maxLength: {value: 13, message:"Se permite máximo 13 caracteres"}
                     })}
-                    disabled={dataConsultarNroDocumento?.content.nombre_razon_social || currentClienteId 
+                    disabled={nroDocumento?.content.nombre_razon_social || currentClienteId 
                       ? true : false
                     }
                   />
@@ -247,7 +247,7 @@ export default function ClienteFormMdl({onChooseCliente}: Props) {
                     minLength: {value: 3, message:"Se permite mínimo 3 caracteres"},
                     maxLength: {value: 150, message:"Se permite máximo 150 caracteres"}
                   })}
-                  disabled={dataConsultarNroDocumento?.content.nombre_razon_social ? true : false}
+                  disabled={nroDocumento?.content.nombre_razon_social ? true : false}
                 />
                 {errors.nombre_razon_social && 
                   <div className="invalid-feedback d-block">{errors.nombre_razon_social.message}</div>
@@ -256,9 +256,9 @@ export default function ClienteFormMdl({onChooseCliente}: Props) {
               <Form.Group as={Col} md={12} className="mb-3">
                 <Form.Label htmlFor="direccion" className="d-flex justify-content-between">
                   <div>Dirección</div>
-                  { dataConsultarNroDocumento?.content &&
-                    <Badge bg={dataConsultarNroDocumento?.content.condicion == "HABIDO" ? "success" : "warning"}>
-                      {dataConsultarNroDocumento?.content.condicion}
+                  { nroDocumento?.content &&
+                    <Badge bg={nroDocumento?.content.condicion == "HABIDO" ? "success" : "warning"}>
+                      {nroDocumento?.content.condicion}
                     </Badge>
                   }
                 </Form.Label>
@@ -268,7 +268,7 @@ export default function ClienteFormMdl({onChooseCliente}: Props) {
                     minLength: {value: 3, message:"Se permite mínimo 3 caracteres"},
                     maxLength: {value: 150, message:"Se permite máximo 150 caracteres"},
                   })}
-                  disabled={dataConsultarNroDocumento?.content.direccion ? true : false}
+                  disabled={nroDocumento?.content.direccion ? true : false}
                 />
                 {errors.direccion && 
                   <div className="invalid-feedback d-block">{errors.direccion.message}</div>
@@ -281,14 +281,14 @@ export default function ClienteFormMdl({onChooseCliente}: Props) {
                     id="lugar"
                     title={lugar}
                     value={lugar}
-                    disabled={dataConsultarNroDocumento?.content.ubigeo ? true : false}
+                    disabled={nroDocumento?.content.ubigeo ? true : false}
                     readOnly
                   />
                   <Button 
                     onClick={clearUbigeo}
                     variant="outline-secondary" 
                     title="Eliminar ubigeo"
-                    disabled={dataConsultarNroDocumento?.content.ubigeo ? true : false}
+                    disabled={nroDocumento?.content.ubigeo ? true : false}
                     >
                     <FaTrash />
                   </Button>
@@ -296,7 +296,7 @@ export default function ClienteFormMdl({onChooseCliente}: Props) {
                     onClick={() => setShowUbigeos(true)} 
                     variant="outline-secondary" 
                     title="Seleccionar ubigeo"
-                    disabled={dataConsultarNroDocumento?.content.ubigeo ? true : false}
+                    disabled={nroDocumento?.content.ubigeo ? true : false}
                   >
                     <FaEdit />
                   </Button>
@@ -344,9 +344,9 @@ export default function ClienteFormMdl({onChooseCliente}: Props) {
               <Button 
                 variant="primary" 
                 type="submit"
-                disabled={isPendingMutate ? true : isDirty ? false : true}
+                disabled={isPendingMutation ? true : isDirty ? false : true}
               >
-                {isPendingMutate &&
+                {isPendingMutation &&
                   <Spinner
                     as="span"
                     animation="border"
@@ -360,7 +360,7 @@ export default function ClienteFormMdl({onChooseCliente}: Props) {
             </div>
           </Form>
         </Modal.Body>
-        {isPendingGetCliente && <LdsEllipsisCenter/>}
+        {isPendingCliente && <LdsEllipsisCenter/>}
       </Modal>
       <UbigeosMdl
         show={showUbigeos} 

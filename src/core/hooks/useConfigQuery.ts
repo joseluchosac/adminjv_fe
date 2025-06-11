@@ -189,17 +189,17 @@ export const useMutationConfigQuery = () => {
     mutate(params) 
   }
 
-  const getEstablecimientos = () => {
-    const params = {
-      url: apiURL + "config/get_establecimientos",
-      method: "POST",
-      headers:{ 
-        Authorization,
-        'nombre-modulo': nombreModulo,
-      },
-    }
-    mutate(params) 
-  }
+  // const getEstablecimientos = () => {
+  //   const params = {
+  //     url: apiURL + "config/get_establecimientos",
+  //     method: "POST",
+  //     headers:{ 
+  //       Authorization,
+  //       'nombre-modulo': nombreModulo,
+  //     },
+  //   }
+  //   mutate(params) 
+  // }
   
   const getEstablecimiento = (id: number) => {
     const params = {
@@ -309,13 +309,13 @@ export const useMutationConfigQuery = () => {
     updateUsuarioSolSec,
     getEmailConfig,
     updateEmailConfig,
-    getEstablecimientos,
-    getEstablecimiento,
-    createEstablecimiento,
-    updateEstablecimiento,
-    updateEstadoEstablecimiento,
-    deleteEstablecimiento,
-    getSeriesEstablecimiento,
+    // getEstablecimientos,
+    // getEstablecimiento,
+    // createEstablecimiento,
+    // updateEstablecimiento,
+    // updateEstadoEstablecimiento,
+    // deleteEstablecimiento,
+    // getSeriesEstablecimiento,
     typeAction: typeActionRef.current,
     reset,
   }

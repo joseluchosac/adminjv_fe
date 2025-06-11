@@ -2,36 +2,36 @@ import { useEffect, useState } from "react";
 import { Badge, Button, Col, Container, Form, InputGroup, Row, Stack } from "react-bootstrap";
 import { BsSearch } from "react-icons/bs";
 import { useDebounce } from "react-use";
-import { LdsBar } from "../../core/components/Loaders";
-import { useFilterMarcasQuery } from "../../core/hooks/useMarcasQuery";
-import useMarcasStore from "../../core/store/useMarcasStore";
-import DynaIcon from "../../core/components/DynaComponents";
-import { useMarcas } from "./context/MarcasContext";
-import { filterParamsInit } from "../../core/utils/constants";
+import useSucursalesStore from "../../../core/store/useSucursalesStore";
+import { useSucursales } from "./context/SucursalesContext";
+import { useFilterSucursalesQuery } from "../../../core/hooks/useSucursalesQuery";
+import { filterParamsInit } from "../../../core/utils/constants";
+import { LdsBar } from "../../../core/components/Loaders";
+import DynaIcon from "../../../core/components/DynaComponents";
 
-export default function MarcasHead() {
+export default function SucursalesHead() {
   const [inputSearch, setInputSearch] = useState("")
-  const filterParamsMarcas = useMarcasStore(state => state.filterParamsMarcas)
-  const setFilterParamsMarcas = useMarcasStore(state => state.setFilterParamsMarcas)
-  const {setShowMarcaForm, setCurrentMarcaId, filterMarcasCurrent} = useMarcas()
-  const {isFetching} = useFilterMarcasQuery();
+  const filterParamsSucursales = useSucursalesStore(state => state.filterParamsSucursales)
+  const setFilterParamsSucursales = useSucursalesStore(state => state.setFilterParamsSucursales)
+  const {setShowSucursalForm, setCurrentSucursalId, filterSucursalesCurrent} = useSucursales()
+  const {isFetching} = useFilterSucursalesQuery();
 
   useDebounce(() => { 
-    if (inputSearch.toLowerCase().trim() == filterParamsMarcas.search.toLowerCase().trim()) return
-    setFilterParamsMarcas({ ...filterParamsMarcas, search: inputSearch.trim() });
+    if (inputSearch.toLowerCase().trim() == filterParamsSucursales.search.toLowerCase().trim()) return
+    setFilterParamsSucursales({ ...filterParamsSucursales, search: inputSearch.trim() });
   }, 500, [inputSearch]);
 
   const handleUnsort = () => {
-    setFilterParamsMarcas({...filterParamsMarcas, orders: filterParamsInit.orders})
+    setFilterParamsSucursales({...filterParamsSucursales, orders: filterParamsInit.orders})
   };
 
   const handleNuevo = () => {
-    setCurrentMarcaId(0)
-    setShowMarcaForm(true);
+    setCurrentSucursalId(0)
+    setShowSucursalForm(true);
   };
 
   useEffect(()=>{
-    setInputSearch(filterParamsMarcas.search)
+    setInputSearch(filterParamsSucursales.search)
   }, [])
 
   return (
@@ -39,7 +39,7 @@ export default function MarcasHead() {
       {isFetching && <LdsBar />}
       <Row className="align-items-center mb-2">
         <Col sm className="text-center text-sm-start">
-          <h5>Lista de Marcas</h5>
+          <h5>Lista de Sucursales</h5>
         </Col>
         <Col sm className="text-center text-sm-start mb-3 mb-sm-0">
           <InputGroup>
@@ -68,13 +68,13 @@ export default function MarcasHead() {
             <Stack
               direction="horizontal"
               gap={2}
-              className={`${filterMarcasCurrent.orders.length ? "" : "d-none"}`}
+              className={`${filterSucursalesCurrent.orders.length ? "" : "d-none"}`}
             >
               <Badge bg="secondary" role="button" onClick={handleUnsort} className="d-flex gap-1">
                 <DynaIcon name="FaCircleXmark"  className="pr-4" />
                   ORDEN:
                   <div className="text-wrap">
-                    {filterMarcasCurrent.orders.map((el) => el.field_label).join(", ")}
+                    {filterSucursalesCurrent.orders.map((el) => el.field_label).join(", ")}
                   </div>
               </Badge>
             </Stack>

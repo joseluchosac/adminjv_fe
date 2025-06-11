@@ -35,7 +35,7 @@ export default function CategoriaOpc({setValue, getValues, producto}:Props) {
   }
   
   const {
-    data: mutated,
+    data: mutation,
     createCategoria
   } = useMutateCategoriasQuery()
   
@@ -72,10 +72,10 @@ export default function CategoriaOpc({setValue, getValues, producto}:Props) {
   },[categoriasOpc])
 
   useEffect(()=>{
-    if(!mutated) return
-    setCatalogosCategoriasTree(mutated.content)
+    if(!mutation) return
+    setCatalogosCategoriasTree(mutation.content)
     setNCategoria(nCategoriaInit)
-  }, [mutated])
+  }, [mutation])
 
   return (
     <Card className="mb-4">

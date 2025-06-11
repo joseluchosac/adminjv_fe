@@ -3,8 +3,10 @@ import { useMutation, useQueryClient } from "@tanstack/react-query"
 import useSessionStore from "../store/useSessionStore"
 import { Modulo } from "../types"
 import { mutationFetch } from "../services/mutationFecth";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+
+type TypeAction = "mutate_modulo" | "mutate_modulos"
 
 // ****** MUTATION ******
 export const useMutateModulosQuery = () => {
@@ -14,6 +16,7 @@ export const useMutateModulosQuery = () => {
   const nombreModulo = useSessionStore(state => state.moduloActual?.nombre)
   const Authorization = "Bearer " + tknSession
   const queryClient = useQueryClient()
+  const typeActionRef = useRef<TypeAction | "">("")
 
   const {mutate, isPending, data} = useMutation({
     mutationFn: mutationFetch,
@@ -73,6 +76,7 @@ export const useMutateModulosQuery = () => {
   }
 
   const updateModulo = (modulo: Modulo) => {
+    typeActionRef.current = "mutate_modulo"
     const params = {
       url: apiURL + "modulos/update_modulo",
       method: "PUT",
@@ -86,6 +90,7 @@ export const useMutateModulosQuery = () => {
   }
 
   const createModulo = (param:  Modulo) => {
+    typeActionRef.current = "mutate_modulo"
     const params = {
       url: apiURL + "modulos/create_modulo",
       method: "POST",
@@ -99,6 +104,7 @@ export const useMutateModulosQuery = () => {
   }
 
   const deleteModulo = (id: number) => {
+    typeActionRef.current = "mutate_modulo"
     const params = {
       url: apiURL + "modulos/delete_modulo",
       method: "DELETE",
