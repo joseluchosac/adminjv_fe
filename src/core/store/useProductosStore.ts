@@ -23,7 +23,6 @@ const productosStoreInit = {
     {show: false, orderable: true, order_dir:"", field_name: "categoria_ids", field_label:"Catgoria ids",},
     {show: true, orderable: true, order_dir:"", field_name: "barcode", field_label:"Cód. barras",},
     {show: true, orderable: false, order_dir:"", field_name: "precio_venta", field_label:"Precio",},
-    {show: true, orderable: true, order_dir:"", field_name: "stock", field_label:"Stock",},
     {show: true, orderable: false, order_dir:"", field_name: "unidad_medida_cod", field_label:"Un",},
     {show: false, orderable: false, order_dir:"", field_name: "estado", field_label:"Estado",},
     {show: true, orderable: true, order_dir:"", field_name: "created_at", field_label:"F creacion",},

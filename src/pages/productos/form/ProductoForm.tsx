@@ -88,8 +88,8 @@ export default function Productoform(){
   } = useMutationProductosQuery()
   
   const submit = (data: Producto) => {
-    console.log(data)
-    return
+    // console.log(data)
+    // return
     Swal.fire({
       icon: 'question',
       text: data.id

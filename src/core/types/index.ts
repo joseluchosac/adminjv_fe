@@ -7,9 +7,13 @@ export type ResponseQuery = {
   msg?: string;
   msgType?: "default" | "error" | "info" | "success" | "warning";
 }
-export interface DataGetProducto extends ResponseQuery {
-  content: Producto | null;
+
+export type ThisTerm = {
+  nombre: string;
+  descripcion: string;
+  establecimiento_id: number
 }
+
 // ✅ TIPOS PARA EL CAMPO DE UNA TABLA
 export type CampoTable = {
   field_name: string;
@@ -171,6 +175,10 @@ export interface Producto {
   updated_at: string;
 }
 
+export interface DataGetProducto extends ResponseQuery {
+  content: Producto | null;
+}
+
 // ✅ TIPOS PARA TABLA LABORATORIOS
 export interface Laboratorio {
   id: number;
@@ -227,4 +235,45 @@ export interface Ubigeo {
   ubigeo_inei: string;
   ubigeo_reniec: string;
   dis_prov_dep: string;
+}
+
+// ✅ TIPOS PARA MOVIMIENTO
+export type Movimiento = {
+  id: number;
+  establecimiento_id: number;
+  fecha: string;
+  serie: string;
+  correlativo: string;
+  tipo: string;
+  concepto: string;
+  observacion: string;
+  user_id: number;
+  estado: number;
+  created_at: string;
+  updated_at: string;
+}
+export type Movimientoform = {
+  establecimiento_id: number;
+  tipo: string;
+  concepto: string;
+  observacion: string;
+  detalle: MovimientoFormDetalle[];
+}
+
+export type MovimientoFormDetalle = {
+  tmp_id: number;
+  codigo: string;
+  movimiento_id: number;
+  producto_id: number;
+  producto_descripcion: string;
+  marca: string;
+  laboratorio: string;
+  precio_costo: number;
+  stock: number;
+  cantidad: number;
+  observacion: string;
+}
+
+export interface DataGetMovimiento extends ResponseQuery {
+  content: Movimiento | null;
 }

@@ -181,6 +181,11 @@ export function objToUriBase64(par:any){
   const param = JSON.stringify(par)
   return btoa(encodeURIComponent(param))
 }
+// ✅ RETORNA UNA CADENA BASE64 A OBJETO
+export function uriBase64ToObj(par: string){
+  const param = atob(par)
+  return JSON.parse(decodeURIComponent(param))
+}
 
 // ✅ FUNCION ASINCRONA RECIBE PARAMETRO DE RESTRASO
 export async function delay(ms: number){
@@ -200,4 +205,17 @@ export function generarSlug(texto: string) {
   texto = texto.replace(/-+/g, '-');  // Eliminar guiones duplicados
   texto = texto.replace(/^-+|-+$/g, '');  // Eliminar guiones al principio y al final
   return texto;
+}
+
+// ✅ FUNCION QUE GENERA UNA CADENA ALFANUMERICA ALEATORIA
+// Ejemplo de uso:
+// const cadena = generarCadenaAlfanumerica(10);
+// console.log(cadena);
+export function cadena(longitud: number): string {
+  const caracteres = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let resultado = '';
+  for (let i = 0; i < longitud; i++) {
+    resultado += caracteres.charAt(Math.floor(Math.random() * caracteres.length));
+  }
+  return resultado;
 }

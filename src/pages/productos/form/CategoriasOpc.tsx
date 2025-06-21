@@ -93,7 +93,7 @@ export default function CategoriaOpc({setValue, getValues, producto}:Props) {
                     role="button"
                     onClick={()=>seleccionarOpcion(el.id)}
                   >
-                    <div className="d-flex align-items-center gap-1">
+                    <div className="d-flex align-items-center gap-1 text-nowrap">
                       {el.checked
                         ? <FaCheckSquare className="text-primary flex-shrink-0" />
                         : <FaRegSquare className="text-secondary flex-shrink-0" />

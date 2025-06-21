@@ -22,29 +22,6 @@ export const useMutateCategoriasQuery = () => {
     }
   })
 
-  // const getCategorias = () => {
-  //   const params = {
-  //     url: apiURL + "categorias/get_categorias",
-  //     method: "POST",
-  //     headers:{ 
-  //       Authorization,
-  //       'nombre-modulo': nombreModulo,
-  //     },
-  //   }
-  //   mutate(params)
-  // }
-  // const getCategoriasTree = () => {
-  //   const params = {
-  //     url: apiURL + "categorias/get_categorias_tree",
-  //     method: "POST",
-  //     headers:{ 
-  //       Authorization,
-  //       'nombre-modulo': nombreModulo,
-  //     },
-  //   }
-  //   mutate(params)
-  // }
-
   const sortCategorias = (orderedItems: Categoria[]) => {
     const params = {
       url: apiURL + "categorias/sort_categorias",

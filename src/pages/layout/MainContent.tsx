@@ -8,7 +8,6 @@ import { useGetCatalogosQuery } from "../../core/hooks/useCatalogosQuery";
 const MainContent: React.FC = () => {
   const darkMode = useLayoutStore(state => state.layout.darkMode)
   useGetCatalogosQuery()
-
   return (
     <>
       <MainHeader />

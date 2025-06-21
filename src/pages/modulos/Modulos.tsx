@@ -138,7 +138,7 @@ const Modulos:React.FC = () => {
 
 
   return (
-    <Container>
+    <Container style={{maxWidth: "991.98px"}}>
       <Row>
         <Col className="mb-3">
           <Card>

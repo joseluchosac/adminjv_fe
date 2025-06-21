@@ -2,6 +2,7 @@ import { FilterParams } from "../types";
 
 //--> CLAVES PARA LOCAL STORAGE
 export const ls_layoutKey = "ls_layout"
+
 export const selectDark = {
   control: (styles: any) => ({
     ...styles,
@@ -45,6 +46,7 @@ export const selectDark = {
 }
 
 export const lsTknSessionKey = "lsTknSession"
+export const lsThisT = "lsThisT"
 
 
 export const registerFormInit = {

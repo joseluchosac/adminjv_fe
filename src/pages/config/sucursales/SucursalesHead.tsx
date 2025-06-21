@@ -35,7 +35,7 @@ export default function SucursalesHead() {
   }, [])
 
   return (
-    <Container className="mb-2 pt-2 position-relative" style={{maxWidth: "767.98px"}}>
+    <Container className="mb-2 pt-2 position-relative">
       {isFetching && <LdsBar />}
       <Row className="align-items-center mb-2">
         <Col sm className="text-center text-sm-start">

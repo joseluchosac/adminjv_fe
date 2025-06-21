@@ -97,7 +97,7 @@ const MainSidebar:React.FC = () => {
         <div className="brand">
           <a onClick={handleSidebarMini} href="#" className="nav-link">
             <img src={empresaSession?.urlLogo} alt="Logo empresa" className="" />
-            <span>{empresaSession?.nombre_comercial}</span>
+            <span className='text-wrap'>{empresaSession?.nombre_comercial}</span>
           </a>
         </div>
         <nav className='nav-sidebar' ref={navSidebarRef} style={{position:"relative"}}>

@@ -115,6 +115,19 @@ export const useMutationProductosQuery = () => {
     mutate(params)
   }
 
+  const getProductoByCode = (codigo: string, establecimiento_id: number) => {
+    const params = {
+      url: apiURL + "productos/get_producto_by_code",
+      method: "POST",
+      headers:{ 
+        Authorization,
+        'nombre-modulo': nombreModulo,
+      },
+      body: JSON.stringify({codigo, establecimiento_id}),
+    }
+    mutate(params)
+  }
+
   const createProducto = (producto: Producto) => {
     typeActionRef.current = "mutate_producto"
     const params = {
@@ -189,6 +202,7 @@ export const useMutationProductosQuery = () => {
     isError,
     filterProductoFull,
     getProducto,
+    getProductoByCode,
     createProducto,
     updateProducto,
     updateEstado,

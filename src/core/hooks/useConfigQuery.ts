@@ -4,7 +4,7 @@ import useSessionStore from "../store/useSessionStore"
 import { mutationFetch } from "../services/mutationFecth";
 import { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { Establecimiento } from "../types/catalogosTypes";
+import { ThisTerm } from "../types";
 
 type TypeAction = 
   "mutate_empresa"
@@ -14,12 +14,13 @@ type TypeAction =
   | "mutate_usuario_sol_sec"
   | "mutate_email_config"
   | "mutate_establecimiento"
+  | "requery_terminal"
   
 // ****** MUTATION ******
 export const useMutationConfigQuery = () => {
   // const [typeAction, setTypeAction] = useState<TypeAction | "">("")
-  const resetSessionStore = useSessionStore(state => state.resetSessionStore)
   const navigate = useNavigate()
+  const resetSessionStore = useSessionStore(state => state.resetSessionStore)
   const tknSession = useSessionStore(state => state.tknSession)
   const nombreModulo = useSessionStore(state => state.moduloActual?.nombre)
   const Authorization = "Bearer " + tknSession
@@ -189,97 +190,17 @@ export const useMutationConfigQuery = () => {
     mutate(params) 
   }
 
-  // const getEstablecimientos = () => {
-  //   const params = {
-  //     url: apiURL + "config/get_establecimientos",
-  //     method: "POST",
-  //     headers:{ 
-  //       Authorization,
-  //       'nombre-modulo': nombreModulo,
-  //     },
-  //   }
-  //   mutate(params) 
-  // }
-  
-  const getEstablecimiento = (id: number) => {
+  const registerTerminal = (terminal: ThisTerm) => {
     const params = {
-      url: apiURL + "config/get_establecimiento",
+      url: apiURL + "config/register_terminal",
       method: "POST",
       headers:{ 
         Authorization,
         'nombre-modulo': nombreModulo,
       },
-      body: JSON.stringify({id})
+      body: JSON.stringify(terminal),
     }
-    mutate(params) 
-  }
-
-  const createEstablecimiento = (establecimiento: Establecimiento) => {
-    typeActionRef.current = "mutate_establecimiento"
-    const params = {
-      url: apiURL + "config/create_establecimiento",
-      method: "POST",
-      headers:{ 
-        Authorization,
-        'nombre-modulo': nombreModulo,
-      },
-      body: JSON.stringify(establecimiento)
-    }
-    mutate(params) 
-  }
-
-  const updateEstablecimiento = (establecimiento: Establecimiento) => {
-    typeActionRef.current = "mutate_establecimiento"
-    const params = {
-      url: apiURL + "config/update_establecimiento",
-      method: "PUT",
-      headers:{ 
-        Authorization,
-        'nombre-modulo': nombreModulo,
-      },
-      body: JSON.stringify(establecimiento)
-    }
-    mutate(params) 
-  }
-  const updateEstadoEstablecimiento = (estado: {id:number; estado:number}) => {
-    typeActionRef.current = "mutate_establecimiento"
-    const params = {
-      url: apiURL + "config/update_estado_establecimiento",
-      method: "PUT",
-      headers:{ 
-        Authorization,
-        'nombre-modulo': nombreModulo,
-      },
-      body: JSON.stringify(estado)
-    }
-    mutate(params) 
-  }
-
-  const deleteEstablecimiento = (id: number) => {
-    typeActionRef.current = "mutate_establecimiento"
-    const params = {
-      url: apiURL + "config/delete_establecimiento",
-      method: "DELETE",
-      headers:{ 
-        Authorization,
-        'nombre-modulo': nombreModulo,
-      },
-      body: JSON.stringify({id})
-    }
-    mutate(params) 
-  }
-
-  const getSeriesEstablecimiento = (establecimiento_id: number) => {
-    const params = {
-      url: apiURL + "config/get_series_establecimiento",
-      method: "POST",
-      headers:{ 
-        Authorization,
-        'nombre-modulo': nombreModulo,
-      },
-      body: JSON.stringify({establecimiento_id})
-    }
-    mutate(params) 
+    mutate(params)
   }
 
   const reset = (newValues: any) => {
@@ -309,13 +230,7 @@ export const useMutationConfigQuery = () => {
     updateUsuarioSolSec,
     getEmailConfig,
     updateEmailConfig,
-    // getEstablecimientos,
-    // getEstablecimiento,
-    // createEstablecimiento,
-    // updateEstablecimiento,
-    // updateEstadoEstablecimiento,
-    // deleteEstablecimiento,
-    // getSeriesEstablecimiento,
+    registerTerminal,
     typeAction: typeActionRef.current,
     reset,
   }

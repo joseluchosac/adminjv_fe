@@ -125,7 +125,7 @@ export default function MarcaForm() {
                 <Form.Control
                   id="nombre"
                   {...register('nombre', {
-                    required:"El marca es requerido",
+                    required:"Ingrese la marca",
                     minLength: {value: 3, message:"Se permite mínimo 3 caracteres"},
                     maxLength: {value: 150, message:"Se permite máximo 150 caracteres"}
                   })}

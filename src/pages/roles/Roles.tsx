@@ -164,7 +164,7 @@ const Roles: React.FC = () => {
 
 
   return (
-    <Container>
+    <Container style={{maxWidth: "991.98px"}}>
       <Row>
         <Col>
           <Card>

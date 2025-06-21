@@ -8,10 +8,11 @@ export interface Catalogos {
   tipos_documento: TipoDocumento[];
   tipos_moneda: TipoMoneda[];
   tipos_movimiento_caja: TipoMovimientoCaja[];
-  tipos_movimiento_producto: TipoMovimientoProducto[];
+  tipos_movimiento: TipoMovimiento[];
   tipos_operacion: TipoOperacion[];
   unidades_medida: UnidadMedida[];
   departamentos: Departamento[];
+  establecimientos: Establecimiento[];
   categorias_tree: Categoria[];
 }
 export type Caja = {
@@ -76,13 +77,12 @@ export type TipoMovimientoCaja = {
   descripcion: string;
   estado: number
 }
-export type TipoMovimientoProducto = {
+
+export type TipoMovimiento = {
   id: number;
-  codigo: string;
   tipo: string;
-  tipo_operacion_cod: string;
-  descripcion: string;
-  documento: string;
+  concepto: string;
+  origen: string;
   estado: number
 }
 export type TipoOperacion = {
@@ -90,7 +90,6 @@ export type TipoOperacion = {
   descripcion: string;
   estado: number
 }
-
 export type UnidadMedida = {
   codigo: string;
   descripcion: string;
@@ -113,7 +112,6 @@ export type Distrito = {
   distrito: string;
   ubigeo_inei: string;
 }
-
 export type Establecimiento = {
   id: number;
   tipo: string;
@@ -129,14 +127,14 @@ export type Establecimiento = {
 
 export type Sucursal = Omit<Establecimiento, "tipo">
 
-export type SerieEstablecimiento = {
+export type SerieSucursal = {
   id: number;
-  establecimiento_id: string;
+  tipo_comprobante_cod: string;
+  establecimiento_id: number;
   descripcion: string;
   serie: string;
-  serie_prefix: string;
-  serie_suffix: string;
   correlativo: string;
+  modifica_a: string;
   estado: number;
 }
 export type Categoria = {

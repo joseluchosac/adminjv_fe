@@ -4,7 +4,8 @@ import ApisConsulta from "./ApisConsulta";
 import SunatCpe from "./SunatCpe";
 import Emails from "./emails/Emails";
 import Empresa from "./empresa/Empresa";
-import Sucursales from "./sucursales/sucursales";
+import Sucursales from "./sucursales/Sucursales";
+import Terminales from "./Terminales";
 
 export default function Config() {
   const [tabKey, setTabKey] = useState('empresa');
@@ -31,6 +32,9 @@ export default function Config() {
         </Tab>
         <Tab eventKey="apis_consulta" title="Apis consulta">
           {tabKey === "apis_consulta" && <ApisConsulta />}
+        </Tab>
+        <Tab eventKey="terminal" title="Terminal">
+          {tabKey === "terminal" && <Terminales />}
         </Tab>
       </Tabs>
     </div>

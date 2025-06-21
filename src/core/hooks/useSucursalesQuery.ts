@@ -88,7 +88,7 @@ export const useMutationSucursalesQuery = () => {
   const filterSucursalesFull = () => {// Sin Paginacion
     typeActionRef.current = "filter_full"
     const params = {
-      url: apiURL + "sucursales/filter_sucursales_full",
+      url: apiURL + "establecimientos/filter_sucursales_full",
       method: "POST",
       headers:{ 
         Authorization,
@@ -101,7 +101,7 @@ export const useMutationSucursalesQuery = () => {
 
   const getSucursal = (id: number) => {
     const params = {
-      url: apiURL + "sucursales/get_sucursal",
+      url: apiURL + "establecimientos/get_sucursal",
       method: "POST",
       headers:{ 
         Authorization,
@@ -115,7 +115,7 @@ export const useMutationSucursalesQuery = () => {
   const createSucursal = (sucursal: Sucursal) => {
     typeActionRef.current = "mutate_sucursal"
     const params = {
-      url: apiURL + "sucursales/create_sucursal",
+      url: apiURL + "establecimientos/create_sucursal",
       method: "POST",
       headers:{ 
         Authorization,
@@ -129,7 +129,7 @@ export const useMutationSucursalesQuery = () => {
   const updateSucursal = (sucursal: Sucursal) => {
     typeActionRef.current = "mutate_sucursal"
     const params = {
-      url: apiURL + "sucursales/update_sucursal",
+      url: apiURL + "establecimientos/update_sucursal",
       method: "PUT",
       headers:{ 
         Authorization,
@@ -143,7 +143,7 @@ export const useMutationSucursalesQuery = () => {
   const deleteSucursal = (id: number) => {
     typeActionRef.current = "mutate_sucursal"
     const params = {
-      url: apiURL + "sucursales/delete_sucursal",
+      url: apiURL + "establecimientos/delete_sucursal",
       method: "DELETE",
       headers:{ 
         Authorization,
@@ -169,7 +169,6 @@ export const useMutationSucursalesQuery = () => {
     data, 
     isPending, 
     isError,
-    filterSucursalesFull,
     getSucursal,
     createSucursal,
     updateSucursal,
