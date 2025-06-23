@@ -3,14 +3,13 @@ import { useEffect, useRef } from "react"
 import { useNavigate } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query"
 import useSessionStore from "../store/useSessionStore"
-// import useSucursalesStore from "../store/useSucursalesStore";
 import { mutationFetch } from "../services/mutationFecth"
-import { SerieSucursal } from "../types/catalogosTypes";
+import { Numeracion } from "../types/catalogosTypes";
 
-type TypeAction = "filter_full" | "mutate_serie_sucursal" | "delete_serie_sucursal"
+type TypeAction = "filter_full" | "mutate_numeracion" | "delete_numeracion"
 
 // ****** MUTATION ******
-export const useMutationSeriesQuery = () => {
+export const useMutationNumeracionesQuery = () => {
   const resetSessionStore = useSessionStore(state => state.resetSessionStore)
   const navigate = useNavigate()
   const tknSession = useSessionStore(state => state.tknSession)
@@ -23,26 +22,26 @@ export const useMutationSeriesQuery = () => {
     mutationFn: mutationFetch,
     onSuccess: (resp) => {
       if(resp.msgType !== 'success') return
-      // queryClient.invalidateQueries({queryKey:["sucursales"]}) // Recarga la tabla sucursales
+      // queryClient.invalidateQueries({queryKey:["establecimientos"]}) // Recarga la tabla establecimientos
     }
   })
 
-  const getSeriesSucursal = (establecimiento_id: number) => {
-    const params = {
-      url: apiURL + "series/get_series_establecimiento",
-      method: "POST",
-      headers:{ 
-        Authorization,
-        'nombre-modulo': nombreModulo,
-      },
-      body: JSON.stringify({establecimiento_id}),
-    }
-    mutate(params)
-  }
+  // const getNumeracionesEstablecimiento = (establecimiento_id: number) => {
+  //   const params = {
+  //     url: apiURL + "numeraciones/get_numeraciones_establecimiento",
+  //     method: "POST",
+  //     headers:{ 
+  //       Authorization,
+  //       'nombre-modulo': nombreModulo,
+  //     },
+  //     body: JSON.stringify({establecimiento_id}),
+  //   }
+  //   mutate(params)
+  // }
 
-  const getSerieSucursal = (id: number) => {
+  const getNumeracion = (id: number) => {
     const params = {
-      url: apiURL + "series/get_serie_establecimiento",
+      url: apiURL + "numeraciones/get_numeracion",
       method: "POST",
       headers:{ 
         Authorization,
@@ -53,37 +52,37 @@ export const useMutationSeriesQuery = () => {
     mutate(params)
   }
 
-  const createSerieSucursal = (serieSucursal: SerieSucursal) => {
-    typeActionRef.current = "mutate_serie_sucursal"
+  const createNumeracion = (numeracion: Numeracion) => {
+    typeActionRef.current = "mutate_numeracion"
     const params = {
-      url: apiURL + "series/create_serie_establecimiento",
+      url: apiURL + "numeraciones/create_numeracion",
       method: "POST",
       headers:{ 
         Authorization,
         'nombre-modulo': nombreModulo,
       },
-      body: JSON.stringify(serieSucursal),
+      body: JSON.stringify(numeracion),
     }
     mutate(params)
   }
 
-  const updateSerieSucursal = (serieSucursal: SerieSucursal) => {
-    typeActionRef.current = "mutate_serie_sucursal"
+  const updateNumeracion = (numeracion: Numeracion) => {
+    typeActionRef.current = "mutate_numeracion"
     const params = {
-      url: apiURL + "series/update_serie_establecimiento",
+      url: apiURL + "numeraciones/update_numeracion",
       method: "PUT",
       headers:{ 
         Authorization,
         'nombre-modulo': nombreModulo,
       },
-      body: JSON.stringify(serieSucursal),
+      body: JSON.stringify(numeracion),
     }
     mutate(params)
   }
-  const deleteSerieSucursal = (id: number) => {
-    typeActionRef.current = "delete_serie_sucursal"
+  const deleteNumeracion = (id: number) => {
+    typeActionRef.current = "delete_numeracion"
     const params = {
-      url: apiURL + "series/delete_serie_establecimiento",
+      url: apiURL + "numeraciones/delete_numeracion",
       method: "DELETE",
       headers:{ 
         Authorization,
@@ -105,11 +104,11 @@ export const useMutationSeriesQuery = () => {
     data, 
     isPending, 
     isError,
-    getSeriesSucursal,
-    getSerieSucursal,
-    createSerieSucursal,
-    updateSerieSucursal,
-    deleteSerieSucursal,
+    // getNumeracionesEstablecimiento,
+    getNumeracion,
+    createNumeracion,
+    updateNumeracion,
+    deleteNumeracion,
     typeAction: typeActionRef.current,
   }
 }

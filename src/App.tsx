@@ -19,7 +19,7 @@ import Laboratorios from './pages/laboratorios/Laboratorios';
 import Profile from './pages/profile/Profile';
 import Marcas from './pages/marcas/Marcas';
 import ProductosPWrap from './pages/productos/ProductosPWrap';
-import Series from './pages/series/Series';
+import Numeraciones from './pages/numeraciones/Numeraciones';
 import Movimientos from './pages/movimientos/Movimientos';
 
 
@@ -54,7 +54,7 @@ function App() {
           <Route path="catalogos" element={<Catalogos />} />
           <Route path="modulos" element={<Modulos />} />
           <Route path="roles" element={<Roles />} />
-          <Route path="series" element={<Series />} />
+          <Route path="numeraciones" element={<Numeraciones />} />
           <Route path="config" element={<Config />} />
           <Route path="profile" element={<Profile />} />
         </Route>

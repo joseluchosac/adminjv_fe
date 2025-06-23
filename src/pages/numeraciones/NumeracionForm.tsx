@@ -1,16 +1,16 @@
 import { Button, Col, Form, Modal, Row, Spinner } from "react-bootstrap";
-import { useSeries } from "./context/SeriesContext";
+import { useNumeraciones } from "./context/NumeracionesContext";
 import { useForm } from "react-hook-form";
-import { SerieSucursal } from "../../core/types/catalogosTypes";
+import { Numeracion } from "../../core/types/catalogosTypes";
 import Swal from "sweetalert2";
 import useLayoutStore from "../../core/store/useLayoutStore";
 import { LdsBar, LdsEllipsisCenter } from "../../core/components/Loaders";
 import { useEffect } from "react";
-import { useMutationSeriesQuery } from "../../core/hooks/useSeriesQuery";
+import { useMutationNumeracionesQuery } from "../../core/hooks/useNumeracionesQuery";
 import { toast } from "react-toastify";
 import useCatalogosStore from "../../core/store/useCatalogosStore";
 
-const formInit: SerieSucursal = {
+const formInit: Numeracion = {
   id: 0,
   establecimiento_id: 0,
   tipo_comprobante_cod: "",
@@ -18,34 +18,35 @@ const formInit: SerieSucursal = {
   serie:"",
   correlativo:"",
   modifica_a:"",
+  serie_prefix:"",
   estado:1
 }
 
-export default function SerieSucursalForm() {
+export default function NumeracionForm() {
   const tipos_comprobante = useCatalogosStore(state => state.catalogos?.tipos_comprobante)
   const darkMode = useLayoutStore(state => state.layout.darkMode)
-  
+  const setNumeracion = useCatalogosStore(state => state.setNumeracion)
   const {
     showForm,
     setShowForm,
-    currentSerieSucursalId,
-    setCurrentSerieSucursalId,
-    currentSucursalId,
-    actualizarSerieSucursal,
-  } = useSeries()
+    currentNumeracionId,
+    setCurrentNumeracionId,
+    currentEstablecimientoId,
+    // actualizarNumeracionEstablecimiento,
+  } = useNumeraciones()
 
   const {
-    data: serieSucursal,
-    isPending: isPendingSerieSucursal,
-    getSerieSucursal
-  } = useMutationSeriesQuery()
+    data: numeracion,
+    isPending: isPendingNumeracion,
+    getNumeracion
+  } = useMutationNumeracionesQuery()
 
   const {
     data: mutation,
     isPending: isPendingMutation,
-    createSerieSucursal,
-    updateSerieSucursal,
-  } = useMutationSeriesQuery()
+    createNumeracion,
+    updateNumeracion,
+  } = useMutationNumeracionesQuery()
 
   const {
     register, 
@@ -53,25 +54,25 @@ export default function SerieSucursalForm() {
     handleSubmit, 
     reset,
     setValue
-  } = useForm<SerieSucursal>({defaultValues: formInit})
+  } = useForm<Numeracion>({defaultValues: formInit})
 
-  const submit = (serieSucursal: SerieSucursal) => {
+  const submit = (numeracionEstablecimiento: Numeracion) => {
     Swal.fire({
       icon: 'question',
-      text: serieSucursal.id
-        ? `¿Desea guardar los cambios de ${serieSucursal.descripcion}?`
-        : `¿Desea registrar a ${serieSucursal.descripcion}?`,
+      text: numeracionEstablecimiento.id
+        ? `¿Desea guardar los cambios de ${numeracionEstablecimiento.descripcion}?`
+        : `¿Desea registrar a ${numeracionEstablecimiento.descripcion}?`,
       showCancelButton: true,
       confirmButtonText: "Sí",
       cancelButtonText: 'Cancelar',
-      target: document.getElementById('serie_sucursal_form'),
+      target: document.getElementById('numeracion_establecimiento_form'),
       customClass: {popup: darkMode ? 'swal-dark' : ''}
     }).then((result) => {
       if (result.isConfirmed) {
-        if (serieSucursal.id){
-          updateSerieSucursal(serieSucursal)
+        if (numeracionEstablecimiento.id){
+          updateNumeracion(numeracionEstablecimiento)
         }else{
-          createSerieSucursal(serieSucursal)
+          createNumeracion(numeracionEstablecimiento)
         }
       }
     });
@@ -79,32 +80,32 @@ export default function SerieSucursalForm() {
 
   useEffect(() => {
     if(showForm){
-      if(currentSerieSucursalId) {
-        getSerieSucursal(currentSerieSucursalId)
+      if(currentNumeracionId) {
+        getNumeracion(currentNumeracionId)
       }else{
-        setValue('establecimiento_id',currentSucursalId)
+        setValue('establecimiento_id',currentEstablecimientoId)
       }
     }else{
       reset(formInit)
-      setCurrentSerieSucursalId(0)
+      setCurrentNumeracionId(0)
     }
   }, [showForm])
 
   useEffect(() => {
-    if(!serieSucursal) return
-    if(serieSucursal.error){
-      toast(serieSucursal.msg, {type: serieSucursal.msgType})
+    if(!numeracion) return
+    if(numeracion.error){
+      toast(numeracion.msg, {type: numeracion.msgType})
       setShowForm(false);
     }else{
-      if(serieSucursal.content) reset(serieSucursal?.content)
+      if(numeracion.content) reset(numeracion?.content)
     }
-  }, [serieSucursal])
+  }, [numeracion])
   
   useEffect(() => {
     if(!mutation) return
+    if(!mutation.error) setShowForm(false)
     if(mutation?.content){
-      actualizarSerieSucursal(mutation.content)
-      setShowForm(false);
+      setNumeracion(mutation.content)
     }
     toast(mutation.msg, {type: mutation.msgType})
   }, [mutation])
@@ -112,10 +113,10 @@ export default function SerieSucursalForm() {
   return (
     <Modal show={showForm} onHide={()=>setShowForm(false)} backdrop="static" size="md" >
       <Modal.Header closeButton className="py-2">
-        <Modal.Title>{currentSerieSucursalId ? "Editar serie" : "Agregar serie"}</Modal.Title>
+        <Modal.Title>{currentNumeracionId ? "Editar numeración" : "Agregar numeración"}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <Form onSubmit={handleSubmit(submit)} id="serie_sucursal_form">
+        <Form onSubmit={handleSubmit(submit)} id="numeracion_establecimiento_form">
           {(isPendingMutation) && <LdsBar />}
           <Row>
             <Form.Group as={Col} sm={6} className="mb-3">
@@ -220,7 +221,7 @@ export default function SerieSucursalForm() {
           </div>
         </Form>
       </Modal.Body>
-      {isPendingSerieSucursal  && <LdsEllipsisCenter/>}
+      {isPendingNumeracion  && <LdsEllipsisCenter/>}
     </Modal>
   )
 }

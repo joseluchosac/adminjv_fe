@@ -4,31 +4,33 @@ import { Button, Col, Form, Row, Spinner } from "react-bootstrap";
 import Swal from "sweetalert2";
 import { toast } from "react-toastify";
 import { Controller, useForm } from "react-hook-form";
-import { useSucursales } from "./context/SucursalesContext";
+import { useEstablecimientos } from "./context/EstablecimientosContext";
 import { ResponseQuery } from "../../../core/types";
-import { Sucursal } from "../../../core/types/catalogosTypes";
+import { Establecimiento } from "../../../core/types/catalogosTypes";
 import useLayoutStore from "../../../core/store/useLayoutStore";
-import { useMutationSucursalesQuery } from "../../../core/hooks/useSucursalesQuery";
+import { useMutationEstablecimientosQuery } from "../../../core/hooks/useEstablecimientosQuery";
 import { LdsBar, LdsEllipsisCenter } from "../../../core/components/Loaders";
 import SelectAsync from "react-select/async"
 import { debounce } from "../../../core/utils/funciones";
 import { filterParamsInit, selectDark } from "../../../core/utils/constants";
 import { filterUbigeosFetch } from "../../../core/services/ubigeosFetch";
 import useSessionStore from "../../../core/store/useSessionStore";
+import useCatalogosStore from "../../../core/store/useCatalogosStore";
 
-interface DataGetSucursal extends ResponseQuery {
-  content: Sucursal | null;
+interface DataGetEstablecimiento extends ResponseQuery {
+  content: Establecimiento | null;
 }
-type GetSucursalQuery = {
-  data: DataGetSucursal | null ;
+type GetEstablecimientoQuery = {
+  data: DataGetEstablecimiento | null ;
   isPending: boolean;
   isError: boolean;
-  getSucursal: (id: number) => void
+  getEstablecimiento: (id: number) => void
 }
 
-const sucursalFormInit = {
+const establecimientoFormInit = {
   id: 0,
   codigo: "",
+  tipo: "",
   descripcion: "",
   direccion: "",
   ubigeo_inei: "",
@@ -38,27 +40,28 @@ const sucursalFormInit = {
   estado: 1,
 }
 
-export default function SucursalForm() {
-  const {showSucursalForm, setShowSucursalForm, currentSucursalId} = useSucursales()
+export default function EstablecimientoForm() {
+  const {showEstablecimientoForm, setShowEstablecimientoForm, currentEstablecimientoId} = useEstablecimientos()
   const darkMode = useLayoutStore(state => state.layout.darkMode)
   const tknSession = useSessionStore(state => state.tknSession)
+  const tipos_establecimiento = useCatalogosStore(state=>state.catalogos?.tipos_establecimiento)
+  const setEstablecimiento = useCatalogosStore(state=>state.setEstablecimiento)
   const abortUbigeos = useRef<AbortController | null>(null);
 
   const {
-    data: sucursal,
-    isPending: isPendingSucursal,
-    isError: isErrorSucursal,
-    getSucursal,
-  }: GetSucursalQuery = useMutationSucursalesQuery()
+    data: establecimiento,
+    isPending: isPendingEstablecimiento,
+    isError: isErrorEstablecimiento,
+    getEstablecimiento,
+  }: GetEstablecimientoQuery = useMutationEstablecimientosQuery()
 
   const {
     data: mutation,
     isPending: isPendingMutation,
     isError: isErrorMutation,
-    createSucursal, 
-    updateSucursal,
-    typeAction,
-  } = useMutationSucursalesQuery()
+    createEstablecimiento, 
+    updateEstablecimiento,
+  } = useMutationEstablecimientosQuery()
 
   const {
     register, 
@@ -69,7 +72,7 @@ export default function SucursalForm() {
     control,
     reset,
     clearErrors,
-  } = useForm<Sucursal>({defaultValues: sucursalFormInit})
+  } = useForm<Establecimiento>({defaultValues: establecimientoFormInit})
 
 
   const loadUbigeosOptions =  debounce((search: string, callback: any) => {
@@ -83,59 +86,60 @@ export default function SucursalForm() {
   },500)
 
 
-  const submit = (sucursal: Sucursal) => {
+  const submit = (establecimiento: Establecimiento) => {
     Swal.fire({
       icon: 'question',
-      text: sucursal.id
+      text: establecimiento.id
         ? `¿Desea guardar los cambios?`
-        : `¿Desea registrar a ${sucursal.descripcion}?`,
+        : `¿Desea registrar a ${establecimiento.descripcion}?`,
       showCancelButton: true,
       confirmButtonText: "Sí",
       cancelButtonText: 'Cancelar',
-      target: document.getElementById('sucursal_form'),
+      target: document.getElementById('establecimiento_form'),
       customClass: {popup: darkMode ? 'swal-dark' : ''}
     }).then((result) => {
       if (result.isConfirmed) {
-        if (sucursal.id){
-          updateSucursal(sucursal)
+        if (establecimiento.id){
+          updateEstablecimiento(establecimiento)
         }else{
-          createSucursal(sucursal)
+          createEstablecimiento(establecimiento)
         }
       }
     });
   };
 
   useEffect(() => {
-    if(showSucursalForm){
-      if(currentSucursalId) getSucursal(currentSucursalId)
+    if(showEstablecimientoForm){
+      if(currentEstablecimientoId) getEstablecimiento(currentEstablecimientoId)
     }else{
-      reset(sucursalFormInit)
+      reset(establecimientoFormInit)
     }
-  }, [showSucursalForm])
+  }, [showEstablecimientoForm])
 
   useEffect(() => {
-    if(!sucursal) return
-    if(sucursal.error){
-      toast(sucursal.msg, {type: sucursal.msgType})
-      setShowSucursalForm(false);
+    if(!establecimiento) return
+    if(establecimiento.error){
+      toast(establecimiento.msg, {type: establecimiento.msgType})
+      setShowEstablecimientoForm(false);
     }else{
-      if(sucursal.content) reset(sucursal?.content)
+      if(establecimiento.content) reset(establecimiento?.content)
     }
-  }, [sucursal])
+  }, [establecimiento])
   
   useEffect(() => {
     if(!mutation) return
-    if(typeAction==="mutate_sucursal"){
-      if(!mutation.error) setShowSucursalForm(false);
-      toast(mutation.msg, {type: mutation.msgType})
+    toast(mutation.msg, {type: mutation.msgType})
+    if(mutation.content){
+      setEstablecimiento(mutation.content)
     }
+    if(!mutation.error) setShowEstablecimientoForm(false);
   }, [mutation])
 
   useEffect(() => {
-    if(!isErrorSucursal) return
+    if(!isErrorEstablecimiento) return
     toast.error("Error al obtener datos")
-    setShowSucursalForm(false)
-  }, [isErrorSucursal])
+    setShowEstablecimientoForm(false)
+  }, [isErrorEstablecimiento])
 
   useEffect(() => {
     if(!isErrorMutation) return
@@ -145,15 +149,15 @@ export default function SucursalForm() {
 
   return (
     <div>
-      <Modal show={showSucursalForm} onHide={()=>setShowSucursalForm(false)} backdrop="static" size="md" >
+      <Modal show={showEstablecimientoForm} onHide={()=>setShowEstablecimientoForm(false)} backdrop="static" size="md" >
         <Modal.Header closeButton className="py-2">
-          <Modal.Title>{currentSucursalId ? "Editar sucursal" : "Nueva sucursal"}</Modal.Title>
+          <Modal.Title>{currentEstablecimientoId ? "Editar establecimiento" : "Nueva establecimiento"}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <Form onSubmit={handleSubmit(submit)} id="sucursal_form">
-            {(isPendingMutation && typeAction==="mutate_sucursal") && <LdsBar />}
+          <Form onSubmit={handleSubmit(submit)} id="establecimiento_form">
+            {(isPendingMutation) && <LdsBar />}
             <Row>
-              <Form.Group as={Col} md={3} className="mb-3">
+              <Form.Group as={Col} md={4} className="mb-3">
                 <Form.Label htmlFor="codigo">Código</Form.Label>
                 <Form.Control
                   id="codigo"
@@ -165,7 +169,21 @@ export default function SucursalForm() {
                   <div className="invalid-feedback d-block">{errors.codigo.message}</div>
                 }
               </Form.Group>
-              <Form.Group as={Col} md={9} className="mb-3">
+              <Form.Group as={Col} md={8} className="mb-3">
+                <Form.Label htmlFor="tipo">Tipo</Form.Label>
+                <Form.Select
+                  id="tipo"
+                  {...register('tipo', {
+                    required:"Ingrese el código",
+                  })}
+                >
+                  {tipos_establecimiento?.map(el=><option key={el}>{el}</option>)}
+                </Form.Select>
+                {errors.tipo && 
+                  <div className="invalid-feedback d-block">{errors.tipo.message}</div>
+                }
+              </Form.Group>
+              <Form.Group as={Col} md={12} className="mb-3">
                 <Form.Label htmlFor="descripcion">Descripción</Form.Label>
                 <Form.Control
                   id="descripcion"
@@ -231,22 +249,22 @@ export default function SucursalForm() {
             </Row>
             <div className="d-flex gap-2 justify-content-end">
               <Button
-                onClick={() => reset(sucursalFormInit)}
+                onClick={() => reset(establecimientoFormInit)}
                 variant="seccondary"
                 type="button"
-                hidden={currentSucursalId ? true : false}
+                hidden={currentEstablecimientoId ? true : false}
               >Reset</Button>
               <Button
                 variant="seccondary"
                 type="button"
-                onClick={()=>setShowSucursalForm(false)}
+                onClick={()=>setShowEstablecimientoForm(false)}
               >Cerrar</Button>
               <Button 
                 variant="primary" 
                 type="submit"
-                disabled={(isPendingMutation && typeAction==="mutate_sucursal") ? true : isDirty ? false : true}
+                disabled={(isPendingMutation) ? true : isDirty ? false : true}
               >
-                {(isPendingMutation && typeAction==="mutate_sucursal") &&
+                {(isPendingMutation) &&
                   <Spinner
                     as="span"
                     animation="border"
@@ -260,7 +278,7 @@ export default function SucursalForm() {
             </div>
           </Form>
         </Modal.Body>
-        {isPendingSucursal  && <LdsEllipsisCenter/>}
+        {isPendingEstablecimiento  && <LdsEllipsisCenter/>}
       </Modal>
     </div>
   );

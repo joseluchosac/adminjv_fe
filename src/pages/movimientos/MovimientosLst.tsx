@@ -61,9 +61,9 @@ const MovimientosLst: React.FC = () => {
           setFilterParamsMovimientos({...filterParamsMovimientos, orders: []})
         }
       }
-
     }
   };
+
   const handleNextPage = () => {
     fetchNextPage();
   };
@@ -105,10 +105,10 @@ const MovimientosLst: React.FC = () => {
                   return (
                     <th
                       key={el.field_name}
-                      onClick={handleSort}
                       data-orderable={el.orderable}
                       data-campo={el.field_name}
                       role={el.orderable ? "button" : "columnheader"}
+                      onClick={handleSort}
                     >
                       <div className="d-flex gap-1">
                         <div>{el.field_label}</div>

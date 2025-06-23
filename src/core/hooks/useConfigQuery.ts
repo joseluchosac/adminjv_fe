@@ -14,13 +14,15 @@ type TypeAction =
   | "mutate_usuario_sol_sec"
   | "mutate_email_config"
   | "mutate_establecimiento"
-  | "requery_terminal"
+  | "check_this_term"
   
 // ****** MUTATION ******
 export const useMutationConfigQuery = () => {
   // const [typeAction, setTypeAction] = useState<TypeAction | "">("")
   const navigate = useNavigate()
   const resetSessionStore = useSessionStore(state => state.resetSessionStore)
+  const thisTerm = useSessionStore(state => state.thisTerm)
+  const setThisTerm = useSessionStore(state => state.setThisTerm)
   const tknSession = useSessionStore(state => state.tknSession)
   const nombreModulo = useSessionStore(state => state.moduloActual?.nombre)
   const Authorization = "Bearer " + tknSession
@@ -203,6 +205,21 @@ export const useMutationConfigQuery = () => {
     mutate(params)
   }
 
+  const checkThisTerm = () => {
+    if(!thisTerm) return
+    typeActionRef.current = "check_this_term"
+    const params = {
+      url: apiURL + "config/get_terminal",
+      method: "POST",
+      headers:{ 
+        Authorization,
+        'nombre-modulo': nombreModulo,
+      },
+      body: JSON.stringify({nombre: thisTerm?.nombre}),
+    }
+    mutate(params)
+  }
+
   const reset = (newValues: any) => {
     mutate({newValues}) // Solo actualiza los datos, no hace fetch
   }
@@ -211,6 +228,11 @@ export const useMutationConfigQuery = () => {
     if(data?.msgType === "errorToken"){
       resetSessionStore()
       navigate("/auth")
+    }
+    if(typeActionRef.current === "check_this_term"){
+      if(data && !data.content){
+        setThisTerm(null)
+      }
     }
   },[data])
 
@@ -231,6 +253,7 @@ export const useMutationConfigQuery = () => {
     getEmailConfig,
     updateEmailConfig,
     registerTerminal,
+    checkThisTerm,
     typeAction: typeActionRef.current,
     reset,
   }

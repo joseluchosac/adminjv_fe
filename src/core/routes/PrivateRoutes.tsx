@@ -5,6 +5,7 @@ import useSessionStore from "../store/useSessionStore";
 import { useMutateModulosQuery } from "../hooks/useModulosQuery";
 import { Modulo } from "../types";
 import { LdsDots11 } from "../components/Loaders";
+import { useMutationConfigQuery } from "../hooks/useConfigQuery";
 
 interface Props { redirectTo: string; }
 
@@ -27,12 +28,15 @@ const PrivateRoutes: React.FC<Props> = ({ redirectTo }) => {
     getModulosSession
   } = useMutateModulosQuery()
 
+  const {checkThisTerm} = useMutationConfigQuery()
+
   useEffect(()=>{
     if(!tknSession){
       navigate(redirectTo)
     }else{
       checkAuth()
     }
+    checkThisTerm()
   }, [])
 
   useEffect(() => {

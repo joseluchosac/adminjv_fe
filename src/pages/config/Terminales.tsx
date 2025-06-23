@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Button, Col, Form, Row } from "react-bootstrap";
 import { FormControlElement } from "../../core/types";
-import { Sucursal } from "../../core/types/catalogosTypes";
+import { Establecimiento } from "../../core/types/catalogosTypes";
 import useSessionStore from "../../core/store/useSessionStore";
 import { useMutationConfigQuery } from "../../core/hooks/useConfigQuery";
 import useCatalogosStore from "../../core/store/useCatalogosStore";
@@ -87,7 +87,7 @@ export default function Terminales() {
               onChange={handleChange}
             >
               <option value=""></option>
-              {establecimientos && establecimientos.filter(el=>el.tipo == "sucursal").map((el: Sucursal) => {
+              {establecimientos && establecimientos.map((el: Establecimiento) => {
                 return <option key={el.id} value={el.id}>{el.descripcion}</option>
               })}
             </Form.Select>

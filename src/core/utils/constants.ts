@@ -92,10 +92,10 @@ export const filterParamsInit: FilterParams = {
 //     ],
 //     equals: [
 //       {
-//         field_name: "sucursal_id", 
+//         field_name: "establecimiento_id", 
 //         field_value: "1", 
 //         label_name: "principal", 
-//         label_value: "Sucursal"
+//         label_value: "Establecimiento"
 //       },
 //     ],
 //     between: {

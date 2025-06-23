@@ -86,6 +86,7 @@ export default function MovimientosLstHead() {
           </Col>
           <Col sm className="text-center text-sm-start mb-3 mb-sm-0">
             <Form.Control
+              name="buscar"
               type="search"
               placeholder="Buscar"
               value={inputSearch}

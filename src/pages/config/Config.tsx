@@ -1,17 +1,17 @@
-import { Tab, Tabs} from "react-bootstrap";
+import { Container, Tab, Tabs} from "react-bootstrap";
 import { useState } from "react";
 import ApisConsulta from "./ApisConsulta";
 import SunatCpe from "./SunatCpe";
 import Emails from "./emails/Emails";
 import Empresa from "./empresa/Empresa";
-import Sucursales from "./sucursales/Sucursales";
 import Terminales from "./Terminales";
+import Establecimientos from "./establecimientos/Establecimientos";
 
 export default function Config() {
   const [tabKey, setTabKey] = useState('empresa');
 
   return (
-    <div style={{maxWidth: "991.98px"}} className="mx-auto">
+    <Container style={{maxWidth: "991.98px"}} className="mx-auto">
       <Tabs
         id="controlled-tab-example"
         activeKey={tabKey}
@@ -21,8 +21,8 @@ export default function Config() {
         <Tab eventKey="empresa" title="Empresa">
           {tabKey === "empresa" && <Empresa />}
         </Tab>
-        <Tab eventKey="sucursales" title="Sucursales">
-          {tabKey === "sucursales" && <Sucursales />}
+        <Tab eventKey="establecimientos" title="Establecimientos">
+          {tabKey === "establecimientos" && <Establecimientos />}
         </Tab>
         <Tab eventKey="sunat_cpe" title="Sunat CPE">
           {tabKey === "sunat_cpe" && <SunatCpe />}
@@ -37,6 +37,6 @@ export default function Config() {
           {tabKey === "terminal" && <Terminales />}
         </Tab>
       </Tabs>
-    </div>
+    </Container>
   );
 }

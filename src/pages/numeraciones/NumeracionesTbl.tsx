@@ -1,80 +1,61 @@
 import { useEffect } from "react"
-import { useSeries } from "./context/SeriesContext"
-import { useMutationSeriesQuery } from "../../core/hooks/useSeriesQuery"
+import { useNumeraciones } from "./context/NumeracionesContext"
+import { useMutationNumeracionesQuery } from "../../core/hooks/useNumeracionesQuery"
 import { Button, Card, Table } from "react-bootstrap"
-import { SerieSucursal } from "../../core/types/catalogosTypes"
+import { Numeracion } from "../../core/types/catalogosTypes"
 import { FaEdit, FaTrash } from "react-icons/fa"
 import { toast } from "react-toastify"
 import Swal from "sweetalert2"
 import useLayoutStore from "../../core/store/useLayoutStore"
+import useCatalogosStore from "../../core/store/useCatalogosStore"
 
-export default function SeriesSucursalTbl() {
+export default function NumeracionesTbl() {
   const darkMode = useLayoutStore(state => state.layout.darkMode)
+  const numeraciones = useCatalogosStore(state => state.catalogos?.numeraciones)
+  const delNumeracion = useCatalogosStore(state => state.delNumeracion)
   const {
-    currentSucursalId,
-    seriesSucursal,
-    setSeriesSucursal,
-    setCurrentSerieSucursalId,
+    currentEstablecimientoId,
+    setCurrentNumeracionId,
     setShowForm,
-    eliminarSerieSucursal
-  } = useSeries()
-
-  const {
-    data: dataSeriesSucursal,
-    getSeriesSucursal
-  } = useMutationSeriesQuery()
+  } = useNumeraciones()
 
   const {
     data: mutation,
-    deleteSerieSucursal
-  } = useMutationSeriesQuery()
+    deleteNumeracion
+  } = useMutationNumeracionesQuery()
 
   const handleNuevo = () => {
-    if(currentSucursalId){
+    if(currentEstablecimientoId){
       setShowForm(true)
     }else{
-        toast.warning("Elija una sucursal")
+      toast.warning("Elija un establecimiento")
     }
   }
 
   const toEdit = (id: number) => {
-    setCurrentSerieSucursalId(id)
+    setCurrentNumeracionId(id)
     setShowForm(true)
   }
 
-  const eliminar = (serieSucursal: SerieSucursal) => {
+  const eliminar = (numeracionEstablecimiento: Numeracion) => {
     Swal.fire({
       icon: 'question',
-      text: `¿Desea eliminar la serie ${serieSucursal.descripcion}?`,
+      text: `¿Desea eliminar la numeración ${numeracionEstablecimiento.descripcion}?`,
       showCancelButton: true,
       confirmButtonText: "Sí",
       cancelButtonText: 'Cancelar',
       customClass: {popup: darkMode ? 'swal-dark' : ''}
     }).then((result) => {
       if (result.isConfirmed) {
-        deleteSerieSucursal(serieSucursal.id)
+        deleteNumeracion(numeracionEstablecimiento.id)
       }
     });
   }
 
-  useEffect(()=>{
-    if(!currentSucursalId) return
-    getSeriesSucursal(currentSucursalId)
-  },[currentSucursalId])
-
-  useEffect(() => {
-    if(!dataSeriesSucursal) return
-    if(dataSeriesSucursal?.content){
-      setSeriesSucursal(dataSeriesSucursal.content as SerieSucursal[])
-    }else{
-      setSeriesSucursal(null)
-    }
-  }, [dataSeriesSucursal])
-
   useEffect(() => {
     if(!mutation) return
     if(mutation?.content){
-      eliminarSerieSucursal(mutation.content.id)
+      delNumeracion(mutation.content)
     }
     toast(mutation.msg, {type: mutation.msgType})
   }, [mutation])
@@ -82,27 +63,27 @@ export default function SeriesSucursalTbl() {
   return (
     <div>
       <div className="d-flex justify-content-between my-2">
-        <h5 className="ps-2">Series y correlativos</h5>
+        <h5 className="ps-2">Numeraciones</h5>
         <Button
           size="sm"
           onClick={handleNuevo}
-        >Agregar serie</Button>
+        >Agregar numeración</Button>
       </div>
       <Card>
-        <Card.Body>
+        <Card.Body className="p-0">
           <div className="position-relative">
             <div className="table-responsive" style={{ height: "73vh" }}>
               <Table striped hover className="mb-1">
                 <thead className="sticky-top">
                   <tr className="text-nowrap">
-                    <th>Descripcion</th>
+                    <th>Descripción</th>
                     <th>Serie</th>
                     <th>Correlativo</th>
                     <th>Acciones</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {seriesSucursal && seriesSucursal.map((el) => (
+                  {numeraciones && numeraciones?.filter(el=>el.establecimiento_id === currentEstablecimientoId).map((el) => (
                     <tr key={el.id}>
                       <td>{el.descripcion}</td>
                       <td>{el.serie}</td>

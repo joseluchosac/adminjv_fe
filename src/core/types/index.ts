@@ -192,8 +192,6 @@ export interface Marca {
   estado: number;
 }
 
-
-
 // ✅ TIPOS PARA PROVEEDOR
 export type Proveedor = {
   id: number;
@@ -242,8 +240,9 @@ export type Movimiento = {
   id: number;
   establecimiento_id: number;
   fecha: string;
-  serie: string;
-  correlativo: string;
+  // serie: string;
+  // correlativo: string;
+  numeracion: string;
   tipo: string;
   concepto: string;
   observacion: string;

@@ -140,12 +140,12 @@ export default function Movimientoform(){
               <Card.Body>
                 <Row className="mb-3">
                   <Form.Group as={Col} xl={12} className="mb-3">
-                    <Form.Label htmlFor="establecimiento_id">Sucursal</Form.Label>
+                    <Form.Label htmlFor="establecimiento_id">Establecimiento</Form.Label>
                     <Form.Select
                       id="establecimiento_id"
                       {...register('establecimiento_id', {
                         required: "Elija un establecimiento",
-                        min:{value: 1, message:"Elija una sucursal"},
+                        min:{value: 1, message:"Elija un establecimiento"},
                         valueAsNumber: true
                       })}
                     >

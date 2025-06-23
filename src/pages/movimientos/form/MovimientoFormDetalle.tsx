@@ -14,9 +14,10 @@ export default function MovimientoFormDetalle() {
   } = useMovimientos()
 
   const cambiarItem = ((e: React.ChangeEvent<FormControlElement>, item: MovimientoFormDetalle) => {
-    console.log(item.stock)
     let {name, value}:{name: string, value: string | number} = e.target
-    value = (name === 'cantidad' || name === 'precio_costo') ? parseFloat(value) : value
+    if(name === 'cantidad' || name === 'precio_costo'){
+      value = value === "" ? 0 : parseFloat(value) 
+    }
     if(name === 'cantidad' && value as number > item.stock && getValues().tipo === "salida"){
       toast.warning("stock insuficiente")
       value = item.stock
@@ -32,10 +33,6 @@ export default function MovimientoFormDetalle() {
     const nuevosItems = getValues().detalle.filter(el=>el.tmp_id != tmp_id)
     setValue("detalle", nuevosItems)
   }
-
-  // useEffect(()=>{
-  //   console.log(watch().detalle)
-  // },[watch().detalle])
 
   return (
     <Card>
@@ -56,7 +53,7 @@ export default function MovimientoFormDetalle() {
               {watch().detalle?.map((el, idx)=>
                 <tr key={el.tmp_id}>
                   <td>{idx+1}</td>
-                  <td style={{minWidth: "300px", maxWidth:"450px"}}>
+                  <td style={{maxWidth:"450px"}}>
                     <div>
                       {el.producto_descripcion}
                     </div>
@@ -76,7 +73,7 @@ export default function MovimientoFormDetalle() {
                       size="sm"
                       step={0.10}
                       min={0.10}
-                      style={{width:"100px"}}
+                      style={{maxWidth:"100px"}}
                       onChange={(e) => cambiarItem(e, el)}
                       value={el.cantidad}
                     />
@@ -88,7 +85,7 @@ export default function MovimientoFormDetalle() {
                       size="sm"
                       step={0.10}
                       min={0.10}
-                      style={{width:"100px"}}
+                      style={{maxWidth:"100px"}}
                       onChange={(e) => cambiarItem(e, el)}
                       value={el.precio_costo}
                     />

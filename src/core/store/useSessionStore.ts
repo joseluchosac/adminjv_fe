@@ -15,7 +15,7 @@ interface UseSessionStore {
   setUserSession: (newUserSession:User) => void;
   resetSessionStore: () => void;
   setModulosSesion: (newModulosRolSesion: any) => void;
-  setThisTerm: (newThisTerm: ThisTerm) => void; 
+  setThisTerm: (newThisTerm: ThisTerm | null) => void; 
   reset: () => void;
 }
 
