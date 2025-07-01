@@ -10,12 +10,15 @@ import { type Movimientoform } from "../../../core/types";
 import { useMovimientos } from "../hooks/useMovimientos";
 import MovimientoFormDetalle from "./MovimientoFormDetalle";
 import BusquedaProducto from "./BusquedaProducto";
+import useSessionStore from "../../../core/store/useSessionStore";
+import { movimientoFormInit } from "../context/MovimientosContext";
+import { cropText } from "../../../core/utils/funciones";
 
 export default function Movimientoform(){
   const darkMode = useLayoutStore(state => state.layout.darkMode)
   const establecimientos = useCatalogosStore(state => state.catalogos?.establecimientos)
   const tipos_movimiento = useCatalogosStore(state => state.catalogos?.tipos_movimiento)
-
+  const thisTerm = useSessionStore(state => state.thisTerm)
   const { 
     modo,
     setModo,
@@ -47,9 +50,25 @@ export default function Movimientoform(){
   }
 
   const submit = (data: Movimientoform) => {
-    console.log(data)
-    createMovimiento(data)
-    return
+    if(data.establecimiento_id == data.destino_id){
+      toast.warning("Elija otro destino")
+      return
+    }
+    if(!data.detalle.length){
+      toast.warning("Ingrese los productos")
+      return
+    }
+    for(const el of data.detalle){
+      if(el.cantidad < 0.10){
+        toast.warning(`Ingrese una cantidad válida del producto ${cropText(el.producto_descripcion,30)}`)
+        return
+      }
+      if(el.precio_costo.toString() == "" || el.precio_costo < 0){
+        toast.warning(`Ingrese un precio válido del producto ${cropText(el.producto_descripcion,30)}`)
+        return
+      }
+    }
+
     Swal.fire({
       icon: 'question',
       text: `¿Desea generar el movimiento?`,
@@ -62,42 +81,37 @@ export default function Movimientoform(){
       }
     }).then((result) => {
       if (result.isConfirmed) {
-        // createMovimiento(data)
+        createMovimiento(data)
       }
     });
   };
 
   useEffect(()=>{
-    if(modo.vista === "edit"){
-      // setValue("establecimiento_id", establecimiento_id)
+    if(modo.vista === "edit" && thisTerm){
+      setValue("establecimiento_id", thisTerm.establecimiento_id)
     }else{
-      // reset(movimientoFormInit)
+      reset(movimientoFormInit)
     }
   },[modo.vista])
 
   useEffect(()=>{
     setValue("concepto","")
   },[watch().tipo])
-  // useEffect(() => {
-  //   if(!movimiento) return
-  //   if(movimiento.error){
-  //     toast.error("Error al obtener los datos")
-  //   }else{
-  //     if(movimiento.content) {
-  //       reset(movimiento.content)
-  //     }
-  //   }
-  // }, [movimiento])
-  
-  // useEffect(() => {
-  //   if(!isErrorMovimiento) return
-  //   toast.error("Error de conexion")
-  // }, [isErrorMovimiento])
+
+  useEffect(()=>{
+    setValue("detalle", [])
+  },[watch().tipo, watch().establecimiento_id])
+
+  useEffect(()=>{
+    setValue("destino_id", 0)
+  },[watch().concepto])
 
   useEffect(() => {
     if(!mutation) return
-    if(!mutation.error) setModo((prev)=>({...prev, vista:"list"}));
     toast(mutation.msg, {type: mutation.msgType})
+    if(!mutation.error){
+      setModo((prev)=>({...prev, vista:"list"}));
+    }
   }, [mutation])
 
   return (
@@ -144,8 +158,7 @@ export default function Movimientoform(){
                     <Form.Select
                       id="establecimiento_id"
                       {...register('establecimiento_id', {
-                        required: "Elija un establecimiento",
-                        min:{value: 1, message:"Elija un establecimiento"},
+                        min:{value: 1, message:"Elija un establecimiento valido"},
                         valueAsNumber: true
                       })}
                     >
@@ -192,6 +205,29 @@ export default function Movimientoform(){
                       <div className="invalid-feedback d-block">{errors.concepto.message}</div>
                     }
                   </Form.Group>
+                  <Form.Group as={Col} xl={12} className="mb-3">
+                    <Form.Label htmlFor="destino_id">Destino traspaso</Form.Label>
+                    <Form.Select
+                      id="destino_id"
+                      disabled={watch("concepto").toLowerCase() === "traspaso" ? false : true}
+                      {...register('destino_id', {
+                        validate: (val: number) => {
+                          if (watch('concepto').toLowerCase() == "traspaso" && !val) {
+                            return "Elija el destino cuando el concepto es traspaso";
+                          }
+                        },
+                        valueAsNumber: true
+                      })}
+                    >
+                      <option value="0"></option>
+                      {establecimientos?.map(el => 
+                        <option key={el.id} value={el.id}>{el.descripcion}</option>
+                      )}
+                    </Form.Select>
+                    {errors.destino_id && 
+                      <div className="invalid-feedback d-block">{errors.destino_id.message}</div>
+                    }
+                  </Form.Group> 
                   <Form.Group as={Col} lg={12} className="mb-3">
                     <Form.Label htmlFor="observacion">Observación</Form.Label>
                     <Form.Control

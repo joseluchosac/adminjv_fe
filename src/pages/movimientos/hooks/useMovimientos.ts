@@ -1,11 +1,9 @@
-import { useContext, useEffect } from "react";
-import { movimientoFormInit, MovimientosContext } from "../context/MovimientosContext";
-import useSessionStore from "../../../core/store/useSessionStore";
+import { useContext } from "react";
+import { MovimientosContext } from "../context/MovimientosContext";
 import { MovimientoFormDetalle } from "../../../core/types";
 
 export const useMovimientos = () => {
   const context = useContext(MovimientosContext);
-  const establecimiento_id = useSessionStore(state => state.thisTerm?.establecimiento_id)
 
   if (context === undefined) {
     throw new Error('useMovimientos must be used within an MovimientosProvider');
@@ -24,12 +22,6 @@ export const useMovimientos = () => {
     }
     context.userMovimientoForm.setValue("detalle", nuevoDetalle, {shouldDirty: true})
   }
-
-  useEffect(()=>{
-    if(establecimiento_id){
-      context.userMovimientoForm.reset({...movimientoFormInit, establecimiento_id})
-    }
-  },[establecimiento_id])
 
   return {
     ...context,

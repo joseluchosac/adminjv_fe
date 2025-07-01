@@ -159,7 +159,7 @@ export interface Producto {
   marca: string;
   laboratorio_id: number;
   laboratorio: string;
-  unidad_medida_cod: string;
+  unidad: string;
   tipo_moneda_cod: string;
   precio_venta: number;
   precio_costo: number;
@@ -167,7 +167,6 @@ export interface Producto {
   impuesto_id_icbper: number;
   inventariable: number;
   lotizable: number;
-  stock: number;
   stock_min: number;
   imagen: string;
   estado: number;
@@ -239,22 +238,21 @@ export interface Ubigeo {
 export type Movimiento = {
   id: number;
   establecimiento_id: number;
+  establecimiento: string;
   fecha: string;
-  // serie: string;
-  // correlativo: string;
   numeracion: string;
   tipo: string;
   concepto: string;
-  observacion: string;
-  user_id: number;
   estado: number;
   created_at: string;
-  updated_at: string;
 }
+
 export type Movimientoform = {
   establecimiento_id: number;
   tipo: string;
+  serie_pre: string;
   concepto: string;
+  destino_id: number;
   observacion: string;
   detalle: MovimientoFormDetalle[];
 }
@@ -267,12 +265,24 @@ export type MovimientoFormDetalle = {
   producto_descripcion: string;
   marca: string;
   laboratorio: string;
-  precio_costo: number;
   stock: number;
   cantidad: number;
+  precio_costo: number;
   observacion: string;
 }
 
 export interface DataGetMovimiento extends ResponseQuery {
   content: Movimiento | null;
+}
+
+
+export type Numeracion = {
+  id: number;
+  establecimiento_id: number;
+  descripcion_doc: string;
+  serie_pre: string;
+  serie_suf: string;
+  serie: string;
+  correlativo: number;
+  estado: number;
 }

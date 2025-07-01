@@ -5,6 +5,9 @@ import { Establecimiento } from "../../core/types/catalogosTypes";
 import useSessionStore from "../../core/store/useSessionStore";
 import { useMutationConfigQuery } from "../../core/hooks/useConfigQuery";
 import useCatalogosStore from "../../core/store/useCatalogosStore";
+import { toast } from "react-toastify";
+import Swal from "sweetalert2";
+import useLayoutStore from "../../core/store/useLayoutStore";
 
 const esteTerminalFormInit = {
   establecimiento_id: 0,
@@ -16,11 +19,13 @@ export default function Terminales() {
   const [esteTerminalForm, setEsteTerminalForm] = useState(esteTerminalFormInit)
   const thisTerm = useSessionStore(state => state.thisTerm)
   const setThisTerm = useSessionStore(state => state.setThisTerm)
+  const darkMode = useLayoutStore(state=>state.layout.darkMode)
   const establecimientos = useCatalogosStore(state => state.catalogos?.establecimientos)
 
   const {
     data: mutation,
-    registerTerminal
+    linkThisTerminal,
+    unlinkThisTerminal
   } = useMutationConfigQuery()
 
   const handleChange = (e: React.ChangeEvent<FormControlElement>) => {
@@ -31,20 +36,37 @@ export default function Terminales() {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
+    // console.log(esteTerminalForm)
+    // return
     if(!esteTerminalForm.descripcion){
-      console.log('ingrese la descripcion')
+      toast.warning('Ingrese la descripcion')
       return false
     }
- 
-    registerTerminal(esteTerminalForm)
+     if(!esteTerminalForm.establecimiento_id){
+      toast.warning('Elija el establecimiento')
+      return false
+    }
+    Swal.fire({
+      icon: 'question',
+      text: esteTerminalForm.nombre ? '¿Desea guardar los cambios?':'¿Desea registrar este terminal?',
+      showCancelButton: true,
+      confirmButtonText: "Sí",
+      cancelButtonText: 'Cancelar',
+      customClass: { 
+        popup: darkMode ? 'swal-dark' : ''
+      }
+    }).then((result) => {
+      if (result.isConfirmed) {
+        linkThisTerminal(esteTerminalForm)
+      }
+    });
   }
 
   useEffect(() => {
     if(!mutation) return
-    if(mutation?.content){
-      console.log(mutation.content)
-      setThisTerm(mutation.content)
-    }
+    toast(mutation.msg, {type: mutation.msgType})
+    setThisTerm(mutation.content)
+    console.log(mutation)
   }, [mutation])
 
   useEffect(() => {
@@ -93,8 +115,21 @@ export default function Terminales() {
             </Form.Select>
           </Col>
         </Form.Group>   
-        <Form.Group as={Row} className="mb-3 px-5">
-          <Button type='submit'>Guardar</Button>
+        <Form.Group as={Row} className="mb-3">
+          <div className="d-flex justify-content-end gap-3">
+            {thisTerm && 
+              <Button
+                type='button'
+                variant="danger"
+                onClick={()=>{
+                  unlinkThisTerminal(thisTerm.nombre)
+                }}
+              >
+                Desvincular
+              </Button>
+            }
+            <Button type='submit'>Guardar vínculo</Button>
+          </div>
         </Form.Group>
       </Form>
     </div>

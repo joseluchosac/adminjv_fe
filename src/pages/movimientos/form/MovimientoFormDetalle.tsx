@@ -14,18 +14,15 @@ export default function MovimientoFormDetalle() {
   } = useMovimientos()
 
   const cambiarItem = ((e: React.ChangeEvent<FormControlElement>, item: MovimientoFormDetalle) => {
-    let {name, value}:{name: string, value: string | number} = e.target
-    if(name === 'cantidad' || name === 'precio_costo'){
-      value = value === "" ? 0 : parseFloat(value) 
-    }
-    if(name === 'cantidad' && value as number > item.stock && getValues().tipo === "salida"){
+    let {name, value} = e.target
+    if(name === 'cantidad' && parseFloat(value)  > item.stock && getValues().tipo === "salida"){
       toast.warning("stock insuficiente")
-      value = item.stock
+      value = item.stock.toString()
     }
-    const nuevoItem = {...item, [name]: value}
-    const idx = getValues().detalle.findIndex(el=>el.tmp_id === item.tmp_id)
-    const nuevosItems = [...getValues().detalle]
-    nuevosItems[idx] = nuevoItem
+    const itemModif = {...item, [name]: value}
+    const nuevosItems = getValues().detalle.map(el => {
+      return el.tmp_id === itemModif.tmp_id ? itemModif : el
+    })
     setValue("detalle", nuevosItems)
   })
 
@@ -71,8 +68,6 @@ export default function MovimientoFormDetalle() {
                       name="cantidad"
                       type="number"
                       size="sm"
-                      step={0.10}
-                      min={0.10}
                       style={{maxWidth:"100px"}}
                       onChange={(e) => cambiarItem(e, el)}
                       value={el.cantidad}
@@ -83,8 +78,6 @@ export default function MovimientoFormDetalle() {
                       name="precio_costo"
                       type="number"
                       size="sm"
-                      step={0.10}
-                      min={0.10}
                       style={{maxWidth:"100px"}}
                       onChange={(e) => cambiarItem(e, el)}
                       value={el.precio_costo}

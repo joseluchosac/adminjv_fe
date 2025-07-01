@@ -2,22 +2,28 @@ import { useEffect } from "react"
 import { useNumeraciones } from "./context/NumeracionesContext"
 import { useMutationNumeracionesQuery } from "../../core/hooks/useNumeracionesQuery"
 import { Button, Card, Table } from "react-bootstrap"
-import { Numeracion } from "../../core/types/catalogosTypes"
 import { FaEdit, FaTrash } from "react-icons/fa"
 import { toast } from "react-toastify"
 import Swal from "sweetalert2"
 import useLayoutStore from "../../core/store/useLayoutStore"
-import useCatalogosStore from "../../core/store/useCatalogosStore"
+import { Numeracion } from "../../core/types"
 
 export default function NumeracionesTbl() {
   const darkMode = useLayoutStore(state => state.layout.darkMode)
-  const numeraciones = useCatalogosStore(state => state.catalogos?.numeraciones)
-  const delNumeracion = useCatalogosStore(state => state.delNumeracion)
   const {
+    numeraciones,
+    setNumeraciones,
+    delNumeracion,
     currentEstablecimientoId,
     setCurrentNumeracionId,
     setShowForm,
+
   } = useNumeraciones()
+
+  const {
+    data: dataGetNumeraciones,
+    getNumeraciones
+  } = useMutationNumeracionesQuery()
 
   const {
     data: mutation,
@@ -40,7 +46,7 @@ export default function NumeracionesTbl() {
   const eliminar = (numeracionEstablecimiento: Numeracion) => {
     Swal.fire({
       icon: 'question',
-      text: `¿Desea eliminar la numeración ${numeracionEstablecimiento.descripcion}?`,
+      text: `¿Desea eliminar la numeración ${numeracionEstablecimiento.serie_pre}?`,
       showCancelButton: true,
       confirmButtonText: "Sí",
       cancelButtonText: 'Cancelar',
@@ -51,6 +57,20 @@ export default function NumeracionesTbl() {
       }
     });
   }
+
+  
+
+  useEffect(() => {
+    getNumeraciones()
+  }, [])
+
+  useEffect(() => {
+    if(!dataGetNumeraciones) return
+    if(dataGetNumeraciones.content){
+      setNumeraciones(dataGetNumeraciones.content)
+    }
+  }, [dataGetNumeraciones])
+
 
   useEffect(() => {
     if(!mutation) return
@@ -85,7 +105,7 @@ export default function NumeracionesTbl() {
                 <tbody>
                   {numeraciones && numeraciones?.filter(el=>el.establecimiento_id === currentEstablecimientoId).map((el) => (
                     <tr key={el.id}>
-                      <td>{el.descripcion}</td>
+                      <td>{el.descripcion_doc}</td>
                       <td>{el.serie}</td>
                       <td>{el.correlativo}</td>
                       <td>

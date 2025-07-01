@@ -40,9 +40,8 @@ const productoFormInit = {
   impuesto_id_icbper: 0,
   inventariable: 0,
   lotizable: 0,
-  stock: 0,
   stock_min: 0,
-  imagen: '',
+  thumb: '',
   estado: 1,
   created_at: '',
   updated_at: '',
@@ -344,18 +343,6 @@ export default function Productoform(){
                       </Tab>
                       <Tab eventKey="inventario" title="Inventario">
                         <Row>
-                          <Form.Group as={Col} md={4} xl={4} className="mb-3">
-                            <Form.Label htmlFor="stock">Stock</Form.Label>
-                            <Form.Control
-                              id="stock"
-                              type="number"
-                              step={0.01}
-                              {...register('stock', {valueAsNumber:true})}
-                            />
-                            {errors.stock && 
-                              <div className="invalid-feedback d-block">{errors.stock.message}</div>
-                            }
-                          </Form.Group>
                           <Form.Group as={Col} md={4} xl={4} className="mb-3">
                             <Form.Label htmlFor="stock_min">Stock mínimo</Form.Label>
                             <Form.Control

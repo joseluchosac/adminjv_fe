@@ -27,7 +27,9 @@ export interface MovimientosContextType {
 export const movimientoFormInit: Movimientoform = {
   establecimiento_id: 0,
   tipo: "",
+  serie_pre: "M",
   concepto: "",
+  destino_id: 0,
   observacion: "",
   detalle: []
 }

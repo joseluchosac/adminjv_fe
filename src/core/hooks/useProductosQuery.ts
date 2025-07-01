@@ -17,7 +17,8 @@ type TypeAction =
 export const useFilterProductosQuery = () => {
   const [isEnabledQuery, setIsEnabledQuery] = useState(false)
   const setFilterParamsProductos = useProductosStore(state => state.setFilterParamsProductos)
-  const tknSession = useSessionStore(state => state.tknSession)
+  const token = useSessionStore(state => state.tknSession)
+  const thisTerm = useSessionStore(state => state.thisTerm)
   const filterParamsProductos = useProductosStore(state => state.filterParamsProductos)
   const navigate = useNavigate()
   const queryClient = useQueryClient()
@@ -25,7 +26,7 @@ export const useFilterProductosQuery = () => {
   const {fetchNextPage, data, refetch, isError, isLoading, isFetching, hasNextPage,  } = useInfiniteQuery({
     queryKey: ['productos'],
     queryFn: ({pageParam = 1, signal}) => {
-      return filterProductosFetch({filterParamsProductos, pageParam, signal, token: tknSession})
+      return filterProductosFetch({filterParamsProductos, pageParam, signal, token, thisTerm})
     },
     initialPageParam: 1,
     enabled: isEnabledQuery,

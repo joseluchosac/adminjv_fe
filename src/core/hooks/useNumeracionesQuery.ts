@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query"
 import useSessionStore from "../store/useSessionStore"
 import { mutationFetch } from "../services/mutationFecth"
-import { Numeracion } from "../types/catalogosTypes";
+import { Numeracion } from "../types";
 
 type TypeAction = "filter_full" | "mutate_numeracion" | "delete_numeracion"
 
@@ -26,18 +26,17 @@ export const useMutationNumeracionesQuery = () => {
     }
   })
 
-  // const getNumeracionesEstablecimiento = (establecimiento_id: number) => {
-  //   const params = {
-  //     url: apiURL + "numeraciones/get_numeraciones_establecimiento",
-  //     method: "POST",
-  //     headers:{ 
-  //       Authorization,
-  //       'nombre-modulo': nombreModulo,
-  //     },
-  //     body: JSON.stringify({establecimiento_id}),
-  //   }
-  //   mutate(params)
-  // }
+  const getNumeraciones = () => {
+    const params = {
+      url: apiURL + "numeraciones/get_numeraciones",
+      method: "POST",
+      headers:{ 
+        Authorization,
+        'nombre-modulo': nombreModulo,
+      },
+    }
+    mutate(params)
+  }
 
   const getNumeracion = (id: number) => {
     const params = {
@@ -104,7 +103,7 @@ export const useMutationNumeracionesQuery = () => {
     data, 
     isPending, 
     isError,
-    // getNumeracionesEstablecimiento,
+    getNumeraciones,
     getNumeracion,
     createNumeracion,
     updateNumeracion,

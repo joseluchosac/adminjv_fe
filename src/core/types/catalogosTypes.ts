@@ -14,7 +14,6 @@ export interface Catalogos {
   departamentos: Departamento[];
   establecimientos: Establecimiento[];
   tipos_establecimiento: string[];
-  numeraciones: Numeracion[];
   categorias_tree: Categoria[];
 }
 export type Caja = {
@@ -57,6 +56,8 @@ export type TipoComprobante = {
   id: number;
   codigo: string;
   descripcion: string;
+  serie_pre: string;
+  descripcion_doc: string;
   estado: number
 }
 export type TipoDocumento = {
@@ -127,17 +128,7 @@ export type Establecimiento = {
   estado: number;
 }
 
-export type Numeracion = {
-  id: number;
-  establecimiento_id: number;
-  tipo_comprobante_cod: string;
-  descripcion: string;
-  serie: string;
-  correlativo: string;
-  modifica_a: string;
-  serie_prefix: string;
-  estado: number;
-}
+
 
 export type Categoria = {
   id: number;

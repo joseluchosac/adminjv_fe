@@ -36,7 +36,6 @@ const PrivateRoutes: React.FC<Props> = ({ redirectTo }) => {
     }else{
       checkAuth()
     }
-    checkThisTerm()
   }, [])
 
   useEffect(() => {
@@ -48,6 +47,7 @@ const PrivateRoutes: React.FC<Props> = ({ redirectTo }) => {
       setUserSession(dataCheckAuth.content.registro)
       setEmpresaSession(dataCheckAuth.content.empresaSession)
       getModulosSession()
+      checkThisTerm()
     }
   }, [dataCheckAuth])
 

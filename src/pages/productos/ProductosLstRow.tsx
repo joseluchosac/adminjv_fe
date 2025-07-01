@@ -101,9 +101,18 @@ function ProductosLstRow({ producto, camposProducto }: ProductosLstRowProps) {
                 style={{minWidth: "300px", maxWidth:"450px"}}
                 title={producto[el.field_name as keyof Producto] as string}
               >
-                {producto[el.field_name as keyof Producto]}
+                <div>{producto[el.field_name as keyof Producto]}</div>
+                <div className="d-flex gap-3 text-muted">
+                  {producto.marca ? <div><small>{producto.marca}</small></div> :''}
+                  {producto.laboratorio ? <div><small>{producto.laboratorio}</small></div> :''}
+                  {producto.codigo ? <div><small>{producto.codigo}</small></div> :''}
+                  {producto.barcode ? <div><small>Bar: {producto.barcode}</small></div> :''}
+                </div>
               </td>
             )
+          }
+          case "stock": {
+            return <td key={el.field_name}>{parseFloat(producto[el.field_name as keyof Producto] as string)} {producto.unidad}</td>
           }
           default: {
             return <td key={el.field_name}>{producto[el.field_name as keyof Producto]}</td>

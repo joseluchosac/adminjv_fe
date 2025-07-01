@@ -1,10 +1,11 @@
-import { FilterParams, Producto } from "../types";
+import { FilterParams, Producto, ThisTerm } from "../types";
 const apiURL = import.meta.env.VITE_API_URL;
 
 type FilterProductosFetch = {
   filterParamsProductos: FilterParams;
   pageParam: number;
   token?: string | null;
+  thisTerm?: ThisTerm | null
   signal?: AbortSignal | null
 }
 
@@ -25,12 +26,14 @@ export const filterProductosFetch = async({
   filterParamsProductos, 
   pageParam, 
   token = null,
-  signal = null, 
+  thisTerm = null,
+  signal = null,
 }: FilterProductosFetch): Promise<FilterProductosFetchResp> => {
   let options: RequestInit  = {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      "attached-data": JSON.stringify({thisTerm}),
     },
     body: JSON.stringify(filterParamsProductos),
     credentials: "include", // envio de cookies

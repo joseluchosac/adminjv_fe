@@ -4,10 +4,8 @@ import { useEffect, useRef } from "react"
 import { toast } from "react-toastify"
 import { useMovimientos } from "../hooks/useMovimientos"
 import { type MovimientoFormDetalle } from "../../../core/types"
-import useSessionStore from "../../../core/store/useSessionStore"
 
 export default function BusquedaProducto() {
-  const thisTerm = useSessionStore(state=>state.thisTerm)
   const formRef = useRef<HTMLFormElement | null>(null)
   const {
     agregarProducto,
@@ -25,8 +23,8 @@ export default function BusquedaProducto() {
     e.preventDefault()
     let {value} = e.currentTarget.buscar
     if(!value) return
-    if(thisTerm){
-      getProductoByCode(value.toUpperCase(), thisTerm.establecimiento_id)
+    if(getValues().establecimiento_id){
+      getProductoByCode(value.toUpperCase(), getValues().establecimiento_id)
     }
   })
 

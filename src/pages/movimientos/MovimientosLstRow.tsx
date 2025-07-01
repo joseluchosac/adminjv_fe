@@ -84,8 +84,7 @@ function MovimientosLstRow({ movimiento, camposMovimiento }: MovimientosLstRowPr
               </td>
             )
           }
-          case "created_at":
-          case "updated_at": {
+          case "created_at": {
             return <td key={el.field_name}>{validDate(movimiento[el.field_name ], 'dd/MM/yyyy')}</td>
           }
           default: {

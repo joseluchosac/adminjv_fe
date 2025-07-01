@@ -192,15 +192,28 @@ export const useMutationConfigQuery = () => {
     mutate(params) 
   }
 
-  const registerTerminal = (terminal: ThisTerm) => {
+  const linkThisTerminal = (terminal: ThisTerm) => {
     const params = {
-      url: apiURL + "config/register_terminal",
+      url: apiURL + "config/link_this_terminal",
       method: "POST",
       headers:{ 
         Authorization,
         'nombre-modulo': nombreModulo,
       },
       body: JSON.stringify(terminal),
+    }
+    mutate(params)
+  }
+
+  const unlinkThisTerminal = (nombre: string) => {
+    const params = {
+      url: apiURL + "config/unlink_this_terminal",
+      method: "DELETE",
+      headers:{ 
+        Authorization,
+        'nombre-modulo': nombreModulo,
+      },
+      body: JSON.stringify({nombre}),
     }
     mutate(params)
   }
@@ -252,7 +265,8 @@ export const useMutationConfigQuery = () => {
     updateUsuarioSolSec,
     getEmailConfig,
     updateEmailConfig,
-    registerTerminal,
+    linkThisTerminal,
+    unlinkThisTerminal,
     checkThisTerm,
     typeAction: typeActionRef.current,
     reset,

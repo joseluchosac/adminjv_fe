@@ -1,7 +1,6 @@
-import { Button, Col, Form, Modal, Row, Spinner } from "react-bootstrap";
+import { Button, Col, Form, InputGroup, Modal, Row, Spinner } from "react-bootstrap";
 import { useNumeraciones } from "./context/NumeracionesContext";
 import { useForm } from "react-hook-form";
-import { Numeracion } from "../../core/types/catalogosTypes";
 import Swal from "sweetalert2";
 import useLayoutStore from "../../core/store/useLayoutStore";
 import { LdsBar, LdsEllipsisCenter } from "../../core/components/Loaders";
@@ -9,30 +8,29 @@ import { useEffect } from "react";
 import { useMutationNumeracionesQuery } from "../../core/hooks/useNumeracionesQuery";
 import { toast } from "react-toastify";
 import useCatalogosStore from "../../core/store/useCatalogosStore";
+import { Numeracion } from "../../core/types";
 
 const formInit: Numeracion = {
   id: 0,
   establecimiento_id: 0,
-  tipo_comprobante_cod: "",
-  descripcion: "",
+  descripcion_doc: "",
+  serie_pre: "",
+  serie_suf: "",
   serie:"",
-  correlativo:"",
-  modifica_a:"",
-  serie_prefix:"",
+  correlativo:0,
   estado:1
 }
 
 export default function NumeracionForm() {
   const tipos_comprobante = useCatalogosStore(state => state.catalogos?.tipos_comprobante)
   const darkMode = useLayoutStore(state => state.layout.darkMode)
-  const setNumeracion = useCatalogosStore(state => state.setNumeracion)
   const {
+    setNumeracion,
     showForm,
     setShowForm,
     currentNumeracionId,
     setCurrentNumeracionId,
     currentEstablecimientoId,
-    // actualizarNumeracionEstablecimiento,
   } = useNumeraciones()
 
   const {
@@ -53,15 +51,20 @@ export default function NumeracionForm() {
     formState: {errors, isDirty}, 
     handleSubmit, 
     reset,
-    setValue
+    setValue,
+    getValues,
+    watch,
+
   } = useForm<Numeracion>({defaultValues: formInit})
 
   const submit = (numeracionEstablecimiento: Numeracion) => {
+    // console.log(numeracionEstablecimiento)
+    // return
     Swal.fire({
       icon: 'question',
       text: numeracionEstablecimiento.id
-        ? `¿Desea guardar los cambios de ${numeracionEstablecimiento.descripcion}?`
-        : `¿Desea registrar a ${numeracionEstablecimiento.descripcion}?`,
+        ? `¿Desea guardar los cambios de ${numeracionEstablecimiento.descripcion_doc}?`
+        : `¿Desea registrar la numeración de ${numeracionEstablecimiento.descripcion_doc}?`,
       showCancelButton: true,
       confirmButtonText: "Sí",
       cancelButtonText: 'Cancelar',
@@ -97,7 +100,8 @@ export default function NumeracionForm() {
       toast(numeracion.msg, {type: numeracion.msgType})
       setShowForm(false);
     }else{
-      if(numeracion.content) reset(numeracion?.content)
+      if(numeracion.content)
+        reset(numeracion?.content)
     }
   }, [numeracion])
   
@@ -110,6 +114,13 @@ export default function NumeracionForm() {
     toast(mutation.msg, {type: mutation.msgType})
   }, [mutation])
 
+  useEffect(() => {
+    setValue('serie', `${getValues().serie_pre}${getValues().serie_suf}`)
+    if(!tipos_comprobante) return
+    const tipo_comprobante = tipos_comprobante?.find(el => el.serie_pre === getValues().serie_pre)
+    setValue('descripcion_doc', tipo_comprobante ? tipo_comprobante.descripcion_doc : "")
+  }, [watch("serie_pre"), watch("serie_suf")])
+
   return (
     <Modal show={showForm} onHide={()=>setShowForm(false)} backdrop="static" size="md" >
       <Modal.Header closeButton className="py-2">
@@ -119,50 +130,35 @@ export default function NumeracionForm() {
         <Form onSubmit={handleSubmit(submit)} id="numeracion_establecimiento_form">
           {(isPendingMutation) && <LdsBar />}
           <Row>
-            <Form.Group as={Col} sm={6} className="mb-3">
-              <Form.Label htmlFor="tipo_comprobante_cod">Tipo comprobante</Form.Label>
+            <Form.Group as={Col} sm={8} className="mb-3">
+              <Form.Label htmlFor="serie_pre">Tipo comprobante</Form.Label>
               <Form.Select
-                id="tipo_comprobante_cod"
-                {...register('tipo_comprobante_cod',{required: "Ingrese el tipo de comprobante"})}
-                onChange={(e)=>{
-                  const descripcion = e.target.options[e.target.selectedIndex].textContent || ""
-                  setValue("descripcion", descripcion, {shouldDirty: true})
-                }}
+                id="serie_pre"
+                {...register('serie_pre',{required: "Ingrese el tipo de comprobante"})}
               >
                 {tipos_comprobante && tipos_comprobante.map((el) => 
-                  <option key={el.codigo} value={el.codigo}>{el.descripcion}</option>
+                  <option key={el.id} value={el.serie_pre}>{el.descripcion_doc}</option>
                 )}
               </Form.Select>
-              {errors.tipo_comprobante_cod && 
-                <div className="invalid-feedback d-block">{errors.tipo_comprobante_cod.message}</div>
+              {errors.serie_pre && 
+                <div className="invalid-feedback d-block">{errors.serie_pre.message}</div>
               }
             </Form.Group>
-            <Form.Group as={Col} sm={6} className="mb-3">
-              <Form.Label htmlFor="descripcion">Descripción</Form.Label>
-              <Form.Control
-                id="descripcion"
-                {...register('descripcion', {
-                  required:"Ingrese la descripción",
-                  minLength: {value: 3, message:"Se permite mínimo 3 caracteres"},
-                  maxLength: {value: 100, message:"Se permite máximo 100 caracteres"}
-                })}
-              />
-              {errors.descripcion && 
-                <div className="invalid-feedback d-block">{errors.descripcion.message}</div>
-              }
-            </Form.Group>
-            <Form.Group as={Col} sm={3} className="mb-3">
-              <Form.Label htmlFor="serie">Serie</Form.Label>
-              <Form.Control
-                id="serie"
-                {...register('serie', {
-                  required:"Ingrese la serie de 4 caracteres",
-                  minLength: {value: 4, message:"Se permite mínimo 4 caracteres"},
-                  maxLength: {value: 4, message:"Se permite mínimo 4 caracteres"}
-                })}
-              />
-              {errors.serie && 
-                <div className="invalid-feedback d-block">{errors.serie.message}</div>
+            <Form.Group as={Col} sm={4} className="mb-3">
+              <Form.Label htmlFor="serie_suf">Serie</Form.Label>
+              <InputGroup>
+                <InputGroup.Text>{watch("serie_pre")}</InputGroup.Text>
+                <Form.Control
+                  id="serie_suf"
+                  {...register('serie_suf', {
+                    required:"Ingrese la serie de 4 caracteres",
+                    minLength: {value: 4-watch("serie_pre").length, message:"Se permite mínimo 4 caracteres"},
+                    maxLength: {value: 4-watch("serie_pre").length, message:"Se permite mínimo 4 caracteres"}
+                  })}
+                />
+              </InputGroup>
+              {errors.serie_suf && 
+                <div className="invalid-feedback d-block">{errors.serie_suf.message}</div>
               }
             </Form.Group>
             <Form.Group as={Col} sm={4} className="mb-3">
@@ -182,18 +178,6 @@ export default function NumeracionForm() {
               {errors.correlativo && 
                 <div className="invalid-feedback d-block">{errors.correlativo.message}</div>
               }
-            </Form.Group>
-            <Form.Group as={Col} sm={5} className="mb-3">
-              <Form.Label htmlFor="modifica_a">Modifica a</Form.Label>
-              <Form.Select
-                id="modifica_a"
-                {...register('modifica_a')}
-              >
-                <option value=""></option>
-                {tipos_comprobante && tipos_comprobante.map((el) => 
-                  <option key={el.codigo} value={el.codigo}>{el.descripcion}</option>
-                )}
-              </Form.Select>
             </Form.Group>
           </Row>
           <div className="d-flex gap-2 justify-content-end">

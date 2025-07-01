@@ -219,3 +219,8 @@ export function cadena(longitud: number): string {
   }
   return resultado;
 }
+
+// ✅ FUNCION QUE RECORTA UNA CADENA DE TEXTO AUMENTANDO '...'
+export function cropText(texto: string, limite = 20) {
+  return texto.length > limite ? texto.slice(0, limite) + '...' : texto;
+}
