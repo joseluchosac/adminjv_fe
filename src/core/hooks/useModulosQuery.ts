@@ -13,7 +13,6 @@ export const useMutateModulosQuery = () => {
   const resetSessionStore = useSessionStore(state => state.resetSessionStore)
   const navigate = useNavigate()
   const tknSession = useSessionStore(state => state.tknSession)
-  const nombreModulo = useSessionStore(state => state.moduloActual?.nombre)
   const Authorization = "Bearer " + tknSession
   const queryClient = useQueryClient()
   const typeActionRef = useRef<TypeAction | "">("")
@@ -31,7 +30,6 @@ export const useMutateModulosQuery = () => {
       method: "POST",
       headers:{ 
         Authorization,
-        'nombre-modulo': nombreModulo,
       },
     }
     mutate(params)
@@ -43,7 +41,6 @@ export const useMutateModulosQuery = () => {
       method: "POST",
       headers:{ 
         Authorization,
-        // 'nombre-modulo': nombreModulo,
       },
     }
     mutate(params)
@@ -55,7 +52,6 @@ export const useMutateModulosQuery = () => {
       method: "POST",
       headers:{ 
         Authorization,
-        'nombre-modulo': nombreModulo,
       },
       body: JSON.stringify({rol_id})
     }
@@ -68,7 +64,6 @@ export const useMutateModulosQuery = () => {
       method: "PUT",
       headers:{ 
         Authorization,
-        'nombre-modulo': nombreModulo,
       },
       body: JSON.stringify(orderedItems)
     }
@@ -82,7 +77,6 @@ export const useMutateModulosQuery = () => {
       method: "PUT",
       headers:{ 
         Authorization,
-        'nombre-modulo': nombreModulo,
       },
       body: JSON.stringify(modulo),
     }
@@ -96,7 +90,6 @@ export const useMutateModulosQuery = () => {
       method: "POST",
       headers:{ 
         Authorization,
-        'nombre-modulo': nombreModulo,
       },
       body: JSON.stringify(param),
     }
@@ -110,7 +103,6 @@ export const useMutateModulosQuery = () => {
       method: "DELETE",
       headers:{ 
         Authorization,
-        'nombre-modulo': nombreModulo,
       },
       body: JSON.stringify({id}),
     }
@@ -123,7 +115,6 @@ export const useMutateModulosQuery = () => {
       method: "POST",
       headers:{ 
         Authorization,
-        'nombre-modulo': nombreModulo,
       },
       body: JSON.stringify(param),
     }

@@ -72,7 +72,6 @@ export const useMutationLaboratoriosQuery = () => {
   const resetSessionStore = useSessionStore(state => state.resetSessionStore)
   const navigate = useNavigate()
   const tknSession = useSessionStore(state => state.tknSession)
-  const nombreModulo = useSessionStore(state => state.moduloActual?.nombre)
   const Authorization = "Bearer " + tknSession
   const filterParamsLaboratorios = useLaboratoriosStore(state => state.filterParamsLaboratorios)
   const queryClient = useQueryClient()
@@ -93,7 +92,6 @@ export const useMutationLaboratoriosQuery = () => {
       method: "POST",
       headers:{ 
         Authorization,
-        'nombre-modulo': nombreModulo,
       },
       body: JSON.stringify(filterParamsLaboratorios),
     }
@@ -106,7 +104,6 @@ export const useMutationLaboratoriosQuery = () => {
       method: "POST",
       headers:{ 
         Authorization,
-        'nombre-modulo': nombreModulo,
       },
       body: JSON.stringify({id}),
     }
@@ -120,7 +117,6 @@ export const useMutationLaboratoriosQuery = () => {
       method: "POST",
       headers:{ 
         Authorization,
-        'nombre-modulo': nombreModulo,
       },
       body: JSON.stringify(laboratorio),
     }
@@ -134,7 +130,6 @@ export const useMutationLaboratoriosQuery = () => {
       method: "PUT",
       headers:{ 
         Authorization,
-        'nombre-modulo': nombreModulo,
       },
       body: JSON.stringify(laboratorio),
     }
@@ -148,7 +143,6 @@ export const useMutationLaboratoriosQuery = () => {
       method: "DELETE",
       headers:{ 
         Authorization,
-        'nombre-modulo': nombreModulo,
       },
       body: JSON.stringify({id}),
     }

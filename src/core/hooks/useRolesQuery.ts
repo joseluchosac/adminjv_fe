@@ -11,7 +11,6 @@ export const useMutateRolesQuery = () => {
   const resetSessionStore = useSessionStore(state => state.resetSessionStore)
   const navigate = useNavigate()
   const tknSession = useSessionStore(state => state.tknSession)
-  const nombreModulo = useSessionStore(state => state.moduloActual?.nombre)
   const Authorization = "Bearer " + tknSession
   const queryClient = useQueryClient()
 
@@ -30,7 +29,6 @@ export const useMutateRolesQuery = () => {
       method: "PUT",
       headers:{ 
         Authorization,
-        'nombre-modulo': nombreModulo,
       },
       body: JSON.stringify(param),
     }
@@ -43,7 +41,6 @@ export const useMutateRolesQuery = () => {
       method: "POST",
       headers:{ 
         Authorization,
-        'nombre-modulo': nombreModulo,
       },
       body: JSON.stringify(param),
     }
@@ -56,7 +53,6 @@ export const useMutateRolesQuery = () => {
       method: "DELETE",
       headers:{ 
         Authorization,
-        'nombre-modulo': nombreModulo,
       },
       body: JSON.stringify(param),
     }

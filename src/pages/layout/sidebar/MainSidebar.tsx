@@ -56,8 +56,9 @@ const MainSidebar:React.FC = () => {
       navlinkParent?.children[0].classList.add('active-parent')
     }
     document.body.classList.remove("sidebar-show-responsive");
-
-    setModuloActual(moduloActual)
+    if(moduloActual){
+      setModuloActual(moduloActual)
+    }
   }
 
   useEffect(() => {

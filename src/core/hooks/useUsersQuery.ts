@@ -82,7 +82,6 @@ export const useMutationUsersQuery = () => {
   const resetSessionStore = useSessionStore(state => state.resetSessionStore)
   const navigate = useNavigate()
   const tknSession = useSessionStore(state => state.tknSession)
-  const nombreModulo = useSessionStore(state => state.moduloActual?.nombre)
   const Authorization = "Bearer " + tknSession
   const filterParamsUsers = useUsersStore(state => state.filterParamsUsers)
   const queryClient = useQueryClient()
@@ -131,7 +130,6 @@ export const useMutationUsersQuery = () => {
       method: "POST",
       headers:{ 
         Authorization,
-        'nombre-modulo': nombreModulo,
       },
       body: JSON.stringify(filterParamsUsers),
     }
@@ -144,7 +142,6 @@ export const useMutationUsersQuery = () => {
       method: "POST",
       headers:{ 
         Authorization,
-        'nombre-modulo': nombreModulo,
       },
       body: JSON.stringify({id}),
     }
@@ -157,7 +154,6 @@ export const useMutationUsersQuery = () => {
       method: "POST",
       headers:{ 
         Authorization,
-        'nombre-modulo': nombreModulo,
       },
       body: JSON.stringify({id}),
     }
@@ -171,7 +167,6 @@ export const useMutationUsersQuery = () => {
       method: "POST",
       headers:{ 
         Authorization,
-        'nombre-modulo': nombreModulo,
       },
       body: JSON.stringify(user),
     }
@@ -195,7 +190,6 @@ export const useMutationUsersQuery = () => {
       method: "PUT",
       headers:{ 
         Authorization,
-        'nombre-modulo': nombreModulo,
       },
       body: JSON.stringify(user),
     }
@@ -209,7 +203,6 @@ export const useMutationUsersQuery = () => {
       method: "PUT",
       headers:{ 
         Authorization,
-        'nombre-modulo': nombreModulo,
       },
       body: JSON.stringify(user),
     }
@@ -223,7 +216,6 @@ export const useMutationUsersQuery = () => {
       method: "DELETE",
       headers:{ 
         Authorization,
-        'nombre-modulo': nombreModulo,
       },
       body: JSON.stringify({id}),
     }

@@ -8,12 +8,6 @@ export type ResponseQuery = {
   msgType?: "default" | "error" | "info" | "success" | "warning";
 }
 
-export type ThisTerm = {
-  nombre: string;
-  descripcion: string;
-  establecimiento_id: number
-}
-
 // ✅ TIPOS PARA EL CAMPO DE UNA TABLA
 export type CampoTable = {
   field_name: string;
@@ -27,7 +21,7 @@ export type FormsAuth = {
   formOfLogin: string; formOfForgot: string;
 }
 export type LoginForm = {
-  username: string; password: string;
+  username: string; password: string, establecimiento_id: string;
 }
 export type RestoreForm = {
   code:string; new_password:string; new_password_repeat:string;
@@ -159,7 +153,7 @@ export interface Producto {
   marca: string;
   laboratorio_id: number;
   laboratorio: string;
-  unidad: string;
+  unidad_medida_cod: string;
   tipo_moneda_cod: string;
   precio_venta: number;
   precio_costo: number;
@@ -167,8 +161,26 @@ export interface Producto {
   impuesto_id_icbper: number;
   inventariable: number;
   lotizable: number;
+  stock: number;
   stock_min: number;
   imagen: string;
+  estado: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export type ProductoItem = {
+  id: number;
+  establecimiento_id: number;
+  codigo: string;
+  barcode: string;
+  descripcion: string;
+  marca_id: number;
+  marca: string;
+  laboratorio_id: number;
+  laboratorio: string;
+  stock: number;
+  unidad: string;
   estado: number;
   created_at: string;
   updated_at: string;

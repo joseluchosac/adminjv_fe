@@ -1,5 +1,5 @@
 import { format, isValid, parseISO } from "date-fns";
-import { CampoTable, Producto } from "../../core/types";
+import { CampoTable, ProductoItem } from "../../core/types";
 import { useProductos } from "./context/ProductosContext";
 import { FaEdit, FaToggleOff, FaToggleOn, FaTrash } from "react-icons/fa";
 import Swal from "sweetalert2";
@@ -9,7 +9,7 @@ import { useEffect } from "react";
 import { toast } from "react-toastify";
 
 interface ProductosLstRowProps {
-  producto: Producto ;
+  producto: ProductoItem ;
   camposProducto: CampoTable[]
 }
 
@@ -99,9 +99,9 @@ function ProductosLstRow({ producto, camposProducto }: ProductosLstRowProps) {
                 key={el.field_name}
                 className="overflow-hidden text-wrap"
                 style={{minWidth: "300px", maxWidth:"450px"}}
-                title={producto[el.field_name as keyof Producto] as string}
+                title={producto[el.field_name as keyof ProductoItem] as string}
               >
-                <div>{producto[el.field_name as keyof Producto]}</div>
+                <div>{producto[el.field_name as keyof ProductoItem]}</div>
                 <div className="d-flex gap-3 text-muted">
                   {producto.marca ? <div><small>{producto.marca}</small></div> :''}
                   {producto.laboratorio ? <div><small>{producto.laboratorio}</small></div> :''}
@@ -112,10 +112,10 @@ function ProductosLstRow({ producto, camposProducto }: ProductosLstRowProps) {
             )
           }
           case "stock": {
-            return <td key={el.field_name}>{parseFloat(producto[el.field_name as keyof Producto] as string)} {producto.unidad}</td>
+            return <td key={el.field_name}>{parseFloat(producto[el.field_name as keyof ProductoItem] as string)} {producto.unidad}</td>
           }
           default: {
-            return <td key={el.field_name}>{producto[el.field_name as keyof Producto]}</td>
+            return <td key={el.field_name}>{producto[el.field_name as keyof ProductoItem]}</td>
           }
         }
       })}

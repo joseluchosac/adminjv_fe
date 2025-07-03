@@ -18,15 +18,15 @@ export const useFilterProductosQuery = () => {
   const [isEnabledQuery, setIsEnabledQuery] = useState(false)
   const setFilterParamsProductos = useProductosStore(state => state.setFilterParamsProductos)
   const token = useSessionStore(state => state.tknSession)
-  const thisTerm = useSessionStore(state => state.thisTerm)
+  const curEstab = useSessionStore(state => state.curEstab)
   const filterParamsProductos = useProductosStore(state => state.filterParamsProductos)
   const navigate = useNavigate()
   const queryClient = useQueryClient()
 
-  const {fetchNextPage, data, refetch, isError, isLoading, isFetching, hasNextPage,  } = useInfiniteQuery({
+  const {fetchNextPage, data, refetch, isError, isLoading, isFetching, hasNextPage} = useInfiniteQuery({
     queryKey: ['productos'],
     queryFn: ({pageParam = 1, signal}) => {
-      return filterProductosFetch({filterParamsProductos, pageParam, signal, token, thisTerm})
+      return filterProductosFetch({filterParamsProductos, pageParam, signal, token, curEstab})
     },
     initialPageParam: 1,
     enabled: isEnabledQuery,
@@ -75,7 +75,8 @@ export const useMutationProductosQuery = () => {
   const resetSessionStore = useSessionStore(state => state.resetSessionStore)
   const navigate = useNavigate()
   const tknSession = useSessionStore(state => state.tknSession)
-  const nombreModulo = useSessionStore(state => state.moduloActual?.nombre)
+  const curModulo = useSessionStore(state => state.moduloActual?.nombre)
+  const curEstab = useSessionStore(state => state.curEstab)
   const Authorization = "Bearer " + tknSession
   const filterParamsProductos = useProductosStore(state => state.filterParamsProductos)
   const queryClient = useQueryClient()
@@ -96,7 +97,7 @@ export const useMutationProductosQuery = () => {
       method: "POST",
       headers:{ 
         Authorization,
-        'nombre-modulo': nombreModulo,
+        "attached-data": JSON.stringify({curEstab, curModulo}),
       },
       body: JSON.stringify(filterParamsProductos),
     }
@@ -109,7 +110,7 @@ export const useMutationProductosQuery = () => {
       method: "POST",
       headers:{ 
         Authorization,
-        'nombre-modulo': nombreModulo,
+        "attached-data": JSON.stringify({curEstab, curModulo}),
       },
       body: JSON.stringify({id}),
     }
@@ -122,7 +123,6 @@ export const useMutationProductosQuery = () => {
       method: "POST",
       headers:{ 
         Authorization,
-        'nombre-modulo': nombreModulo,
       },
       body: JSON.stringify({codigo, establecimiento_id}),
     }
@@ -136,7 +136,6 @@ export const useMutationProductosQuery = () => {
       method: "POST",
       headers:{ 
         Authorization,
-        'nombre-modulo': nombreModulo,
       },
       body: JSON.stringify(producto),
     }
@@ -150,7 +149,6 @@ export const useMutationProductosQuery = () => {
       method: "PUT",
       headers:{ 
         Authorization,
-        'nombre-modulo': nombreModulo,
       },
       body: JSON.stringify(producto),
     }
@@ -164,7 +162,6 @@ export const useMutationProductosQuery = () => {
       method: "PUT",
       headers:{ 
         Authorization,
-        'nombre-modulo': nombreModulo,
       },
       body: JSON.stringify(estado),
     }
@@ -179,7 +176,6 @@ export const useMutationProductosQuery = () => {
       method: "DELETE",
       headers:{ 
         Authorization,
-        'nombre-modulo': nombreModulo,
       },
       body: JSON.stringify({id}),
     }

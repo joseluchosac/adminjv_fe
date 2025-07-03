@@ -54,7 +54,6 @@ export const useFilterMovimientosQuery = () => {
 
   useEffect(()=>{
     if(data?.pages[data?.pages.length-1].msgType === "errorToken"){
-      // resetSessionStore()
       navigate("/auth")
     }
   },[data])
@@ -74,7 +73,6 @@ export const useMutationMovimientosQuery = () => {
   const resetSessionStore = useSessionStore(state => state.resetSessionStore)
   const navigate = useNavigate()
   const tknSession = useSessionStore(state => state.tknSession)
-  const nombreModulo = useSessionStore(state => state.moduloActual?.nombre)
   const Authorization = "Bearer " + tknSession
   const queryClient = useQueryClient()
   const typeActionRef = useRef<TypeAction | "">("")
@@ -88,20 +86,6 @@ export const useMutationMovimientosQuery = () => {
   })
 
 
-
-  // const getMovimiento = (id: number) => {
-  //   const params = {
-  //     url: apiURL + "movimientos/get_movimiento",
-  //     method: "POST",
-  //     headers:{ 
-  //       Authorization,
-  //       'nombre-modulo': nombreModulo,
-  //     },
-  //     body: JSON.stringify({id}),
-  //   }
-  //   mutate(params)
-  // }
-
   const createMovimiento = (movimiento: Movimientoform) => {
     typeActionRef.current = "mutate_movimiento"
     const params = {
@@ -109,7 +93,6 @@ export const useMutationMovimientosQuery = () => {
       method: "POST",
       headers:{ 
         Authorization,
-        'nombre-modulo': nombreModulo,
       },
       body: JSON.stringify(movimiento),
     }
@@ -123,41 +106,12 @@ export const useMutationMovimientosQuery = () => {
       method: "PUT",
       headers:{ 
         Authorization,
-        'nombre-modulo': nombreModulo,
       },
       body: JSON.stringify(movimiento),
     }
     mutate(params)
   }
 
-  // const updateEstado = (estado: {id:number; estado:number}) => {
-  //   typeActionRef.current = "mutate_movimiento"
-  //   const params = {
-  //     url: apiURL + "movimientos/update_estado",
-  //     method: "PUT",
-  //     headers:{ 
-  //       Authorization,
-  //       'nombre-modulo': nombreModulo,
-  //     },
-  //     body: JSON.stringify(estado),
-  //   }
-  //   mutate(params)
-  // }
-
-
-  // const deleteMovimiento = (id: number) => {
-  //   typeActionRef.current = "mutate_movimiento"
-  //   const params = {
-  //     url: apiURL + "movimientos/delete_movimiento",
-  //     method: "DELETE",
-  //     headers:{ 
-  //       Authorization,
-  //       'nombre-modulo': nombreModulo,
-  //     },
-  //     body: JSON.stringify({id}),
-  //   }
-  //   mutate(params)
-  // }
 
   const reset = (newValues: any) => {
     mutate({newValues}) // Solo actualiza los datos, solo local
@@ -174,12 +128,8 @@ export const useMutationMovimientosQuery = () => {
     data, 
     isPending, 
     isError,
-    // filterMovimientoFull,
-    // getMovimiento,
     createMovimiento,
     updateMovimiento,
-    // updateEstado,
-    // deleteMovimiento,
     reset,
   }
 }

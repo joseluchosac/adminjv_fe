@@ -70,7 +70,6 @@ export const useMutationProveedoresQuery = () => {
   const resetSessionStore = useSessionStore(state => state.resetSessionStore)
   const navigate = useNavigate()
   const tknSession = useSessionStore(state => state.tknSession)
-  const nombreModulo = useSessionStore(state => state.moduloActual?.nombre)
   const Authorization = "Bearer " + tknSession
   const filterParamsProveedores = useProveedoresStore(state => state.filterParamsProveedores)
 
@@ -90,7 +89,6 @@ export const useMutationProveedoresQuery = () => {
       method: "POST",
       headers:{ 
         Authorization,
-        'nombre-modulo': nombreModulo,
       },
       body: JSON.stringify(filterParamsProveedores),
     }
@@ -103,7 +101,6 @@ export const useMutationProveedoresQuery = () => {
       method: "POST",
       headers:{ 
         Authorization,
-        'nombre-modulo': nombreModulo,
       },
       body: JSON.stringify({id}),
     }
@@ -116,7 +113,6 @@ export const useMutationProveedoresQuery = () => {
       method: "POST",
       headers:{ 
         Authorization,
-        'nombre-modulo': nombreModulo,
       },
       body: JSON.stringify(proveedor),
     }
@@ -130,7 +126,6 @@ export const useMutationProveedoresQuery = () => {
       method: "PUT",
       headers:{ 
         Authorization,
-        'nombre-modulo': nombreModulo,
       },
       body: JSON.stringify(param),
     }
@@ -143,7 +138,6 @@ export const useMutationProveedoresQuery = () => {
       method: "DELETE",
       headers:{ 
         Authorization,
-        'nombre-modulo': nombreModulo,
       },
       body: JSON.stringify({id}),
     }
@@ -156,7 +150,6 @@ export const useMutationProveedoresQuery = () => {
       method: "POST",
       headers:{ 
         Authorization,
-        'nombre-modulo': nombreModulo,
       },
       body: JSON.stringify(param),
     }

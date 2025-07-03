@@ -4,7 +4,6 @@ import useSessionStore from "../store/useSessionStore"
 import { mutationFetch } from "../services/mutationFecth";
 import { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { ThisTerm } from "../types";
 
 type TypeAction = 
   "mutate_empresa"
@@ -21,10 +20,7 @@ export const useMutationConfigQuery = () => {
   // const [typeAction, setTypeAction] = useState<TypeAction | "">("")
   const navigate = useNavigate()
   const resetSessionStore = useSessionStore(state => state.resetSessionStore)
-  const thisTerm = useSessionStore(state => state.thisTerm)
-  const setThisTerm = useSessionStore(state => state.setThisTerm)
   const tknSession = useSessionStore(state => state.tknSession)
-  const nombreModulo = useSessionStore(state => state.moduloActual?.nombre)
   const Authorization = "Bearer " + tknSession
   const queryClient = useQueryClient()
   const typeActionRef = useRef<TypeAction | "">("")
@@ -42,7 +38,6 @@ export const useMutationConfigQuery = () => {
       url: apiURL + "config/get_empresa",
       headers:{ 
         Authorization, 
-        'nombre-modulo': nombreModulo,
       },
     }
     mutate(params)
@@ -55,7 +50,6 @@ export const useMutationConfigQuery = () => {
       method: "POST",
       headers:{ 
         Authorization,
-        'nombre-modulo': nombreModulo,
       },
       body: formData
     }
@@ -68,7 +62,6 @@ export const useMutationConfigQuery = () => {
       method: "POST",
       headers:{ 
         Authorization,
-        'nombre-modulo': nombreModulo,
       },
     }
     mutate(params) 
@@ -81,7 +74,6 @@ export const useMutationConfigQuery = () => {
       method: "POST",
       headers:{ 
         Authorization,
-        'nombre-modulo': nombreModulo,
       },
       body: JSON.stringify(form)
     }
@@ -94,7 +86,6 @@ export const useMutationConfigQuery = () => {
       method: "POST",
       headers:{ 
         Authorization,
-        'nombre-modulo': nombreModulo,
       },
     }
     mutate(params)  
@@ -107,7 +98,6 @@ export const useMutationConfigQuery = () => {
       method: "POST",
       headers:{ 
         Authorization,
-        'nombre-modulo': nombreModulo,
       },
       body: JSON.stringify(form)
     }
@@ -120,7 +110,6 @@ export const useMutationConfigQuery = () => {
       method: "POST",
       headers:{ 
         Authorization,
-        'nombre-modulo': nombreModulo,
       },
     }
     mutate(params) 
@@ -133,7 +122,6 @@ export const useMutationConfigQuery = () => {
       method: "POST",
       headers:{ 
         Authorization,
-        'nombre-modulo': nombreModulo,
       },
       body: JSON.stringify(form)
     }
@@ -146,7 +134,6 @@ export const useMutationConfigQuery = () => {
       method: "POST",
       headers:{ 
         Authorization,
-        'nombre-modulo': nombreModulo,
       },
     }
     mutate(params) 
@@ -159,7 +146,6 @@ export const useMutationConfigQuery = () => {
       method: "POST",
       headers:{ 
         Authorization,
-        'nombre-modulo': nombreModulo,
       },
       body: JSON.stringify(form)
     }
@@ -172,7 +158,6 @@ export const useMutationConfigQuery = () => {
       method: "POST",
       headers:{ 
         Authorization,
-        'nombre-modulo': nombreModulo,
       },
     }
     mutate(params) 
@@ -185,53 +170,15 @@ export const useMutationConfigQuery = () => {
       method: "POST",
       headers:{ 
         Authorization,
-        'nombre-modulo': nombreModulo,
       },
       body: JSON.stringify(form)
     }
     mutate(params) 
   }
 
-  const linkThisTerminal = (terminal: ThisTerm) => {
-    const params = {
-      url: apiURL + "config/link_this_terminal",
-      method: "POST",
-      headers:{ 
-        Authorization,
-        'nombre-modulo': nombreModulo,
-      },
-      body: JSON.stringify(terminal),
-    }
-    mutate(params)
-  }
 
-  const unlinkThisTerminal = (nombre: string) => {
-    const params = {
-      url: apiURL + "config/unlink_this_terminal",
-      method: "DELETE",
-      headers:{ 
-        Authorization,
-        'nombre-modulo': nombreModulo,
-      },
-      body: JSON.stringify({nombre}),
-    }
-    mutate(params)
-  }
 
-  const checkThisTerm = () => {
-    if(!thisTerm) return
-    typeActionRef.current = "check_this_term"
-    const params = {
-      url: apiURL + "config/get_terminal",
-      method: "POST",
-      headers:{ 
-        Authorization,
-        'nombre-modulo': nombreModulo,
-      },
-      body: JSON.stringify({nombre: thisTerm?.nombre}),
-    }
-    mutate(params)
-  }
+
 
   const reset = (newValues: any) => {
     mutate({newValues}) // Solo actualiza los datos, no hace fetch
@@ -242,11 +189,7 @@ export const useMutationConfigQuery = () => {
       resetSessionStore()
       navigate("/auth")
     }
-    if(typeActionRef.current === "check_this_term"){
-      if(data && !data.content){
-        setThisTerm(null)
-      }
-    }
+
   },[data])
 
   return {
@@ -265,9 +208,6 @@ export const useMutationConfigQuery = () => {
     updateUsuarioSolSec,
     getEmailConfig,
     updateEmailConfig,
-    linkThisTerminal,
-    unlinkThisTerminal,
-    checkThisTerm,
     typeAction: typeActionRef.current,
     reset,
   }

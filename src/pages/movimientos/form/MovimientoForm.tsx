@@ -18,7 +18,7 @@ export default function Movimientoform(){
   const darkMode = useLayoutStore(state => state.layout.darkMode)
   const establecimientos = useCatalogosStore(state => state.catalogos?.establecimientos)
   const tipos_movimiento = useCatalogosStore(state => state.catalogos?.tipos_movimiento)
-  const thisTerm = useSessionStore(state => state.thisTerm)
+  const curEstab = useSessionStore(state => state.curEstab)
   const { 
     modo,
     setModo,
@@ -87,8 +87,8 @@ export default function Movimientoform(){
   };
 
   useEffect(()=>{
-    if(modo.vista === "edit" && thisTerm){
-      setValue("establecimiento_id", thisTerm.establecimiento_id)
+    if(modo.vista === "edit" && curEstab){
+      setValue("establecimiento_id", curEstab)
     }else{
       reset(movimientoFormInit)
     }

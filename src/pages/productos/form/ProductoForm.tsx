@@ -40,6 +40,7 @@ const productoFormInit = {
   impuesto_id_icbper: 0,
   inventariable: 0,
   lotizable: 0,
+  stock: 0,
   stock_min: 0,
   thumb: '',
   estado: 1,
@@ -205,7 +206,7 @@ export default function Productoform(){
                     <Form.Control
                       id="codigo"
                       {...register('codigo', {
-                        maxLength: {value: 10, message:"Se permite máximo 10 caracteres"}
+                        maxLength: {value: 11, message:"Se permite máximo 11 caracteres"}
                       })}
                     />
                     {errors.codigo && 
@@ -338,11 +339,28 @@ export default function Productoform(){
                               <div className="invalid-feedback d-block">{errors.precio_costo.message}</div>
                             }
                           </Form.Group>
-
                         </Row>
                       </Tab>
                       <Tab eventKey="inventario" title="Inventario">
                         <Row>
+                          <Form.Group as={Col} className="mb-3" controlId="inventariable">
+                            <Form.Check {...register('inventariable')} label="Inventariable" />
+                          </Form.Group>
+                          <Form.Group as={Col} className="mb-3" controlId="lotizable">
+                            <Form.Check {...register('lotizable')} label="Lotizable" />
+                          </Form.Group>
+                        </Row>
+                        <Row>
+                          <Form.Group as={Col} md={4} xl={4} className="mb-3">
+                            <Form.Label htmlFor="stock">Stock</Form.Label>
+                            <Form.Control
+                              id="stock"
+                              type="number"
+                              step={0.01}
+                              disabled
+                              {...register('stock', {valueAsNumber:true})}
+                            />
+                          </Form.Group>
                           <Form.Group as={Col} md={4} xl={4} className="mb-3">
                             <Form.Label htmlFor="stock_min">Stock mínimo</Form.Label>
                             <Form.Control
@@ -354,12 +372,6 @@ export default function Productoform(){
                             {errors.stock_min && 
                               <div className="invalid-feedback d-block">{errors.stock_min.message}</div>
                             }
-                          </Form.Group>
-                          <Form.Group className="mb-3" controlId="inventariable">
-                            <Form.Check {...register('inventariable')} label="Inventariable" />
-                          </Form.Group>
-                          <Form.Group className="mb-3" controlId="lotizable">
-                            <Form.Check {...register('lotizable')} label="Lotizable" />
                           </Form.Group>
                         </Row>
                       </Tab>

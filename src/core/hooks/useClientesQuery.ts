@@ -74,7 +74,6 @@ export const useMutationClientesQuery = () => {
   const resetSessionStore = useSessionStore(state => state.resetSessionStore)
   const navigate = useNavigate()
   const tknSession = useSessionStore(state => state.tknSession)
-  const nombreModulo = useSessionStore(state => state.moduloActual?.nombre)
   const Authorization = "Bearer " + tknSession
   const filterParamsClientes = useClientesStore(state => state.filterParamsClientes)  
   const queryClient = useQueryClient()
@@ -94,7 +93,6 @@ export const useMutationClientesQuery = () => {
       method: "POST",
       headers:{ 
         Authorization,
-        'nombre-modulo': nombreModulo,
       },
       body: JSON.stringify(filterParamsClientes),
     }
@@ -107,7 +105,6 @@ export const useMutationClientesQuery = () => {
       method: "POST",
       headers:{ 
         Authorization,
-        'nombre-modulo': nombreModulo,
       },
       body: JSON.stringify({id}),
     }
@@ -121,7 +118,6 @@ export const useMutationClientesQuery = () => {
       method: "POST",
       headers:{ 
         Authorization,
-        'nombre-modulo': nombreModulo,
       },
       body: JSON.stringify(cliente),
     }
@@ -135,7 +131,6 @@ export const useMutationClientesQuery = () => {
       method: "PUT",
       headers:{ 
         Authorization,
-        'nombre-modulo': nombreModulo,
       },
       body: JSON.stringify(cliente),
     }
@@ -149,7 +144,6 @@ export const useMutationClientesQuery = () => {
       method: "DELETE",
       headers:{ 
         Authorization,
-        'nombre-modulo': nombreModulo,
       },
       body: JSON.stringify({id}),
     }
@@ -163,7 +157,6 @@ export const useMutationClientesQuery = () => {
       method: "POST",
       headers:{ 
         Authorization,
-        'nombre-modulo': nombreModulo,
       },
       body: JSON.stringify(param),
     }

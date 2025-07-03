@@ -11,7 +11,6 @@ export const useMutateCategoriasQuery = () => {
   const resetSessionStore = useSessionStore(state => state.resetSessionStore)
   const navigate = useNavigate()
   const tknSession = useSessionStore(state => state.tknSession)
-  const nombreModulo = useSessionStore(state => state.moduloActual?.nombre)
   const Authorization = "Bearer " + tknSession
   const queryClient = useQueryClient()
 
@@ -28,7 +27,6 @@ export const useMutateCategoriasQuery = () => {
       method: "PUT",
       headers:{ 
         Authorization,
-        'nombre-modulo': nombreModulo,
       },
       body: JSON.stringify(orderedItems)
     }
@@ -41,7 +39,6 @@ export const useMutateCategoriasQuery = () => {
       method: "POST",
       headers:{ 
         Authorization,
-        'nombre-modulo': nombreModulo,
       },
       body: JSON.stringify(categoria),
     }
@@ -54,7 +51,6 @@ export const useMutateCategoriasQuery = () => {
       method: "PUT",
       headers:{ 
         Authorization,
-        'nombre-modulo': nombreModulo,
       },
       body: JSON.stringify(categoria),
     }
@@ -67,7 +63,6 @@ export const useMutateCategoriasQuery = () => {
       method: "DELETE",
       headers:{ 
         Authorization,
-        'nombre-modulo': nombreModulo,
       },
       body: JSON.stringify({id}),
     }
@@ -85,8 +80,6 @@ export const useMutateCategoriasQuery = () => {
   return {
     data, 
     isPending, 
-    // getCategorias,
-    // getCategoriasTree,
     sortCategorias,
     createCategoria, 
     updateCategoria, 

@@ -71,7 +71,6 @@ export const useMutationMarcasQuery = () => {
   const resetSessionStore = useSessionStore(state => state.resetSessionStore)
   const navigate = useNavigate()
   const tknSession = useSessionStore(state => state.tknSession)
-  const nombreModulo = useSessionStore(state => state.moduloActual?.nombre)
   const Authorization = "Bearer " + tknSession
   const filterParamsMarcas = useMarcasStore(state => state.filterParamsMarcas)
   const queryClient = useQueryClient()
@@ -92,7 +91,6 @@ export const useMutationMarcasQuery = () => {
       method: "POST",
       headers:{ 
         Authorization,
-        'nombre-modulo': nombreModulo,
       },
       body: JSON.stringify(filterParamsMarcas),
     }
@@ -105,7 +103,6 @@ export const useMutationMarcasQuery = () => {
       method: "POST",
       headers:{ 
         Authorization,
-        'nombre-modulo': nombreModulo,
       },
       body: JSON.stringify({id}),
     }
@@ -119,7 +116,6 @@ export const useMutationMarcasQuery = () => {
       method: "POST",
       headers:{ 
         Authorization,
-        'nombre-modulo': nombreModulo,
       },
       body: JSON.stringify(marca),
     }
@@ -133,7 +129,6 @@ export const useMutationMarcasQuery = () => {
       method: "PUT",
       headers:{ 
         Authorization,
-        'nombre-modulo': nombreModulo,
       },
       body: JSON.stringify(marca),
     }
@@ -147,7 +142,6 @@ export const useMutationMarcasQuery = () => {
       method: "DELETE",
       headers:{ 
         Authorization,
-        'nombre-modulo': nombreModulo,
       },
       body: JSON.stringify({id}),
     }

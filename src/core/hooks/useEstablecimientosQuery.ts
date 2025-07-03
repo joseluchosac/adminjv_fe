@@ -13,7 +13,6 @@ export const useMutationEstablecimientosQuery = () => {
   const resetSessionStore = useSessionStore(state => state.resetSessionStore)
   const navigate = useNavigate()
   const tknSession = useSessionStore(state => state.tknSession)
-  const nombreModulo = useSessionStore(state => state.moduloActual?.nombre)
   const Authorization = "Bearer " + tknSession
   const queryClient = useQueryClient()
   const typeActionRef = useRef<TypeAction | "">("")
@@ -32,8 +31,15 @@ export const useMutationEstablecimientosQuery = () => {
       method: "POST",
       headers:{ 
         Authorization,
-        'nombre-modulo': nombreModulo,
       },
+    }
+    mutate(params)
+  }
+
+  const getEstablecimientosOptions = () => {
+    const params = {
+      url: apiURL + "establecimientos/get_establecimientos_options",
+      method: "POST",
     }
     mutate(params)
   }
@@ -44,7 +50,6 @@ export const useMutationEstablecimientosQuery = () => {
       method: "POST",
       headers:{ 
         Authorization,
-        'nombre-modulo': nombreModulo,
       },
       body: JSON.stringify({id}),
     }
@@ -58,7 +63,6 @@ export const useMutationEstablecimientosQuery = () => {
       method: "POST",
       headers:{ 
         Authorization,
-        'nombre-modulo': nombreModulo,
       },
       body: JSON.stringify(establecimiento),
     }
@@ -72,7 +76,6 @@ export const useMutationEstablecimientosQuery = () => {
       method: "PUT",
       headers:{ 
         Authorization,
-        'nombre-modulo': nombreModulo,
       },
       body: JSON.stringify(establecimiento),
     }
@@ -86,7 +89,6 @@ export const useMutationEstablecimientosQuery = () => {
       method: "DELETE",
       headers:{ 
         Authorization,
-        'nombre-modulo': nombreModulo,
       },
       body: JSON.stringify({id}),
     }
@@ -109,6 +111,7 @@ export const useMutationEstablecimientosQuery = () => {
     isPending, 
     isError,
     getEstablecimientos,
+    getEstablecimientosOptions,
     getEstablecimiento,
     createEstablecimiento,
     updateEstablecimiento,

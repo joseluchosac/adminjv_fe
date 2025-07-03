@@ -11,11 +11,15 @@ const formsAuth = {
   formOfLogin: "formOfLogin",
   formOfForgot: "formOfForgot",
 }
+const loginFormInit = {
+  username:'',
+  password:'',
+  establecimiento_id: '',
+}
 
 const Auth: React.FC = () => {
-  const [loginForm, setLoginForm] = useState<LoginForm>({ username: "", password: "" });
+  const [loginForm, setLoginForm] = useState<LoginForm>(loginFormInit);
   const [currentForm, setCurrentForm] = useState(formsAuth.formOfLogin)
-  // const [email, setEmail] = useState("")
   const darkMode = useLayoutStore(state => state.layout.darkMode)
 
   const {

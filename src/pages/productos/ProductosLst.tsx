@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import { Card, Table } from "react-bootstrap";
 import { toast } from "react-toastify";
-import { Producto } from "../../core/types";
+import { ProductoItem } from "../../core/types";
 import ProductosLstRow from "./ProductosLstRow";
 import useProductosStore from "../../core/store/useProductosStore";
 import DynaIcon from "../../core/components/DynaComponents";
@@ -71,7 +71,7 @@ const ProductosLst: React.FC = () => {
 
   useEffect(()=>{
     if(data?.pages[0].error || !data?.pages[0].content) return
-    const newProductos = data?.pages.flatMap(el => el.content) as Producto[];
+    const newProductos = data?.pages.flatMap(el => el.content);
     setProductos([...newProductos])
   },[data])
 
@@ -127,7 +127,7 @@ const ProductosLst: React.FC = () => {
               </tr>
             </thead>
             <tbody>
-              {productos && productos.map((producto: Producto) => (
+              {productos && productos.map((producto: ProductoItem) => (
                 <ProductosLstRow key={producto.id} producto={producto} camposProducto={camposProducto}/>
               ))}
             </tbody>

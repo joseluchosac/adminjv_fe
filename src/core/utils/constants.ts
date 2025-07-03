@@ -46,7 +46,7 @@ export const selectDark = {
 }
 
 export const lsTknSessionKey = "lsTknSession"
-export const lsThisT = "lsThisT"
+export const lsCurEst = "lsCurEst"
 
 
 export const registerFormInit = {

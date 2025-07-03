@@ -1,6 +1,6 @@
 import { create } from "zustand";
-import { EmpresaSession, Modulo, ThisTerm, User } from "../types";
-import { lsThisT, lsTknSessionKey } from "../utils/constants";
+import { EmpresaSession, Modulo, User } from "../types";
+import { lsCurEst, lsTknSessionKey } from "../utils/constants";
 
 interface UseSessionStore {
   tknSession: string | null;
@@ -8,31 +8,35 @@ interface UseSessionStore {
   userSession: User | null;
   modulosSesion: Modulo[] | null;
   moduloActual: Modulo | null;
-  thisTerm: ThisTerm | null;
+  curEstab: number;
+  setCurEstab: (establecimiento_id: number) => void;
   setModuloActual: (modulo: Modulo | null) => void;
   setTknSession: (newTknSession:string) => void;
   setEmpresaSession: (newEmpresaSession:EmpresaSession) => void;
   setUserSession: (newUserSession:User) => void;
   resetSessionStore: () => void;
   setModulosSesion: (newModulosRolSesion: any) => void;
-  setThisTerm: (newThisTerm: ThisTerm | null) => void;
   reset: () => void;
 }
 
 const tknSession = localStorage.getItem(lsTknSessionKey)
-const thisT = localStorage.getItem(lsThisT) 
+const curEstab = localStorage.getItem(lsCurEst) // Current establecimiento
 
 const initialState = {
+  curEstab: curEstab ? Number(curEstab) : 0,
   tknSession: tknSession,
   empresaSession: null,
   userSession: null,
   modulosSesion: null,
   moduloActual: null,
-  thisTerm: thisT ? JSON.parse(atob(thisT)) as ThisTerm : null,
 }
 
 const useSessionStore = create<UseSessionStore>((set) => ({
     ...initialState,
+    setCurEstab: (establecimiento_id) => {
+      set({curEstab: establecimiento_id})
+      window.localStorage.setItem(lsCurEst,  establecimiento_id.toString())
+    },
     setModuloActual: (modulo) => {
       set({moduloActual: modulo})
     },
@@ -54,15 +58,6 @@ const useSessionStore = create<UseSessionStore>((set) => ({
     },
     setModulosSesion: (newModulosRolSesion) => {
       set({modulosSesion: newModulosRolSesion})
-    },
-    setThisTerm: (newThisTerm) => {
-      if(newThisTerm){
-        set({thisTerm: newThisTerm})
-        window.localStorage.setItem(lsThisT, btoa(JSON.stringify(newThisTerm)))
-      }else{
-        set({thisTerm: null})
-        window.localStorage.removeItem(lsThisT)
-      }
     },
     reset: () => set(initialState),
 }))

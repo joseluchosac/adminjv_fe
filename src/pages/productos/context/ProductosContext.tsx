@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import { FilterCurrent, Producto } from "../../../core/types";
+import { FilterCurrent, ProductoItem } from "../../../core/types";
 import { CategoriaOpc } from "../../../core/types/catalogosTypes";
 import useCatalogosStore from "../../../core/store/useCatalogosStore";
 import { flattenTree } from "../../../core/utils/funciones";
@@ -16,8 +16,8 @@ const filterProductosCurrentInit: FilterCurrent = {
 }
 
 export interface ProductosContextType {
-  productos: Producto[] | null;
-  setProductos: React.Dispatch<React.SetStateAction<Producto[] | null>>;
+  productos: ProductoItem[] | null;
+  setProductos: React.Dispatch<React.SetStateAction<ProductoItem[] | null>>;
   modo: Modo;
   setModo: React.Dispatch<React.SetStateAction<Modo>>;
   categoriasOpc: CategoriaOpc[] | null
@@ -33,7 +33,7 @@ const ProductosContext = createContext<ProductosContextType | undefined>(undefin
 
 // Proveedor del contexto
 export const ProductosProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [productos, setProductos] = useState<Producto[] | null>(null);
+  const [productos, setProductos] = useState<ProductoItem[] | null>(null);
   const [modo, setModo] = useState<Modo>({vista: "list", productoId: 0});
   const [categoriasOpc, setCategoriasOpc] = useState<CategoriaOpc[] | null>(null);
   const [filterProductosCurrent, setFilterProductosCurrent] = useState(filterProductosCurrentInit);

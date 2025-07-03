@@ -2,46 +2,62 @@ import { Alert, Button, Card, Form, InputGroup } from "react-bootstrap";
 import DynaIcon from "../../core/components/DynaComponents";
 import { Link } from "react-router-dom";
 import { LdsBar } from "../../core/components/Loaders";
-import { FormsAuth, LoginForm } from "../../core/types";
+import { FormControlElement, FormsAuth, LoginForm } from "../../core/types";
 import { useMutationUsersQuery } from "../../core/hooks/useUsersQuery";
 import useSessionStore from "../../core/store/useSessionStore";
 import { useEffect } from "react";
+import { useMutationEstablecimientosQuery } from "../../core/hooks/useEstablecimientosQuery";
+import { FaStore } from "react-icons/fa";
+import { EstablecimientoOption } from "../../core/types/catalogosTypes";
 
 type LoginProps = {
   isPendingEmail: boolean;
   loginForm: LoginForm;
-  setLoginForm: (p: LoginForm) => void;
+  setLoginForm: React.Dispatch<React.SetStateAction<LoginForm>>;
   handleShowForm: (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => void;
   formsAuth: FormsAuth;
 }
 
-const Login: React.FC<LoginProps> = ({
-  isPendingEmail, 
-  loginForm,
-  setLoginForm,
-  handleShowForm,
-  formsAuth,
-}) => {
-  
-  const {setTknSession, setUserSession, setModulosSesion, setEmpresaSession} = useSessionStore()
+const Login: React.FC<LoginProps> = ({isPendingEmail,loginForm,setLoginForm,handleShowForm,formsAuth,}) => {
+  const {
+    setTknSession,
+    setUserSession,
+    setModulosSesion,
+    setEmpresaSession,
+    curEstab,
+    setCurEstab,
+  } = useSessionStore()
+
   const {
     data: dataSignIn,
     isPending: isPendingSignIn,
     signIn
   } = useMutationUsersQuery()
 
+  const {
+    data: establecimientos,
+    getEstablecimientosOptions
+  } = useMutationEstablecimientosQuery()
+
   const handleSubmitLoginForm = (e: React.FormEvent) => {
     e.preventDefault();
+    setCurEstab(Number(loginForm.establecimiento_id))
     signIn(loginForm)
   };
 
-  const handleChangeLoginForm = (e: React.ChangeEvent<HTMLInputElement>) => {
+
+  const handleChangeLoginForm = (e: React.ChangeEvent<FormControlElement>) => {
     const {name, value} = e.target
-    setLoginForm({ ...loginForm, [name]: value });
+    setLoginForm((prev) => ({ ...prev, [name]: value }));
   };
-  // const handleChangeCheckLoginForm = (e: React.ChangeEvent<HTMLInputElement>) => {
-  //   setLoginForm({ ...loginForm, [e.target.name]: e.target.value });
-  // };
+
+  useEffect(() => {
+    getEstablecimientosOptions()
+  },[])
+
+  useEffect(() => {
+    setLoginForm((prev)=>({...prev, establecimiento_id:curEstab.toString()}))
+  },[curEstab])
 
   useEffect(() => {
     if(dataSignIn && !dataSignIn?.error){
@@ -87,6 +103,19 @@ const Login: React.FC<LoginProps> = ({
             onChange={handleChangeLoginForm}
           />
           <InputGroup.Text id="basic-addon2"><DynaIcon name="FaLock" /></InputGroup.Text>
+        </InputGroup>
+        <InputGroup className="mb-3">
+          <Form.Select
+            name="establecimiento_id"
+            value={loginForm.establecimiento_id}
+            onChange={handleChangeLoginForm}
+          >
+            <option value="">- Establecimiento -</option>
+            {establecimientos && establecimientos?.content.map((el: EstablecimientoOption) => (
+              <option key={el.id} value={el.id}>{el.descripcion}</option>
+            ))}
+          </Form.Select>
+          <InputGroup.Text id="basic-addon2"><FaStore /></InputGroup.Text>
         </InputGroup>
         <div className="d-flex justify-content-end align-items-center mb-3">
           <Button variant="primary" type="submit">

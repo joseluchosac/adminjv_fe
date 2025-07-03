@@ -127,6 +127,11 @@ export type Establecimiento = {
   email: string;
   estado: number;
 }
+export type EstablecimientoOption = {
+  id: number;
+  codigo: string;
+  descripcion: string;
+}
 
 
 
