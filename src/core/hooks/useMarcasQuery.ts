@@ -1,32 +1,41 @@
 const apiURL = import.meta.env.VITE_API_URL;
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useRef } from "react"
 import { useNavigate } from "react-router-dom";
 import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import useSessionStore from "../store/useSessionStore"
 import useMarcasStore from "../store/useMarcasStore";
 import { mutationFetch } from "../services/mutationFecth"
-import { filterMarcasFetch } from "../services/marcasFetch";
-import { Marca } from "../types";
-import { filterParamsInit } from "../utils/constants";
+import { FilterMarcasResp, Marca } from "../types";
+import { filterFetch } from "../services/filterFetch";
 
 type TypeAction = "filter_full" | "mutate_marca"
 
 // ****** FILTRAR ******
 export const useFilterMarcasQuery = () => {
-  const [isEnabledQuery, setIsEnabledQuery] = useState(false)
   const tknSession = useSessionStore(state => state.tknSession)
   const filterParamsMarcas = useMarcasStore(state => state.filterParamsMarcas)
-  const setFilterParamsMarcas = useMarcasStore(state => state.setFilterParamsMarcas)
-  const navigate = useNavigate()
+  // const setFilterParamsMarcas = useMarcasStore(state => state.setFilterParamsMarcas)
   const queryClient = useQueryClient()
   
-  const {fetchNextPage, data, refetch, isError, isLoading, isFetching, hasNextPage} = useInfiniteQuery({
+  const {
+    data,
+    fetchNextPage,
+    isError,
+    isLoading,
+    isFetching,
+    hasNextPage
+  } = useInfiniteQuery<FilterMarcasResp, Error>({
     queryKey: ['marcas'],
     queryFn: ({pageParam = 1, signal}) => {
-      return filterMarcasFetch({filterParamsMarcas, pageParam, signal, token: tknSession})
+      const page = pageParam as number
+      return filterFetch({
+        filterParams: filterParamsMarcas,
+        url: `${apiURL}marcas/filter_marcas?page=${page}`,
+        signal,
+        token: tknSession
+      })
     },
     initialPageParam: 1,
-    enabled: isEnabledQuery,
     getNextPageParam: (lastPage) => {
       return lastPage.next != 0 ? lastPage.next : undefined
     },
@@ -34,27 +43,19 @@ export const useFilterMarcasQuery = () => {
     staleTime: 1000 * 60 * 5 
   })
 
-  useEffect(() => {
+  const resetear = ()=>{
     queryClient.resetQueries({ queryKey: ['marcas'], exact: true });
+  }
+
+  useEffect(() => {
     return () => {
-      queryClient.setQueryData(['marcas'], () => null)
-      setFilterParamsMarcas(filterParamsInit)
+      resetear()
     }
   },[])
   
   useEffect(() => {
-    if(!isEnabledQuery){
-      setIsEnabledQuery(true)
-    }else{
-      refetch()
-    }
+    queryClient.invalidateQueries({queryKey:["marcas"]})
   }, [filterParamsMarcas])
-
-  useEffect(()=>{
-    if(data?.pages[data?.pages.length-1].msgType === "errorToken"){
-      navigate("/auth")
-    }
-  },[data])
 
   return {
     data,
@@ -153,7 +154,7 @@ export const useMutationMarcasQuery = () => {
   }
 
   useEffect(()=>{
-    if(data?.msgType === "errorToken"){
+    if(data?.errorType === "errorToken"){
       resetSessionStore()
       navigate("/auth")
     }

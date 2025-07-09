@@ -122,7 +122,7 @@ export const useMutateModulosQuery = () => {
   }
 
   useEffect(()=>{
-    if(data?.msgType === "errorToken"){
+    if(data?.errorType === "errorToken"){
       resetSessionStore()
       navigate("/auth")
     }

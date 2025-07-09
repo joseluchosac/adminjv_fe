@@ -1,13 +1,12 @@
 const apiURL = import.meta.env.VITE_API_URL;
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useRef } from "react"
 import { useNavigate } from "react-router-dom";
 import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import useSessionStore from "../store/useSessionStore"
 import useProductosStore from "../store/useProductosStore"
-import { filterProductosFetch } from "../services/productosFetch"
-import { Producto } from "../types"
+import { FilterProductosResp, Producto } from "../types"
 import { mutationFetch } from "../services/mutationFecth"
-import { filterParamsInit } from "../utils/constants";
+import { filterFetch } from "../services/filterFetch";
 
 type TypeAction = 
 "filter_full" 
@@ -15,50 +14,52 @@ type TypeAction =
 
 // ****** FILTRAR ******
 export const useFilterProductosQuery = () => {
-  const [isEnabledQuery, setIsEnabledQuery] = useState(false)
-  const setFilterParamsProductos = useProductosStore(state => state.setFilterParamsProductos)
+  // const setFilterParamsProductos = useProductosStore(state => state.setFilterParamsProductos)
   const token = useSessionStore(state => state.tknSession)
   const curEstab = useSessionStore(state => state.curEstab)
   const filterParamsProductos = useProductosStore(state => state.filterParamsProductos)
-  const navigate = useNavigate()
   const queryClient = useQueryClient()
 
-  const {fetchNextPage, data, refetch, isError, isLoading, isFetching, hasNextPage} = useInfiniteQuery({
+  const {
+    fetchNextPage,
+    data,
+    isError,
+    isLoading,
+    isFetching,
+    hasNextPage
+  } = useInfiniteQuery<FilterProductosResp, Error>({
     queryKey: ['productos'],
     queryFn: ({pageParam = 1, signal}) => {
-      return filterProductosFetch({filterParamsProductos, pageParam, signal, token, curEstab})
+      const page = pageParam as number
+      return filterFetch({
+        filterParams: filterParamsProductos,
+        url: `${apiURL}productos/filter_productos?page=${page}`,
+        signal,
+        curEstab,
+        token
+      })
     },
     initialPageParam: 1,
-    enabled: isEnabledQuery,
     getNextPageParam: (lastPage) => {
       return lastPage.next != 0 ? lastPage.next : undefined
     },
     getPreviousPageParam: (lastPage) => lastPage.previous ?? undefined,
     staleTime: 1000 * 60 * 5 
   })
-
-  useEffect(() => {
+  const resetear = ()=>{
     queryClient.resetQueries({ queryKey: ['productos'], exact: true });
+  }
+  useEffect(() => {
     return () => {
-      queryClient.setQueryData(['productos'], () => null)
-      setFilterParamsProductos(filterParamsInit)
+      resetear()
     }
   },[])
   
   useEffect(() => {
-    if(!isEnabledQuery){
-      setIsEnabledQuery(true)
-    }else{
-      refetch()
-    }
+    queryClient.invalidateQueries({queryKey:["productos"]})
   }, [filterParamsProductos])
 
-  useEffect(()=>{
-    if(data?.pages[data?.pages.length-1].msgType === "errorToken"){
-      // resetSessionStore()
-      navigate("/auth")
-    }
-  },[data])
+
 
   return {
     data,
@@ -187,7 +188,7 @@ export const useMutationProductosQuery = () => {
   }
 
   useEffect(()=>{
-    if(data?.msgType === "errorToken"){
+    if(data?.errorType === "errorToken"){
       resetSessionStore()
       navigate("/auth")
     }

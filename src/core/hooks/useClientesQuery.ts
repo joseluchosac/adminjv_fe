@@ -1,12 +1,12 @@
 const apiURL = import.meta.env.VITE_API_URL;
 import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import useSessionStore from "../store/useSessionStore"
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useRef } from "react"
 import { mutationFetch } from "../services/mutationFecth"
 import { useNavigate } from "react-router-dom";
-import { filterClientesFetch } from "../services/clientesFetch";
-import useClientesStore, { clientesStoreInit } from "../store/useClientesStore";
-import { Cliente } from "../types";
+import useClientesStore from "../store/useClientesStore";
+import { Cliente, FilterClientesResp } from "../types";
+import { filterFetch } from "../services/filterFetch";
 
 type TypeAction = 
 "filter_full" 
@@ -15,21 +15,30 @@ type TypeAction =
 
 // ****** FILTRAR CLIENTES ******
 export const useFilterClientesQuery = () => {
-  // const navigate = useNavigate()
-  const [isEnabledQuery, setIsEnabledQuery] = useState(false)
-  const tknSession = useSessionStore(state => state.tknSession)
   const filterParamsClientes = useClientesStore(state => state.filterParamsClientes)
+  // const setFilterParamsClientes = useClientesStore(state => state.setFilterParamsClientes)
+  const tknSession = useSessionStore(state => state.tknSession)
   const queryClient = useQueryClient()
-  const setFilterParamsClientes = useClientesStore(state => state.setFilterParamsClientes)
 
-
-  const {fetchNextPage, data, refetch, isError, isLoading, isFetching, hasNextPage,  } = useInfiniteQuery({
+  const {
+    fetchNextPage,
+    data,
+    isError,
+    isLoading,
+    isFetching,
+    hasNextPage
+  } = useInfiniteQuery<FilterClientesResp, Error>({
     queryKey: ['clientes'],
     queryFn: ({pageParam = 1, signal}) => {
-      return filterClientesFetch({filterParamsClientes, pageParam, signal, token: tknSession})
+      const page = pageParam as number
+      return filterFetch({
+        filterParams: filterParamsClientes,
+        url: `${apiURL}clientes/filter_clientes?page=${page}`,
+        signal,
+        token: tknSession
+      })
     },
     initialPageParam: 1,
-    enabled: isEnabledQuery,
     getNextPageParam: (lastPage) => {
       return lastPage.next != 0 ? lastPage.next : undefined
     },
@@ -37,24 +46,22 @@ export const useFilterClientesQuery = () => {
     staleTime: 1000 * 60 * 5 
   })
 
-  useEffect(() => {
+  const resetear = ()=>{
     queryClient.resetQueries({ queryKey: ['clientes'], exact: true });
+  }
+
+  useEffect(() => {
     return () => {
-      queryClient.setQueryData(['clientes'], () => null)
-      setFilterParamsClientes(clientesStoreInit.filterParamsClientes)
+      resetear()
     }
   },[])
   
   useEffect(() => {
-    if(!isEnabledQuery){
-      setIsEnabledQuery(true)
-    }else{
-      refetch()
-    }
+    queryClient.invalidateQueries({queryKey:["clientes"]})
   }, [filterParamsClientes])
 
   // useEffect(()=>{
-  //   if(data?.pages[data?.pages.length-1].msgType === "errorToken"){
+  //   if(data?.pages[data?.pages.length-1].errorType === "errorToken"){
   //     navigate("/auth")
   //   }
   // },[data])
@@ -168,7 +175,7 @@ export const useMutationClientesQuery = () => {
   }
 
   useEffect(()=>{
-    if(data?.msgType === "errorToken"){
+    if(data?.errorType === "errorToken"){
       resetSessionStore()
       navigate("/auth")
     }

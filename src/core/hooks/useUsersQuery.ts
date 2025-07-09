@@ -1,13 +1,12 @@
 const apiURL = import.meta.env.VITE_API_URL;
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useRef } from "react"
 import { useNavigate } from "react-router-dom";
 import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import useSessionStore from "../store/useSessionStore"
 import useUsersStore from "../store/useUsersStore"
-import { filterUsersFetch } from "../services/usersFetch"
-import { LoginForm, RegisterForm, User } from "../types"
+import { FilterUsersResp, LoginForm, MutationFetch, RegisterForm, ResponseQuery, User } from "../types"
 import { mutationFetch } from "../services/mutationFecth"
-import { filterParamsInit } from "../utils/constants";
+import { filterFetch } from "../services/filterFetch";
 
 type TypeAction = 
 "filter_full" 
@@ -22,50 +21,55 @@ type TypeAction =
 
 // ****** FILTRAR ******
 export const useFilterUsersQuery = () => {
-  const [isEnabledQuery, setIsEnabledQuery] = useState(false)
-  // const resetSessionStore = useSessionStore(state => state.resetSessionStore)
-  const setFilterParamsUsers = useUsersStore(state => state.setFilterParamsUsers)
-  const tknSession = useSessionStore(state => state.tknSession)
   const filterParamsUsers = useUsersStore(state => state.filterParamsUsers)
-  const navigate = useNavigate()
+  // const setFilterParamsUsers = useUsersStore(state => state.setFilterParamsUsers)
+  const tknSession = useSessionStore(state => state.tknSession)
   const queryClient = useQueryClient()
 
-  const {fetchNextPage, data, refetch, isError, isLoading, isFetching, hasNextPage,  } = useInfiniteQuery({
+  const {
+    fetchNextPage,
+    data,
+    isError,
+    isLoading,
+    isFetching,
+    hasNextPage
+  } = useInfiniteQuery<FilterUsersResp, Error>({
     queryKey: ['users'],
     queryFn: ({pageParam = 1, signal}) => {
-      return filterUsersFetch({filterParamsUsers, pageParam, signal, token: tknSession})
+      const page = pageParam as number
+      return filterFetch({
+        filterParams: filterParamsUsers,
+        url: `${apiURL}users/filter_users?page=${page}`,
+        signal,
+        token: tknSession
+      })
     },
     initialPageParam: 1,
-    enabled: isEnabledQuery,
     getNextPageParam: (lastPage) => {
       return lastPage.next != 0 ? lastPage.next : undefined
     },
     getPreviousPageParam: (lastPage) => lastPage.previous ?? undefined,
     staleTime: 1000 * 60 * 5 
   })
-
-  useEffect(() => {
+  const resetear = ()=>{
     queryClient.resetQueries({ queryKey: ['users'], exact: true });
+  }
+  useEffect(() => {
     return () => {
-      queryClient.setQueryData(['users'], () => null)
-      setFilterParamsUsers(filterParamsInit)
+      resetear()
     }
   },[])
   
   useEffect(() => {
-    if(!isEnabledQuery){
-      setIsEnabledQuery(true)
-    }else{
-      refetch()
-    }
+    queryClient.invalidateQueries({queryKey:["users"]})
   }, [filterParamsUsers])
 
-  useEffect(()=>{
-    if(data?.pages[data?.pages.length-1].msgType === "errorToken"){
-      // resetSessionStore()
-      navigate("/auth")
-    }
-  },[data])
+  // useEffect(()=>{
+  //   if(data?.pages[data?.pages.length-1].errorType === "errorToken"){
+  //     // resetSessionStore()
+  //     navigate("/auth")
+  //   }
+  // },[data])
 
   return {
     data,
@@ -78,7 +82,7 @@ export const useFilterUsersQuery = () => {
 }
 
 // ****** MUTATION ******
-export const useMutationUsersQuery = () => {
+export const useMutationUsersQuery = <T>() => {
   const resetSessionStore = useSessionStore(state => state.resetSessionStore)
   const navigate = useNavigate()
   const tknSession = useSessionStore(state => state.tknSession)
@@ -87,7 +91,7 @@ export const useMutationUsersQuery = () => {
   const queryClient = useQueryClient()
   const typeActionRef = useRef<TypeAction | "">("")
 
-  const {data, isPending, isError, mutate, } = useMutation({
+  const {data, isPending, isError, mutate, } = useMutation<T, Error, MutationFetch, unknown>({
     mutationFn: mutationFetch,
     // onMutate: async ({param}) => {
       // 1: Optimista
@@ -104,7 +108,8 @@ export const useMutationUsersQuery = () => {
       // })
     // },
     onSuccess: (resp) => {
-      if(resp.msgType !== 'success') return
+      const r = resp as ResponseQuery
+      if(r?.msgType !== 'success') return
       queryClient.invalidateQueries({queryKey:["users"]})
 
       // 1: Actualizando la lista manualmente
@@ -287,7 +292,8 @@ export const useMutationUsersQuery = () => {
   }
 
   useEffect(()=>{
-    if(data?.msgType === "errorToken"){
+    const r = data as ResponseQuery
+    if(r?.errorType === "errorToken"){
       resetSessionStore()
       navigate("/auth")
     }

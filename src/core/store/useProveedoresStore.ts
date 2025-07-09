@@ -28,7 +28,7 @@ export const proveedoresStoreInit = {
     {show: true, orderable: true, order_dir:"", field_name: "telefono", field_label:"Teléf.",},
   ],
   filterParamsProveedores: {
-    offset: 25,
+    offset: 5,
     search: "",
     equals: [],
     between: {field_name: "", field_label: "", range: ""},

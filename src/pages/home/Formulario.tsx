@@ -1,3 +1,4 @@
+const apiURL = import.meta.env.VITE_API_URL;
 import { useEffect, useRef } from "react"
 import { Button, Col, Container, Form, Row } from "react-bootstrap"
 import { Controller, useForm } from "react-hook-form"
@@ -6,10 +7,10 @@ import Select from "react-select"
 import useLayoutStore from "../../core/store/useLayoutStore"
 import { filterParamsInit, selectDark } from "../../core/utils/constants"
 import useLaboratoriosStore from "../../core/store/useLaboratoriosStore"
-import { filterLaboratoriosFetch } from "../../core/services/laboratoriosFetch"
 import useSessionStore from "../../core/store/useSessionStore"
 import { debounce } from "../../core/utils/funciones"
-import { filterMarcasFetch } from "../../core/services/marcasFetch"
+import { filterFetch } from "../../core/services/filterFetch"
+import { LaboratorioItem } from "../../core/types";
 const opciones = [
   {value:1, label:"opcion 1"},
   {value:2, label:"opcion 2"},
@@ -80,9 +81,15 @@ function Formulario() {
     abortMarcas.current?.abort(); // ✅ Cancela la petición anterior
     abortMarcas.current = new AbortController();
     const filtered = {...filterParamsInit, search}
-    filterMarcasFetch({filterParamsMarcas: filtered, pageParam:1, token: tknSession, signal: abortMarcas.current.signal })
+    const abortController = new AbortController()
+    return filterFetch({
+      filterParams: filtered,
+      url: `${apiURL}marcas/filter_marcas?page=1`,
+      signal: abortController.signal,
+      token: tknSession
+    })
     .then(data=>{
-      callback(data.filas.map(el=>({value:el.id, label:el.nombre})))
+      callback(data.filas.map((el: LaboratorioItem)=>({value:el.id, label:el.nombre})))
     })
   },500)
 
@@ -90,9 +97,16 @@ function Formulario() {
     abortLaboratorios.current?.abort(); // ✅ Cancela la petición anterior
     abortLaboratorios.current = new AbortController();
     const filtered = {...filterParamsLaboratorios, search}
-    filterLaboratoriosFetch({filterParamsLaboratorios: filtered, pageParam:1, token: tknSession, signal: abortLaboratorios.current.signal })
+
+    const abortController = new AbortController()
+    return filterFetch({
+      filterParams: filtered,
+      url: `${apiURL}laboratorios/filter_laboratorios?page=1`,
+      signal: abortController.signal,
+      token: tknSession
+    })
     .then(data=>{
-      callback(data.filas.map(el=>({value:el.id, label:el.nombre})))
+      callback(data.filas.map((el: LaboratorioItem)=>({value:el.id, label:el.nombre})))
     })
   },500)
 

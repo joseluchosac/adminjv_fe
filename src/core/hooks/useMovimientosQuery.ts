@@ -1,13 +1,12 @@
 const apiURL = import.meta.env.VITE_API_URL;
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useRef } from "react"
 import { useNavigate } from "react-router-dom";
 import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import useSessionStore from "../store/useSessionStore"
 import useMovimientosStore from "../store/useMovimientosStore"
-import { filterMovimientosFetch } from "../services/movimientosFetch"
-import { Movimiento, Movimientoform } from "../types"
+import { FilterMovimientosResp, Movimiento, Movimientoform } from "../types"
 import { mutationFetch } from "../services/mutationFecth"
-import { filterParamsInit } from "../utils/constants";
+import { filterFetch } from "../services/filterFetch";
 
 type TypeAction = 
 "filter_full" 
@@ -15,20 +14,30 @@ type TypeAction =
 
 // ****** FILTRAR ******
 export const useFilterMovimientosQuery = () => {
-  const [isEnabledQuery, setIsEnabledQuery] = useState(false)
-  const setFilterParamsMovimientos = useMovimientosStore(state => state.setFilterParamsMovimientos)
+  // const setFilterParamsMovimientos = useMovimientosStore(state => state.setFilterParamsMovimientos)
   const tknSession = useSessionStore(state => state.tknSession)
   const filterParamsMovimientos = useMovimientosStore(state => state.filterParamsMovimientos)
-  const navigate = useNavigate()
   const queryClient = useQueryClient()
 
-  const {fetchNextPage, data, refetch, isError, isLoading, isFetching, hasNextPage,  } = useInfiniteQuery({
+  const {
+    fetchNextPage,
+    data,
+    isError,
+    isLoading,
+    isFetching,
+    hasNextPage
+  } = useInfiniteQuery<FilterMovimientosResp, Error>({
     queryKey: ['movimientos'],
     queryFn: ({pageParam = 1, signal}) => {
-      return filterMovimientosFetch({filterParamsMovimientos, pageParam, signal, token: tknSession})
+      const page = pageParam as number
+      return filterFetch({
+        filterParams: filterParamsMovimientos,
+        url: `${apiURL}movimientos/filter_movimientos?page=${page}`,
+        signal,
+        token: tknSession
+      })
     },
     initialPageParam: 1,
-    enabled: isEnabledQuery,
     getNextPageParam: (lastPage) => {
       return lastPage.next != 0 ? lastPage.next : undefined
     },
@@ -36,27 +45,19 @@ export const useFilterMovimientosQuery = () => {
     staleTime: 1000 * 60 * 5 
   })
 
-  useEffect(() => {
+  const resetear = ()=>{
     queryClient.resetQueries({ queryKey: ['movimientos'], exact: true });
+  }
+
+  useEffect(() => {
     return () => {
-      queryClient.setQueryData(['movimientos'], () => null)
-      setFilterParamsMovimientos(filterParamsInit)
+      resetear()
     }
   },[])
   
   useEffect(() => {
-    if(!isEnabledQuery){
-      setIsEnabledQuery(true)
-    }else{
-      refetch()
-    }
+    queryClient.invalidateQueries({queryKey:["movimientos"]})
   }, [filterParamsMovimientos])
-
-  useEffect(()=>{
-    if(data?.pages[data?.pages.length-1].msgType === "errorToken"){
-      navigate("/auth")
-    }
-  },[data])
 
   return {
     data,
@@ -118,7 +119,7 @@ export const useMutationMovimientosQuery = () => {
   }
 
   useEffect(()=>{
-    if(data?.msgType === "errorToken"){
+    if(data?.errorType === "errorToken"){
       resetSessionStore()
       navigate("/auth")
     }

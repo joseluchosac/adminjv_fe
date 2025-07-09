@@ -1,5 +1,5 @@
 import { Badge, NavDropdown } from "react-bootstrap";
-import { CampoTable, Proveedor} from "../../core/types";
+import { CampoTable, Proveedor, ResponseQuery} from "../../core/types";
 import useProveedoresStore from "../../core/store/useProveedoresStore";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import { useMutationProveedoresQuery } from "../../core/hooks/useProveedoresQuery";
@@ -12,6 +12,7 @@ interface Props {
   proveedor: Proveedor ;
   camposProveedor: CampoTable[]
 }
+interface DataMutation extends ResponseQuery {id: number}
 
 function ProveedoresTblRow({ proveedor, camposProveedor }: Props) {
   const setCurrentProveedorId = useProveedoresStore(state => state.setCurrentProveedorId)
@@ -19,9 +20,9 @@ function ProveedoresTblRow({ proveedor, camposProveedor }: Props) {
   const darkMode = useLayoutStore(state => state.layout.darkMode)
   
   const {
-    data,
+    data: mutation,
     deleteProveedor
-  } = useMutationProveedoresQuery()
+  } = useMutationProveedoresQuery<DataMutation>()
 
   // const validDate = (date:string, formato = "dd/MM/yyyy") => {
   //   return isValid(parseISO(date)) ? format(date, formato) : ''
@@ -52,9 +53,9 @@ function ProveedoresTblRow({ proveedor, camposProveedor }: Props) {
   }
 
   useEffect(() => {
-    if (!data) return
-    toast(data.msg, {type: data.msgType})
-  }, [data])
+    if (!mutation) return
+    toast(mutation.msg, {type: mutation.msgType})
+  }, [mutation])
   
   return (
     <tr className="text-nowrap">

@@ -1,12 +1,12 @@
 const apiURL = import.meta.env.VITE_API_URL;
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useRef } from "react"
 import { useNavigate } from "react-router-dom";
 import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import useSessionStore from "../store/useSessionStore"
-import useLaboratoriosStore, { laboratoriosStoreInit } from "../store/useLaboratoriosStore";
+import useLaboratoriosStore from "../store/useLaboratoriosStore";
 import { mutationFetch } from "../services/mutationFecth"
-import { filterLaboratoriosFetch } from "../services/laboratoriosFetch";
-import { Laboratorio } from "../types";
+import { FilterLaboratoriosResp, Laboratorio } from "../types";
+import { filterFetch } from "../services/filterFetch";
 
 type TypeAction = 
   "filter_full"
@@ -14,48 +14,50 @@ type TypeAction =
 
 // ****** FILTRAR  ******
 export const useFilterLaboratoriosQuery = () => {
-  const [isEnabledQuery, setIsEnabledQuery] = useState(false)
   const tknSession = useSessionStore(state => state.tknSession)
   const filterParamsLaboratorios = useLaboratoriosStore(state => state.filterParamsLaboratorios)
-  const setFilterParamsLaboratorios = useLaboratoriosStore(state => state.setFilterParamsLaboratorios)
-  const navigate = useNavigate()
+  // const setFilterParamsLaboratorios = useLaboratoriosStore(state => state.setFilterParamsLaboratorios)
   const queryClient = useQueryClient()
 
-  const {fetchNextPage, data, refetch, isError, isLoading, isFetching, hasNextPage} = useInfiniteQuery({
+  const {
+    data,
+    fetchNextPage,
+    isError,
+    isLoading,
+    isFetching,
+    hasNextPage
+  } = useInfiniteQuery<FilterLaboratoriosResp, Error>({
     queryKey: ['laboratorios'],
     queryFn: ({pageParam = 1, signal}) => {
-      return filterLaboratoriosFetch({filterParamsLaboratorios, pageParam, signal, token: tknSession})
+      const page = pageParam as number
+      return filterFetch({
+        filterParams: filterParamsLaboratorios,
+        url: `${apiURL}laboratorios/filter_laboratorios?page=${page}`,
+        signal,
+        token: tknSession
+      })
     },
     initialPageParam: 1,
-    enabled: isEnabledQuery,
     getNextPageParam: (lastPage) => {
       return lastPage.next != 0 ? lastPage.next : undefined
     },
     getPreviousPageParam: (lastPage) => lastPage.previous ?? undefined,
     staleTime: 1000 * 60 * 5 
   })
+  
+  const resetear = ()=>{
+    queryClient.resetQueries({ queryKey: ['laboratorios'], exact: true });
+  }
 
   useEffect(() => {
-    queryClient.resetQueries({ queryKey: ['laboratorios'], exact: true });
     return () => {
-      queryClient.setQueryData(['laboratorios'], () => null)
-      setFilterParamsLaboratorios(laboratoriosStoreInit.filterParamsLaboratorios)
+      resetear()
     }
   },[])
   
   useEffect(() => {
-    if(!isEnabledQuery){
-      setIsEnabledQuery(true)
-    }else{
-      refetch()
-    }
+    queryClient.invalidateQueries({queryKey:["laboratorios"]})
   }, [filterParamsLaboratorios])
-
-  useEffect(()=>{
-    if(data?.pages[data?.pages.length-1].msgType === "errorToken"){
-      navigate("/auth")
-    }
-  },[data])
 
   return {
     data,
@@ -154,7 +156,7 @@ export const useMutationLaboratoriosQuery = () => {
   }
 
   useEffect(()=>{
-    if(data?.msgType === "errorToken"){
+    if(data?.errorType === "errorToken"){
       resetSessionStore()
       navigate("/auth")
     }

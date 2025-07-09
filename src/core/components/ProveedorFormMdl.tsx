@@ -12,7 +12,7 @@ import { useMutationProveedoresQuery } from "../hooks/useProveedoresQuery";
 import { FaEdit, FaSearch, FaTrash } from "react-icons/fa";
 import UbigeosMdl from "./UbigeosMdl";
 import { Ubigeo } from "../types/catalogosTypes";
-import { Proveedor } from "../types";
+import { Proveedor, ResponseQuery } from "../types";
 const proveedorForm_init = {
   id: 0,
   tipo_documento_cod: "0",
@@ -31,6 +31,23 @@ const proveedorForm_init = {
 }
 type Props = {
   onChooseProveedor: (proveedor: Proveedor) => void
+}
+type DataProveedor = ResponseQuery & Proveedor
+
+interface DataMutation extends ResponseQuery {content: Proveedor}
+
+interface DataNroDocumento extends ResponseQuery {
+  nombre_razon_social: string;
+  tipo_documento_cod: string;
+  nro_documento: string;
+  nombreCompleto: string;
+  condicion: string;
+  estado: string;
+  direccion: string;
+  departamento: string;
+  provincia: string;
+  distrito: string;
+  ubigeo: string;
 }
 
 export default function ProveedorFormMdl({onChooseProveedor}: Props) {
@@ -55,21 +72,21 @@ export default function ProveedorFormMdl({onChooseProveedor}: Props) {
     isPending: isPendingProveedor,
     isError: isErrorProveedor,
     getProveedor
-  } = useMutationProveedoresQuery()
+  } = useMutationProveedoresQuery<DataProveedor>()
 
   const {
     data: mutation,
-    isPending: isPendingMutation ,
+    isPending: isPendingMutation,
     createProveedor, 
     updateProveedor, 
-  } = useMutationProveedoresQuery()
+  } = useMutationProveedoresQuery<DataMutation>()
 
   const {
     data: nroDocumento,
     isPending: isPendingNroDocumento ,
     reset: resetNroDocumento,
     consultarNroDocumento,
-  } = useMutationProveedoresQuery()
+  } = useMutationProveedoresQuery<DataNroDocumento>()
 
   const onChooseUbigeo = (ubigeo: Ubigeo) => {
     setShowUbigeos(false)
@@ -137,26 +154,20 @@ export default function ProveedorFormMdl({onChooseProveedor}: Props) {
 
   useEffect(() => {
     if(!nroDocumento) return
-    if(!nroDocumento.error){
-      const {tipoDocumento, nombre_razon_social} = nroDocumento.content
-      setValue("nombre_razon_social", nombre_razon_social)
-      setValue("api", 1)
-      if(tipoDocumento == "1"){
-        setLugar("")
-        setValue("direccion", "")
-        setValue("ubigeo_inei", "",{shouldDirty: true})
-      }else if(tipoDocumento == "6"){
-        const {ubigeo, departamento, provincia, distrito, direccion} = nroDocumento.content
-        setLugar(`${departamento} - ${provincia} - ${distrito}`)
-        setValue("direccion", direccion)
-        setValue("ubigeo_inei", ubigeo,{shouldDirty: true})
-      }
-    }else{
-      setValue("nombre_razon_social", "")
-      setValue("api", 0)
+    const {tipo_documento_cod, nombre_razon_social} = nroDocumento
+    setValue("nombre_razon_social", nombre_razon_social)
+    setValue("api", 1)
+    if(tipo_documento_cod == "1"){
       setLugar("")
       setValue("direccion", "")
       setValue("ubigeo_inei", "",{shouldDirty: true})
+    }else if(tipo_documento_cod == "6"){
+      const {ubigeo, departamento, provincia, distrito, direccion} = nroDocumento
+      setLugar(`${departamento} - ${provincia} - ${distrito}`)
+      setValue("direccion", direccion)
+      setValue("ubigeo_inei", ubigeo,{shouldDirty: true})
+    }
+    if(nroDocumento.msg && nroDocumento.msgType){
       toast(nroDocumento.msg, {type: nroDocumento.msgType})
     }
   }, [nroDocumento])
@@ -167,11 +178,9 @@ export default function ProveedorFormMdl({onChooseProveedor}: Props) {
       toast.error("Error al obtener los datos")
       setShowProveedorFormMdl(false);
     }else{
-      if(proveedor.content){
-        reset(proveedor.content)
-        setLugar(`${proveedor.content.departamento} - ${proveedor.content.provincia} - ${proveedor.content.distrito}`)
-
-      }
+      reset(proveedor)
+      const {departamento, provincia, distrito} = proveedor
+      setLugar(`${departamento} - ${provincia} - ${distrito}`)
     }
   }, [proveedor])
 
@@ -204,7 +213,7 @@ export default function ProveedorFormMdl({onChooseProveedor}: Props) {
                 <Form.Select
                   id="tipo_documento_cod"
                   {...register('tipo_documento_cod',{valueAsNumber:true})}
-                  disabled={nroDocumento?.content.nombre_razon_social || currentProveedorId 
+                  disabled={nroDocumento?.nombre_razon_social || currentProveedorId 
                     ? true : false
                   }
                 >
@@ -216,9 +225,9 @@ export default function ProveedorFormMdl({onChooseProveedor}: Props) {
               <Form.Group as={Col} md={8} className="mb-3">
                 <Form.Label htmlFor="nro_documento" className="d-flex justify-content-between">
                   <div>Nro Doc</div>
-                  { nroDocumento?.content &&
-                    <Badge bg={nroDocumento?.content.estado == "ACTIVO" ? "success" : "warning"}>
-                      {nroDocumento?.content.estado}
+                  { nroDocumento &&
+                    <Badge bg={nroDocumento?.estado == "ACTIVO" ? "success" : "warning"}>
+                      {nroDocumento?.estado}
                     </Badge>
                   }
                 </Form.Label>
@@ -228,7 +237,7 @@ export default function ProveedorFormMdl({onChooseProveedor}: Props) {
                     {...register('nro_documento',{
                       maxLength: {value: 13, message:"Se permite máximo 13 caracteres"}
                     })}
-                    disabled={nroDocumento?.content.nombre_razon_social || currentProveedorId 
+                    disabled={nroDocumento?.nombre_razon_social || currentProveedorId 
                       ? true : false
                     }
                   />
@@ -248,7 +257,7 @@ export default function ProveedorFormMdl({onChooseProveedor}: Props) {
                     minLength: {value: 3, message:"Se permite mínimo 3 caracteres"},
                     maxLength: {value: 150, message:"Se permite máximo 150 caracteres"}
                   })}
-                  disabled={nroDocumento?.content.nombre_razon_social ? true : false}
+                  disabled={nroDocumento?.nombre_razon_social ? true : false}
                 />
                 {errors.nombre_razon_social && 
                   <div className="invalid-feedback d-block">{errors.nombre_razon_social.message}</div>
@@ -257,9 +266,9 @@ export default function ProveedorFormMdl({onChooseProveedor}: Props) {
               <Form.Group as={Col} md={12} className="mb-3">
                 <Form.Label htmlFor="direccion" className="d-flex justify-content-between">
                   <div>Dirección</div>
-                  { nroDocumento?.content &&
-                    <Badge bg={nroDocumento?.content.condicion == "HABIDO" ? "success" : "warning"}>
-                      {nroDocumento?.content.condicion}
+                  { nroDocumento &&
+                    <Badge bg={nroDocumento?.condicion == "HABIDO" ? "success" : "warning"}>
+                      {nroDocumento?.condicion}
                     </Badge>
                   }
                 </Form.Label>
@@ -269,7 +278,7 @@ export default function ProveedorFormMdl({onChooseProveedor}: Props) {
                     minLength: {value: 3, message:"Se permite mínimo 3 caracteres"},
                     maxLength: {value: 150, message:"Se permite máximo 150 caracteres"},
                   })}
-                  disabled={nroDocumento?.content.direccion ? true : false}
+                  disabled={nroDocumento?.direccion ? true : false}
                 />
                 {errors.direccion && 
                   <div className="invalid-feedback d-block">{errors.direccion.message}</div>
@@ -282,14 +291,14 @@ export default function ProveedorFormMdl({onChooseProveedor}: Props) {
                     id="lugar"
                     title={lugar}
                     value={lugar}
-                    disabled={nroDocumento?.content.ubigeo ? true : false}
+                    disabled={nroDocumento?.ubigeo ? true : false}
                     readOnly
                   />
                   <Button 
                     onClick={clearUbigeo}
                     variant="outline-secondary" 
                     title="Eliminar ubigeo"
-                    disabled={nroDocumento?.content.ubigeo ? true : false}
+                    disabled={nroDocumento?.ubigeo ? true : false}
                     >
                     <FaTrash />
                   </Button>
@@ -297,7 +306,7 @@ export default function ProveedorFormMdl({onChooseProveedor}: Props) {
                     onClick={() => setShowUbigeos(true)} 
                     variant="outline-secondary" 
                     title="Seleccionar ubigeo"
-                    disabled={nroDocumento?.content.ubigeo ? true : false}
+                    disabled={nroDocumento?.ubigeo ? true : false}
                   >
                     <FaEdit />
                   </Button>

@@ -138,7 +138,7 @@ export const useMutationCatalogosQuery = () => {
 
   useEffect(()=>{
     if(!data) return
-    if(data?.msgType === "errorToken"){
+    if(data?.errorType === "errorToken"){
       resetSessionStore()
       navigate("/auth")
     }

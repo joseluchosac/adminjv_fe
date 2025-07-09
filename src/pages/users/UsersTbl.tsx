@@ -70,8 +70,8 @@ const UsersTbl: React.FC = () => {
 
 
   useEffect(()=>{
-    if(data?.pages[0].error || !data?.pages[0].content) return
-    const newUsers = data?.pages.flatMap(el => el.content) as User[];
+    if(data?.pages[0].error || !data?.pages[0].filas) return
+    const newUsers = data?.pages.flatMap(el => el.filas) as User[];
     setUsers([...newUsers])
   },[data])
 

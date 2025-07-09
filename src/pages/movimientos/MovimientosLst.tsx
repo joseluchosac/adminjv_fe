@@ -70,8 +70,8 @@ const MovimientosLst: React.FC = () => {
 
 
   useEffect(()=>{
-    if(data?.pages[0].error || !data?.pages[0].content) return
-    const newMovimientos = data?.pages.flatMap(el => el.content) as Movimiento[];
+    if(data?.pages[0].error || !data?.pages[0].filas) return
+    const newMovimientos = data?.pages.flatMap(el => el.filas) as Movimiento[];
     setMovimientos([...newMovimientos])
   },[data])
 

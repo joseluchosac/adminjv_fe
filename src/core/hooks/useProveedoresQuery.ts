@@ -1,59 +1,59 @@
 const apiURL = import.meta.env.VITE_API_URL;
 import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import useSessionStore from "../store/useSessionStore"
-import { useEffect, useState } from "react"
+import { useEffect } from "react"
 import { mutationFetch } from "../services/mutationFecth"
 import { useNavigate } from "react-router-dom";
-import { filterProveedoresFetch } from "../services/proveedoresFetch";
-import useProveedoresStore, { proveedoresStoreInit } from "../store/useProveedoresStore";
-import { Proveedor } from "../types";
-
+import useProveedoresStore from "../store/useProveedoresStore";
+import { FilterProveedoresResp, MutationFetch, Proveedor, ResponseQuery } from "../types";
+import { filterFetch } from "../services/filterFetch";
 
 // ****** FILTRAR CLIENTES ******
 export const useFilterProveedoresQuery = () => {
-  // const navigate = useNavigate()
-  const [isEnabledQuery, setIsEnabledQuery] = useState(false)
-  const tknSession = useSessionStore(state => state.tknSession)
   const filterParamsProveedores = useProveedoresStore(state => state.filterParamsProveedores)
+  // const setFilterParamsProveedores = useProveedoresStore(state => state.setFilterParamsProveedores)
+  const tknSession = useSessionStore(state => state.tknSession)
   const queryClient = useQueryClient()
-  const setFilterParamsProveedores = useProveedoresStore(state => state.setFilterParamsProveedores)
 
-
-  const {fetchNextPage, data, refetch, isError, isLoading, isFetching, hasNextPage,  } = useInfiniteQuery({
+  const {
+    data,
+    fetchNextPage,
+    isError,
+    isLoading,
+    isFetching,
+    hasNextPage
+  } = useInfiniteQuery<FilterProveedoresResp, Error>({
     queryKey: ['proveedores'],
     queryFn: ({pageParam = 1, signal}) => {
-      return filterProveedoresFetch({filterParamsProveedores, pageParam, signal, token: tknSession})
+      const page = pageParam as number
+      return filterFetch({
+        filterParams: filterParamsProveedores,
+        url: `${apiURL}proveedores/filter_proveedores?page=${page}`,
+        signal,
+        token: tknSession
+      })
     },
     initialPageParam: 1,
-    enabled: isEnabledQuery,
     getNextPageParam: (lastPage) => {
       return lastPage.next != 0 ? lastPage.next : undefined
     },
-    getPreviousPageParam: (lastPage) => lastPage.previous ?? undefined,
+    // getPreviousPageParam: (lastPage) => lastPage.previous ?? undefined,
     staleTime: 1000 * 60 * 5 
   })
 
-  useEffect(() => {
+  const resetear = ()=>{
     queryClient.resetQueries({ queryKey: ['proveedores'], exact: true });
+  }
+
+  useEffect(() => {
     return () => {
-      queryClient.setQueryData(['proveedores'], () => null)
-      setFilterParamsProveedores(proveedoresStoreInit.filterParamsProveedores)
+      resetear()
     }
   },[])
   
   useEffect(() => {
-    if(!isEnabledQuery){
-      setIsEnabledQuery(true)
-    }else{
-      refetch()
-    }
+    queryClient.invalidateQueries({queryKey:["proveedores"]})
   }, [filterParamsProveedores])
-
-  // useEffect(()=>{
-  //   if(data?.pages[data?.pages.length-1].msgType === "errorToken"){
-  //     navigate("/auth")
-  //   }
-  // },[data])
 
   return {
     data,
@@ -66,7 +66,7 @@ export const useFilterProveedoresQuery = () => {
 }
 
 // ****** MUTATION CLIENTES ******
-export const useMutationProveedoresQuery = () => {
+export const useMutationProveedoresQuery = <T>() => {
   const resetSessionStore = useSessionStore(state => state.resetSessionStore)
   const navigate = useNavigate()
   const tknSession = useSessionStore(state => state.tknSession)
@@ -75,10 +75,11 @@ export const useMutationProveedoresQuery = () => {
 
   const queryClient = useQueryClient()
 
-  const {data, isPending, isError, mutate, } = useMutation({
+  const {data, isPending, isError, mutate, } = useMutation<T, Error, MutationFetch, unknown>({
     mutationFn: mutationFetch,
     onSuccess: (resp) => {
-      if(resp.msgType !== 'success') return
+      const r = resp as ResponseQuery
+      if(r?.msgType !== 'success') return
       queryClient.invalidateQueries({queryKey:["proveedores"]}) // Recarga la tabla proveedores
     }
   })
@@ -161,7 +162,8 @@ export const useMutationProveedoresQuery = () => {
   }
 
   useEffect(()=>{
-    if(data?.msgType === "errorToken"){
+    const d = data as ResponseQuery
+    if(d?.errorType === "errorToken"){
       resetSessionStore()
       navigate("/auth")
     }

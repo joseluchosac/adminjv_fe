@@ -2,10 +2,11 @@
 export declare type FormControlElement = HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement;
 
 // ✅ TIPOS PARA LAS RESPUESTAS DE LA API (el content se le agrega despues)
-export type ResponseQuery = {
+export interface ResponseQuery {
   error?: boolean;
   msg?: string;
   msgType?: "default" | "error" | "info" | "success" | "warning";
+  errorType?: string;
 }
 
 // ✅ TIPOS PARA EL CAMPO DE UNA TABLA
@@ -44,7 +45,23 @@ export type User = {
   password: string;
   password_repeat: string;
 }
-
+export type UserItem = {
+  id: number;
+  nombres: string;
+  apellidos: string;
+  username: string;
+  email: string;
+  rol_id: number;
+  rol: string;
+  caja_id: number;
+  caja: string;
+  estado: number;
+  created_at: string;
+  updated_at: string;
+}
+export interface FilterUsersResp extends FilterResp {
+  filas: UserItem[];
+}
 export interface RegisterForm {
   nombres: string;
   apellidos: string;
@@ -139,6 +156,34 @@ type FilterParamsBetween = {
   field_label: string;
   range: string
 }
+export type FilterFetchParam = {
+  token: string | null;
+  filterParams: FilterParams;
+  signal: AbortSignal;
+  url: string;
+  curEstab?: number
+}
+// observar el de abajo para eliminar
+export type FilterFetch = {
+  page: number;
+  token: string | null;
+  filterParams: FilterParams;
+  signal: AbortSignal
+}
+
+
+// ✅ TIPOS PARA FILTROS DE RESPUESTA GENERALES
+type FilterResp = {
+  num_regs: number;
+  pages: number;
+  page: number;
+  next: number;
+  previous: number;
+  offset: number;
+  error?: boolean;
+  msg?: string;
+  msgTye?: string
+}
 
 export type FilterCurrent = Omit<FilterParams, "offset" | "search">
 
@@ -186,6 +231,9 @@ export type ProductoItem = {
   updated_at: string;
 }
 
+export interface FilterProductosResp extends FilterResp {
+  filas: ProductoItem[];
+}
 export interface DataGetProducto extends ResponseQuery {
   content: Producto | null;
 }
@@ -196,11 +244,28 @@ export interface Laboratorio {
   nombre: string;
   estado: number;
 }
+export type LaboratorioItem = {
+  id: number;
+  nombre: string;
+  estado: number;
+}
+export interface FilterLaboratoriosResp extends FilterResp {
+  filas: LaboratorioItem[];
+}
 // ✅TIPOS PARA TABLA MARCAS 
 export interface Marca {
   id: number;
   nombre: string;
   estado: number;
+}
+
+export type MarcaItem = {
+  id: number;
+  nombre: string;
+  estado: number;
+}
+export interface FilterMarcasResp extends FilterResp {
+  filas: MarcaItem[];
 }
 
 // ✅ TIPOS PARA PROVEEDOR
@@ -220,7 +285,22 @@ export type Proveedor = {
   api?: number;
   estado?: number;
 }
-
+export type ProveedorItem = {
+  id: number;
+  tipo_documento: string;
+  nro_documento: string;
+  nombre_razon_social: string;
+  direccion: string;
+  departamento: string;
+  provincia: string;
+  distrito: string;
+  email: string;
+  telefono: string;
+  estado: number;
+}
+export interface FilterProveedoresResp extends FilterResp {
+  filas: ProveedorItem[];
+}
 // ✅ TIPOS PARA CLIENTE
 export type Cliente = {
   id: number;
@@ -238,14 +318,36 @@ export type Cliente = {
   api?: number;
   estado?: number;
 }
-
+export type ClienteItem = {
+  id: number;
+  tipo_documento: string;
+  nro_documento: string;
+  nombre_razon_social: string;
+  direccion: string;
+  departamento: string;
+  provincia: string;
+  distrito: string;
+  email: string;
+  telefono: string;
+  estado: number;
+}
+export interface FilterClientesResp extends FilterResp {
+  filas: ClienteItem[];
+}
 // ✅ TIPOS PARA UBIGEO
 export interface Ubigeo {
   ubigeo_inei: string;
   ubigeo_reniec: string;
   dis_prov_dep: string;
 }
-
+export interface UbigeoItem {
+  ubigeo_inei: string;
+  ubigeo_reniec: string;
+  dis_prov_dep: string;
+}
+export interface FilterUbigeosResp extends FilterResp {
+  filas: UbigeoItem[];
+}
 // ✅ TIPOS PARA MOVIMIENTO
 export type Movimiento = {
   id: number;
@@ -258,7 +360,20 @@ export type Movimiento = {
   estado: number;
   created_at: string;
 }
-
+export type MovimientoItem = {
+  id: number;
+  establecimiento_id: number;
+  establecimiento: string;
+  tipo: string;
+  concepto: string;
+  fecha: string;
+  numeracion: string;
+  estado: number;
+  created_at: string;
+}
+export interface FilterMovimientosResp extends FilterResp {
+  filas: MovimientoItem[];
+}
 export type Movimientoform = {
   establecimiento_id: number;
   tipo: string;
@@ -297,4 +412,12 @@ export type Numeracion = {
   serie: string;
   correlativo: number;
   estado: number;
+}
+
+export interface MutationFetch {
+  newValues?: any;
+  url?: string;
+  method?: string;
+  headers?: any;
+  body?: any
 }

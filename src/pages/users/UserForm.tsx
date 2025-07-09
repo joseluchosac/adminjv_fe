@@ -11,15 +11,10 @@ import useCatalogosStore from "../../core/store/useCatalogosStore";
 import { useUsers } from "./context/UsersContext";
 import { ResponseQuery, User } from "../../core/types";
 
-interface DataGetUser extends ResponseQuery {
-  content: User | null;
+interface DataUser extends ResponseQuery {
+  content: User;
 }
-type GetUserQuery = {
-  data: DataGetUser | null ;
-  isPending: boolean;
-  isError: boolean;
-  getUser: (id: number) => void
-}
+
 
 const userFormInit = {
   id: 0,
@@ -53,14 +48,14 @@ export default function Userform(){
     isPending: isPendingUser,
     isError: isErrorUser,
     getUser
-  }: GetUserQuery = useMutationUsersQuery()
+  }= useMutationUsersQuery<DataUser>()
 
   const {
     data: mutation,
     isPending: isPendingMutation,
     createUser, 
     updateUser, 
-  } = useMutationUsersQuery()
+  } = useMutationUsersQuery<DataUser>()
   
   const submit = (data: User) => {
     Swal.fire({

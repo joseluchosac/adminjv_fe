@@ -1,11 +1,4 @@
-
-type MutationFetch = {
-  newValues?: any;
-  url?: string;
-  method?: string;
-  headers?: any;
-  body?: any
-}
+import { MutationFetch } from "../types"
 
 export const mutationFetch = async ({
   newValues=null, // objeto que actualizara la data de la mutacion sin realizar el fetch
@@ -21,7 +14,8 @@ export const mutationFetch = async ({
   }
   if(headers){ options.headers = headers }
   if(body){ options.body = body }
-  const res = await fetch(url, options);
-  return res.json()
+  const response = await fetch(url, options);
+  if(!response.ok) throw new Error("Hubo un error en la respuesta");
+  return response.json()
 }
 

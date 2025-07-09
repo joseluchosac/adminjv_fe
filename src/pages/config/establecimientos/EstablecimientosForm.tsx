@@ -1,3 +1,4 @@
+const apiURL = import.meta.env.VITE_API_URL;
 import { useEffect, useRef } from "react";
 import Modal from "react-bootstrap/Modal";
 import { Button, Col, Form, Row, Spinner } from "react-bootstrap";
@@ -5,7 +6,7 @@ import Swal from "sweetalert2";
 import { toast } from "react-toastify";
 import { Controller, useForm } from "react-hook-form";
 import { useEstablecimientos } from "./context/EstablecimientosContext";
-import { ResponseQuery } from "../../../core/types";
+import { ResponseQuery, UbigeoItem } from "../../../core/types";
 import { Establecimiento } from "../../../core/types/catalogosTypes";
 import useLayoutStore from "../../../core/store/useLayoutStore";
 import { useMutationEstablecimientosQuery } from "../../../core/hooks/useEstablecimientosQuery";
@@ -13,9 +14,9 @@ import { LdsBar, LdsEllipsisCenter } from "../../../core/components/Loaders";
 import SelectAsync from "react-select/async"
 import { debounce } from "../../../core/utils/funciones";
 import { filterParamsInit, selectDark } from "../../../core/utils/constants";
-import { filterUbigeosFetch } from "../../../core/services/ubigeosFetch";
 import useSessionStore from "../../../core/store/useSessionStore";
 import useCatalogosStore from "../../../core/store/useCatalogosStore";
+import { filterFetch } from "../../../core/services/filterFetch";
 
 interface DataGetEstablecimiento extends ResponseQuery {
   content: Establecimiento | null;
@@ -79,9 +80,14 @@ export default function EstablecimientoForm() {
     abortUbigeos.current?.abort(); // ✅ Cancela la petición anterior
     abortUbigeos.current = new AbortController();
     const filtered = {...filterParamsInit, search}
-    filterUbigeosFetch({filterParamsUbigeos: filtered, pageParam:1, token: tknSession, signal: abortUbigeos.current.signal })
+    filterFetch({
+      filterParams: filtered,
+      url: `${apiURL}ubigeos/filter_ubigeos?page=1`,
+      signal: abortUbigeos.current.signal,
+      token: tknSession
+    })
     .then(data=>{
-      callback(data.filas.map(el=>({value: el.ubigeo_inei, label: el.dis_prov_dep})))
+      callback(data.filas.map((el: UbigeoItem)=>({value: el.ubigeo_inei, label: el.dis_prov_dep})))
     })
   },500)
 
