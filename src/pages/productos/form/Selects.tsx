@@ -4,12 +4,10 @@ import { Form } from "react-bootstrap"
 import { Control, Controller, UseFormClearErrors, UseFormGetValues, UseFormSetValue } from "react-hook-form";
 import SelectAsync from "react-select/async"
 import { debounce } from "../../../core/utils/funciones";
-import useLaboratoriosStore from "../../../core/store/useLaboratoriosStore";
 import useSessionStore from "../../../core/store/useSessionStore";
-import { selectDark } from "../../../core/utils/constants";
+import { filterParamsInit, selectDark } from "../../../core/utils/constants";
 import useLayoutStore from "../../../core/store/useLayoutStore";
 import { LaboratorioItem, MarcaItem, Producto } from "../../../core/types";
-import useMarcasStore from "../../../core/store/useMarcasStore";
 import { FaPlus } from "react-icons/fa6";
 import { filterFetch } from "../../../core/services/filterFetch";
 
@@ -35,7 +33,6 @@ export function MarcasSelect({
     clearErrors,
     setShowMarcaForm,
   }: SelectPropsMarcas) {
-  const filterParamsMarcas = useMarcasStore(state => state.filterParamsMarcas)
   const abortMarcas = useRef<AbortController | null>(null);
   const tknSession = useSessionStore(state => state.tknSession)
   const darkMode = useLayoutStore(state => state.layout.darkMode)
@@ -43,7 +40,7 @@ export function MarcasSelect({
   const loadMarcasOptions =  debounce((search: string, callback: any) => {
     abortMarcas.current?.abort();
     abortMarcas.current = new AbortController();
-    const filtered = {...filterParamsMarcas, search}
+    const filtered = {...filterParamsInit, search}
     filterFetch({
       filterParams: filtered,
       url: `${apiURL}marcas/filter_marcas?page=1`,
@@ -98,7 +95,7 @@ export function LaboratorioSelect({
   clearErrors, 
   setShowLaboratorioForm
 }: SelectPropsLaboratorios) {
-  const filterParamsLaboratorios = useLaboratoriosStore(state => state.filterParamsLaboratorios)
+  // const filterParamsLaboratorios = useLaboratoriosStore(state => state.filterParamsLaboratorios)
   const abortLaboratorios = useRef<AbortController | null>(null);
   const tknSession = useSessionStore(state => state.tknSession)
   const darkMode = useLayoutStore(state => state.layout.darkMode)
@@ -106,7 +103,7 @@ export function LaboratorioSelect({
   const loadLaboratoriosOptions =  debounce((search: string, callback: any) => {
     abortLaboratorios.current?.abort(); // ✅ Cancela la petición anterior
     abortLaboratorios.current = new AbortController();
-    const filtered = {...filterParamsLaboratorios, search}
+    const filtered = {...filterParamsInit, search}
 
     const abortController = new AbortController()
     return filterFetch({

@@ -1,4 +1,4 @@
-import { FilterParams } from "../types";
+import { CampoTable, FilterInfo, FilterParams } from "../types";
 
 //--> CLAVES PARA LOCAL STORAGE
 export const ls_layoutKey = "ls_layout"
@@ -84,22 +84,42 @@ export const filterParamsInit: FilterParams = {
     orders: [], 
 }
 ///   ejemplo de uso
-// const filterParamsInit_: FilterParams = {
-//     offset: 25,
-//     search: "",
-//     orders: [
-//       {field_name: "nombres", order_dir: "ASC", field_label: "Nombres"}
-//     ],
-//     equals: [
-//       {
-//         field_name: "establecimiento_id", 
-//         field_value: "1", 
-//         label_name: "principal", 
-//         label_value: "Establecimiento"
-//       },
-//     ],
-//     between: {
-//       field_name: "created_at", 
-//       field_label:"Creado", 
-//       range: "2024-12-18 00:00:00, 2024-12-19 23:59:59"},
-// }
+/*
+  const filterParamsInit_: FilterParams = {
+    offset: 25,
+    search: "",
+    orders: [
+      {field_name: "nombres", order_dir: "ASC", field_label: "Nombres"}
+    ],
+    equals: [
+      {
+        field_name: "establecimiento_id", 
+        field_value: "1", 
+        label_name: "principal", 
+        label_value: "Establecimiento"
+      },
+    ],
+    between: {
+      field_name: "created_at", 
+      field_label:"Creado", 
+      range: "2024-12-18 00:00:00, 2024-12-19 23:59:59"
+    },
+  }
+*/
+
+
+//--> ROLES
+// *****************************************************
+export const filterInfoInit: FilterInfo = {
+  search:"",
+  equals: [],
+  between: {field_name: "", field_label: "", range: ""},
+  orders: [], 
+}
+
+export const camposMarcaInit: CampoTable[] = [
+  {show: true, orderable: false, order_dir:"", field_name: "acciones", field_label:"Acciones",  },
+  {show: false, orderable: true, order_dir:"", field_name: "id", field_label:"Id",  },
+  {show: true, orderable: true, order_dir:"", field_name: "nombre", field_label:"Nombre",  },
+  {show: true, orderable: true, order_dir:"", field_name: "estado", field_label:"Estado",  },
+]

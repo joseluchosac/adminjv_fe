@@ -1,11 +1,11 @@
-import { CampoTable, Marca} from "../../core/types";
+import { CampoTable, Marca} from "../../../core/types";
 import { FaEdit, FaToggleOff, FaToggleOn, FaTrash } from "react-icons/fa";
-import { useMutationMarcasQuery } from "../../core/hooks/useMarcasQuery";
+import { useMutationMarcasQuery } from "../../../core/hooks/useMarcasQuery";
 import Swal from "sweetalert2";
-import useLayoutStore from "../../core/store/useLayoutStore";
+import useLayoutStore from "../../../core/store/useLayoutStore";
 import { useEffect } from "react";
 import { toast } from "react-toastify";
-import { useMarcas } from "./context/MarcasContext";
+import { useMarcas } from "../context/MarcasContext";
 
 interface Props {
   marca: Marca ;

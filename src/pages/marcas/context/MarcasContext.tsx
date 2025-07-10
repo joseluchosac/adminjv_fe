@@ -1,21 +1,16 @@
 import { createContext, useContext, useState } from "react";
-import { FilterCurrent, Marca } from "../../../core/types";
-
-const filterMarcasCurrentInit: FilterCurrent = {
-  equals: [],
-  between: {field_name: "", field_label: "", range: ""},
-  orders: [], 
-}
+import { FilterInfo, FilterParams } from "../../../core/types";
+import { filterInfoInit, filterParamsInit } from "../../../core/utils/constants";
 
 export interface MarcasContextType {
-  marcas: Marca[] | null;
-  setMarcas: React.Dispatch<React.SetStateAction<Marca[] | null>>;
   showMarcaForm: boolean;
   setShowMarcaForm: React.Dispatch<React.SetStateAction<boolean>>;
   currentMarcaId: number;
   setCurrentMarcaId: React.Dispatch<React.SetStateAction<number>>;
-  filterMarcasCurrent: FilterCurrent;
-  setFilterMarcasCurrent: React.Dispatch<React.SetStateAction<FilterCurrent>>;
+  filterInfoMarcas: FilterInfo;
+  setFilterInfoMarcas: React.Dispatch<React.SetStateAction<FilterInfo>>;
+  filterParamsMarcasForm: FilterParams;
+  setFilterParamsMarcasForm: React.Dispatch<React.SetStateAction<FilterParams>>;
 }
 
 // Crear el contexto con un valor por defecto
@@ -23,21 +18,21 @@ const MarcasContext = createContext<MarcasContextType | undefined>(undefined);
 
 // Proveedor del contexto
 export const MarcasProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [marcas, setMarcas] = useState<Marca[] | null>(null);
   const [showMarcaForm, setShowMarcaForm] = useState(false);
   const [currentMarcaId, setCurrentMarcaId] = useState(0);
-  const [filterMarcasCurrent, setFilterMarcasCurrent] = useState(filterMarcasCurrentInit);
+  const [filterInfoMarcas, setFilterInfoMarcas] = useState(filterInfoInit);
+  const [filterParamsMarcasForm, setFilterParamsMarcasForm] = useState(filterParamsInit);
 
   return (
     <MarcasContext.Provider value={{ 
-      marcas, 
-      setMarcas, 
       showMarcaForm, 
       setShowMarcaForm,
       currentMarcaId,
       setCurrentMarcaId,
-      filterMarcasCurrent,
-      setFilterMarcasCurrent
+      filterInfoMarcas,
+      setFilterInfoMarcas,
+      filterParamsMarcasForm,
+       setFilterParamsMarcasForm,
     }}>
       {children}
     </MarcasContext.Provider>

@@ -16,7 +16,6 @@ type TypeAction =
 export const useFilterLaboratoriosQuery = () => {
   const tknSession = useSessionStore(state => state.tknSession)
   const filterParamsLaboratorios = useLaboratoriosStore(state => state.filterParamsLaboratorios)
-  // const setFilterParamsLaboratorios = useLaboratoriosStore(state => state.setFilterParamsLaboratorios)
   const queryClient = useQueryClient()
 
   const {

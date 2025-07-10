@@ -171,8 +171,7 @@ export type FilterFetch = {
   signal: AbortSignal
 }
 
-
-// ✅ TIPOS PARA FILTROS DE RESPUESTA GENERALES
+// ✅ TIPO PARA RESPUESTA DE UNA PETICION DE FILTRO
 type FilterResp = {
   num_regs: number;
   pages: number;
@@ -184,7 +183,9 @@ type FilterResp = {
   msg?: string;
   msgTye?: string
 }
-
+// ✅ TIPO PARA MOSTRAR LA INFORMACION DEL FILTRO
+export type FilterInfo = Omit<FilterParams, "offset">
+// eliminar el de abajo
 export type FilterCurrent = Omit<FilterParams, "offset" | "search">
 
 // ✅ TIPOS PARA PRODUCTO

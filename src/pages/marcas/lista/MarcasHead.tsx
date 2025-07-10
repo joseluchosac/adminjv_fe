@@ -2,27 +2,30 @@ import { useEffect, useState } from "react";
 import { Badge, Button, Col, Container, Form, InputGroup, Row, Stack } from "react-bootstrap";
 import { BsSearch } from "react-icons/bs";
 import { useDebounce } from "react-use";
-import { LdsBar } from "../../core/components/Loaders";
-import { useFilterMarcasQuery } from "../../core/hooks/useMarcasQuery";
-import useMarcasStore from "../../core/store/useMarcasStore";
-import DynaIcon from "../../core/components/DynaComponents";
-import { useMarcas } from "./context/MarcasContext";
-import { filterParamsInit } from "../../core/utils/constants";
-
-export default function MarcasHead() {
+import { LdsBar } from "../../../core/components/Loaders";
+import DynaIcon from "../../../core/components/DynaComponents";
+import { useMarcas } from "../context/MarcasContext";
+import { filterParamsInit } from "../../../core/utils/constants";
+type Props = {
+  isFetching: boolean
+}
+export default function MarcasHead({isFetching}: Props) {
   const [inputSearch, setInputSearch] = useState("")
-  const filterParamsMarcas = useMarcasStore(state => state.filterParamsMarcas)
-  const setFilterParamsMarcas = useMarcasStore(state => state.setFilterParamsMarcas)
-  const {setShowMarcaForm, setCurrentMarcaId, filterMarcasCurrent} = useMarcas()
-  const {isFetching} = useFilterMarcasQuery();
+  const {
+    setShowMarcaForm,
+    setCurrentMarcaId,
+    filterInfoMarcas,
+    filterParamsMarcasForm,
+    setFilterParamsMarcasForm
+  } = useMarcas()
 
   useDebounce(() => { 
-    if (inputSearch.toLowerCase().trim() == filterParamsMarcas.search.toLowerCase().trim()) return
-    setFilterParamsMarcas({ ...filterParamsMarcas, search: inputSearch.trim() });
+    if (inputSearch.toLowerCase().trim() == filterParamsMarcasForm.search.toLowerCase().trim()) return
+    setFilterParamsMarcasForm({ ...filterParamsMarcasForm, search: inputSearch.trim() });
   }, 500, [inputSearch]);
 
   const handleUnsort = () => {
-    setFilterParamsMarcas({...filterParamsMarcas, orders: filterParamsInit.orders})
+    setFilterParamsMarcasForm({...filterParamsMarcasForm, orders: filterParamsInit.orders})
   };
 
   const handleNuevo = () => {
@@ -31,7 +34,7 @@ export default function MarcasHead() {
   };
 
   useEffect(()=>{
-    setInputSearch(filterParamsMarcas.search)
+    setInputSearch(filterParamsMarcasForm.search)
   }, [])
 
   return (
@@ -68,13 +71,13 @@ export default function MarcasHead() {
             <Stack
               direction="horizontal"
               gap={2}
-              className={`${filterMarcasCurrent.orders.length ? "" : "d-none"}`}
+              className={`${filterInfoMarcas.orders.length ? "" : "d-none"}`}
             >
               <Badge bg="secondary" role="button" onClick={handleUnsort} className="d-flex gap-1">
                 <DynaIcon name="FaCircleXmark"  className="pr-4" />
                   ORDEN:
                   <div className="text-wrap">
-                    {filterMarcasCurrent.orders.map((el) => el.field_label).join(", ")}
+                    {filterInfoMarcas.orders.map((el) => el.field_label).join(", ")}
                   </div>
               </Badge>
             </Stack>

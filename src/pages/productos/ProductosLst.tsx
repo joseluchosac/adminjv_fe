@@ -70,8 +70,8 @@ const ProductosLst: React.FC = () => {
 
 
   useEffect(()=>{
-    if(data?.pages[0].error || !data?.pages[0].content) return
-    const newProductos = data?.pages.flatMap(el => el.content);
+    if(data?.pages[0].error || !data?.pages[0].filas) return
+    const newProductos = data?.pages.flatMap(el => el.filas);
     setProductos([...newProductos])
   },[data])
 

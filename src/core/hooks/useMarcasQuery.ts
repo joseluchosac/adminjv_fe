@@ -1,20 +1,19 @@
 const apiURL = import.meta.env.VITE_API_URL;
-import { useEffect, useRef } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import { useNavigate } from "react-router-dom";
 import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import useSessionStore from "../store/useSessionStore"
-import useMarcasStore from "../store/useMarcasStore";
 import { mutationFetch } from "../services/mutationFecth"
 import { FilterMarcasResp, Marca } from "../types";
 import { filterFetch } from "../services/filterFetch";
+import { filterParamsInit } from "../utils/constants";
 
 type TypeAction = "filter_full" | "mutate_marca"
 
 // ****** FILTRAR ******
 export const useFilterMarcasQuery = () => {
+  const [filterParamsMarcas, setFilterParamsMarcas] = useState(filterParamsInit)
   const tknSession = useSessionStore(state => state.tknSession)
-  const filterParamsMarcas = useMarcasStore(state => state.filterParamsMarcas)
-  // const setFilterParamsMarcas = useMarcasStore(state => state.setFilterParamsMarcas)
   const queryClient = useQueryClient()
   
   const {
@@ -43,9 +42,11 @@ export const useFilterMarcasQuery = () => {
     staleTime: 1000 * 60 * 5 
   })
 
-  const resetear = ()=>{
+  const resetear = useCallback(()=>{
     queryClient.resetQueries({ queryKey: ['marcas'], exact: true });
-  }
+    setFilterParamsMarcas(filterParamsInit)
+  },[])
+  
 
   useEffect(() => {
     return () => {
@@ -63,7 +64,9 @@ export const useFilterMarcasQuery = () => {
     isLoading, 
     isFetching, 
     hasNextPage, 
-    fetchNextPage, 
+    fetchNextPage,
+    filterParamsMarcas,
+    setFilterParamsMarcas,
   }
 }
 
@@ -73,7 +76,6 @@ export const useMutationMarcasQuery = () => {
   const navigate = useNavigate()
   const tknSession = useSessionStore(state => state.tknSession)
   const Authorization = "Bearer " + tknSession
-  const filterParamsMarcas = useMarcasStore(state => state.filterParamsMarcas)
   const queryClient = useQueryClient()
   const typeActionRef = useRef<TypeAction | "">("")
 
@@ -85,18 +87,18 @@ export const useMutationMarcasQuery = () => {
     }
   })
 
-  const filterMarcasFull = () => {// Sin Paginacion
-    typeActionRef.current = "filter_full"
-    const params = {
-      url: apiURL + "marcas/filter_marcas_full",
-      method: "POST",
-      headers:{ 
-        Authorization,
-      },
-      body: JSON.stringify(filterParamsMarcas),
-    }
-    mutate(params)
-  }
+  // const filterMarcasFull = () => {// Sin Paginacion
+  //   typeActionRef.current = "filter_full"
+  //   const params = {
+  //     url: apiURL + "marcas/filter_marcas_full",
+  //     method: "POST",
+  //     headers:{ 
+  //       Authorization,
+  //     },
+  //     body: JSON.stringify(filterParamsMarcas),
+  //   }
+  //   mutate(params)
+  // }
 
   const getMarca = (id: number) => {
     const params = {
@@ -164,7 +166,6 @@ export const useMutationMarcasQuery = () => {
     data, 
     isPending, 
     isError,
-    filterMarcasFull,
     getMarca,
     createMarca,
     updateMarca,
