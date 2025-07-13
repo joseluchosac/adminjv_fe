@@ -1,5 +1,4 @@
 import Modal from "react-bootstrap/Modal";
-import useProductosStore from "../../core/store/useProductosStore";
 import { Badge, Button, Col, Form, Row, Tab, Tabs } from "react-bootstrap";
 import { useEffect, useState } from "react";
 import {
@@ -11,36 +10,45 @@ import {
   subMonths,
   subWeeks,
 } from "date-fns";
-import useCatalogosStore from "../../core/store/useCatalogosStore";
-import { filterParamsInit } from "../../core/utils/constants";
-import { useProductos } from "./context/ProductosContext";
+import useCatalogosStore from "../../../core/store/useCatalogosStore";
+import { filterParamsInit } from "../../../core/utils/constants";
+import { useUsers } from "../context/UsersContext";
+import { CampoTable } from "../../../core/types";
+import { LdsBar } from "../../../core/components/Loaders";
 
 const dateRangeInit = { field_name: "", field_label: "", date_from: "", date_to: "" };
 const equalFormInit = { rol_id: "", caja_id: "", estado: ""}
 
-const ProductosLstFilterMdl: React.FC = () => {
+type Props = {
+  isFetching: boolean;
+  camposUser: CampoTable[]
+}
+const UsersLstFilterMdl: React.FC<Props> = ({isFetching, camposUser}) => {
   const [tabName, setTabName] = useState("order")
   const [dateRange, setDateRange] = useState(dateRangeInit);
   const [rangeName, setRangeName] = useState("")
   const [equalForm, setEqualForm] = useState(equalFormInit)
-  const {showProductosFilterMdl, setShowProductosFilterMdl} = useProductos()
-  const filterParamsProductos = useProductosStore((state) => state.filterParamsProductos);
-  const setFilterParamsProductos = useProductosStore(state => state.setFilterParamsProductos)
-  const camposProducto = useProductosStore(state => state.camposProducto)
   const roles = useCatalogosStore(state => state.catalogos?.roles)
   const cajas = useCatalogosStore(state => state.catalogos?.cajas)
   
+  const {
+    filterParamsUsersForm,
+    setFilterParamsUsersForm,
+    showUsersFilterMdl,
+    setShowUsersFilterMdl
+  } = useUsers()
+
   const handleChangeOrder = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const field_name = e.target.value
     const field_label = e.currentTarget.options[e.currentTarget.selectedIndex].textContent || ""
     const newOrders = field_name ? [{field_name, order_dir: "ASC", field_label}] : []
-    setFilterParamsProductos({...filterParamsProductos, orders: newOrders})
+    setFilterParamsUsersForm({...filterParamsUsersForm, orders: newOrders})
   }
 
   const handleChangeOrderDir = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const order_dir = e.target.value
-    const newOrders = [{...filterParamsProductos.orders[0], order_dir}]
-    setFilterParamsProductos({...filterParamsProductos, orders: newOrders})
+    const newOrders = [{...filterParamsUsersForm.orders[0], order_dir}]
+    setFilterParamsUsersForm({...filterParamsUsersForm, orders: newOrders})
   }
 
   const handleChangeEqual = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -48,7 +56,7 @@ const ProductosLstFilterMdl: React.FC = () => {
     const { name: field_name, value: field_value } = e.currentTarget;
     const label_value = e.currentTarget.options[e.currentTarget.selectedIndex].textContent || ""
     setEqualForm({...equalForm, [field_name]:field_value})
-    let { equals } = filterParamsProductos;
+    let { equals } = filterParamsUsersForm;
     const idx = equals.findIndex(el => el.field_name === field_name)
     if(!field_value){
       equals = equals.filter(el => el.field_name !== field_name)
@@ -59,7 +67,7 @@ const ProductosLstFilterMdl: React.FC = () => {
         equals[idx] = {field_name, field_value, label_name, label_value}
       }
     }
-    setFilterParamsProductos({ ...filterParamsProductos, equals: [...equals] });
+    setFilterParamsUsersForm({ ...filterParamsUsersForm, equals: [...equals] });
   }
 
   const handleSelectCampoRange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -123,45 +131,46 @@ const ProductosLstFilterMdl: React.FC = () => {
         (dateRange.date_to ? dateRange.date_to + " 23:59:59" : ""),
     };
     if (
-      filterParamsProductos.between.field_name == newBetween.field_name &&
-      filterParamsProductos.between.range == newBetween.range
+      filterParamsUsersForm.between.field_name == newBetween.field_name &&
+      filterParamsUsersForm.between.range == newBetween.range
     ) return;
-    setFilterParamsProductos({ ...filterParamsProductos, between: newBetween });
+    setFilterParamsUsersForm({ ...filterParamsUsersForm, between: newBetween });
   };
 
   const handleUnbetween = () => {
     setDateRange(dateRangeInit);
     setRangeName("")
-    if(!filterParamsProductos.between.field_name) return
-    setFilterParamsProductos({...filterParamsProductos, between: filterParamsInit.between})
+    if(!filterParamsUsersForm.between.field_name) return
+    setFilterParamsUsersForm({...filterParamsUsersForm, between: filterParamsInit.between})
     
   }
 
   
   useEffect(() => {
-    if(showProductosFilterMdl){
-      if(!filterParamsProductos.between.field_name){
+    if(showUsersFilterMdl){
+      if(!filterParamsUsersForm.between.field_name){
         handleUnbetween()
       }
-      const {range, field_name, field_label} = filterParamsProductos.between
+      const {range, field_name, field_label} = filterParamsUsersForm.between
       const date_from = range ? range.split(", ")[0].split(" ")[0] : ""
       const date_to = range ? range.split(", ")[1].split(" ")[0] : ""
       setDateRange({field_name, field_label, date_from, date_to})
       const newEqualForm = structuredClone(equalFormInit)
-      for (const el of filterParamsProductos.equals) {
+      for (const el of filterParamsUsersForm.equals) {
         const field_name = el.field_name as keyof typeof equalFormInit
         newEqualForm[field_name] = el.field_value
       }
       setEqualForm(newEqualForm)
     }
-  },[showProductosFilterMdl])
+  },[showUsersFilterMdl])
   
   return (
     <Modal 
-      show={showProductosFilterMdl} 
-      onHide={()=>setShowProductosFilterMdl(false)}
+      show={showUsersFilterMdl} 
+      onHide={()=>setShowUsersFilterMdl(false)}
     >
       <Modal.Body>
+        {isFetching && <LdsBar />}
         <Tabs
           activeKey={tabName}
           onSelect={(k) => setTabName(k as string)}
@@ -174,11 +183,11 @@ const ProductosLstFilterMdl: React.FC = () => {
                 <Form.Select
                   id="f_order"
                   name="order"
-                  value={filterParamsProductos.orders.length ? filterParamsProductos.orders[0].field_name : ""}
+                  value={filterParamsUsersForm.orders.length ? filterParamsUsersForm.orders[0].field_name : ""}
                   onChange={handleChangeOrder}
                 >
                   <option value="">Ninguno</option>
-                  {camposProducto && camposProducto.filter(el=>el.orderable).map(el=>{
+                  {camposUser && camposUser.filter(el=>el.orderable).map(el=>{
                     return <option key={el.field_name} value={el.field_name}>{el.field_label}</option>
                   })}
                 </Form.Select>
@@ -188,7 +197,7 @@ const ProductosLstFilterMdl: React.FC = () => {
                 <Form.Select
                   id="f_order_dir"
                   name="order_dir"
-                  value={filterParamsProductos.orders.length ? filterParamsProductos.orders[0].order_dir : "ASC"}
+                  value={filterParamsUsersForm.orders.length ? filterParamsUsersForm.orders[0].order_dir : "ASC"}
                   onChange={handleChangeOrderDir}
                 >
                   <option value="ASC">Ascendente</option>
@@ -342,4 +351,4 @@ const ProductosLstFilterMdl: React.FC = () => {
   );
 }
 
-export default ProductosLstFilterMdl;
+export default UsersLstFilterMdl;

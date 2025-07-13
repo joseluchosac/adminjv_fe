@@ -32,7 +32,7 @@ export const MarcasProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       filterInfoMarcas,
       setFilterInfoMarcas,
       filterParamsMarcasForm,
-       setFilterParamsMarcasForm,
+      setFilterParamsMarcasForm,
     }}>
       {children}
     </MarcasContext.Provider>

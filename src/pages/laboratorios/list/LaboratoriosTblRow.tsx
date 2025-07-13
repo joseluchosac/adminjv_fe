@@ -1,12 +1,11 @@
-import { Badge } from "react-bootstrap";
-import { CampoTable, Laboratorio} from "../../core/types";
-import useLaboratoriosStore from "../../core/store/useLaboratoriosStore";
-import { FaEdit, FaTrash } from "react-icons/fa";
-import { useMutationLaboratoriosQuery } from "../../core/hooks/useLaboratoriosQuery";
+import { CampoTable, Laboratorio} from "../../../core/types";
+import { FaEdit, FaToggleOff, FaToggleOn, FaTrash } from "react-icons/fa";
+import { useMutationLaboratoriosQuery } from "../../../core/hooks/useLaboratoriosQuery";
 import Swal from "sweetalert2";
-import useLayoutStore from "../../core/store/useLayoutStore";
+import useLayoutStore from "../../../core/store/useLayoutStore";
 import { useEffect } from "react";
 import { toast } from "react-toastify";
+import { useLaboratorios } from "../context/LaboratoriosContext";
 
 interface Props {
   laboratorio: Laboratorio ;
@@ -14,19 +13,14 @@ interface Props {
 }
 
 function LaboratoriosTblRow({ laboratorio, camposLaboratorio }: Props) {
-  const setCurrentLaboratorioId = useLaboratoriosStore(state => state.setCurrentLaboratorioId)
-  const setShowLaboratorioFormMdl = useLaboratoriosStore(state => state.setShowLaboratorioFormMdl)
   const darkMode = useLayoutStore(state => state.layout.darkMode)
-  
-  const {
-    data,
-    deleteLaboratorio
-  } = useMutationLaboratoriosQuery()
+  const {setShowLaboratorioForm, setCurrentLaboratorioId} = useLaboratorios()
+  const {data, deleteLaboratorio, updateLaboratorio} = useMutationLaboratoriosQuery()
 
   const handleToEdit = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
     e.preventDefault()
     setCurrentLaboratorioId(laboratorio.id)
-    setShowLaboratorioFormMdl(true)
+    setShowLaboratorioForm(true)
   }
 
   const handleDelete = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
@@ -47,6 +41,10 @@ function LaboratoriosTblRow({ laboratorio, camposLaboratorio }: Props) {
     });
   }
 
+  const toggleEstado = () => {
+    updateLaboratorio({...laboratorio, estado: laboratorio.estado ? 0 : 1})
+  }
+
   useEffect(() => {
     if (!data) return
     toast(data.msg, {type: data.msgType})
@@ -59,9 +57,16 @@ function LaboratoriosTblRow({ laboratorio, camposLaboratorio }: Props) {
         if(show){
           switch (field_name) {
             case "estado":{
-              return <td key={field_name}> {laboratorio.estado == 0
-                ? <Badge bg="danger">Deshabilitdo</Badge>
-                : <Badge bg="success">Habilitado</Badge>} </td>
+              return <td key={field_name}>
+                {laboratorio.estado == 0
+                  ? <div role="button" onClick={toggleEstado} title="Habilitar" data-estado="0">
+                      <FaToggleOff className="text-muted" size={"1.3rem"} />
+                    </div>
+                  : <div role="button" onClick={toggleEstado} title="Deshabilitar" data-estado="1">
+                      <FaToggleOn className="text-primary" size={"1.3rem"} />
+                    </div>
+                }
+                </td>
             }
             case "acciones":{
               return (
@@ -71,7 +76,7 @@ function LaboratoriosTblRow({ laboratorio, camposLaboratorio }: Props) {
                       <FaEdit />
                     </a>
                     <a onClick={handleDelete} href="#" className="p-1" title="Eliminar">
-                      <FaTrash className="text-danger mb-1"/>
+                      <FaTrash className="text-danger"/>
                     </a>
                   </div>
                 </td>

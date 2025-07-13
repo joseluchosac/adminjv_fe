@@ -1,34 +1,32 @@
 const apiDOCS = import.meta.env.VITE_DOCS_URL;
 import { useEffect, useState } from 'react'
 import { Badge, Button, Col, Container, Dropdown, Form, Row, Stack } from 'react-bootstrap'
-import { LdsBar } from '../../core/components/Loaders'
 import { FaFileExcel, FaFilePdf, FaFilter } from 'react-icons/fa'
-import DynaIcon from '../../core/components/DynaComponents'
-import useProductosStore from '../../core/store/useProductosStore'
-import { useFilterProductosQuery } from '../../core/hooks/useProductosQuery'
 import { useDebounce } from 'react-use'
-import { filterParamsInit } from '../../core/utils/constants'
-import { objToUriBase64 } from '../../core/utils/funciones'
-import { useProductos } from './context/ProductosContext';
+import { useProductos } from '../context/ProductosContext';
+import { filterParamsInit } from '../../../core/utils/constants';
+import { objToUriBase64 } from '../../../core/utils/funciones';
+import { LdsBar } from '../../../core/components/Loaders';
+import DynaIcon from '../../../core/components/DynaComponents';
 
-export default function ProductosLstHead() {
+type Props = {isFetching: boolean}
+
+export default function ProductosHead({isFetching}: Props) {
   const [inputSearch, setInputSearch] = useState("")
-  const filterParamsProductos = useProductosStore(state => state.filterParamsProductos)
-  const setFilterParamsProductos = useProductosStore(state => state.setFilterParamsProductos)
-
   const {
-    filterProductosCurrent, 
+    filterInfoProductos,
+    filterParamsProductosForm,
+    setFilterParamsProductosForm,
     setShowProductosFilterMdl,
     modo,
     setModo,
   } = useProductos()
 
-  const { isFetching: isFetchingProductos } = useFilterProductosQuery();
-
   useDebounce(() => { 
-    if (inputSearch.toLowerCase().trim() == filterParamsProductos.search.toLowerCase().trim()) return
-    setFilterParamsProductos({ ...filterParamsProductos, search: inputSearch.trim() });
+    if (inputSearch.toLowerCase().trim() == filterParamsProductosForm.search.toLowerCase().trim()) return
+    setFilterParamsProductosForm({ ...filterParamsProductosForm, search: inputSearch.trim() });
   }, 500, [inputSearch]);
+
   const handleSetShowProductosFilterMdl = (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
     e.preventDefault()
     setShowProductosFilterMdl(true)
@@ -36,18 +34,18 @@ export default function ProductosLstHead() {
   const handleUnequal = (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
     const {field_name} = e.currentTarget.dataset
     if(field_name){
-      let { equals } = filterParamsProductos;
+      let { equals } = filterParamsProductosForm;
       equals = equals.filter(el => el.field_name !== field_name)
-      setFilterParamsProductos({ ...filterParamsProductos, equals: [...equals] });
+      setFilterParamsProductosForm({ ...filterParamsProductosForm, equals: [...equals] });
     }
   };
   
   const handleUnsort = () => {
-    setFilterParamsProductos({...filterParamsProductos, orders: filterParamsInit.orders})
+    setFilterParamsProductosForm({...filterParamsProductosForm, orders: filterParamsInit.orders})
   };
 
   const handleUnbetween = () => {
-    setFilterParamsProductos({...filterParamsProductos, between: filterParamsInit.between})
+    setFilterParamsProductosForm({...filterParamsProductosForm, between: filterParamsInit.between})
   }
 
   const handleNuevo = () => {
@@ -55,7 +53,7 @@ export default function ProductosLstHead() {
   };
 
   const getDateRangeInfo = () => {
-    const {between} = filterParamsProductos
+    const {between} = filterParamsProductosForm
     if(!between.field_name) return ""
     let date_from = between.range.split(",")[0].split(" ")[0]
     let date_to = between.range.split(",")[1].trim().split(" ")[0]
@@ -68,18 +66,18 @@ export default function ProductosLstHead() {
   }
 
   const handleTraerTodo = () => {
-    const param = objToUriBase64(filterParamsProductos)
+    const param = objToUriBase64(filterParamsProductosForm)
     window.open(apiDOCS+"pdf/?action=productos_report&p=" + param)
   }
 
   useEffect(()=>{
-    setInputSearch(filterParamsProductos.search)
+    setInputSearch(filterParamsProductosForm.search)
   }, [])
 
 
   return (
       <Container className={`mb-2 pt-2 position-relative ${modo.vista === "edit" ? "d-none" : ""}`}>
-          {isFetchingProductos && <LdsBar />}
+          {isFetching && <LdsBar />}
         <Row className="align-items-center">
           <Col sm className="text-center text-sm-start">
             <h5>Lista de Productos</h5>
@@ -132,27 +130,27 @@ export default function ProductosLstHead() {
               <Stack
                 direction="horizontal"
                 gap={2}
-                className={`${filterProductosCurrent.orders.length ? "" : "d-none"}`}
+                className={`${filterInfoProductos.orders.length ? "" : "d-none"}`}
               >
                 <Badge bg="secondary" role="button" onClick={handleUnsort} className="d-flex gap-1">
                   <DynaIcon name="FaCircleXmark"  className="pr-4" />
                     ORDEN:
                     <div className="text-wrap">
-                      {filterProductosCurrent.orders.map((el) => el.field_label).join(", ")}
+                      {filterInfoProductos.orders.map((el) => el.field_label).join(", ")}
                     </div>
                 </Badge>
               </Stack>
-                {(filterProductosCurrent.between.field_name.length !== 0) &&
+                {(filterInfoProductos.between.field_name.length !== 0) &&
                   <Stack direction="horizontal" gap={2} className="flex-wrap">
                     <Badge bg="secondary" role="button" onClick={handleUnbetween} className="d-flex gap-1">
                       <DynaIcon name="FaCircleXmark"  className="pr-4" />
-                      {`${filterProductosCurrent.between.field_label}: `}
+                      {`${filterInfoProductos.between.field_label}: `}
                       <div className="text-wrap">{getDateRangeInfo()}</div>
                     </Badge>
                   </Stack>
                 }
               <Stack direction="horizontal" gap={2}>
-                {filterProductosCurrent.equals.map((el, idx) => {
+                {filterInfoProductos.equals.map((el, idx) => {
                   return (
                     <Badge 
                       bg="secondary" 

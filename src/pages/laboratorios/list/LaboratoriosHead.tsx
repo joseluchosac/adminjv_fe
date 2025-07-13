@@ -4,37 +4,37 @@ import { BsSearch } from "react-icons/bs";
 import { useDebounce } from "react-use";
 import { LdsBar } from "../../../core/components/Loaders";
 import DynaIcon from "../../../core/components/DynaComponents";
-import { useMarcas } from "../context/MarcasContext";
+import { useLaboratorios } from "../context/LaboratoriosContext";
 import { filterParamsInit } from "../../../core/utils/constants";
 
 type Props = { isFetching: boolean }
 
-export default function MarcasHead({isFetching}: Props) {
+export default function LaboratoriosHead({isFetching}: Props) {
   const [inputSearch, setInputSearch] = useState("")
   const {
-    setShowMarcaForm,
-    setCurrentMarcaId,
-    filterInfoMarcas,
-    filterParamsMarcasForm,
-    setFilterParamsMarcasForm
-  } = useMarcas()
+    setShowLaboratorioForm,
+    setCurrentLaboratorioId,
+    filterInfoLaboratorios,
+    filterParamsLaboratoriosForm,
+    setFilterParamsLaboratoriosForm
+  } = useLaboratorios()
 
   useDebounce(() => { 
-    if (inputSearch.toLowerCase().trim() == filterParamsMarcasForm.search.toLowerCase().trim()) return
-    setFilterParamsMarcasForm({ ...filterParamsMarcasForm, search: inputSearch.trim() });
+    if (inputSearch.toLowerCase().trim() == filterParamsLaboratoriosForm.search.toLowerCase().trim()) return
+    setFilterParamsLaboratoriosForm({ ...filterParamsLaboratoriosForm, search: inputSearch.trim() });
   }, 500, [inputSearch]);
 
   const handleUnsort = () => {
-    setFilterParamsMarcasForm({...filterParamsMarcasForm, orders: filterParamsInit.orders})
+    setFilterParamsLaboratoriosForm({...filterParamsLaboratoriosForm, orders: filterParamsInit.orders})
   };
 
   const handleNuevo = () => {
-    setCurrentMarcaId(0)
-    setShowMarcaForm(true);
+    setCurrentLaboratorioId(0)
+    setShowLaboratorioForm(true);
   };
 
   useEffect(()=>{
-    setInputSearch(filterParamsMarcasForm.search)
+    setInputSearch(filterParamsLaboratoriosForm.search)
   }, [])
 
   return (
@@ -42,7 +42,7 @@ export default function MarcasHead({isFetching}: Props) {
       {isFetching && <LdsBar />}
       <Row className="align-items-center mb-2">
         <Col sm className="text-center text-sm-start">
-          <h5>Lista de Marcas</h5>
+          <h5>Lista de Laboratorios</h5>
         </Col>
         <Col sm className="text-center text-sm-start mb-3 mb-sm-0">
           <InputGroup>
@@ -71,13 +71,13 @@ export default function MarcasHead({isFetching}: Props) {
             <Stack
               direction="horizontal"
               gap={2}
-              className={`${filterInfoMarcas.orders.length ? "" : "d-none"}`}
+              className={`${filterInfoLaboratorios.orders.length ? "" : "d-none"}`}
             >
               <Badge bg="secondary" role="button" onClick={handleUnsort} className="d-flex gap-1">
                 <DynaIcon name="FaCircleXmark"  className="pr-4" />
                   ORDEN:
                   <div className="text-wrap">
-                    {filterInfoMarcas.orders.map((el) => el.field_label).join(", ")}
+                    {filterInfoLaboratorios.orders.map((el) => el.field_label).join(", ")}
                   </div>
               </Badge>
             </Stack>

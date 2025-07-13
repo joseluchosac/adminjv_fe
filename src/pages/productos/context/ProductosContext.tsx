@@ -1,31 +1,26 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import { FilterCurrent, ProductoItem } from "../../../core/types";
+import { FilterInfo, FilterParams } from "../../../core/types";
 import { CategoriaOpc } from "../../../core/types/catalogosTypes";
 import useCatalogosStore from "../../../core/store/useCatalogosStore";
 import { flattenTree } from "../../../core/utils/funciones";
+import { filterInfoInit, filterParamsInit } from "../../../core/utils/constants";
 
 type Modo = {
   vista: "list" | "edit";
   productoId: number;
 }
 
-const filterProductosCurrentInit: FilterCurrent = {
-  equals: [],
-  between: {field_name: "", field_label: "", range: ""},
-  orders: [], 
-}
-
 export interface ProductosContextType {
-  productos: ProductoItem[] | null;
-  setProductos: React.Dispatch<React.SetStateAction<ProductoItem[] | null>>;
   modo: Modo;
   setModo: React.Dispatch<React.SetStateAction<Modo>>;
   categoriasOpc: CategoriaOpc[] | null
   setCategoriasOpc: React.Dispatch<React.SetStateAction<CategoriaOpc[] | null>>;
   showProductosFilterMdl: boolean;
   setShowProductosFilterMdl: React.Dispatch<React.SetStateAction<boolean>>;
-  filterProductosCurrent: FilterCurrent;
-  setFilterProductosCurrent: React.Dispatch<React.SetStateAction<FilterCurrent>>;
+  filterInfoProductos: FilterInfo;
+  setFilterInfoProductos: React.Dispatch<React.SetStateAction<FilterInfo>>;
+  filterParamsProductosForm: FilterParams;
+  setFilterParamsProductosForm: React.Dispatch<React.SetStateAction<FilterParams>>;
 }
 
 // Crear el contexto con un valor por defecto
@@ -33,24 +28,24 @@ const ProductosContext = createContext<ProductosContextType | undefined>(undefin
 
 // Proveedor del contexto
 export const ProductosProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [productos, setProductos] = useState<ProductoItem[] | null>(null);
   const [modo, setModo] = useState<Modo>({vista: "list", productoId: 0});
   const [categoriasOpc, setCategoriasOpc] = useState<CategoriaOpc[] | null>(null);
-  const [filterProductosCurrent, setFilterProductosCurrent] = useState(filterProductosCurrentInit);
+  const [filterInfoProductos, setFilterInfoProductos] = useState(filterInfoInit);
   const [showProductosFilterMdl, setShowProductosFilterMdl] = useState(false);
+  const [filterParamsProductosForm, setFilterParamsProductosForm] = useState(filterParamsInit);
 
   return (
     <ProductosContext.Provider value={{ 
-      productos, 
-      setProductos,
       modo,
       setModo,
       categoriasOpc,
       setCategoriasOpc,
       showProductosFilterMdl,
       setShowProductosFilterMdl,
-      filterProductosCurrent,
-      setFilterProductosCurrent,
+      filterInfoProductos,
+      setFilterInfoProductos,
+      filterParamsProductosForm,
+      setFilterParamsProductosForm,
     }}>
       {children}
     </ProductosContext.Provider>

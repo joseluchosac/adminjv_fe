@@ -1,23 +1,23 @@
 import { useEffect, useRef, useState } from "react";
 import { Card, Table } from "react-bootstrap";
 import { toast } from "react-toastify";
-import MarcasHead from "./MarcasHead";
+import LaboratoriosHead from "./LaboratoriosHead";
 import DynaIcon from "../../../core/components/DynaComponents";
-import MarcasTblRow from "./MarcasTblRow";
 import { LdsEllipsisCenter } from "../../../core/components/Loaders";
-import { useMarcas } from "../context/MarcasContext";
-import { useFilterMarcasQuery } from "../../../core/hooks/useMarcasQuery";
-import { camposMarcaInit } from "../../../core/utils/constants";
+import { useLaboratorios } from "../context/LaboratoriosContext";
+import { useFilterLaboratoriosQuery } from "../../../core/hooks/useLaboratoriosQuery";
+import { camposLaboratorioInit } from "../../../core/utils/constants";
+import LaboratoriosTblRow from "./LaboratoriosTblRow";
 
-export default function MarcasLst() {
-  const [ camposMarca, setCamposMarca] = useState(camposMarcaInit)
+export default function LaboratoriosLst() {
+  const [ camposLaboratorio, setCamposLaboratorio] = useState(camposLaboratorioInit)
   const tableRef = useRef<HTMLDivElement | null>(null)
   const ldsEllipsisRef = useRef<HTMLDivElement | null>(null)
   const {
-    setFilterInfoMarcas,
-    filterParamsMarcasForm,
-    setFilterParamsMarcasForm,
-  } = useMarcas()
+    setFilterInfoLaboratorios,
+    filterParamsLaboratoriosForm,
+    setFilterParamsLaboratoriosForm,
+  } = useLaboratorios()
 
   const {
     data,
@@ -26,44 +26,44 @@ export default function MarcasLst() {
     isFetching,
     isError,
     hasNextPage,
-    setFilterParamsMarcas
-  } = useFilterMarcasQuery();
+    setFilterParamsLaboratorios
+  } = useFilterLaboratoriosQuery();
 
   const sort = (field_name:string, field_label: string, ctrlKey: boolean) => {
-    const orderIdx = filterParamsMarcasForm.orders.findIndex(el => el.field_name === field_name)
+    const orderIdx = filterParamsLaboratoriosForm.orders.findIndex(el => el.field_name === field_name)
     if(ctrlKey){
       if(orderIdx === -1){
         const newOrder = {field_name, order_dir: "ASC", field_label}
-        setFilterParamsMarcasForm({...filterParamsMarcasForm, orders: [...filterParamsMarcasForm.orders, newOrder]})
+        setFilterParamsLaboratoriosForm({...filterParamsLaboratoriosForm, orders: [...filterParamsLaboratoriosForm.orders, newOrder]})
       }else{
-        let newOrders = structuredClone(filterParamsMarcasForm.orders)
+        let newOrders = structuredClone(filterParamsLaboratoriosForm.orders)
         if(newOrders[orderIdx].order_dir == "ASC"){
           newOrders[orderIdx] = {field_name, order_dir: "DESC", field_label}
-          setFilterParamsMarcasForm({...filterParamsMarcasForm, orders: newOrders})
+          setFilterParamsLaboratoriosForm({...filterParamsLaboratoriosForm, orders: newOrders})
         }else{
           newOrders = newOrders.filter(el=>el.field_name !== field_name)
-          setFilterParamsMarcasForm({...filterParamsMarcasForm, orders: newOrders})
+          setFilterParamsLaboratoriosForm({...filterParamsLaboratoriosForm, orders: newOrders})
         }
       }
     }else{
       if(orderIdx === -1){
         const newOrder = {field_name, order_dir: "ASC", field_label}
-        setFilterParamsMarcasForm({...filterParamsMarcasForm, orders: [newOrder]})
+        setFilterParamsLaboratoriosForm({...filterParamsLaboratoriosForm, orders: [newOrder]})
       }else{
-        let newOrders = structuredClone(filterParamsMarcasForm.orders)
+        let newOrders = structuredClone(filterParamsLaboratoriosForm.orders)
         if(newOrders[orderIdx].order_dir == "ASC"){
           const newOrder = {field_name, order_dir: "DESC", field_label}
-          setFilterParamsMarcasForm({...filterParamsMarcasForm, orders: [newOrder]})
+          setFilterParamsLaboratoriosForm({...filterParamsLaboratoriosForm, orders: [newOrder]})
         }else{
-          setFilterParamsMarcasForm({...filterParamsMarcasForm, orders: []})
+          setFilterParamsLaboratoriosForm({...filterParamsLaboratoriosForm, orders: []})
         }
       }
     }
   };
 
   useEffect(() => {
-    setFilterParamsMarcas(filterParamsMarcasForm)
-  }, [filterParamsMarcasForm])
+    setFilterParamsLaboratorios(filterParamsLaboratoriosForm)
+  }, [filterParamsLaboratoriosForm])
   
   useEffect(()=>{
     if(data?.pages[0].error || isError){
@@ -71,19 +71,19 @@ export default function MarcasLst() {
       return
     }
     if(!isFetching){
-      const {search, equals, between, orders} = filterParamsMarcasForm
-      setFilterInfoMarcas({search, equals, between, orders})
-      const newCamposMarcas = camposMarca.map(el=>{
+      const {search, equals, between, orders} = filterParamsLaboratoriosForm
+      setFilterInfoLaboratorios({search, equals, between, orders})
+      const newCamposLaboratorios = camposLaboratorio.map(el=>{
         const order = orders.find(order => order.field_name === el.field_name)
         return order ? {...el, order_dir: order?.order_dir} : {...el, order_dir: ""}
       })
-      setCamposMarca(newCamposMarcas)
+      setCamposLaboratorio(newCamposLaboratorios)
     }
   },[data, isError, isFetching])
 
   return (
     <>
-      <MarcasHead isFetching={isFetching}/>
+      <LaboratoriosHead isFetching={isFetching}/>
       <Card className="overflow-hidden mx-auto" style={{maxWidth: "767.98px"}}>
         <div className="position-relative">
           <div className="table-responsive" style={{ height: "73vh" }} ref={tableRef}>
@@ -91,7 +91,7 @@ export default function MarcasLst() {
               <Table striped hover className="mb-1">
                 <thead className="sticky-top">
                   <tr className="text-nowrap">
-                    {camposMarca && camposMarca.map((el) => {
+                    {camposLaboratorio && camposLaboratorio.map((el) => {
                       return ( el.show && (
                         <th
                           key={el.field_name}
@@ -118,8 +118,8 @@ export default function MarcasLst() {
                   </tr>
                 </thead>
                 <tbody>
-                  {data && data?.pages.flatMap(el => el.filas).map((marca) => (
-                    <MarcasTblRow key={marca.id} marca={marca} camposMarca={camposMarca}/>
+                  {data && data?.pages.flatMap(el => el.filas).map((laboratorio) => (
+                    <LaboratoriosTblRow key={laboratorio.id} laboratorio={laboratorio} camposLaboratorio={camposLaboratorio}/>
                   ))}
                 </tbody>
               </Table>

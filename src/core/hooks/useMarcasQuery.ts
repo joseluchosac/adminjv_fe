@@ -18,11 +18,11 @@ export const useFilterMarcasQuery = () => {
   
   const {
     data,
-    fetchNextPage,
     isError,
     isLoading,
     isFetching,
-    hasNextPage
+    hasNextPage,
+    fetchNextPage,
   } = useInfiniteQuery<FilterMarcasResp, Error>({
     queryKey: ['marcas'],
     queryFn: ({pageParam = 1, signal}) => {
@@ -65,7 +65,6 @@ export const useFilterMarcasQuery = () => {
     isFetching, 
     hasNextPage, 
     fetchNextPage,
-    filterParamsMarcas,
     setFilterParamsMarcas,
   }
 }

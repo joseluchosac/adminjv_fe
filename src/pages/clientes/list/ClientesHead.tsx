@@ -1,53 +1,52 @@
 import { useEffect, useState } from "react";
-import { Badge, Button, Col, Container, Form, InputGroup, Row, Stack } from "react-bootstrap";
+import { Badge, Button, Col, Form, InputGroup, Row, Stack } from "react-bootstrap";
 import { BsSearch } from "react-icons/bs";
 import { useDebounce } from "react-use";
-import { LdsBar } from "../../../core/components/Loaders";
 import DynaIcon from "../../../core/components/DynaComponents";
-import { useMarcas } from "../context/MarcasContext";
+import { useClientes } from "../context/ClientesContext";
 import { filterParamsInit } from "../../../core/utils/constants";
+import useClientesStore from "../../../core/store/useClientesStore";
 
-type Props = { isFetching: boolean }
-
-export default function MarcasHead({isFetching}: Props) {
+export default function ClientesHead() {
   const [inputSearch, setInputSearch] = useState("")
+  const setShowClienteForm = useClientesStore(state => state.setShowClienteForm)
+  const setCurrentClienteId = useClientesStore(state => state.setCurrentClienteId)
   const {
-    setShowMarcaForm,
-    setCurrentMarcaId,
-    filterInfoMarcas,
-    filterParamsMarcasForm,
-    setFilterParamsMarcasForm
-  } = useMarcas()
+    filterInfoClientes,
+    filterParamsClientesForm,
+    setFilterParamsClientesForm
+  } = useClientes()
 
   useDebounce(() => { 
-    if (inputSearch.toLowerCase().trim() == filterParamsMarcasForm.search.toLowerCase().trim()) return
-    setFilterParamsMarcasForm({ ...filterParamsMarcasForm, search: inputSearch.trim() });
+    if (inputSearch.toLowerCase().trim() == filterParamsClientesForm.search.toLowerCase().trim()) return
+    setFilterParamsClientesForm({ ...filterParamsClientesForm, search: inputSearch.trim() });
   }, 500, [inputSearch]);
 
   const handleUnsort = () => {
-    setFilterParamsMarcasForm({...filterParamsMarcasForm, orders: filterParamsInit.orders})
+    setFilterParamsClientesForm({...filterParamsClientesForm, orders: filterParamsInit.orders})
   };
 
   const handleNuevo = () => {
-    setCurrentMarcaId(0)
-    setShowMarcaForm(true);
+    setCurrentClienteId(0)
+    setShowClienteForm(true);
   };
 
   useEffect(()=>{
-    setInputSearch(filterParamsMarcasForm.search)
+    setInputSearch(filterParamsClientesForm.search)
   }, [])
 
+
   return (
-    <Container className="mb-2 pt-2 position-relative" style={{maxWidth: "767.98px"}}>
-      {isFetching && <LdsBar />}
+    <div className="mb-2 pt-2">
       <Row className="align-items-center mb-2">
         <Col sm className="text-center text-sm-start">
-          <h5>Lista de Marcas</h5>
+          <h5>Lista de Clientes</h5>
         </Col>
         <Col sm className="text-center text-sm-start mb-3 mb-sm-0">
           <InputGroup>
             <Form.Control
               size="sm"
+              name="search"
               type="search"
               value={inputSearch}
               onChange={(e) => setInputSearch(e.target.value)}
@@ -71,19 +70,19 @@ export default function MarcasHead({isFetching}: Props) {
             <Stack
               direction="horizontal"
               gap={2}
-              className={`${filterInfoMarcas.orders.length ? "" : "d-none"}`}
+              className={`${filterInfoClientes.orders.length ? "" : "d-none"}`}
             >
               <Badge bg="secondary" role="button" onClick={handleUnsort} className="d-flex gap-1">
                 <DynaIcon name="FaCircleXmark"  className="pr-4" />
                   ORDEN:
                   <div className="text-wrap">
-                    {filterInfoMarcas.orders.map((el) => el.field_label).join(", ")}
+                    {filterInfoClientes.orders.map((el) => el.field_label).join(", ")}
                   </div>
               </Badge>
             </Stack>
           </div>
         </Col>
       </Row>
-    </Container>
+    </div>
   )
 }

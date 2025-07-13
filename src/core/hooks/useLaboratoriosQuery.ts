@@ -1,12 +1,12 @@
 const apiURL = import.meta.env.VITE_API_URL;
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useNavigate } from "react-router-dom";
 import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import useSessionStore from "../store/useSessionStore"
-import useLaboratoriosStore from "../store/useLaboratoriosStore";
 import { mutationFetch } from "../services/mutationFecth"
 import { FilterLaboratoriosResp, Laboratorio } from "../types";
 import { filterFetch } from "../services/filterFetch";
+import { filterParamsInit } from "../utils/constants";
 
 type TypeAction = 
   "filter_full"
@@ -14,17 +14,17 @@ type TypeAction =
 
 // ****** FILTRAR  ******
 export const useFilterLaboratoriosQuery = () => {
-  const tknSession = useSessionStore(state => state.tknSession)
-  const filterParamsLaboratorios = useLaboratoriosStore(state => state.filterParamsLaboratorios)
+  const [filterParamsLaboratorios, setFilterParamsLaboratorios] = useState(filterParamsInit)
+  const token = useSessionStore(state => state.tknSession)
   const queryClient = useQueryClient()
 
   const {
     data,
-    fetchNextPage,
     isError,
     isLoading,
     isFetching,
-    hasNextPage
+    hasNextPage,
+    fetchNextPage,
   } = useInfiniteQuery<FilterLaboratoriosResp, Error>({
     queryKey: ['laboratorios'],
     queryFn: ({pageParam = 1, signal}) => {
@@ -33,7 +33,7 @@ export const useFilterLaboratoriosQuery = () => {
         filterParams: filterParamsLaboratorios,
         url: `${apiURL}laboratorios/filter_laboratorios?page=${page}`,
         signal,
-        token: tknSession
+        token
       })
     },
     initialPageParam: 1,
@@ -46,6 +46,7 @@ export const useFilterLaboratoriosQuery = () => {
   
   const resetear = ()=>{
     queryClient.resetQueries({ queryKey: ['laboratorios'], exact: true });
+    setFilterParamsLaboratorios(filterParamsInit)
   }
 
   useEffect(() => {
@@ -64,7 +65,8 @@ export const useFilterLaboratoriosQuery = () => {
     isLoading, 
     isFetching, 
     hasNextPage, 
-    fetchNextPage, 
+    fetchNextPage,
+    setFilterParamsLaboratorios,
   }
 }
 
@@ -74,7 +76,6 @@ export const useMutationLaboratoriosQuery = () => {
   const navigate = useNavigate()
   const tknSession = useSessionStore(state => state.tknSession)
   const Authorization = "Bearer " + tknSession
-  const filterParamsLaboratorios = useLaboratoriosStore(state => state.filterParamsLaboratorios)
   const queryClient = useQueryClient()
   const typeActionRef = useRef<TypeAction | "">("")
 
@@ -86,18 +87,18 @@ export const useMutationLaboratoriosQuery = () => {
     }
   })
 
-  const filterLaboratoriosFull = () => {// Sin Paginacion
-    typeActionRef.current = "filter_full"
-    const params = {
-      url: apiURL + "laboratorios/filter_laboratorios_full",
-      method: "POST",
-      headers:{ 
-        Authorization,
-      },
-      body: JSON.stringify(filterParamsLaboratorios),
-    }
-    mutate(params)
-  }
+  // const filterLaboratoriosFull = () => {// Sin Paginacion
+  //   typeActionRef.current = "filter_full"
+  //   const params = {
+  //     url: apiURL + "laboratorios/filter_laboratorios_full",
+  //     method: "POST",
+  //     headers:{ 
+  //       Authorization,
+  //     },
+  //     body: JSON.stringify(filterParamsLaboratorios),
+  //   }
+  //   mutate(params)
+  // }
 
   const getLaboratorio = (id: number) => {
     const params = {
@@ -165,7 +166,7 @@ export const useMutationLaboratoriosQuery = () => {
     data, 
     isPending, 
     isError,
-    filterLaboratoriosFull,
+    // filterLaboratoriosFull,
     getLaboratorio,
     createLaboratorio,
     updateLaboratorio,

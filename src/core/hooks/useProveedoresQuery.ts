@@ -1,27 +1,28 @@
 const apiURL = import.meta.env.VITE_API_URL;
 import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import useSessionStore from "../store/useSessionStore"
-import { useEffect } from "react"
+import { useEffect, useRef, useState } from "react"
 import { mutationFetch } from "../services/mutationFecth"
 import { useNavigate } from "react-router-dom";
-import useProveedoresStore from "../store/useProveedoresStore";
 import { FilterProveedoresResp, MutationFetch, Proveedor, ResponseQuery } from "../types";
 import { filterFetch } from "../services/filterFetch";
+import { filterParamsInit } from "../utils/constants";
 
-// ****** FILTRAR CLIENTES ******
+type TypeAction = "mutate_proveedor" | "consultar_nro_doc"
+
+// ****** FILTRAR ******
 export const useFilterProveedoresQuery = () => {
-  const filterParamsProveedores = useProveedoresStore(state => state.filterParamsProveedores)
-  // const setFilterParamsProveedores = useProveedoresStore(state => state.setFilterParamsProveedores)
-  const tknSession = useSessionStore(state => state.tknSession)
+  const [filterParamsProveedores, setFilterParamsProveedores] = useState(filterParamsInit)
+  const token = useSessionStore(state => state.tknSession)
   const queryClient = useQueryClient()
 
   const {
     data,
-    fetchNextPage,
     isError,
     isLoading,
     isFetching,
-    hasNextPage
+    hasNextPage,
+    fetchNextPage,
   } = useInfiniteQuery<FilterProveedoresResp, Error>({
     queryKey: ['proveedores'],
     queryFn: ({pageParam = 1, signal}) => {
@@ -30,19 +31,20 @@ export const useFilterProveedoresQuery = () => {
         filterParams: filterParamsProveedores,
         url: `${apiURL}proveedores/filter_proveedores?page=${page}`,
         signal,
-        token: tknSession
+        token
       })
     },
     initialPageParam: 1,
     getNextPageParam: (lastPage) => {
       return lastPage.next != 0 ? lastPage.next : undefined
     },
-    // getPreviousPageParam: (lastPage) => lastPage.previous ?? undefined,
+    getPreviousPageParam: (lastPage) => lastPage.previous ?? undefined,
     staleTime: 1000 * 60 * 5 
   })
 
   const resetear = ()=>{
     queryClient.resetQueries({ queryKey: ['proveedores'], exact: true });
+    setFilterParamsProveedores(filterParamsInit)
   }
 
   useEffect(() => {
@@ -61,21 +63,21 @@ export const useFilterProveedoresQuery = () => {
     isLoading, 
     isFetching, 
     hasNextPage, 
-    fetchNextPage, 
+    fetchNextPage,
+    setFilterParamsProveedores,
   }
 }
 
-// ****** MUTATION CLIENTES ******
+// ****** MUTATION ******
 export const useMutationProveedoresQuery = <T>() => {
   const resetSessionStore = useSessionStore(state => state.resetSessionStore)
   const navigate = useNavigate()
   const tknSession = useSessionStore(state => state.tknSession)
   const Authorization = "Bearer " + tknSession
-  const filterParamsProveedores = useProveedoresStore(state => state.filterParamsProveedores)
-
   const queryClient = useQueryClient()
+  const typeActionRef = useRef<TypeAction | "">("")
 
-  const {data, isPending, isError, mutate, } = useMutation<T, Error, MutationFetch, unknown>({
+  const {data, isPending, isError, mutate } = useMutation<T, Error, MutationFetch, unknown>({
     mutationFn: mutationFetch,
     onSuccess: (resp) => {
       const r = resp as ResponseQuery
@@ -83,18 +85,6 @@ export const useMutationProveedoresQuery = <T>() => {
       queryClient.invalidateQueries({queryKey:["proveedores"]}) // Recarga la tabla proveedores
     }
   })
-
-  const filterProveedoresFull = () => {// Sin Paginacion
-    const params = {
-      url: apiURL + "proveedores/filter_proveedores_full",
-      method: "POST",
-      headers:{ 
-        Authorization,
-      },
-      body: JSON.stringify(filterParamsProveedores),
-    }
-    mutate(params)
-  }
 
   const getProveedor = (id: number) => {
     const params = {
@@ -109,6 +99,7 @@ export const useMutationProveedoresQuery = <T>() => {
   }
 
   const createProveedor = (proveedor: Proveedor) => {
+    typeActionRef.current = "mutate_proveedor"
     const params = {
       url: apiURL + "proveedores/create_proveedor",
       method: "POST",
@@ -120,20 +111,34 @@ export const useMutationProveedoresQuery = <T>() => {
     mutate(params)
   }
 
-
-  const updateProveedor = (param: Proveedor) => {
+  const updateProveedor = (proveedor: Proveedor) => {
+    typeActionRef.current = "mutate_proveedor"
     const params = {
       url: apiURL + "proveedores/update_proveedor",
       method: "PUT",
       headers:{ 
         Authorization,
       },
-      body: JSON.stringify(param),
+      body: JSON.stringify(proveedor),
+    }
+    mutate(params)
+  }
+
+  const setStateProveedor = (estado: number) => {
+    typeActionRef.current = "mutate_proveedor"
+    const params = {
+      url: apiURL + "proveedores/set_state_proveedor",
+      method: "PUT",
+      headers:{ 
+        Authorization,
+      },
+      body: JSON.stringify({estado}),
     }
     mutate(params)
   }
 
   const deleteProveedor = (id: number) => {
+    typeActionRef.current = "mutate_proveedor"
     const params = {
       url: apiURL + "proveedores/delete_proveedor",
       method: "DELETE",
@@ -146,6 +151,7 @@ export const useMutationProveedoresQuery = <T>() => {
   }
 
   const consultarNroDocumento = (param: any) => {
+    typeActionRef.current = "consultar_nro_doc"
     const params = {
       url: apiURL + "proveedores/consultar_nro_documento",
       method: "POST",
@@ -173,13 +179,14 @@ export const useMutationProveedoresQuery = <T>() => {
     data, 
     isPending, 
     isError,
-    filterProveedoresFull,
     getProveedor,
     createProveedor,
     updateProveedor,
+    setStateProveedor,
     deleteProveedor,
     consultarNroDocumento,
-    reset
+    typeAction: typeActionRef.current,
+    reset,
   }
 }
 

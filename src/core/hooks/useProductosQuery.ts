@@ -1,12 +1,12 @@
 const apiURL = import.meta.env.VITE_API_URL;
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useNavigate } from "react-router-dom";
 import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import useSessionStore from "../store/useSessionStore"
-import useProductosStore from "../store/useProductosStore"
 import { FilterProductosResp, Producto } from "../types"
 import { mutationFetch } from "../services/mutationFecth"
 import { filterFetch } from "../services/filterFetch";
+import { filterParamsInit } from "../utils/constants";
 
 type TypeAction = 
 "filter_full" 
@@ -14,19 +14,18 @@ type TypeAction =
 
 // ****** FILTRAR ******
 export const useFilterProductosQuery = () => {
-  // const setFilterParamsProductos = useProductosStore(state => state.setFilterParamsProductos)
+  const [filterParamsProductos, setFilterParamsProductos] = useState(filterParamsInit)
   const token = useSessionStore(state => state.tknSession)
   const curEstab = useSessionStore(state => state.curEstab)
-  const filterParamsProductos = useProductosStore(state => state.filterParamsProductos)
   const queryClient = useQueryClient()
 
   const {
-    fetchNextPage,
     data,
     isError,
     isLoading,
     isFetching,
-    hasNextPage
+    hasNextPage,
+    fetchNextPage,
   } = useInfiniteQuery<FilterProductosResp, Error>({
     queryKey: ['productos'],
     queryFn: ({pageParam = 1, signal}) => {
@@ -48,6 +47,7 @@ export const useFilterProductosQuery = () => {
   })
   const resetear = ()=>{
     queryClient.resetQueries({ queryKey: ['productos'], exact: true });
+    setFilterParamsProductos(filterParamsInit)
   }
   useEffect(() => {
     return () => {
@@ -67,7 +67,8 @@ export const useFilterProductosQuery = () => {
     isLoading, 
     isFetching, 
     hasNextPage, 
-    fetchNextPage, 
+    fetchNextPage,
+    setFilterParamsProductos
   }
 }
 
@@ -79,7 +80,6 @@ export const useMutationProductosQuery = () => {
   const curModulo = useSessionStore(state => state.moduloActual?.nombre)
   const curEstab = useSessionStore(state => state.curEstab)
   const Authorization = "Bearer " + tknSession
-  const filterParamsProductos = useProductosStore(state => state.filterParamsProductos)
   const queryClient = useQueryClient()
   const typeActionRef = useRef<TypeAction | "">("")
 
@@ -91,19 +91,19 @@ export const useMutationProductosQuery = () => {
     }
   })
 
-  const filterProductoFull = () => {// Sin Paginacion
-    typeActionRef.current = "filter_full"
-    const params = {
-      url: apiURL + "productos/filter_productos_full",
-      method: "POST",
-      headers:{ 
-        Authorization,
-        "attached-data": JSON.stringify({curEstab, curModulo}),
-      },
-      body: JSON.stringify(filterParamsProductos),
-    }
-    mutate(params)
-  }
+  // const filterProductoFull = () => {// Sin Paginacion
+  //   typeActionRef.current = "filter_full"
+  //   const params = {
+  //     url: apiURL + "productos/filter_productos_full",
+  //     method: "POST",
+  //     headers:{ 
+  //       Authorization,
+  //       "attached-data": JSON.stringify({curEstab, curModulo}),
+  //     },
+  //     body: JSON.stringify(filterParamsProductos),
+  //   }
+  //   mutate(params)
+  // }
 
   const getProducto = (id: number) => {
     const params = {
@@ -198,7 +198,6 @@ export const useMutationProductosQuery = () => {
     data, 
     isPending, 
     isError,
-    filterProductoFull,
     getProducto,
     getProductoByCode,
     createProducto,

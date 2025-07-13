@@ -1,4 +1,4 @@
-import { CampoTable, FilterInfo, FilterParams } from "../types";
+import { CampoTable, Cliente, FilterInfo, FilterParams, Proveedor } from "../types";
 
 //--> CLAVES PARA LOCAL STORAGE
 export const ls_layoutKey = "ls_layout"
@@ -117,9 +117,94 @@ export const filterInfoInit: FilterInfo = {
   orders: [], 
 }
 
+//--> CLIENTES
+// *****************************************************
+export const clienteFormInit: Cliente = {
+  id: 0,
+  tipo_documento_cod: "0",
+  nro_documento: "",
+  nombre_razon_social: "",
+  direccion: '',
+  ubigeo_inei: "",
+  dis_prov_dep:"",
+  email: "",
+  telefono: "",
+  api: 0,
+}
+//--> CLIENTES
+// *****************************************************
+export const proveedorFormInit: Proveedor = {
+  id: 0,
+  tipo_documento_cod: "0",
+  nro_documento: "",
+  nombre_razon_social: "",
+  direccion: '',
+  ubigeo_inei: "",
+  dis_prov_dep:"",
+  email: "",
+  telefono: "",
+  api: 0,
+}
+
+export const camposUserInit: CampoTable[] = [
+  {show: true, orderable: false, order_dir:"", field_name: "acciones", field_label:"Acciones",},
+  {show: false, orderable: true, order_dir:"", field_name: "id", field_label:"Id",},
+  {show: true, orderable: true, order_dir:"", field_name: "username", field_label:"Usuario",},
+  {show: true, orderable: true, order_dir:"", field_name: "nombres", field_label:"Nombres",},
+  {show: true, orderable: true, order_dir:"", field_name: "apellidos", field_label:"Apellidos",},
+  {show: true, orderable: true, order_dir:"", field_name: "email", field_label:"Email",},
+  {show: false, orderable: false, order_dir:"", field_name: "estado", field_label:"Estado",},
+  {show: true, orderable: true, order_dir:"", field_name: "rol", field_label:"Rol",},
+  {show: false, orderable: false, order_dir:"", field_name: "rol_id", field_label:"Rol Id",},
+  {show: true, orderable: true, order_dir:"", field_name: "caja", field_label:"Caja",},
+  {show: false, orderable: false, order_dir:"", field_name: "caja_id", field_label:"CajaID",},
+  {show: true, orderable: true, order_dir:"", field_name: "created_at", field_label:"F creación",},
+  {show: true, orderable: true, order_dir:"", field_name: "updated_at", field_label:"F actualización",},
+]
+
 export const camposMarcaInit: CampoTable[] = [
-  {show: true, orderable: false, order_dir:"", field_name: "acciones", field_label:"Acciones",  },
-  {show: false, orderable: true, order_dir:"", field_name: "id", field_label:"Id",  },
-  {show: true, orderable: true, order_dir:"", field_name: "nombre", field_label:"Nombre",  },
-  {show: true, orderable: true, order_dir:"", field_name: "estado", field_label:"Estado",  },
+  {show: true, orderable: false, order_dir:"", field_name: "acciones", field_label:"Acciones",},
+  {show: false, orderable: true, order_dir:"", field_name: "id", field_label:"Id",},
+  {show: true, orderable: true, order_dir:"", field_name: "nombre", field_label:"Nombre",},
+  {show: true, orderable: true, order_dir:"", field_name: "estado", field_label:"Estado",},
+]
+export const camposLaboratorioInit: CampoTable[] = [
+  {show: true, orderable: false, order_dir:"", field_name: "acciones", field_label:"Acciones",},
+  {show: false, orderable: true, order_dir:"", field_name: "id", field_label:"Id",},
+  {show: true, orderable: true, order_dir:"", field_name: "nombre", field_label:"Nombre",},
+  {show: true, orderable: true, order_dir:"", field_name: "estado", field_label:"Estado",},
+]
+export const camposProductoInit: CampoTable[] = [
+  {show: true, orderable: false, order_dir:"", field_name: "acciones", field_label:"Acciones",},
+  {show: true, orderable: false, order_dir:"", field_name: "establecimiento_id", field_label:"estab id",},
+  {show: false, orderable: true, order_dir:"", field_name: "id", field_label:"Id",},
+  {show: false, orderable: true, order_dir:"", field_name: "codigo", field_label:"Codigo",},
+  {show: true, orderable: true, order_dir:"", field_name: "descripcion", field_label:"Descripcion",},
+  {show: false, orderable: false, order_dir:"", field_name: "marca_id", field_label:"Marca id",},
+  {show: false, orderable: true, order_dir:"", field_name: "marca", field_label:"Marca",},
+  {show: false, orderable: false, order_dir:"", field_name: "laboratorio_id", field_label:"Laboratorio id",},
+  {show: false, orderable: true, order_dir:"", field_name: "laboratorio", field_label:"Lab",},
+  {show: false, orderable: true, order_dir:"", field_name: "barcode", field_label:"Cód. barras",},
+  {show: true, orderable: true, order_dir:"", field_name: "stock", field_label:"Stock",},
+  {show: false, orderable: false, order_dir:"", field_name: "estado", field_label:"Estado",},
+  {show: true, orderable: true, order_dir:"", field_name: "created_at", field_label:"F creacion",},
+  {show: true, orderable: true, order_dir:"", field_name: "updated_at", field_label:"F actualización",},    
+]
+export const camposClienteInit: CampoTable[] = [
+  {show: true, orderable: false, order_dir: "", field_name: "acciones", field_label:"",},
+  {show: false, orderable: true, order_dir: "", field_name: "id", field_label:"Id",},
+  {show: true, orderable: true, order_dir: "", field_name: "nro_documento", field_label:"Nro Doc",},
+  {show: true, orderable: true, order_dir: "", field_name: "nombre_razon_social", field_label:"Cliente",},
+  {show: true, orderable: true, order_dir: "", field_name: "direccion", field_label:"Dirección",},
+  {show: true, orderable: true, order_dir: "", field_name: "email", field_label:"Correo",},
+  {show: true, orderable: true, order_dir: "", field_name: "telefono", field_label:"Teléf.",},
+]
+export const camposProveedorInit: CampoTable[] = [
+  {show: true, orderable: true, order_dir:"", field_name: "acciones", field_label:"",},
+  {show: false, orderable: true, order_dir:"", field_name: "id", field_label:"Id",},
+  {show: true, orderable: true, order_dir:"", field_name: "nro_documento", field_label:"Nro Doc",},
+  {show: true, orderable: true, order_dir:"", field_name: "nombre_razon_social", field_label:"Razon Social",},
+  {show: true, orderable: true, order_dir:"", field_name: "direccion", field_label:"Dirección",},
+  {show: true, orderable: true, order_dir:"", field_name: "email", field_label:"Correo",},
+  {show: true, orderable: true, order_dir:"", field_name: "telefono", field_label:"Teléf.",},
 ]

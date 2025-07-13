@@ -34,11 +34,11 @@ type Props = {
 }
 
 export default function ClienteFormMdl({onChooseCliente}: Props) {
-  const showClienteFormMdl = useClientesStore(state => state.showClienteFormMdl)
+  const showClienteFormMdl = useClientesStore(state => state.showClienteForm)
   const [lugar, setLugar] = useState("");
   const [showUbigeos, setShowUbigeos] = useState(false)
   const currentClienteId = useClientesStore(state => state.currentClienteId)
-  const setShowClienteFormMdl = useClientesStore(state => state.setShowClienteFormMdl)
+  const setShowClienteFormMdl = useClientesStore(state => state.setShowClienteForm)
   const darkMode = useLayoutStore(state => state.layout.darkMode)
   const catalogos = useCatalogosStore(state => state.catalogos)
   const {

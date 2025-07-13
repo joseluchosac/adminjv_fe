@@ -1,12 +1,12 @@
 const apiURL = import.meta.env.VITE_API_URL;
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useNavigate } from "react-router-dom";
 import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import useSessionStore from "../store/useSessionStore"
-import useUsersStore from "../store/useUsersStore"
 import { FilterUsersResp, LoginForm, MutationFetch, RegisterForm, ResponseQuery, User } from "../types"
 import { mutationFetch } from "../services/mutationFecth"
 import { filterFetch } from "../services/filterFetch";
+import { filterParamsInit } from "../utils/constants";
 
 type TypeAction = 
 "filter_full" 
@@ -21,18 +21,17 @@ type TypeAction =
 
 // ****** FILTRAR ******
 export const useFilterUsersQuery = () => {
-  const filterParamsUsers = useUsersStore(state => state.filterParamsUsers)
-  // const setFilterParamsUsers = useUsersStore(state => state.setFilterParamsUsers)
-  const tknSession = useSessionStore(state => state.tknSession)
+  const [filterParamsUsers, setFilterParamsUsers] = useState(filterParamsInit)
+  const token = useSessionStore(state => state.tknSession)
   const queryClient = useQueryClient()
 
   const {
-    fetchNextPage,
     data,
     isError,
     isLoading,
     isFetching,
-    hasNextPage
+    hasNextPage,
+    fetchNextPage,
   } = useInfiniteQuery<FilterUsersResp, Error>({
     queryKey: ['users'],
     queryFn: ({pageParam = 1, signal}) => {
@@ -41,7 +40,7 @@ export const useFilterUsersQuery = () => {
         filterParams: filterParamsUsers,
         url: `${apiURL}users/filter_users?page=${page}`,
         signal,
-        token: tknSession
+        token
       })
     },
     initialPageParam: 1,
@@ -53,7 +52,9 @@ export const useFilterUsersQuery = () => {
   })
   const resetear = ()=>{
     queryClient.resetQueries({ queryKey: ['users'], exact: true });
+    setFilterParamsUsers(filterParamsInit)
   }
+
   useEffect(() => {
     return () => {
       resetear()
@@ -77,7 +78,8 @@ export const useFilterUsersQuery = () => {
     isLoading, 
     isFetching, 
     hasNextPage, 
-    fetchNextPage, 
+    fetchNextPage,
+    setFilterParamsUsers
   }
 }
 
@@ -87,7 +89,6 @@ export const useMutationUsersQuery = <T>() => {
   const navigate = useNavigate()
   const tknSession = useSessionStore(state => state.tknSession)
   const Authorization = "Bearer " + tknSession
-  const filterParamsUsers = useUsersStore(state => state.filterParamsUsers)
   const queryClient = useQueryClient()
   const typeActionRef = useRef<TypeAction | "">("")
 
@@ -128,18 +129,18 @@ export const useMutationUsersQuery = <T>() => {
     }
   })
 
-  const filterUserFull = () => {// Sin Paginacion
-    typeActionRef.current = "filter_full"
-    const params = {
-      url: apiURL + "users/filter_users_full",
-      method: "POST",
-      headers:{ 
-        Authorization,
-      },
-      body: JSON.stringify(filterParamsUsers),
-    }
-    mutate(params)
-  }
+  // const filterUserFull = () => {// Sin Paginacion
+  //   typeActionRef.current = "filter_full"
+  //   const params = {
+  //     url: apiURL + "users/filter_users_full",
+  //     method: "POST",
+  //     headers:{ 
+  //       Authorization,
+  //     },
+  //     body: JSON.stringify(filterParamsUsers),
+  //   }
+  //   mutate(params)
+  // }
 
   const getUser = (id: number) => {
     const params = {
@@ -197,6 +198,19 @@ export const useMutationUsersQuery = <T>() => {
         Authorization,
       },
       body: JSON.stringify(user),
+    }
+    mutate(params)
+  }
+
+  const setStateUser = (estado: number) => {
+    typeActionRef.current = "mutate_user"
+    const params = {
+      url: apiURL + "users/set_state_user",
+      method: "PUT",
+      headers:{ 
+        Authorization,
+      },
+      body: JSON.stringify({estado}),
     }
     mutate(params)
   }
@@ -303,12 +317,12 @@ export const useMutationUsersQuery = <T>() => {
     data, 
     isPending, 
     isError,
-    filterUserFull,
     getUser,
     getProfile,
     createUser,
     signUp,
     updateUser,
+    setStateUser,
     updateProfile,
     deleteUser,
     signIn,

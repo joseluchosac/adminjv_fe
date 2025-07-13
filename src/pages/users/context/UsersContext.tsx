@@ -1,23 +1,18 @@
 import { createContext, useContext, useState } from "react";
-import { FilterCurrent, User } from "../../../core/types";
-
-const filterUsersCurrentInit: FilterCurrent = {
-  equals: [],
-  between: {field_name: "", field_label: "", range: ""},
-  orders: [], 
-}
+import { FilterInfo, FilterParams } from "../../../core/types";
+import { filterInfoInit, filterParamsInit } from "../../../core/utils/constants";
 
 export interface UsersContextType {
-  users: User[] | null;
-  setUsers: React.Dispatch<React.SetStateAction<User[] | null>>;
   showUserForm: boolean;
   setShowUserForm: React.Dispatch<React.SetStateAction<boolean>>;
   showUsersFilterMdl: boolean;
   setShowUsersFilterMdl: React.Dispatch<React.SetStateAction<boolean>>;
   currentUserId: number;
   setCurrentUserId: React.Dispatch<React.SetStateAction<number>>;
-  filterUsersCurrent: FilterCurrent;
-  setFilterUsersCurrent: React.Dispatch<React.SetStateAction<FilterCurrent>>;
+  filterInfoUsers: FilterInfo;
+  setFilterInfoUsers: React.Dispatch<React.SetStateAction<FilterInfo>>;
+  filterParamsUsersForm: FilterParams;
+  setFilterParamsUsersForm: React.Dispatch<React.SetStateAction<FilterParams>>;
 }
 
 // Crear el contexto con un valor por defecto
@@ -25,24 +20,23 @@ const UsersContext = createContext<UsersContextType | undefined>(undefined);
 
 // Proveedor del contexto
 export const UsersProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [users, setUsers] = useState<User[] | null>(null);
   const [showUserForm, setShowUserForm] = useState(false);
   const [currentUserId, setCurrentUserId] = useState(0);
-  const [filterUsersCurrent, setFilterUsersCurrent] = useState(filterUsersCurrentInit);
   const [showUsersFilterMdl, setShowUsersFilterMdl] = useState(false);
-
+  const [filterInfoUsers, setFilterInfoUsers] = useState(filterInfoInit);
+  const [filterParamsUsersForm, setFilterParamsUsersForm] = useState(filterParamsInit);
   return (
     <UsersContext.Provider value={{ 
-      users, 
-      setUsers, 
       showUserForm, 
       setShowUserForm,
       showUsersFilterMdl,
       setShowUsersFilterMdl,
       currentUserId,
       setCurrentUserId,
-      filterUsersCurrent,
-      setFilterUsersCurrent
+      filterInfoUsers,
+      setFilterInfoUsers,
+      filterParamsUsersForm,
+      setFilterParamsUsersForm,
     }}>
       {children}
     </UsersContext.Provider>

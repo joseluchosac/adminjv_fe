@@ -6,7 +6,6 @@ import SelectAsync from "react-select/async"
 import Select from "react-select"
 import useLayoutStore from "../../core/store/useLayoutStore"
 import { filterParamsInit, selectDark } from "../../core/utils/constants"
-import useLaboratoriosStore from "../../core/store/useLaboratoriosStore"
 import useSessionStore from "../../core/store/useSessionStore"
 import { debounce } from "../../core/utils/funciones"
 import { filterFetch } from "../../core/services/filterFetch"
@@ -51,7 +50,6 @@ const unProducto = {
 }
 
 function Formulario() {
-  const filterParamsLaboratorios = useLaboratoriosStore(state => state.filterParamsLaboratorios)
   const darkMode = useLayoutStore(state => state.layout.darkMode)
   const tknSession = useSessionStore(state => state.tknSession)
 
@@ -96,7 +94,7 @@ function Formulario() {
   const loadLaboratoriosOptions =  debounce((search: string, callback: any) => {
     abortLaboratorios.current?.abort(); // ✅ Cancela la petición anterior
     abortLaboratorios.current = new AbortController();
-    const filtered = {...filterParamsLaboratorios, search}
+    const filtered = {...filterParamsInit, search}
 
     const abortController = new AbortController()
     return filterFetch({

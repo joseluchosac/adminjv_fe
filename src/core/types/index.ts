@@ -268,56 +268,18 @@ export type MarcaItem = {
 export interface FilterMarcasResp extends FilterResp {
   filas: MarcaItem[];
 }
-
-// ✅ TIPOS PARA PROVEEDOR
-export type Proveedor = {
-  id: number;
-  tipo_documento_cod: string;
-  tipo_documento: string;
-  nro_documento: string;
-  nombre_razon_social: string;
-  direccion: string;
-  ubigeo_inei: string;
-  departamento: string;
-  provincia: string;
-  distrito: string;
-  email: string;
-  telefono: string;
-  api?: number;
-  estado?: number;
-}
-export type ProveedorItem = {
-  id: number;
-  tipo_documento: string;
-  nro_documento: string;
-  nombre_razon_social: string;
-  direccion: string;
-  departamento: string;
-  provincia: string;
-  distrito: string;
-  email: string;
-  telefono: string;
-  estado: number;
-}
-export interface FilterProveedoresResp extends FilterResp {
-  filas: ProveedorItem[];
-}
 // ✅ TIPOS PARA CLIENTE
 export type Cliente = {
   id: number;
   tipo_documento_cod: string;
-  tipo_documento: string;
   nro_documento: string;
   nombre_razon_social: string;
   direccion: string;
   ubigeo_inei: string;
-  departamento: string;
-  provincia: string;
-  distrito: string;
+  dis_prov_dep: string;
   email: string;
   telefono: string;
   api?: number;
-  estado?: number;
 }
 export type ClienteItem = {
   id: number;
@@ -325,9 +287,7 @@ export type ClienteItem = {
   nro_documento: string;
   nombre_razon_social: string;
   direccion: string;
-  departamento: string;
-  provincia: string;
-  distrito: string;
+  dis_prov_dep: string;
   email: string;
   telefono: string;
   estado: number;
@@ -335,6 +295,34 @@ export type ClienteItem = {
 export interface FilterClientesResp extends FilterResp {
   filas: ClienteItem[];
 }
+// ✅ TIPOS PARA PROVEEDOR
+export type Proveedor = {
+  id: number;
+  tipo_documento_cod: string;
+  nro_documento: string;
+  nombre_razon_social: string;
+  direccion: string;
+  ubigeo_inei: string;
+  dis_prov_dep: string;
+  email: string;
+  telefono: string;
+  api?: number;
+}
+export type ProveedorItem = {
+  id: number;
+  tipo_documento: string;
+  nro_documento: string;
+  nombre_razon_social: string;
+  direccion: string;
+  dis_prov_dep: string;
+  email: string;
+  telefono: string;
+  estado: number;
+}
+export interface FilterProveedoresResp extends FilterResp {
+  filas: ProveedorItem[];
+}
+
 // ✅ TIPOS PARA UBIGEO
 export interface Ubigeo {
   ubigeo_inei: string;
@@ -421,4 +409,18 @@ export interface MutationFetch {
   method?: string;
   headers?: any;
   body?: any
+}
+
+export type NroDocumento = {
+  id: number;
+  nombre_razon_social: string;
+  nro_documento: string;
+  tipo_documento_cod: string;
+  condicion_sunat: string;
+  estado_sunat: string;
+  direccion: string;
+  ubigeo: string;
+  dis_prov_dep: string;
+  email: string;
+  telefono: string;
 }

@@ -95,7 +95,6 @@ export function LaboratorioSelect({
   clearErrors, 
   setShowLaboratorioForm
 }: SelectPropsLaboratorios) {
-  // const filterParamsLaboratorios = useLaboratoriosStore(state => state.filterParamsLaboratorios)
   const abortLaboratorios = useRef<AbortController | null>(null);
   const tknSession = useSessionStore(state => state.tknSession)
   const darkMode = useLayoutStore(state => state.layout.darkMode)

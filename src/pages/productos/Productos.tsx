@@ -1,16 +1,13 @@
+import { ProductosProvider } from "./context/ProductosContext";
 import Productoform from "./form/ProductoForm";
-import ProductosLstHead from "./ProductosLstHead";
-import ProductosLstFilterMdl from "./ProductosLstFilterMdl";
-import ProductosLst from "./ProductosLst";
+import ProductosLst from "./list/ProductosLst";
 
 export default function Productos() {
 
   return (
-    <>
-      <ProductosLstHead/>
+    <ProductosProvider>
       <ProductosLst />
       <Productoform />
-      <ProductosLstFilterMdl />
-    </>
+    </ProductosProvider>
   );
 }

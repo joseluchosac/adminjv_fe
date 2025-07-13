@@ -1,32 +1,28 @@
 const apiURL = import.meta.env.VITE_API_URL;
 import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import useSessionStore from "../store/useSessionStore"
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 import { mutationFetch } from "../services/mutationFecth"
 import { useNavigate } from "react-router-dom";
-import useClientesStore from "../store/useClientesStore";
-import { Cliente, FilterClientesResp } from "../types";
+import { Cliente, FilterClientesResp, MutationFetch, ResponseQuery } from "../types";
 import { filterFetch } from "../services/filterFetch";
+import { filterParamsInit } from "../utils/constants";
 
-type TypeAction = 
-"filter_full" 
-| "mutate_cliente"
-| "consultar_nro_doc"
+type TypeAction = "mutate_cliente" | "consultar_nro_doc"
 
-// ****** FILTRAR CLIENTES ******
+// ****** FILTRAR ******
 export const useFilterClientesQuery = () => {
-  const filterParamsClientes = useClientesStore(state => state.filterParamsClientes)
-  // const setFilterParamsClientes = useClientesStore(state => state.setFilterParamsClientes)
-  const tknSession = useSessionStore(state => state.tknSession)
+  const [filterParamsClientes, setFilterParamsClientes] = useState(filterParamsInit)
+  const token = useSessionStore(state => state.tknSession)
   const queryClient = useQueryClient()
 
   const {
-    fetchNextPage,
     data,
     isError,
     isLoading,
     isFetching,
-    hasNextPage
+    hasNextPage,
+    fetchNextPage,
   } = useInfiniteQuery<FilterClientesResp, Error>({
     queryKey: ['clientes'],
     queryFn: ({pageParam = 1, signal}) => {
@@ -35,7 +31,7 @@ export const useFilterClientesQuery = () => {
         filterParams: filterParamsClientes,
         url: `${apiURL}clientes/filter_clientes?page=${page}`,
         signal,
-        token: tknSession
+        token
       })
     },
     initialPageParam: 1,
@@ -48,6 +44,7 @@ export const useFilterClientesQuery = () => {
 
   const resetear = ()=>{
     queryClient.resetQueries({ queryKey: ['clientes'], exact: true });
+    setFilterParamsClientes(filterParamsInit)
   }
 
   useEffect(() => {
@@ -60,51 +57,34 @@ export const useFilterClientesQuery = () => {
     queryClient.invalidateQueries({queryKey:["clientes"]})
   }, [filterParamsClientes])
 
-  // useEffect(()=>{
-  //   if(data?.pages[data?.pages.length-1].errorType === "errorToken"){
-  //     navigate("/auth")
-  //   }
-  // },[data])
-
   return {
     data,
     isError, 
     isLoading, 
     isFetching, 
     hasNextPage, 
-    fetchNextPage, 
+    fetchNextPage,
+    setFilterParamsClientes,
   }
 }
 
-// ****** MUTATION CLIENTES ******
-export const useMutationClientesQuery = () => {
+// ****** MUTATION ******
+export const useMutationClientesQuery = <T>() => {
   const resetSessionStore = useSessionStore(state => state.resetSessionStore)
   const navigate = useNavigate()
   const tknSession = useSessionStore(state => state.tknSession)
   const Authorization = "Bearer " + tknSession
-  const filterParamsClientes = useClientesStore(state => state.filterParamsClientes)  
   const queryClient = useQueryClient()
   const typeActionRef = useRef<TypeAction | "">("")
 
-  const {data, isPending, isError, mutate, } = useMutation({
+  const {data, isPending, isError, mutate, } = useMutation<T, Error, MutationFetch, unknown>({
     mutationFn: mutationFetch,
     onSuccess: (resp) => {
-      if(resp.msgType !== 'success') return
+      const r = resp as ResponseQuery
+      if(r?.msgType !== 'success') return
       queryClient.invalidateQueries({queryKey:["clientes"]}) // Recarga la tabla clientes
     }
   })
-
-  const filterClientesFull = () => {// Sin Paginacion
-    const params = {
-      url: apiURL + "clientes/filter_clientes_full",
-      method: "POST",
-      headers:{ 
-        Authorization,
-      },
-      body: JSON.stringify(filterParamsClientes),
-    }
-    mutate(params)
-  }
 
   const getCliente = (id: number) => {
     const params = {
@@ -144,6 +124,19 @@ export const useMutationClientesQuery = () => {
     mutate(params)
   }
 
+  const setStateCliente = (estado: number) => {
+    typeActionRef.current = "mutate_cliente"
+    const params = {
+      url: apiURL + "clientes/set_state_cliente",
+      method: "PUT",
+      headers:{ 
+        Authorization,
+      },
+      body: JSON.stringify({estado}),
+    }
+    mutate(params)
+  }
+
   const deleteCliente = (id: number) => {
     typeActionRef.current = "mutate_cliente"
     const params = {
@@ -175,7 +168,8 @@ export const useMutationClientesQuery = () => {
   }
 
   useEffect(()=>{
-    if(data?.errorType === "errorToken"){
+    const r = data as ResponseQuery
+    if(r?.errorType === "errorToken"){
       resetSessionStore()
       navigate("/auth")
     }
@@ -185,10 +179,10 @@ export const useMutationClientesQuery = () => {
     data, 
     isPending, 
     isError,
-    filterClientesFull,
     getCliente,
     createCliente,
     updateCliente,
+    setStateCliente,
     deleteCliente,
     consultarNroDocumento,
     typeAction: typeActionRef.current,
