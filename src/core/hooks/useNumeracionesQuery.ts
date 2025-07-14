@@ -3,8 +3,8 @@ import { useEffect, useRef } from "react"
 import { useNavigate } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query"
 import useSessionStore from "../store/useSessionStore"
-import { mutationFetch } from "../services/mutationFecth"
-import { Numeracion } from "../types";
+import { FnFetchOptions, Numeracion } from "../types";
+import { fnFetch } from "../services/fnFetch";
 
 type TypeAction = "filter_full" | "mutate_numeracion" | "delete_numeracion"
 
@@ -12,13 +12,11 @@ type TypeAction = "filter_full" | "mutate_numeracion" | "delete_numeracion"
 export const useMutationNumeracionesQuery = () => {
   const resetSessionStore = useSessionStore(state => state.resetSessionStore)
   const navigate = useNavigate()
-  const tknSession = useSessionStore(state => state.tknSession)
-  const Authorization = "Bearer " + tknSession
-  // const queryClient = useQueryClient()
+  const token = useSessionStore(state => state.tknSession)
   const typeActionRef = useRef<TypeAction | "">("")
 
   const {data, isPending, isError, mutate, } = useMutation({
-    mutationFn: mutationFetch,
+    mutationFn: fnFetch,
     onSuccess: (resp) => {
       if(resp.msgType !== 'success') return
       // queryClient.invalidateQueries({queryKey:["establecimientos"]}) // Recarga la tabla establecimientos
@@ -26,64 +24,54 @@ export const useMutationNumeracionesQuery = () => {
   })
 
   const getNumeraciones = () => {
-    const params = {
-      url: apiURL + "numeraciones/get_numeraciones",
+    const options: FnFetchOptions = {
       method: "POST",
-      headers:{ 
-        Authorization,
-      },
+      url: apiURL + "numeraciones/get_numeraciones",
+      authorization: "Bearer " + token,
     }
-    mutate(params)
+    mutate(options)
   }
 
   const getNumeracion = (id: number) => {
-    const params = {
-      url: apiURL + "numeraciones/get_numeracion",
+    const options: FnFetchOptions = {
       method: "POST",
-      headers:{ 
-        Authorization,
-      },
+      url: apiURL + "numeraciones/get_numeracion",
       body: JSON.stringify({id}),
+      authorization: "Bearer " + token,
     }
-    mutate(params)
+    mutate(options)
   }
 
   const createNumeracion = (numeracion: Numeracion) => {
     typeActionRef.current = "mutate_numeracion"
-    const params = {
-      url: apiURL + "numeraciones/create_numeracion",
+    const options: FnFetchOptions = {
       method: "POST",
-      headers:{ 
-        Authorization,
-      },
+      url: apiURL + "numeraciones/create_numeracion",
       body: JSON.stringify(numeracion),
+      authorization: "Bearer " + token,
     }
-    mutate(params)
+    mutate(options)
   }
 
   const updateNumeracion = (numeracion: Numeracion) => {
     typeActionRef.current = "mutate_numeracion"
-    const params = {
-      url: apiURL + "numeraciones/update_numeracion",
+    const options: FnFetchOptions = {
       method: "PUT",
-      headers:{ 
-        Authorization,
-      },
+      url: apiURL + "numeraciones/update_numeracion",
       body: JSON.stringify(numeracion),
+      authorization: "Bearer " + token,
     }
-    mutate(params)
+    mutate(options)
   }
   const deleteNumeracion = (id: number) => {
     typeActionRef.current = "delete_numeracion"
-    const params = {
-      url: apiURL + "numeraciones/delete_numeracion",
+    const options: FnFetchOptions = {
       method: "DELETE",
-      headers:{ 
-        Authorization,
-      },
+      url: apiURL + "numeraciones/delete_numeracion",
       body: JSON.stringify({id}),
+      authorization: "Bearer " + token,
     }
-    mutate(params)
+    mutate(options)
   }
 
   useEffect(()=>{

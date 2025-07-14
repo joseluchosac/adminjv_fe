@@ -2,11 +2,10 @@ const apiURL = import.meta.env.VITE_API_URL;
 import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import useSessionStore from "../store/useSessionStore"
 import { useEffect, useRef, useState } from "react"
-import { mutationFetch } from "../services/mutationFecth"
 import { useNavigate } from "react-router-dom";
-import { Cliente, FilterClientesResp, MutationFetch, ResponseQuery } from "../types";
-import { filterFetch } from "../services/filterFetch";
+import { Cliente, FilterClientesResp, FnFetchOptions, ResponseQuery } from "../types";
 import { filterParamsInit } from "../utils/constants";
+import { fnFetch } from "../services/fnFetch";
 
 type TypeAction = "mutate_cliente" | "consultar_nro_doc"
 
@@ -27,12 +26,14 @@ export const useFilterClientesQuery = () => {
     queryKey: ['clientes'],
     queryFn: ({pageParam = 1, signal}) => {
       const page = pageParam as number
-      return filterFetch({
-        filterParams: filterParamsClientes,
+      const options: FnFetchOptions = {
+        method: "POST",
         url: `${apiURL}clientes/filter_clientes?page=${page}`,
-        signal,
-        token
-      })
+        body: JSON.stringify(filterParamsClientes),
+        authorization: "Bearer " + token,
+        signal
+      }
+      return fnFetch(options)
     },
     initialPageParam: 1,
     getNextPageParam: (lastPage) => {
@@ -72,13 +73,13 @@ export const useFilterClientesQuery = () => {
 export const useMutationClientesQuery = <T>() => {
   const resetSessionStore = useSessionStore(state => state.resetSessionStore)
   const navigate = useNavigate()
-  const tknSession = useSessionStore(state => state.tknSession)
-  const Authorization = "Bearer " + tknSession
+  const token = useSessionStore(state => state.tknSession)
   const queryClient = useQueryClient()
   const typeActionRef = useRef<TypeAction | "">("")
 
-  const {data, isPending, isError, mutate, } = useMutation<T, Error, MutationFetch, unknown>({
-    mutationFn: mutationFetch,
+  const {data, isPending, isError, mutate, reset} = useMutation<T, Error, FnFetchOptions, unknown>({
+    mutationKey:["clientes_mut"],
+    mutationFn: fnFetch,
     onSuccess: (resp) => {
       const r = resp as ResponseQuery
       if(r?.msgType !== 'success') return
@@ -87,84 +88,68 @@ export const useMutationClientesQuery = <T>() => {
   })
 
   const getCliente = (id: number) => {
-    const params = {
-      url: apiURL + "clientes/get_cliente",
+    const options: FnFetchOptions = {
       method: "POST",
-      headers:{ 
-        Authorization,
-      },
+      url: apiURL + "clientes/get_cliente",
       body: JSON.stringify({id}),
+      authorization: "Bearer " + token,
     }
-    mutate(params)
+    mutate(options)
   }
 
   const createCliente = (cliente: Cliente) => {
     typeActionRef.current = "mutate_cliente"
-    const params = {
-      url: apiURL + "clientes/create_cliente",
+    const options: FnFetchOptions = {
       method: "POST",
-      headers:{ 
-        Authorization,
-      },
+      url: apiURL + "clientes/create_cliente",
       body: JSON.stringify(cliente),
+      authorization: "Bearer " + token,
     }
-    mutate(params)
+    mutate(options)
   }
 
   const updateCliente = (cliente: Cliente) => {
     typeActionRef.current = "mutate_cliente"
-    const params = {
+    const options: FnFetchOptions = {
+      method: "POST",
       url: apiURL + "clientes/update_cliente",
-      method: "PUT",
-      headers:{ 
-        Authorization,
-      },
       body: JSON.stringify(cliente),
+      authorization: "Bearer " + token,
     }
-    mutate(params)
+    mutate(options)
   }
 
   const setStateCliente = (estado: number) => {
     typeActionRef.current = "mutate_cliente"
-    const params = {
+    const options: FnFetchOptions = {
+      method: "POST",
       url: apiURL + "clientes/set_state_cliente",
-      method: "PUT",
-      headers:{ 
-        Authorization,
-      },
       body: JSON.stringify({estado}),
+      authorization: "Bearer " + token,
     }
-    mutate(params)
+    mutate(options)
   }
 
   const deleteCliente = (id: number) => {
     typeActionRef.current = "mutate_cliente"
-    const params = {
-      url: apiURL + "clientes/delete_cliente",
+    const options: FnFetchOptions = {
       method: "DELETE",
-      headers:{ 
-        Authorization,
-      },
+      url: apiURL + "clientes/delete_cliente",
       body: JSON.stringify({id}),
+      authorization: "Bearer " + token,
     }
-    mutate(params)
+    mutate(options)
   }
 
   const consultarNroDocumento = (param: any) => {
     typeActionRef.current = "consultar_nro_doc"
-    const params = {
-      url: apiURL + "clientes/consultar_nro_documento",
+    const options: FnFetchOptions = {
       method: "POST",
-      headers:{ 
-        Authorization,
-      },
+      url: apiURL + "clientes/consultar_nro_documento",
       body: JSON.stringify(param),
+      authorization: "Bearer " + token,
     }
-    mutate(params)
-  }
-
-  const reset = (newValues: any) => {
-    mutate({newValues}) // Solo actualiza los datos, no hace fetch
+    mutate(options)
   }
 
   useEffect(()=>{

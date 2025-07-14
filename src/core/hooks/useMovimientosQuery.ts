@@ -4,9 +4,8 @@ import { useNavigate } from "react-router-dom";
 import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import useSessionStore from "../store/useSessionStore"
 import useMovimientosStore from "../store/useMovimientosStore"
-import { FilterMovimientosResp, Movimiento, Movimientoform } from "../types"
-import { mutationFetch } from "../services/mutationFecth"
-import { filterFetch } from "../services/filterFetch";
+import { FilterMovimientosResp, FnFetchOptions, Movimiento, Movimientoform } from "../types"
+import { fnFetch } from "../services/fnFetch";
 
 type TypeAction = 
 "filter_full" 
@@ -15,7 +14,7 @@ type TypeAction =
 // ****** FILTRAR ******
 export const useFilterMovimientosQuery = () => {
   // const setFilterParamsMovimientos = useMovimientosStore(state => state.setFilterParamsMovimientos)
-  const tknSession = useSessionStore(state => state.tknSession)
+  const token = useSessionStore(state => state.tknSession)
   const filterParamsMovimientos = useMovimientosStore(state => state.filterParamsMovimientos)
   const queryClient = useQueryClient()
 
@@ -30,12 +29,14 @@ export const useFilterMovimientosQuery = () => {
     queryKey: ['movimientos'],
     queryFn: ({pageParam = 1, signal}) => {
       const page = pageParam as number
-      return filterFetch({
-        filterParams: filterParamsMovimientos,
+      const options: FnFetchOptions = {
+        method: "POST",
         url: `${apiURL}movimientos/filter_movimientos?page=${page}`,
-        signal,
-        token: tknSession
-      })
+        body: JSON.stringify(filterParamsMovimientos),
+        authorization: "Bearer " + token,
+        signal
+      }
+      return fnFetch(options)
     },
     initialPageParam: 1,
     getNextPageParam: (lastPage) => {
@@ -73,13 +74,12 @@ export const useFilterMovimientosQuery = () => {
 export const useMutationMovimientosQuery = () => {
   const resetSessionStore = useSessionStore(state => state.resetSessionStore)
   const navigate = useNavigate()
-  const tknSession = useSessionStore(state => state.tknSession)
-  const Authorization = "Bearer " + tknSession
+  const token = useSessionStore(state => state.tknSession)
   const queryClient = useQueryClient()
   const typeActionRef = useRef<TypeAction | "">("")
 
   const {data, isPending, isError, mutate, } = useMutation({
-    mutationFn: mutationFetch,
+    mutationFn: fnFetch,
     onSuccess: (resp) => {
       if(resp.msgType !== 'success') return
       queryClient.invalidateQueries({queryKey:["movimientos"]})
@@ -89,33 +89,24 @@ export const useMutationMovimientosQuery = () => {
 
   const createMovimiento = (movimiento: Movimientoform) => {
     typeActionRef.current = "mutate_movimiento"
-    const params = {
-      url: apiURL + "movimientos/create_movimiento",
+    const options: FnFetchOptions = {
       method: "POST",
-      headers:{ 
-        Authorization,
-      },
+      url: apiURL + "movimientos/create_movimiento",
       body: JSON.stringify(movimiento),
+      authorization: "Bearer " + token,
     }
-    mutate(params)
+    mutate(options)
   }
 
   const updateMovimiento = (movimiento: Movimiento) => {
     typeActionRef.current = "mutate_movimiento"
-    const params = {
-      url: apiURL + "movimientos/update_movimiento",
+    const options: FnFetchOptions = {
       method: "PUT",
-      headers:{ 
-        Authorization,
-      },
+      url: apiURL + "movimientos/update_movimiento",
       body: JSON.stringify(movimiento),
+      authorization: "Bearer " + token,
     }
-    mutate(params)
-  }
-
-
-  const reset = (newValues: any) => {
-    mutate({newValues}) // Solo actualiza los datos, solo local
+    mutate(options)
   }
 
   useEffect(()=>{
@@ -131,7 +122,6 @@ export const useMutationMovimientosQuery = () => {
     isError,
     createMovimiento,
     updateMovimiento,
-    reset,
   }
 }
 

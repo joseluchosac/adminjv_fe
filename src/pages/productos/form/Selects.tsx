@@ -9,7 +9,7 @@ import { filterParamsInit, selectDark } from "../../../core/utils/constants";
 import useLayoutStore from "../../../core/store/useLayoutStore";
 import { LaboratorioItem, MarcaItem, Producto } from "../../../core/types";
 import { FaPlus } from "react-icons/fa6";
-import { filterFetch } from "../../../core/services/filterFetch";
+import { fnFetch } from "../../../core/services/fnFetch";
 
 type SelectProps = {
   control: Control<Producto, any>;
@@ -41,15 +41,15 @@ export function MarcasSelect({
     abortMarcas.current?.abort();
     abortMarcas.current = new AbortController();
     const filtered = {...filterParamsInit, search}
-    filterFetch({
-      filterParams: filtered,
+    fnFetch({
+      method: "POST",
       url: `${apiURL}marcas/filter_marcas?page=1`,
+      body: JSON.stringify(filtered),
       signal: abortMarcas.current.signal,
-      token: tknSession
-    })
-    .then(data=>{
+      authorization: "Bearer " + tknSession
+    }).then((data) => {
       callback(data.filas.map((el: MarcaItem)=>({value:el.id, label:el.nombre})))
-    })
+    });
   },500)
 
   return (
@@ -105,15 +105,15 @@ export function LaboratorioSelect({
     const filtered = {...filterParamsInit, search}
 
     const abortController = new AbortController()
-    return filterFetch({
-      filterParams: filtered,
+    return fnFetch({
+      method: "POST",
       url: `${apiURL}laboratorios/filter_laboratorios?page=1`,
+      body: JSON.stringify(filtered),
       signal: abortController.signal,
-      token: tknSession
-    })
-    .then(data=>{
+      authorization: "Bearer " + tknSession
+    }).then((data) => {
       callback(data.filas.map((el: LaboratorioItem)=>({value:el.id, label:el.nombre})))
-    })
+    });
   },500)
 
   return (

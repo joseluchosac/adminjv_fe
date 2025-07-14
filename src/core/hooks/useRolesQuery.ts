@@ -1,21 +1,21 @@
 const apiURL = import.meta.env.VITE_API_URL;
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import useSessionStore from "../store/useSessionStore"
-import { mutationFetch } from "../services/mutationFecth";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
+import { fnFetch } from "../services/fnFetch";
+import { FnFetchOptions } from "../types";
 
 
 // ****** MUTATE ROLES ******
 export const useMutateRolesQuery = () => {
   const resetSessionStore = useSessionStore(state => state.resetSessionStore)
   const navigate = useNavigate()
-  const tknSession = useSessionStore(state => state.tknSession)
-  const Authorization = "Bearer " + tknSession
+  const token = useSessionStore(state => state.tknSession)
   const queryClient = useQueryClient()
 
   const {mutate, isPending, data} = useMutation({
-    mutationFn: mutationFetch,
+    mutationFn: fnFetch,
     onSuccess: (resp) => {
       if(resp.msgType !== 'success') return
       queryClient.invalidateQueries({queryKey:["roles"]})
@@ -24,39 +24,33 @@ export const useMutateRolesQuery = () => {
   })
 
   const updateRol = (param:any) => {
-    const params = {
-      url: apiURL + "roles/update_rol",
+    const options: FnFetchOptions = {
       method: "PUT",
-      headers:{ 
-        Authorization,
-      },
+      url: apiURL + "roles/update_rol",
       body: JSON.stringify(param),
+      authorization: "Bearer " + token,
     }
-    mutate(params)
+    mutate(options)
   }
   
   const createRol = (param:any) => {
-    const params = {
-      url: apiURL + "roles/create_rol",
+    const options: FnFetchOptions = {
       method: "POST",
-      headers:{ 
-        Authorization,
-      },
+      url: apiURL + "roles/create_rol",
       body: JSON.stringify(param),
+      authorization: "Bearer " + token,
     }
-    mutate(params)
+    mutate(options)
   }
   
   const deleteRol = (param: any) => {
-    const params = {
-      url: apiURL + "roles/delete_rol",
+    const options: FnFetchOptions = {
       method: "DELETE",
-      headers:{ 
-        Authorization,
-      },
+      url: apiURL + "roles/delete_rol",
       body: JSON.stringify(param),
+      authorization: "Bearer " + token,
     }
-    mutate(params)
+    mutate(options)
   }
 
   useEffect(()=>{

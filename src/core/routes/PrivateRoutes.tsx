@@ -3,10 +3,14 @@ import { Outlet, useNavigate } from "react-router-dom";
 import { useMutationUsersQuery } from "../hooks/useUsersQuery";
 import useSessionStore from "../store/useSessionStore";
 import { useMutateModulosQuery } from "../hooks/useModulosQuery";
-import { Modulo } from "../types";
+import { Modulo, ResponseQuery } from "../types";
 import { LdsDots11 } from "../components/Loaders";
 
 interface Props { redirectTo: string; }
+
+interface DataCheckAuth extends ResponseQuery {
+  content: any;
+}
 
 const PrivateRoutes: React.FC<Props> = ({ redirectTo }) => {
   const [accessModulo, setAccessModulo] = useState<boolean>(false)
@@ -20,7 +24,7 @@ const PrivateRoutes: React.FC<Props> = ({ redirectTo }) => {
   const {
     data: dataCheckAuth,
     checkAuth
-  } = useMutationUsersQuery()
+  } = useMutationUsersQuery<DataCheckAuth>()
 
   const {
     data: modulosSession,

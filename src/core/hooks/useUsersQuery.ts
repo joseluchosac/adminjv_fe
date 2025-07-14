@@ -3,10 +3,9 @@ import { useEffect, useRef, useState } from "react"
 import { useNavigate } from "react-router-dom";
 import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import useSessionStore from "../store/useSessionStore"
-import { FilterUsersResp, LoginForm, MutationFetch, RegisterForm, ResponseQuery, User } from "../types"
-import { mutationFetch } from "../services/mutationFecth"
-import { filterFetch } from "../services/filterFetch";
+import { FilterUsersResp, FnFetchOptions, LoginForm, RegisterForm, ResponseQuery, User } from "../types"
 import { filterParamsInit } from "../utils/constants";
+import { fnFetch } from "../services/fnFetch";
 
 type TypeAction = 
 "filter_full" 
@@ -36,12 +35,14 @@ export const useFilterUsersQuery = () => {
     queryKey: ['users'],
     queryFn: ({pageParam = 1, signal}) => {
       const page = pageParam as number
-      return filterFetch({
-        filterParams: filterParamsUsers,
+      const options: FnFetchOptions = {
+        method: "POST",
         url: `${apiURL}users/filter_users?page=${page}`,
-        signal,
-        token
-      })
+        body: JSON.stringify(filterParamsUsers),
+        authorization: "Bearer " + token,
+        signal
+      }
+      return fnFetch(options)
     },
     initialPageParam: 1,
     getNextPageParam: (lastPage) => {
@@ -87,13 +88,12 @@ export const useFilterUsersQuery = () => {
 export const useMutationUsersQuery = <T>() => {
   const resetSessionStore = useSessionStore(state => state.resetSessionStore)
   const navigate = useNavigate()
-  const tknSession = useSessionStore(state => state.tknSession)
-  const Authorization = "Bearer " + tknSession
+  const token = useSessionStore(state => state.tknSession)
   const queryClient = useQueryClient()
   const typeActionRef = useRef<TypeAction | "">("")
 
-  const {data, isPending, isError, mutate, } = useMutation<T, Error, MutationFetch, unknown>({
-    mutationFn: mutationFetch,
+  const {data, isPending, isError, mutate, } = useMutation<T, Error, FnFetchOptions, unknown>({
+    mutationFn: fnFetch,
     // onMutate: async ({param}) => {
       // 1: Optimista
       // await queryClient.cancelQueries({ queryKey: ['users'], exact: true })
@@ -143,166 +143,148 @@ export const useMutationUsersQuery = <T>() => {
   // }
 
   const getUser = (id: number) => {
-    const params = {
-      url: apiURL + "users/get_user",
+    const options: FnFetchOptions = {
       method: "POST",
-      headers:{ 
-        Authorization,
-      },
+      url: apiURL + "users/get_user",
       body: JSON.stringify({id}),
+      authorization: "Bearer " + token,
     }
-    mutate(params)
+    mutate(options)
   }
 
   const getProfile = (id: number) => {
-    const params = {
-      url: apiURL + "users/get_profile",
+    const options: FnFetchOptions = {
       method: "POST",
-      headers:{ 
-        Authorization,
-      },
+      url: apiURL + "users/get_profile",
       body: JSON.stringify({id}),
+      authorization: "Bearer " + token,
     }
-    mutate(params)
+    mutate(options)
   }
 
   const createUser = (user: User) => {
     typeActionRef.current = "mutate_user"
-    const params = {
-      url: apiURL + "users/create_user",
+    const options: FnFetchOptions = {
       method: "POST",
-      headers:{ 
-        Authorization,
-      },
+      url: apiURL + "users/create_user",
       body: JSON.stringify(user),
+      authorization: "Bearer " + token,
     }
-    mutate(params)
+    mutate(options)
   }
 
   const signUp = (registro: RegisterForm) => { // registrarse
     typeActionRef.current = "sign_up"
-    const params = {
-      url: apiURL + "users/sign_up",
+    const options: FnFetchOptions = {
       method: "POST",
+      url: apiURL + "users/sign_up",
       body: JSON.stringify(registro),
     }
-    mutate(params)
+    mutate(options)
   }
 
   const updateUser = (user: User) => {
     typeActionRef.current = "mutate_user"
-    const params = {
-      url: apiURL + "users/update_user",
+    const options: FnFetchOptions = {
       method: "PUT",
-      headers:{ 
-        Authorization,
-      },
+      url: apiURL + "users/update_user",
       body: JSON.stringify(user),
+      authorization: "Bearer " + token,
     }
-    mutate(params)
+    mutate(options)
   }
 
   const setStateUser = (estado: number) => {
     typeActionRef.current = "mutate_user"
-    const params = {
-      url: apiURL + "users/set_state_user",
+    const options: FnFetchOptions = {
       method: "PUT",
-      headers:{ 
-        Authorization,
-      },
+      url: apiURL + "users/set_state_user",
       body: JSON.stringify({estado}),
+      authorization: "Bearer " + token,
     }
-    mutate(params)
+    mutate(options)
   }
 
   const updateProfile = (user: User) => {
     typeActionRef.current = "mutate_profile"
-    const params = {
-      url: apiURL + "users/update_profile",
+    const options: FnFetchOptions = {
       method: "PUT",
-      headers:{ 
-        Authorization,
-      },
+      url: apiURL + "users/update_profile",
       body: JSON.stringify(user),
+      authorization: "Bearer " + token,
     }
-    mutate(params)
+    mutate(options)
   }
 
   const deleteUser = (id: number) => {
     typeActionRef.current = "mutate_user"
-    const params = {
-      url: apiURL + "users/delete_user",
+    const options: FnFetchOptions = {
       method: "DELETE",
-      headers:{ 
-        Authorization,
-      },
+      url: apiURL + "users/delete_user",
       body: JSON.stringify({id}),
+      authorization: "Bearer " + token,
     }
-    mutate(params)
+    mutate(options)
   }
 
   const signIn = (param: LoginForm) => { // iniciar sesion
     typeActionRef.current = "login"
-    const params = {
-      url: apiURL + "users/sign_in",
+    const options: FnFetchOptions = {
       method: "POST",
+      url: apiURL + "users/sign_in",
       body: JSON.stringify(param),
     }
-    mutate(params)
+    mutate(options)
   }
 
   const checkAuth = () => {
     typeActionRef.current = "check_auth"
-    const params = {
-      url: apiURL + "users/check_auth",
+    const options: FnFetchOptions = {
       method: "POST",
-      headers:{ 
-        Authorization,
-      },
+      url: apiURL + "users/check_auth",
+      authorization: "Bearer " + token,
     }
-    mutate(params)
+    mutate(options)
   }
 
   const checkPassword = (password: string) => { // En modal confirmacion con password
     typeActionRef.current = "check_password"
-    const params = {
-      url: apiURL + "users/check_password",
+    const options: FnFetchOptions = {
       method: "POST",
-      headers:{ 
-        Authorization,
-      },
+      url: apiURL + "users/check_password",
       body: JSON.stringify({password}),
+      authorization: "Bearer " + token,
     }
-    mutate(params)
+    mutate(options)
   }
 
   const getEmailByUsername = (username: string) => {
-    const params = {
-      url: apiURL + "users/get_email_by_username",
+    const options: FnFetchOptions = {
       method: "POST",
+      url: apiURL + "users/get_email_by_username",
       body: JSON.stringify({username}),
     }
-    mutate(params)
+    mutate(options)
   }
 
   const sendCodeRestoration = (param: {email: string, username: string}) => {
     typeActionRef.current = "send_code_restoration"
-    const params = {
-      url: apiURL + "users/send_code_restoration",
+    const options: FnFetchOptions = {
       method: "POST",
+      url: apiURL + "users/send_code_restoration",
       body: JSON.stringify(param),
     }
-    mutate(params)
+    mutate(options)
   }
   
   const restorePassword = (param: any) => {
     typeActionRef.current = "restore_password"
-    const params = {
-      url: apiURL + "users/restore_password",
+    const options: FnFetchOptions = {
       method: "POST",
+      url: apiURL + "users/restore_password",
       body: JSON.stringify(param),
     }
-    mutate(params)
+    mutate(options)
   }
 
   useEffect(()=>{

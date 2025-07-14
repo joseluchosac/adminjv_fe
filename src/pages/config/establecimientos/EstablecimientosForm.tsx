@@ -16,7 +16,7 @@ import { debounce } from "../../../core/utils/funciones";
 import { filterParamsInit, selectDark } from "../../../core/utils/constants";
 import useSessionStore from "../../../core/store/useSessionStore";
 import useCatalogosStore from "../../../core/store/useCatalogosStore";
-import { filterFetch } from "../../../core/services/filterFetch";
+import { fnFetch } from "../../../core/services/fnFetch";
 
 interface DataGetEstablecimiento extends ResponseQuery {
   content: Establecimiento | null;
@@ -80,15 +80,15 @@ export default function EstablecimientoForm() {
     abortUbigeos.current?.abort(); // ✅ Cancela la petición anterior
     abortUbigeos.current = new AbortController();
     const filtered = {...filterParamsInit, search}
-    filterFetch({
-      filterParams: filtered,
+    fnFetch({
+      method: "POST",
       url: `${apiURL}ubigeos/filter_ubigeos?page=1`,
+      body: JSON.stringify(filtered),
       signal: abortUbigeos.current.signal,
-      token: tknSession
-    })
-    .then(data=>{
+      authorization: "Bearer " + tknSession
+    }).then((data) => {
       callback(data.filas.map((el: UbigeoItem)=>({value: el.ubigeo_inei, label: el.dis_prov_dep})))
-    })
+    });
   },500)
 
 

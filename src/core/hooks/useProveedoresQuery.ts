@@ -2,11 +2,10 @@ const apiURL = import.meta.env.VITE_API_URL;
 import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import useSessionStore from "../store/useSessionStore"
 import { useEffect, useRef, useState } from "react"
-import { mutationFetch } from "../services/mutationFecth"
 import { useNavigate } from "react-router-dom";
-import { FilterProveedoresResp, MutationFetch, Proveedor, ResponseQuery } from "../types";
-import { filterFetch } from "../services/filterFetch";
+import { FilterProveedoresResp, FnFetchOptions, Proveedor, ResponseQuery } from "../types";
 import { filterParamsInit } from "../utils/constants";
+import { fnFetch } from "../services/fnFetch";
 
 type TypeAction = "mutate_proveedor" | "consultar_nro_doc"
 
@@ -27,12 +26,14 @@ export const useFilterProveedoresQuery = () => {
     queryKey: ['proveedores'],
     queryFn: ({pageParam = 1, signal}) => {
       const page = pageParam as number
-      return filterFetch({
-        filterParams: filterParamsProveedores,
+      const options: FnFetchOptions = {
+        method: "POST",
         url: `${apiURL}proveedores/filter_proveedores?page=${page}`,
-        signal,
-        token
-      })
+        body: JSON.stringify(filterParamsProveedores),
+        authorization: "Bearer " + token,
+        signal
+      }
+      return fnFetch(options)
     },
     initialPageParam: 1,
     getNextPageParam: (lastPage) => {
@@ -72,13 +73,12 @@ export const useFilterProveedoresQuery = () => {
 export const useMutationProveedoresQuery = <T>() => {
   const resetSessionStore = useSessionStore(state => state.resetSessionStore)
   const navigate = useNavigate()
-  const tknSession = useSessionStore(state => state.tknSession)
-  const Authorization = "Bearer " + tknSession
+  const token = useSessionStore(state => state.tknSession)
   const queryClient = useQueryClient()
   const typeActionRef = useRef<TypeAction | "">("")
 
-  const {data, isPending, isError, mutate } = useMutation<T, Error, MutationFetch, unknown>({
-    mutationFn: mutationFetch,
+  const {data, isPending, isError, mutate, reset } = useMutation<T, Error, FnFetchOptions, unknown>({
+    mutationFn: fnFetch,
     onSuccess: (resp) => {
       const r = resp as ResponseQuery
       if(r?.msgType !== 'success') return
@@ -87,84 +87,68 @@ export const useMutationProveedoresQuery = <T>() => {
   })
 
   const getProveedor = (id: number) => {
-    const params = {
-      url: apiURL + "proveedores/get_proveedor",
+    const options: FnFetchOptions = {
       method: "POST",
-      headers:{ 
-        Authorization,
-      },
+      url: apiURL + "proveedores/get_proveedor",
       body: JSON.stringify({id}),
+      authorization: "Bearer " + token,
     }
-    mutate(params)
+    mutate(options)
   }
 
   const createProveedor = (proveedor: Proveedor) => {
     typeActionRef.current = "mutate_proveedor"
-    const params = {
-      url: apiURL + "proveedores/create_proveedor",
+    const options: FnFetchOptions = {
       method: "POST",
-      headers:{ 
-        Authorization,
-      },
+      url: apiURL + "proveedores/create_proveedor",
       body: JSON.stringify(proveedor),
+      authorization: "Bearer " + token,
     }
-    mutate(params)
+    mutate(options)
   }
 
   const updateProveedor = (proveedor: Proveedor) => {
     typeActionRef.current = "mutate_proveedor"
-    const params = {
-      url: apiURL + "proveedores/update_proveedor",
+    const options: FnFetchOptions = {
       method: "PUT",
-      headers:{ 
-        Authorization,
-      },
+      url: apiURL + "proveedores/update_proveedor",
       body: JSON.stringify(proveedor),
+      authorization: "Bearer " + token,
     }
-    mutate(params)
+    mutate(options)
   }
 
   const setStateProveedor = (estado: number) => {
     typeActionRef.current = "mutate_proveedor"
-    const params = {
-      url: apiURL + "proveedores/set_state_proveedor",
+    const options: FnFetchOptions = {
       method: "PUT",
-      headers:{ 
-        Authorization,
-      },
+      url: apiURL + "proveedores/set_state_proveedor",
       body: JSON.stringify({estado}),
+      authorization: "Bearer " + token,
     }
-    mutate(params)
+    mutate(options)
   }
 
   const deleteProveedor = (id: number) => {
     typeActionRef.current = "mutate_proveedor"
-    const params = {
-      url: apiURL + "proveedores/delete_proveedor",
+    const options: FnFetchOptions = {
       method: "DELETE",
-      headers:{ 
-        Authorization,
-      },
+      url: apiURL + "proveedores/delete_proveedor",
       body: JSON.stringify({id}),
+      authorization: "Bearer " + token,
     }
-    mutate(params)
+    mutate(options)
   }
 
   const consultarNroDocumento = (param: any) => {
     typeActionRef.current = "consultar_nro_doc"
-    const params = {
-      url: apiURL + "proveedores/consultar_nro_documento",
+    const options: FnFetchOptions = {
       method: "POST",
-      headers:{ 
-        Authorization,
-      },
+      url: apiURL + "proveedores/consultar_nro_documento",
       body: JSON.stringify(param),
+      authorization: "Bearer " + token,
     }
-    mutate(params)
-  }
-
-  const reset = (newValues: any) => {
-    mutate({newValues}) // Solo actualiza los datos, no hace fetch
+    mutate(options)
   }
 
   useEffect(()=>{
@@ -186,7 +170,7 @@ export const useMutationProveedoresQuery = <T>() => {
     deleteProveedor,
     consultarNroDocumento,
     typeAction: typeActionRef.current,
-    reset,
+    reset
   }
 }
 

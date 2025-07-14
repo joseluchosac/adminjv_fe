@@ -1,72 +1,64 @@
 const apiURL = import.meta.env.VITE_API_URL;
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import useSessionStore from "../store/useSessionStore"
-import { mutationFetch } from "../services/mutationFecth";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Categoria } from "../types/catalogosTypes";
+import { fnFetch } from "../services/fnFetch";
+import { FnFetchOptions } from "../types";
 
 // ****** MUTATION ******
 export const useMutateCategoriasQuery = () => {
   const resetSessionStore = useSessionStore(state => state.resetSessionStore)
   const navigate = useNavigate()
-  const tknSession = useSessionStore(state => state.tknSession)
-  const Authorization = "Bearer " + tknSession
+  const token = useSessionStore(state => state.tknSession)
   const queryClient = useQueryClient()
 
   const {mutate, isPending, data} = useMutation({
-    mutationFn: mutationFetch,
+    mutationFn: fnFetch,
     onSuccess: () => {
       queryClient.fetchQuery({queryKey:["categorias"]});
     }
   })
 
   const sortCategorias = (orderedItems: Categoria[]) => {
-    const params = {
-      url: apiURL + "categorias/sort_categorias",
+    const options: FnFetchOptions = {
       method: "PUT",
-      headers:{ 
-        Authorization,
-      },
-      body: JSON.stringify(orderedItems)
+      url: apiURL + "categorias/sort_categorias",
+      body: JSON.stringify(orderedItems),
+      authorization: "Bearer " + token,
     }
-    mutate(params)
+    mutate(options)
   }
 
   const createCategoria = (categoria:  Categoria) => {
-    const params = {
-      url: apiURL + "categorias/create_categoria",
+    const options: FnFetchOptions = {
       method: "POST",
-      headers:{ 
-        Authorization,
-      },
+      url: apiURL + "categorias/create_categoria",
       body: JSON.stringify(categoria),
+      authorization: "Bearer " + token,
     }
-    mutate(params)
+    mutate(options)
   }
 
   const updateCategoria = (categoria: Categoria) => {
-    const params = {
-      url: apiURL + "categorias/update_categoria",
+    const options: FnFetchOptions = {
       method: "PUT",
-      headers:{ 
-        Authorization,
-      },
+      url: apiURL + "categorias/update_categoria",
       body: JSON.stringify(categoria),
+      authorization: "Bearer " + token,
     }
-    mutate(params)
+    mutate(options)
   }
 
   const deleteCategoria = (id: number) => {
-    const params = {
-      url: apiURL + "categorias/delete_categoria",
+    const options: FnFetchOptions = {
       method: "DELETE",
-      headers:{ 
-        Authorization,
-      },
+      url: apiURL + "categorias/delete_categoria",
       body: JSON.stringify({id}),
+      authorization: "Bearer " + token,
     }
-    mutate(params)
+    mutate(options)
   }
 
 

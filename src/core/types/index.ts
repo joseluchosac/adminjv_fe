@@ -156,20 +156,33 @@ type FilterParamsBetween = {
   field_label: string;
   range: string
 }
-export type FilterFetchParam = {
-  token: string | null;
-  filterParams: FilterParams;
-  signal: AbortSignal;
+
+export type FnFetchOptions = {
+  method?: "GET" | "POST" | "PUT" | "DELETE";
   url: string;
-  curEstab?: number
+  body?: BodyInit | null | undefined;
+  includeCredentials?: boolean;
+  signal?: AbortSignal | null;
+  head_contentType?: string;
+  authorization?: string;
+  attachedData?: any;
 }
+// observar de abajo
+// export type FilterFetchParam = {
+//   token: string | null;
+//   filterParams: FilterParams;
+//   signal: AbortSignal;
+//   url: string;
+//   curEstab?: number
+// }
+
 // observar el de abajo para eliminar
-export type FilterFetch = {
-  page: number;
-  token: string | null;
-  filterParams: FilterParams;
-  signal: AbortSignal
-}
+// export type FilterFetch = {
+//   page: number;
+//   token: string | null;
+//   filterParams: FilterParams;
+//   signal: AbortSignal
+// }
 
 // ✅ TIPO PARA RESPUESTA DE UNA PETICION DE FILTRO
 type FilterResp = {
@@ -402,9 +415,8 @@ export type Numeracion = {
   correlativo: number;
   estado: number;
 }
-
+// observar de abajo para su eliminacion
 export interface MutationFetch {
-  newValues?: any;
   url?: string;
   method?: string;
   headers?: any;

@@ -1,10 +1,10 @@
 const apiURL = import.meta.env.VITE_API_URL;
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import useSessionStore from "../store/useSessionStore"
-import { Modulo } from "../types"
-import { mutationFetch } from "../services/mutationFecth";
+import { FnFetchOptions, Modulo } from "../types"
 import { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import { fnFetch } from "../services/fnFetch";
 
 type TypeAction = "mutate_modulo" | "mutate_modulos"
 
@@ -12,113 +12,96 @@ type TypeAction = "mutate_modulo" | "mutate_modulos"
 export const useMutateModulosQuery = () => {
   const resetSessionStore = useSessionStore(state => state.resetSessionStore)
   const navigate = useNavigate()
-  const tknSession = useSessionStore(state => state.tknSession)
-  const Authorization = "Bearer " + tknSession
+  const token = useSessionStore(state => state.tknSession)
   const queryClient = useQueryClient()
   const typeActionRef = useRef<TypeAction | "">("")
 
   const {mutate, isPending, data} = useMutation({
-    mutationFn: mutationFetch,
+    mutationFn: fnFetch,
     onSuccess: () => {
       queryClient.fetchQuery({queryKey:["modulos"]});
     }
   })
 
   const getModulos = () => {
-    const params = {
-      url: apiURL + "modulos/get_modulos",
+    const options: FnFetchOptions = {
       method: "POST",
-      headers:{ 
-        Authorization,
-      },
+      url: apiURL + "modulos/get_modulos",
+      authorization: "Bearer " + token,
     }
-    mutate(params)
+    mutate(options)
   }
 
   const getModulosSession = () => {
-    const params = {
-      url: apiURL + "modulos/get_modulos_sesion",
+    const options: FnFetchOptions = {
       method: "POST",
-      headers:{ 
-        Authorization,
-      },
+      url: apiURL + "modulos/get_modulos_sesion",
+      authorization: "Bearer " + token,
     }
-    mutate(params)
+    mutate(options)
   }
 
   const getModuloRol = (rol_id: number) => {
-    const params = {
-      url: apiURL + "modulos/get_modulo_rol",
+    const options: FnFetchOptions = {
       method: "POST",
-      headers:{ 
-        Authorization,
-      },
-      body: JSON.stringify({rol_id})
+      url: apiURL + "modulos/get_modulo_rol",
+      body: JSON.stringify({rol_id}),
+      authorization: "Bearer " + token,
     }
-    mutate(params)
+    mutate(options)
   }
 
   const sortModulos = (orderedItems: Modulo[]) => {
-    const params = {
-      url: apiURL + "modulos/sort_modulos",
+    const options: FnFetchOptions = {
       method: "PUT",
-      headers:{ 
-        Authorization,
-      },
-      body: JSON.stringify(orderedItems)
+      url: apiURL + "modulos/sort_modulos",
+      body: JSON.stringify(orderedItems),
+      authorization: "Bearer " + token,
     }
-    mutate(params)
+    mutate(options)
   }
 
   const updateModulo = (modulo: Modulo) => {
     typeActionRef.current = "mutate_modulo"
-    const params = {
-      url: apiURL + "modulos/update_modulo",
+    const options: FnFetchOptions = {
       method: "PUT",
-      headers:{ 
-        Authorization,
-      },
+      url: apiURL + "modulos/update_modulo",
       body: JSON.stringify(modulo),
+      authorization: "Bearer " + token,
     }
-    mutate(params)
+    mutate(options)
   }
 
-  const createModulo = (param:  Modulo) => {
+  const createModulo = (modulo:  Modulo) => {
     typeActionRef.current = "mutate_modulo"
-    const params = {
-      url: apiURL + "modulos/create_modulo",
+    const options: FnFetchOptions = {
       method: "POST",
-      headers:{ 
-        Authorization,
-      },
-      body: JSON.stringify(param),
+      url: apiURL + "modulos/create_modulo",
+      body: JSON.stringify(modulo),
+      authorization: "Bearer " + token,
     }
-    mutate(params)
+    mutate(options)
   }
 
   const deleteModulo = (id: number) => {
     typeActionRef.current = "mutate_modulo"
-    const params = {
-      url: apiURL + "modulos/delete_modulo",
+    const options: FnFetchOptions = {
       method: "DELETE",
-      headers:{ 
-        Authorization,
-      },
+      url: apiURL + "modulos/delete_modulo",
       body: JSON.stringify({id}),
+      authorization: "Bearer " + token,
     }
-    mutate(params)
+    mutate(options)
   }
 
-  const updateModulosRoles = (param: any) => {
-    const params = {
-      url: apiURL + "modulos/update_modulos_roles",
+  const updateModulosRoles = (modulos_roles: any) => {
+    const options: FnFetchOptions = {
       method: "POST",
-      headers:{ 
-        Authorization,
-      },
-      body: JSON.stringify(param),
+      url: apiURL + "modulos/update_modulos_roles",
+      body: JSON.stringify(modulos_roles),
+      authorization: "Bearer " + token,
     }
-    mutate(params)
+    mutate(options)
   }
 
   useEffect(()=>{

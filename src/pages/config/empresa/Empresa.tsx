@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import useSessionStore from "../../../core/store/useSessionStore"
-import { useMutationConfigQuery } from "../../../core/hooks/useConfigQuery"
+import { useEmpresaQuery, useMutationConfigQuery } from "../../../core/hooks/useConfigQuery"
 import { useForm, useWatch } from "react-hook-form"
 import { type Empresa } from "../../../core/types"
 import { Ubigeo } from "../../../core/types/catalogosTypes"
@@ -11,18 +11,16 @@ import { FaUndo } from "react-icons/fa"
 import { LdsEllipsisCenter } from "../../../core/components/Loaders"
 import UbigeosMdl from "../../../core/components/UbigeosMdl"
 import { ConfirmPass } from "../../../core/components/ConfirmsMdl"
+import { useQueryClient } from "@tanstack/react-query"
 
 export default function Empresa() {
     const [urlLogoPreview, setUrlLogoPreview] = useState("")
     const [showUbigeos, setShowUbigeos] = useState(false)
     const [showConfirmPass, setShowConfirmPass] = useState(false)
     const setEmpresaSession = useSessionStore(state=>state.setEmpresaSession)
-    const {
-      data: empresa,
-      isPending: isPendingEmpresa, 
-      getEmpresa,
-      reset: resetEmpresa,
-    } = useMutationConfigQuery()
+    const {empresa, isFetching: isFetchingEmpresa} = useEmpresaQuery()
+    const queryClient = useQueryClient()
+    
     const {
       data: mutation,
       isPending: isPendingMutation, 
@@ -63,12 +61,12 @@ export default function Empresa() {
   
     const handleResetLogoFile = () => {
       setValue("fileLogo", null)
-      setValue("logo", empresa.logo)
-      setUrlLogoPreview(empresa.urlLogo)
+      setValue("logo", empresa ? empresa.logo : "")
+      setUrlLogoPreview(empresa ? empresa.urlLogo : "")
     }
     
     const handleQuitarLogo = () => {
-      setUrlLogoPreview(empresa.urlNoImage)
+      setUrlLogoPreview(empresa ? empresa.urlNoImage : "")
       setValue("logo", "",{shouldDirty: true})
     }
   
@@ -78,7 +76,7 @@ export default function Empresa() {
     
     const handleReset = () => {
       reset()
-      setUrlLogoPreview(empresa.urlLogo)
+      setUrlLogoPreview(empresa ? empresa.urlLogo : "")
     }
     
     const onChooseUbigeo = (ubigeo: Ubigeo) => {
@@ -88,12 +86,6 @@ export default function Empresa() {
       setValue("distrito", ubigeo.distrito)
       setValue("ubigeo_inei", ubigeo.ubigeo_inei,{shouldDirty: true})
     }
-    
-  
-  
-    useEffect(()=>{
-      getEmpresa()
-    },[])
   
     useEffect(()=>{
       if(empresa){
@@ -125,7 +117,7 @@ export default function Empresa() {
     useEffect(()=>{
       if(!mutation) return
       if(mutation?.msgType === "success"){
-        resetEmpresa(mutation.registro)
+        queryClient.invalidateQueries({queryKey:['empresa']})
         const {
           razon_social,
           nombre_comercial,
@@ -345,7 +337,7 @@ export default function Empresa() {
             Guardar datos de la Empresa
           </Button>
         </div>
-        {(isPendingEmpresa || isPendingMutation) && <LdsEllipsisCenter />}
+        {(isFetchingEmpresa || isPendingMutation) && <LdsEllipsisCenter />}
       </Form>
       <UbigeosMdl
         show={showUbigeos} 

@@ -1,21 +1,19 @@
 import { Button } from "react-bootstrap";
-import useClientesStore from "../../core/store/useClientesStore";
-import ClienteFormMdl from "../../core/components/ClienteFormMdl";
-import { Cliente } from "../../core/types";
+import useTablas from "../../core/hooks/useTablas";
 
 export default function Comprobantes() {
-  const setShowClienteFormMdl = useClientesStore(state => state.setShowClienteFormMdl)
-
+  const {rols, isFetching} = useTablas();
   const handleClick = () => {
-    setShowClienteFormMdl(true)
   }
-  const onChooseCliente = (cliente: Cliente) => {
-    console.log(cliente)
-  }
+
   return (
     <div>
       <Button onClick={handleClick}>Nuevo Cliente</Button>
-      <ClienteFormMdl onChooseCliente={onChooseCliente}/>
+            {isFetching && <h4>Cargando...</h4>}
+      <ul>
+        {rols && rols.map(el=><li key={el.id}>{el.rol}</li>)}
+
+      </ul>
     </div>
   )
 }

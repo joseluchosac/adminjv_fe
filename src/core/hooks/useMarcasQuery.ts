@@ -3,17 +3,16 @@ import { useCallback, useEffect, useRef, useState } from "react"
 import { useNavigate } from "react-router-dom";
 import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import useSessionStore from "../store/useSessionStore"
-import { mutationFetch } from "../services/mutationFecth"
-import { FilterMarcasResp, Marca } from "../types";
-import { filterFetch } from "../services/filterFetch";
+import { FilterMarcasResp, FnFetchOptions, Marca } from "../types";
 import { filterParamsInit } from "../utils/constants";
+import { fnFetch } from "../services/fnFetch";
 
 type TypeAction = "filter_full" | "mutate_marca"
 
 // ****** FILTRAR ******
 export const useFilterMarcasQuery = () => {
   const [filterParamsMarcas, setFilterParamsMarcas] = useState(filterParamsInit)
-  const tknSession = useSessionStore(state => state.tknSession)
+  const token = useSessionStore(state => state.tknSession)
   const queryClient = useQueryClient()
   
   const {
@@ -27,12 +26,14 @@ export const useFilterMarcasQuery = () => {
     queryKey: ['marcas'],
     queryFn: ({pageParam = 1, signal}) => {
       const page = pageParam as number
-      return filterFetch({
-        filterParams: filterParamsMarcas,
+      const options: FnFetchOptions = {
+        method: "POST",
         url: `${apiURL}marcas/filter_marcas?page=${page}`,
-        signal,
-        token: tknSession
-      })
+        body: JSON.stringify(filterParamsMarcas),
+        authorization: "Bearer " + token,
+        signal
+      }
+      return fnFetch(options)
     },
     initialPageParam: 1,
     getNextPageParam: (lastPage) => {
@@ -73,85 +74,59 @@ export const useFilterMarcasQuery = () => {
 export const useMutationMarcasQuery = () => {
   const resetSessionStore = useSessionStore(state => state.resetSessionStore)
   const navigate = useNavigate()
-  const tknSession = useSessionStore(state => state.tknSession)
-  const Authorization = "Bearer " + tknSession
+  const token = useSessionStore(state => state.tknSession)
   const queryClient = useQueryClient()
   const typeActionRef = useRef<TypeAction | "">("")
 
   const {data, isPending, isError, mutate, } = useMutation({
-    mutationFn: mutationFetch,
+    mutationFn: fnFetch,
     onSuccess: (resp) => {
       if(resp.msgType !== 'success') return
       queryClient.invalidateQueries({queryKey:["marcas"]}) // Recarga la tabla marcas
     }
   })
 
-  // const filterMarcasFull = () => {// Sin Paginacion
-  //   typeActionRef.current = "filter_full"
-  //   const params = {
-  //     url: apiURL + "marcas/filter_marcas_full",
-  //     method: "POST",
-  //     headers:{ 
-  //       Authorization,
-  //     },
-  //     body: JSON.stringify(filterParamsMarcas),
-  //   }
-  //   mutate(params)
-  // }
-
   const getMarca = (id: number) => {
-    const params = {
-      url: apiURL + "marcas/get_marca",
+    const options: FnFetchOptions = {
       method: "POST",
-      headers:{ 
-        Authorization,
-      },
+      url: apiURL + "marcas/get_marca",
       body: JSON.stringify({id}),
+      authorization: "Bearer " + token,
     }
-    mutate(params)
+    mutate(options)
   }
 
   const createMarca = (marca: Marca) => {
     typeActionRef.current = "mutate_marca"
-    const params = {
-      url: apiURL + "marcas/create_marca",
+    const options: FnFetchOptions = {
       method: "POST",
-      headers:{ 
-        Authorization,
-      },
+      url: apiURL + "marcas/create_marca",
       body: JSON.stringify(marca),
+      authorization: "Bearer " + token,
     }
-    mutate(params)
+    mutate(options)
   }
 
   const updateMarca = (marca: Marca) => {
     typeActionRef.current = "mutate_marca"
-    const params = {
-      url: apiURL + "marcas/update_marca",
+    const options: FnFetchOptions = {
       method: "PUT",
-      headers:{ 
-        Authorization,
-      },
+      url: apiURL + "marcas/update_marca",
       body: JSON.stringify(marca),
+      authorization: "Bearer " + token,
     }
-    mutate(params)
+    mutate(options)
   }
 
   const deleteMarca = (id: number) => {
     typeActionRef.current = "mutate_marca"
-    const params = {
-      url: apiURL + "marcas/delete_marca",
+    const options: FnFetchOptions = {
       method: "DELETE",
-      headers:{ 
-        Authorization,
-      },
+      url: apiURL + "marcas/delete_marca",
       body: JSON.stringify({id}),
+      authorization: "Bearer " + token,
     }
-    mutate(params)
-  }
-
-  const reset = (newValues: any) => {
-    mutate({newValues}) // Solo actualiza los datos, solo local
+    mutate(options)
   }
 
   useEffect(()=>{
@@ -170,6 +145,5 @@ export const useMutationMarcasQuery = () => {
     updateMarca,
     deleteMarca,
     typeAction: typeActionRef.current,
-    reset,
   }
 }

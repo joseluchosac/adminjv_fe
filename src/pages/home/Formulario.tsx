@@ -8,8 +8,8 @@ import useLayoutStore from "../../core/store/useLayoutStore"
 import { filterParamsInit, selectDark } from "../../core/utils/constants"
 import useSessionStore from "../../core/store/useSessionStore"
 import { debounce } from "../../core/utils/funciones"
-import { filterFetch } from "../../core/services/filterFetch"
 import { LaboratorioItem } from "../../core/types";
+import { fnFetch } from "../../core/services/fnFetch";
 const opciones = [
   {value:1, label:"opcion 1"},
   {value:2, label:"opcion 2"},
@@ -80,15 +80,15 @@ function Formulario() {
     abortMarcas.current = new AbortController();
     const filtered = {...filterParamsInit, search}
     const abortController = new AbortController()
-    return filterFetch({
-      filterParams: filtered,
+    fnFetch({
+      method: "POST",
       url: `${apiURL}marcas/filter_marcas?page=1`,
+      body: JSON.stringify(filtered),
       signal: abortController.signal,
-      token: tknSession
-    })
-    .then(data=>{
+      authorization: "Bearer " + tknSession
+    }).then((data) => {
       callback(data.filas.map((el: LaboratorioItem)=>({value:el.id, label:el.nombre})))
-    })
+    });
   },500)
 
   const loadLaboratoriosOptions =  debounce((search: string, callback: any) => {
@@ -97,15 +97,15 @@ function Formulario() {
     const filtered = {...filterParamsInit, search}
 
     const abortController = new AbortController()
-    return filterFetch({
-      filterParams: filtered,
+    fnFetch({
+      method: "POST",
       url: `${apiURL}laboratorios/filter_laboratorios?page=1`,
+      body: JSON.stringify(filtered),
       signal: abortController.signal,
-      token: tknSession
-    })
-    .then(data=>{
+      authorization: "Bearer " + tknSession
+    }).then((data) => {
       callback(data.filas.map((el: LaboratorioItem)=>({value:el.id, label:el.nombre})))
-    })
+    });
   },500)
 
   const submit = (data: Producto) => {

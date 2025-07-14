@@ -3,10 +3,9 @@ import { useEffect, useRef, useState } from "react"
 import { useNavigate } from "react-router-dom";
 import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import useSessionStore from "../store/useSessionStore"
-import { mutationFetch } from "../services/mutationFecth"
-import { FilterLaboratoriosResp, Laboratorio } from "../types";
-import { filterFetch } from "../services/filterFetch";
+import { FilterLaboratoriosResp, FnFetchOptions, Laboratorio } from "../types";
 import { filterParamsInit } from "../utils/constants";
+import { fnFetch } from "../services/fnFetch";
 
 type TypeAction = 
   "filter_full"
@@ -29,12 +28,14 @@ export const useFilterLaboratoriosQuery = () => {
     queryKey: ['laboratorios'],
     queryFn: ({pageParam = 1, signal}) => {
       const page = pageParam as number
-      return filterFetch({
-        filterParams: filterParamsLaboratorios,
+      const options: FnFetchOptions = {
+        method: "POST",
         url: `${apiURL}laboratorios/filter_laboratorios?page=${page}`,
-        signal,
-        token
-      })
+        body: JSON.stringify(filterParamsLaboratorios),
+        authorization: "Bearer " + token,
+        signal
+      }
+      return fnFetch(options)
     },
     initialPageParam: 1,
     getNextPageParam: (lastPage) => {
@@ -74,85 +75,59 @@ export const useFilterLaboratoriosQuery = () => {
 export const useMutationLaboratoriosQuery = () => {
   const resetSessionStore = useSessionStore(state => state.resetSessionStore)
   const navigate = useNavigate()
-  const tknSession = useSessionStore(state => state.tknSession)
-  const Authorization = "Bearer " + tknSession
+  const token = useSessionStore(state => state.tknSession)
   const queryClient = useQueryClient()
   const typeActionRef = useRef<TypeAction | "">("")
 
   const {data, isPending, isError, mutate, } = useMutation({
-    mutationFn: mutationFetch,
+    mutationFn: fnFetch,
     onSuccess: (resp) => {
       if(resp.msgType !== 'success') return
       queryClient.invalidateQueries({queryKey:["laboratorios"]}) // Recarga la tabla laboratorios
     }
   })
 
-  // const filterLaboratoriosFull = () => {// Sin Paginacion
-  //   typeActionRef.current = "filter_full"
-  //   const params = {
-  //     url: apiURL + "laboratorios/filter_laboratorios_full",
-  //     method: "POST",
-  //     headers:{ 
-  //       Authorization,
-  //     },
-  //     body: JSON.stringify(filterParamsLaboratorios),
-  //   }
-  //   mutate(params)
-  // }
-
   const getLaboratorio = (id: number) => {
-    const params = {
-      url: apiURL + "laboratorios/get_laboratorio",
+    const options: FnFetchOptions = {
       method: "POST",
-      headers:{ 
-        Authorization,
-      },
+      url: apiURL + "laboratorios/get_laboratorio",
       body: JSON.stringify({id}),
+      authorization: "Bearer " + token,
     }
-    mutate(params)
+    mutate(options)
   }
 
   const createLaboratorio = (laboratorio: Laboratorio) => {
     typeActionRef.current = "mutate_laboratorio"
-    const params = {
-      url: apiURL + "laboratorios/create_laboratorio",
+    const options: FnFetchOptions = {
       method: "POST",
-      headers:{ 
-        Authorization,
-      },
+      url: apiURL + "laboratorios/create_laboratorio",
       body: JSON.stringify(laboratorio),
+      authorization: "Bearer " + token,
     }
-    mutate(params)
+    mutate(options)
   }
 
   const updateLaboratorio = (laboratorio: Laboratorio) => {
     typeActionRef.current = "mutate_laboratorio"
-    const params = {
-      url: apiURL + "laboratorios/update_laboratorio",
+    const options: FnFetchOptions = {
       method: "PUT",
-      headers:{ 
-        Authorization,
-      },
+      url: apiURL + "laboratorios/update_laboratorio",
       body: JSON.stringify(laboratorio),
+      authorization: "Bearer " + token,
     }
-    mutate(params)
+    mutate(options)
   }
 
   const deleteLaboratorio = (id: number) => {
     typeActionRef.current = "mutate_laboratorio"
-    const params = {
-      url: apiURL + "laboratorios/delete_laboratorio",
+    const options: FnFetchOptions = {
       method: "DELETE",
-      headers:{ 
-        Authorization,
-      },
+      url: apiURL + "laboratorios/delete_laboratorio",
       body: JSON.stringify({id}),
+      authorization: "Bearer " + token,
     }
-    mutate(params)
-  }
-
-  const reset = (newValues: any) => {
-    mutate({newValues}) // Solo actualiza los datos, no hace fetch
+    mutate(options)
   }
 
   useEffect(()=>{
@@ -172,7 +147,6 @@ export const useMutationLaboratoriosQuery = () => {
     updateLaboratorio,
     deleteLaboratorio,
     typeAction: typeActionRef.current,
-    reset,
   }
 }
 

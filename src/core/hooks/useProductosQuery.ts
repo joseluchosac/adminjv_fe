@@ -3,10 +3,9 @@ import { useEffect, useRef, useState } from "react"
 import { useNavigate } from "react-router-dom";
 import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import useSessionStore from "../store/useSessionStore"
-import { FilterProductosResp, Producto } from "../types"
-import { mutationFetch } from "../services/mutationFecth"
-import { filterFetch } from "../services/filterFetch";
+import { FilterProductosResp, FnFetchOptions, Producto } from "../types"
 import { filterParamsInit } from "../utils/constants";
+import { fnFetch } from "../services/fnFetch";
 
 type TypeAction = 
 "filter_full" 
@@ -30,13 +29,15 @@ export const useFilterProductosQuery = () => {
     queryKey: ['productos'],
     queryFn: ({pageParam = 1, signal}) => {
       const page = pageParam as number
-      return filterFetch({
-        filterParams: filterParamsProductos,
+      const options: FnFetchOptions = {
+        method: "POST",
         url: `${apiURL}productos/filter_productos?page=${page}`,
+        body: JSON.stringify(filterParamsProductos),
+        authorization: "Bearer " + token,
+        attachedData: JSON.stringify({curEstab}),
         signal,
-        curEstab,
-        token
-      })
+      }
+      return fnFetch(options)
     },
     initialPageParam: 1,
     getNextPageParam: (lastPage) => {
@@ -76,115 +77,84 @@ export const useFilterProductosQuery = () => {
 export const useMutationProductosQuery = () => {
   const resetSessionStore = useSessionStore(state => state.resetSessionStore)
   const navigate = useNavigate()
-  const tknSession = useSessionStore(state => state.tknSession)
+  const token = useSessionStore(state => state.tknSession)
   const curModulo = useSessionStore(state => state.moduloActual?.nombre)
   const curEstab = useSessionStore(state => state.curEstab)
-  const Authorization = "Bearer " + tknSession
   const queryClient = useQueryClient()
   const typeActionRef = useRef<TypeAction | "">("")
 
   const {data, isPending, isError, mutate, } = useMutation({
-    mutationFn: mutationFetch,
+    mutationFn: fnFetch,
     onSuccess: (resp) => {
       if(resp.msgType !== 'success') return
       queryClient.invalidateQueries({queryKey:["productos"]})
     }
   })
 
-  // const filterProductoFull = () => {// Sin Paginacion
-  //   typeActionRef.current = "filter_full"
-  //   const params = {
-  //     url: apiURL + "productos/filter_productos_full",
-  //     method: "POST",
-  //     headers:{ 
-  //       Authorization,
-  //       "attached-data": JSON.stringify({curEstab, curModulo}),
-  //     },
-  //     body: JSON.stringify(filterParamsProductos),
-  //   }
-  //   mutate(params)
-  // }
-
   const getProducto = (id: number) => {
-    const params = {
-      url: apiURL + "productos/get_producto",
+    const options: FnFetchOptions = {
       method: "POST",
-      headers:{ 
-        Authorization,
-        "attached-data": JSON.stringify({curEstab, curModulo}),
-      },
+      url: apiURL + "productos/get_producto",
       body: JSON.stringify({id}),
+      authorization: "Bearer " + token,
+      attachedData: JSON.stringify({curEstab, curModulo})
     }
-    mutate(params)
+    mutate(options)
   }
 
   const getProductoByCode = (codigo: string, establecimiento_id: number) => {
-    const params = {
-      url: apiURL + "productos/get_producto_by_code",
+    const options: FnFetchOptions = {
       method: "POST",
-      headers:{ 
-        Authorization,
-      },
+      url: apiURL + "productos/get_producto_by_code",
       body: JSON.stringify({codigo, establecimiento_id}),
+      authorization: "Bearer " + token,
     }
-    mutate(params)
+    mutate(options)
   }
 
   const createProducto = (producto: Producto) => {
     typeActionRef.current = "mutate_producto"
-    const params = {
-      url: apiURL + "productos/create_producto",
+    const options: FnFetchOptions = {
       method: "POST",
-      headers:{ 
-        Authorization,
-      },
+      url: apiURL + "productos/create_producto",
       body: JSON.stringify(producto),
+      authorization: "Bearer " + token,
     }
-    mutate(params)
+    mutate(options)
   }
 
   const updateProducto = (producto: Producto) => {
     typeActionRef.current = "mutate_producto"
-    const params = {
-      url: apiURL + "productos/update_producto",
+    const options: FnFetchOptions = {
       method: "PUT",
-      headers:{ 
-        Authorization,
-      },
+      url: apiURL + "productos/update_producto",
       body: JSON.stringify(producto),
+      authorization: "Bearer " + token,
     }
-    mutate(params)
+    mutate(options)
   }
 
   const updateEstado = (estado: {id:number; estado:number}) => {
     typeActionRef.current = "mutate_producto"
-    const params = {
-      url: apiURL + "productos/update_estado",
+    const options: FnFetchOptions = {
       method: "PUT",
-      headers:{ 
-        Authorization,
-      },
+      url: apiURL + "productos/update_estado",
       body: JSON.stringify(estado),
+      authorization: "Bearer " + token,
     }
-    mutate(params)
+    mutate(options)
   }
 
 
   const deleteProducto = (id: number) => {
     typeActionRef.current = "mutate_producto"
-    const params = {
-      url: apiURL + "productos/delete_producto",
+    const options: FnFetchOptions = {
       method: "DELETE",
-      headers:{ 
-        Authorization,
-      },
+      url: apiURL + "productos/delete_producto",
       body: JSON.stringify({id}),
+      authorization: "Bearer " + token,
     }
-    mutate(params)
-  }
-
-  const reset = (newValues: any) => {
-    mutate({newValues}) // Solo actualiza los datos, solo local
+    mutate(options)
   }
 
   useEffect(()=>{
@@ -204,7 +174,6 @@ export const useMutationProductosQuery = () => {
     updateProducto,
     updateEstado,
     deleteProducto,
-    reset,
   }
 }
 

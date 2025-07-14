@@ -32,8 +32,8 @@ import useCatalogosStore from "../../core/store/useCatalogosStore";
 import { useMutationProveedoresQuery } from "../../core/hooks/useProveedoresQuery";
 import { LdsBar, LdsEllipsisCenter } from "../../core/components/Loaders";
 import { cropText, debounce } from "../../core/utils/funciones";
-import { filterFetch } from "../../core/services/filterFetch";
 import useSessionStore from "../../core/store/useSessionStore";
+import { fnFetch } from "../../core/services/fnFetch";
 
 interface DataNroDocumento extends ResponseQuery {
   content: NroDocumento;
@@ -91,11 +91,12 @@ export default function ProveedorForm() {
     abortUbigeos.current?.abort(); // ✅ Cancela la petición anterior
     abortUbigeos.current = new AbortController();
     const filtered = { ...filterParamsInit, search };
-    filterFetch({
-      filterParams: filtered,
+    fnFetch({
+      method: "POST",
       url: `${apiURL}ubigeos/filter_ubigeos?page=1`,
+      body: JSON.stringify(filtered),
       signal: abortUbigeos.current.signal,
-      token,
+      authorization: "Bearer " + token
     }).then((data) => {
       callback(
         data.filas.map((el: UbigeoItem) => ({
@@ -146,7 +147,7 @@ export default function ProveedorForm() {
   const resetForm = () => {
     reset(proveedorFormInit);
     if(nroDocumento){
-      resetNroDocumento(null);
+      resetNroDocumento();
     }
   };
 

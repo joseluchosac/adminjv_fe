@@ -3,8 +3,9 @@ import { useEffect, useRef } from "react"
 import { useNavigate } from "react-router-dom";
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import useSessionStore from "../store/useSessionStore"
-import { mutationFetch } from "../services/mutationFecth"
 import { Establecimiento } from "../types/catalogosTypes";
+import { fnFetch } from "../services/fnFetch";
+import { FnFetchOptions } from "../types";
 
 type TypeAction = "filter_full" | "mutate_establecimiento" | "delete_establecimiento"
 
@@ -12,13 +13,12 @@ type TypeAction = "filter_full" | "mutate_establecimiento" | "delete_establecimi
 export const useMutationEstablecimientosQuery = () => {
   const resetSessionStore = useSessionStore(state => state.resetSessionStore)
   const navigate = useNavigate()
-  const tknSession = useSessionStore(state => state.tknSession)
-  const Authorization = "Bearer " + tknSession
+  const token = useSessionStore(state => state.tknSession)
   const queryClient = useQueryClient()
   const typeActionRef = useRef<TypeAction | "">("")
 
   const {data, isPending, isError, mutate, } = useMutation({
-    mutationFn: mutationFetch,
+    mutationFn: fnFetch,
     onSuccess: (resp) => {
       if(resp.msgType !== 'success') return
       queryClient.invalidateQueries({queryKey:["establecimientos"]}) // Recarga la tabla establecimientos
@@ -26,77 +26,63 @@ export const useMutationEstablecimientosQuery = () => {
   })
 
   const getEstablecimientos = () => {
-    const params = {
-      url: apiURL + "establecimientos/get_establecimientos",
+    const options: FnFetchOptions = {
       method: "POST",
-      headers:{ 
-        Authorization,
-      },
+      url: apiURL + "establecimientos/get_establecimientos",
+      authorization: "Bearer " + token,
     }
-    mutate(params)
+    mutate(options)
   }
 
   const getEstablecimientosOptions = () => {
-    const params = {
-      url: apiURL + "establecimientos/get_establecimientos_options",
+    const options: FnFetchOptions = {
       method: "POST",
+      url: apiURL + "establecimientos/get_establecimientos_options",
     }
-    mutate(params)
+    mutate(options)
   }
 
   const getEstablecimiento = (id: number) => {
-    const params = {
-      url: apiURL + "establecimientos/get_establecimiento",
+    const options: FnFetchOptions = {
       method: "POST",
-      headers:{ 
-        Authorization,
-      },
+      url: apiURL + "establecimientos/get_establecimiento",
       body: JSON.stringify({id}),
+      authorization: "Bearer " + token,
     }
-    mutate(params)
+    mutate(options)
   }
 
   const createEstablecimiento = (establecimiento: Establecimiento) => {
     typeActionRef.current = "mutate_establecimiento"
-    const params = {
-      url: apiURL + "establecimientos/create_establecimiento",
+    const options: FnFetchOptions = {
       method: "POST",
-      headers:{ 
-        Authorization,
-      },
+      url: apiURL + "establecimientos/create_establecimiento",
       body: JSON.stringify(establecimiento),
+      authorization: "Bearer " + token,
     }
-    mutate(params)
+    mutate(options)
   }
 
   const updateEstablecimiento = (establecimiento: Establecimiento) => {
     typeActionRef.current = "mutate_establecimiento"
-    const params = {
-      url: apiURL + "establecimientos/update_establecimiento",
+    const options: FnFetchOptions = {
       method: "PUT",
-      headers:{ 
-        Authorization,
-      },
+      url: apiURL + "establecimientos/update_establecimiento",
       body: JSON.stringify(establecimiento),
+      authorization: "Bearer " + token,
     }
-    mutate(params)
+    mutate(options)
   }
 
   const deleteEstablecimiento = (id: number) => {
     typeActionRef.current = "delete_establecimiento"
-    const params = {
-      url: apiURL + "establecimientos/delete_establecimiento",
+    const options: FnFetchOptions = {
       method: "DELETE",
-      headers:{ 
-        Authorization,
-      },
+      url: apiURL + "establecimientos/delete_establecimiento",
       body: JSON.stringify({id}),
+      authorization: "Bearer " + token,
     }
-    mutate(params)
-  }
-
-  const reset = (newValues: any) => {
-    mutate({newValues}) // Solo actualiza los datos, solo local
+    mutate(options)
   }
 
   useEffect(()=>{
@@ -117,6 +103,5 @@ export const useMutationEstablecimientosQuery = () => {
     updateEstablecimiento,
     deleteEstablecimiento,
     typeAction: typeActionRef.current,
-    reset,
   }
 }

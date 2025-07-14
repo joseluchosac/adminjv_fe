@@ -2,11 +2,11 @@ const apiURL = import.meta.env.VITE_API_URL
 import { useMutation, useQuery } from "@tanstack/react-query"
 import useSessionStore from "../store/useSessionStore"
 import { useEffect, useRef } from "react"
-import { getCatalogosFetch } from "../services/catalogosFetch"
 import useCatalogosStore from "../store/useCatalogosStore"
-import { mutationFetch } from "../services/mutationFecth"
 import { useNavigate } from "react-router-dom"
 import { Catalogos, TipoComprobante } from "../types/catalogosTypes"
+import { FnFetchOptions } from "../types"
+import { fnFetch } from "../services/fnFetch"
 
 type GetProvincias = {departamento:string}
 type GetDistritos = {departamento: string, provincia: string}
@@ -25,7 +25,13 @@ export const useGetCatalogosQuery = () => {
   const {data, isLoading, isFetching, isError, refetch } = useQuery<GetCatalogosFetch, Error>({
     queryKey: ["catalogos"],
     queryFn: ({signal}) => {
-      return getCatalogosFetch({token: tknSession, signal})
+      const options: FnFetchOptions = {
+        method: "POST",
+        url: apiURL + "catalogos/get_catalogos",
+        authorization: "Bearer " + tknSession,
+        signal
+      }
+      return fnFetch(options)
     },
     staleTime: 1000 * 60 * 60,
     // refetchOnMount: false,
@@ -59,12 +65,10 @@ export const useMutationCatalogosQuery = () => {
   const setCatalogos = useCatalogosStore(state => state.setCatalogos)
   const catalogos = useCatalogosStore(state => state.catalogos)
   const navigate = useNavigate()
-  const tknSession = useSessionStore(state => state.tknSession)
-  const Authorization = "Bearer " + tknSession
-  // const queryClient = useQueryClient()
+  const token = useSessionStore(state => state.tknSession)
 
   const {data, isPending, isError, mutate, } = useMutation({
-    mutationFn: mutationFetch,
+    mutationFn: fnFetch,
     onSuccess: (resp) => {
       if(resp.msgType !== 'success') return
       // queryClient.invalidateQueries({queryKey:["catalogos"]})
@@ -73,67 +77,57 @@ export const useMutationCatalogosQuery = () => {
 
   const getProvincias = ({departamento}:GetProvincias) => {
     fnName.current = getProvincias.name
-    const params = {
-      url: apiURL + 'catalogos/get_provincias',
+    const options: FnFetchOptions = {
       method: "POST",
-      headers:{ 
-        Authorization,
-      },
+      url: apiURL + "catalogos/get_provincias",
       body: JSON.stringify({departamento}),
+      authorization: "Bearer " + token,
     }
-    mutate(params)
+    mutate(options)
   }
 
   const getDistritos = ({departamento, provincia}: GetDistritos) => {
     fnName.current = getDistritos.name
-    const params = {
-      url: apiURL + 'catalogos/get_distritos',
+    const options: FnFetchOptions = {
       method: "POST",
-      headers:{ 
-        Authorization,
-      },
+      url: apiURL + "catalogos/get_distritos",
       body: JSON.stringify({departamento, provincia}),
+      authorization: "Bearer " + token,
     }
-    mutate(params)
+    mutate(options)
   }
 
   const createTipoComprobante = (param: TipoComprobante) => {
     fnName.current = createTipoComprobante.name
-    const params = {
-      url: apiURL + 'catalogos/create_tipo_comprobante',
+    const options: FnFetchOptions = {
       method: "POST",
-      headers:{ 
-        Authorization,
-      },
+      url: apiURL + "catalogos/create_tipo_comprobante",
       body: JSON.stringify(param),
+      authorization: "Bearer " + token,
     }
-    mutate(params)
+    mutate(options)
   }
   
   const updateTipoComprobante = (param: TipoComprobante) => {
     fnName.current = updateTipoComprobante.name
-    const params = {
-      url: apiURL + 'catalogos/update_tipo_comprobante',
+    const options: FnFetchOptions = {
       method: "PUT",
-      headers:{ 
-        Authorization,
-      },
+      url: apiURL + "catalogos/update_tipo_comprobante",
       body: JSON.stringify(param),
+      authorization: "Bearer " + token,
     }
-    mutate(params)
+    mutate(options)
   }
 
   const deleteTipoComprobante = (id: number) => {
     fnName.current = deleteTipoComprobante.name
-    const params = {
-      url: apiURL + 'catalogos/delete_tipo_comprobante',
+    const options: FnFetchOptions = {
       method: "DELETE",
-      headers:{ 
-        Authorization,
-      },
+      url: apiURL + "catalogos/delete_tipo_comprobante",
       body: JSON.stringify({id}),
+      authorization: "Bearer " + token,
     }
-    mutate(params)
+    mutate(options)
   }
 
   useEffect(()=>{
