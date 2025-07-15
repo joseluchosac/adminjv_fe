@@ -1,151 +1,148 @@
-import { useEffect, useState } from "react"
-import useSessionStore from "../../../core/store/useSessionStore"
-import { useEmpresaQuery, useMutationConfigQuery } from "../../../core/hooks/useConfigQuery"
-import { useForm, useWatch } from "react-hook-form"
-import { type Empresa } from "../../../core/types"
-import { Ubigeo } from "../../../core/types/catalogosTypes"
+const apiURL = import.meta.env.VITE_API_URL;
+import { useEffect, useRef, useState } from "react"
+import SelectAsync from "react-select/async";
 import { toast } from "react-toastify"
 import { Button, Col, Form, InputGroup, Row } from "react-bootstrap"
+import { Controller, useForm, useWatch } from "react-hook-form"
 import { MdHideImage, MdImage } from "react-icons/md"
 import { FaUndo } from "react-icons/fa"
-import { LdsEllipsisCenter } from "../../../core/components/Loaders"
-import UbigeosMdl from "../../../core/components/UbigeosMdl"
-import { ConfirmPass } from "../../../core/components/ConfirmsMdl"
 import { useQueryClient } from "@tanstack/react-query"
+import useSessionStore from "../../../core/store/useSessionStore"
+import { ResponseQuery, UbigeoItem, type Empresa } from "../../../core/types"
+import { LdsEllipsisCenter } from "../../../core/components/Loaders"
+import { ConfirmPass } from "../../../core/components/ConfirmsMdl"
+import { debounce } from "../../../core/utils/funciones"
+import { filterParamsInit, selectDark } from "../../../core/utils/constants"
+import { fnFetch } from "../../../core/services/fnFetch"
+import useLayoutStore from "../../../core/store/useLayoutStore";
+import { useEmpresaQuery, useMutationEmpresaQuery } from "../../../core/hooks/useEmpresaQuery";
 
 export default function Empresa() {
-    const [urlLogoPreview, setUrlLogoPreview] = useState("")
-    const [showUbigeos, setShowUbigeos] = useState(false)
-    const [showConfirmPass, setShowConfirmPass] = useState(false)
-    const setEmpresaSession = useSessionStore(state=>state.setEmpresaSession)
-    const {empresa, isFetching: isFetchingEmpresa} = useEmpresaQuery()
-    const queryClient = useQueryClient()
-    
-    const {
-      data: mutation,
-      isPending: isPendingMutation, 
-      updateEmpresa 
-    } = useMutationConfigQuery()
-    const {
-      register, 
-      formState, 
-      handleSubmit, 
-      reset,
-      getValues,
-      setValue,
-      control
-    } = useForm<Empresa>()
-    const watchLogoFile = useWatch({ control, name:"fileLogo" });
+  const [showConfirmPass, setShowConfirmPass] = useState(false)
+  const [urlLogoPreview, setUrlLogoPreview] = useState("")
+  const token = useSessionStore((state) => state.tknSession);
+  const queryClient = useQueryClient()
+  const {empresa, isFetching: isFetchingEmpresa} = useEmpresaQuery()
+  const darkMode = useLayoutStore((state) => state.layout.darkMode);
+  const abortUbigeos = useRef<AbortController | null>(null);
+
+  const {
+    data: mutation,
+    isPending: isPendingMutation, 
+    updateEmpresa 
+  } = useMutationEmpresaQuery<ResponseQuery>()
+
+  const {
+    register, 
+    formState: {errors, dirtyFields}, 
+    handleSubmit, 
+    reset,
+    getValues,
+    setValue,
+    control,
+    clearErrors
+  } = useForm<Empresa>()
+
+  const loadUbigeosOptions = debounce((search: string, callback: any) => {
+    abortUbigeos.current?.abort(); // ✅ Cancela la petición anterior
+    abortUbigeos.current = new AbortController();
+    const filtered = { ...filterParamsInit, search };
+    fnFetch({
+      method: "POST",
+      url: `${apiURL}ubigeos/filter_ubigeos?page=1`,
+      body: JSON.stringify(filtered),
+      signal: abortUbigeos.current.signal,
+      authorization: "Bearer " + token
+    }).then((data) => {
+      callback(
+        data.filas.map((el: UbigeoItem) => ({
+          value: el.ubigeo_inei,
+          label: el.dis_prov_dep,
+        }))
+      );
+    });
+  }, 500);
   
-    const submit = () => {
-      setShowConfirmPass(true)
-      // onSuccessConfirmPass() // Solo para saltarse la confirmacion
-    }
-  
-    const onSuccessConfirmPass = () => {
-      let formData = new FormData()
-      let data = getValues()
-      Object.keys(data).forEach((el) => {
-        if(!['fileLogo', 'fileCertificado', 'urlLogo', 'urlNoImage'].includes(el)){
-          formData.append(el, data[el as keyof Empresa ])
-        }
-      })
-      if(data.fileLogo?.length){
-        formData.append("fileLogo",data.fileLogo[0])
+  const watchLogoFile = useWatch({ control, name:"fileLogo" });
+
+
+  const submit = () => {
+    setShowConfirmPass(true)
+    // onSuccessConfirmPass() // Solo para saltarse la confirmacion
+  }
+
+  const onSuccessConfirmPass = () => {
+    let formData = new FormData()
+    let data = getValues()
+    Object.keys(data).forEach((el) => {
+      if(!['fileLogo', 'fileCertificado', 'urlLogo', 'urlNoImage'].includes(el)){
+        formData.append(el, data[el as keyof Empresa ])
       }
-      if(data.fileCertificado?.length){
-        formData.append("fileCertificado",data.fileCertificado[0])
-      }
-      updateEmpresa(formData)
+    })
+    if(data.fileLogo?.length){
+      formData.append("fileLogo",data.fileLogo[0])
     }
+    if(data.fileCertificado?.length){
+      formData.append("fileCertificado",data.fileCertificado[0])
+    }
+    updateEmpresa(formData)
+  }
+
+  const handleResetLogoFile = () => {
+    setValue("fileLogo", null)
+    setValue("logo", empresa ? empresa.logo : "")
+    setUrlLogoPreview(empresa ? empresa.urlLogo : "")
+  }
   
-    const handleResetLogoFile = () => {
-      setValue("fileLogo", null)
-      setValue("logo", empresa ? empresa.logo : "")
-      setUrlLogoPreview(empresa ? empresa.urlLogo : "")
-    }
-    
-    const handleQuitarLogo = () => {
-      setUrlLogoPreview(empresa ? empresa.urlNoImage : "")
-      setValue("logo", "",{shouldDirty: true})
-    }
+  const handleQuitarLogo = () => {
+    setUrlLogoPreview(empresa ? empresa.urlNoImage : "")
+    setValue("logo", "",{shouldDirty: true})
+  }
+
+  const handleQuitarCertificado = () => {
+    setValue("certificado_digital", "",{shouldDirty: true})
+  }
   
-    const handleQuitarCertificado = () => {
-      setValue("certificado_digital", "",{shouldDirty: true})
+  const handleReset = () => {
+    reset()
+    setUrlLogoPreview(empresa ? empresa.urlLogo : "")
+  }
+
+  useEffect(()=>{
+    if(empresa){
+      reset(empresa as Empresa)
+      setUrlLogoPreview(empresa.urlLogo)
     }
-    
-    const handleReset = () => {
-      reset()
-      setUrlLogoPreview(empresa ? empresa.urlLogo : "")
-    }
-    
-    const onChooseUbigeo = (ubigeo: Ubigeo) => {
-      setShowUbigeos(false)
-      setValue("departamento", ubigeo.departamento)
-      setValue("provincia", ubigeo.provincia)
-      setValue("distrito", ubigeo.distrito)
-      setValue("ubigeo_inei", ubigeo.ubigeo_inei,{shouldDirty: true})
-    }
-  
-    useEffect(()=>{
-      if(empresa){
-        reset(empresa as Empresa)
+  },[empresa])
+
+  useEffect(() => {
+    if(!empresa) return
+    if(!watchLogoFile || !watchLogoFile.length){
+      setUrlLogoPreview(empresa.urlLogo)
+    }else{
+      if(!watchLogoFile[0].type.includes("image/")){
         setUrlLogoPreview(empresa.urlLogo)
-  
-      }
-    },[empresa])
-  
-    useEffect(() => {
-      if(!empresa) return
-      if(!watchLogoFile || !watchLogoFile.length){
-        setUrlLogoPreview(empresa.urlLogo)
+        setValue("fileLogo", null)
       }else{
-        if(!watchLogoFile[0].type.includes("image/")){
-          setUrlLogoPreview(empresa.urlLogo)
-          setValue("fileLogo", null)
-        }else{
-          const reader = new FileReader()
-          reader.onloadend = () => {
-            setUrlLogoPreview(reader.result as string)
-          }
-          reader.readAsDataURL(watchLogoFile[0])
-          setValue("logo", empresa.logo)
+        const reader = new FileReader()
+        reader.onloadend = () => {
+          setUrlLogoPreview(reader.result as string)
         }
+        reader.readAsDataURL(watchLogoFile[0])
+        setValue("logo", empresa.logo)
       }
-    }, [watchLogoFile])
-  
-    useEffect(()=>{
-      if(!mutation) return
-      if(mutation?.msgType === "success"){
-        queryClient.invalidateQueries({queryKey:['empresa']})
-        const {
-          razon_social,
-          nombre_comercial,
-          ruc,
-          direccion,
-          departamento,
-          provincia,
-          distrito,
-          telefono,
-          email,
-          urlLogo,
-        } = mutation.registro
-        setEmpresaSession({
-          razon_social,
-          nombre_comercial,
-          ruc,
-          direccion,
-          departamento,
-          provincia,
-          distrito,
-          telefono,
-          email,
-          urlLogo,
-        })
-      setValue("fileLogo", null) 
-      }
-      toast(mutation?.msg, {type: mutation?.msgType})
-    },[mutation])
+    }
+  }, [watchLogoFile])
+
+  useEffect(()=>{
+    if(!mutation) return
+    if(mutation?.msgType === "success"){
+      queryClient.invalidateQueries({queryKey:['empresa']})
+      queryClient.invalidateQueries({queryKey:['empresa_session']})
+    setValue("fileLogo", null) 
+    }
+    toast(mutation?.msg, {type: mutation?.msgType})
+  },[mutation])
 
 
   return (
@@ -174,20 +171,40 @@ export default function Empresa() {
             />
           </Form.Group>
           <Form.Group className="mb-3">
-            <Form.Label htmlFor="lugar">Distrito - Provincia - Departamento</Form.Label>
-            <InputGroup>
-              <Form.Control
-                id="lugar"
-                value={getValues().ubigeo_inei
-                  ? `${getValues().distrito} - ${getValues().provincia} - ${getValues().departamento}`
-                  : ""
-                }
-                disabled={true}
-              />
-              <Button variant="outline-secondary" onClick={()=>setShowUbigeos(true)}>
-                Cambiar
-              </Button>
-            </InputGroup>
+            <Form.Label >Ubigeo</Form.Label>
+            <Controller
+              name="ubigeo_inei"
+              control={control}
+              rules={{required: "Ingrese el ubigeo"}}
+              render={() => (
+                <div title={getValues().dis_prov_dep}>
+                  <SelectAsync
+                    loadOptions={loadUbigeosOptions}
+                    // defaultOptions
+                    styles={darkMode ? selectDark : undefined}
+                    isClearable
+                    value={{
+                      value: getValues().ubigeo_inei,
+                      label: getValues().dis_prov_dep,
+                    }}
+                    onChange={(selectedOpt) => {
+                      setValue(
+                        "ubigeo_inei",
+                        selectedOpt?.value ? selectedOpt?.value : "",
+                        { shouldDirty: true }
+                      );
+                      setValue("dis_prov_dep", selectedOpt?.label || "");
+                      if (selectedOpt) clearErrors("ubigeo_inei");
+                    }}
+                  />
+                </div>
+              )}
+            />
+            {errors.ubigeo_inei && (
+              <div className="invalid-feedback d-block">
+                {errors.ubigeo_inei.message}
+              </div>
+            )}
           </Form.Group>
           <Col md={6}>
             <Form.Group as={Col} className="mb-3">
@@ -315,7 +332,7 @@ export default function Empresa() {
           <Button 
             type="button" 
             variant="secundary"
-            disabled={!Boolean(Object.keys(formState.dirtyFields).length)}
+            disabled={!Boolean(Object.keys(dirtyFields).length)}
             onClick={handleReset}
           >
             Resetear
@@ -339,11 +356,6 @@ export default function Empresa() {
         </div>
         {(isFetchingEmpresa || isPendingMutation) && <LdsEllipsisCenter />}
       </Form>
-      <UbigeosMdl
-        show={showUbigeos} 
-        setShow={setShowUbigeos}
-        onChooseUbigeo={onChooseUbigeo}
-      />
       <ConfirmPass
         show = {showConfirmPass}
         setShow = {setShowConfirmPass}

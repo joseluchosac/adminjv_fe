@@ -9,16 +9,16 @@ import useLayoutStore from "../../../core/store/useLayoutStore";
 import DynaIcon from "../../../core/components/DynaComponents";
 import { FaDoorOpen } from "react-icons/fa6";
 import { FaUserEdit } from "react-icons/fa";
+import { useUserSessionQuery } from "../../../core/hooks/useUsersQuery";
 
 
 function MainHeader () {
   const resetSessionStore = useSessionStore(state => state.resetSessionStore)
-  const userSession = useSessionStore(state => state.userSession)
   const layout = useLayoutStore(state => state.layout)
   const setLayout = useLayoutStore(state => state.setLayout)
   const moduloActual = useSessionStore(state => state.moduloActual)
   const navigate = useNavigate()
-
+  const {userSession} = useUserSessionQuery()
 
   const showSidebar = (e:React.MouseEvent) => {
     e.preventDefault();

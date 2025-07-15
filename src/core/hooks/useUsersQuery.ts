@@ -1,11 +1,12 @@
 const apiURL = import.meta.env.VITE_API_URL;
 import { useEffect, useRef, useState } from "react"
 import { useNavigate } from "react-router-dom";
-import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query"
+import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import useSessionStore from "../store/useSessionStore"
-import { FilterUsersResp, FnFetchOptions, LoginForm, RegisterForm, ResponseQuery, User } from "../types"
+import { FilterUsersResp, FnFetchOptions, LoginForm, RegisterForm, ResponseQuery, User, UserSession } from "../types"
 import { filterParamsInit } from "../utils/constants";
 import { fnFetch } from "../services/fnFetch";
+interface DataUserSession extends ResponseQuery {content: UserSession}
 
 type TypeAction = 
 "filter_full" 
@@ -17,6 +18,27 @@ type TypeAction =
 | "check_password"
 | "send_code_restoration"
 | "restore_password"
+
+export const useUserSessionQuery = () => {
+  const tknSession = useSessionStore(state => state.tknSession)
+  const {data, isFetching} = useQuery<DataUserSession>({
+    queryKey: ['user_session'],
+    queryFn: () => {
+      const options: FnFetchOptions = {
+        method:"POST",
+        url: apiURL + "users/get_user_session",
+        authorization: "Bearer " + tknSession
+      }
+      return fnFetch(options)
+    },
+    staleTime: 1000 * 60 * 60 * 24
+  })
+
+  return {
+    userSession: data?.content,
+    isFetching
+  }
+}
 
 // ****** FILTRAR ******
 export const useFilterUsersQuery = () => {
@@ -93,6 +115,7 @@ export const useMutationUsersQuery = <T>() => {
   const typeActionRef = useRef<TypeAction | "">("")
 
   const {data, isPending, isError, mutate, } = useMutation<T, Error, FnFetchOptions, unknown>({
+    mutationKey: ['mutation_users'],
     mutationFn: fnFetch,
     // onMutate: async ({param}) => {
       // 1: Optimista
@@ -152,11 +175,10 @@ export const useMutationUsersQuery = <T>() => {
     mutate(options)
   }
 
-  const getProfile = (id: number) => {
+  const getProfile = () => {
     const options: FnFetchOptions = {
       method: "POST",
       url: apiURL + "users/get_profile",
-      body: JSON.stringify({id}),
       authorization: "Bearer " + token,
     }
     mutate(options)

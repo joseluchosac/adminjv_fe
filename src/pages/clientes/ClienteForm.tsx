@@ -181,11 +181,6 @@ export default function ClienteForm() {
       setValue("telefono", nroDocumento.content.telefono);
       setValue("api", 1, { shouldDirty: true });
     } else {
-      // setValue("nombre_razon_social", "");
-      // setValue("api", 0);
-      // setValue("direccion", "");
-      // setValue("ubigeo_inei", "", { shouldDirty: true });
-      // setValue("dis_prov_dep", "");
       toast(nroDocumento.msg, { type: nroDocumento.msgType });
     }
   }, [nroDocumento]);

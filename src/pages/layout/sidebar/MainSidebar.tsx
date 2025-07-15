@@ -8,6 +8,7 @@ import useLayoutStore from '../../../core/store/useLayoutStore';
 import DynaIcon from '../../../core/components/DynaComponents';
 import useSessionStore from '../../../core/store/useSessionStore';
 import { Modulo } from '../../../core/types';
+import { useEmpresaSessionQuery } from '../../../core/hooks/useEmpresaQuery';
 
 const MainSidebar:React.FC = () => {
   const [modulosSesionTree, setModulosSesionTree] = useState<any>(null)
@@ -18,7 +19,7 @@ const MainSidebar:React.FC = () => {
   const setLayout = useLayoutStore(state => state.setLayout)
   const modulosSesion = useSessionStore(state => state.modulosSesion)
   const setModuloActual = useSessionStore(state => state.setModuloActual)
-  const empresaSession = useSessionStore(state => state.empresaSession)
+  const {empresaSession} = useEmpresaSessionQuery()
 
   const handleSidebarMini = (e:React.MouseEvent) => {
     e.preventDefault();

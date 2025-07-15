@@ -15,6 +15,7 @@ import { useProductos } from "../context/ProductosContext";
 import useCatalogosStore from "../../../core/store/useCatalogosStore";
 import { filterParamsInit } from "../../../core/utils/constants";
 import { LdsBar } from "../../../core/components/Loaders";
+import { useCajasQuery } from "../../../core/hooks/useCatalogosQuery";
 
 
 const dateRangeInit = { field_name: "", field_label: "", date_from: "", date_to: "" };
@@ -37,7 +38,7 @@ const ProductosLstFilterMdl: React.FC<Props> = ({isFetching, camposProducto}) =>
   } = useProductos()
 
   const roles = useCatalogosStore(state => state.catalogos?.roles)
-  const cajas = useCatalogosStore(state => state.catalogos?.cajas)
+  const {cajas} = useCajasQuery()
   
   const handleChangeOrder = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const field_name = e.target.value

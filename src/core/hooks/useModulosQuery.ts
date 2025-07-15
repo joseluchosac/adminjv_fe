@@ -1,12 +1,35 @@
 const apiURL = import.meta.env.VITE_API_URL;
-import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import useSessionStore from "../store/useSessionStore"
-import { FnFetchOptions, Modulo } from "../types"
+import { FnFetchOptions, Modulo, ResponseQuery } from "../types"
 import { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { fnFetch } from "../services/fnFetch";
 
+interface DataModulosSession extends ResponseQuery {content: Modulo[]}
+
 type TypeAction = "mutate_modulo" | "mutate_modulos"
+
+export const useModulosSessionQuery = () => {
+  const tknSession = useSessionStore(state => state.tknSession)
+  const {data, isFetching} = useQuery<DataModulosSession>({
+    queryKey: ['modulos_session'],
+    queryFn: () => {
+      const options: FnFetchOptions = {
+        method:"POST",
+        url: apiURL + "modulos/get_modulos_sesion",
+        authorization: "Bearer " + tknSession
+      }
+      return fnFetch(options)
+    },
+    staleTime: 1000 * 60 * 60 * 24
+  })
+
+  return {
+    modulosSession: data?.content,
+    isFetching
+  }
+}
 
 // ****** MUTATION ******
 export const useMutateModulosQuery = () => {
@@ -17,6 +40,7 @@ export const useMutateModulosQuery = () => {
   const typeActionRef = useRef<TypeAction | "">("")
 
   const {mutate, isPending, data} = useMutation({
+    mutationKey: ['mutation_modulos'],
     mutationFn: fnFetch,
     onSuccess: () => {
       queryClient.fetchQuery({queryKey:["modulos"]});

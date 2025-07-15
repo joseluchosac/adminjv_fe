@@ -77,6 +77,7 @@ export const useMutationClientesQuery = <T>() => {
   const queryClient = useQueryClient()
   const typeActionRef = useRef<TypeAction | "">("")
 
+// ****** MUTATION ******
   const {data, isPending, isError, mutate, reset} = useMutation<T, Error, FnFetchOptions, unknown>({
     mutationKey:["clientes_mut"],
     mutationFn: fnFetch,

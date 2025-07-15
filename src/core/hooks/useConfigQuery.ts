@@ -1,9 +1,9 @@
 const apiURL = import.meta.env.VITE_API_URL;
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 import useSessionStore from "../store/useSessionStore"
 import { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { Empresa, FnFetchOptions } from "../types";
+import { FnFetchOptions } from "../types";
 import { fnFetch } from "../services/fnFetch";
 
 type TypeAction = 
@@ -15,28 +15,6 @@ type TypeAction =
   | "mutate_email_config"
   | "mutate_establecimiento"
   | "check_this_term"
-
-type DataEmpresa = {content: Empresa}
-
-export const useEmpresaQuery = () => {
-  const tknSession = useSessionStore(state => state.tknSession)
-  const {data, isFetching} = useQuery<DataEmpresa>({
-    queryKey: ['empresa'],
-    queryFn: () => {
-      const options: FnFetchOptions = {
-        url: apiURL + "config/get_empresa",
-        authorization: "Bearer " + tknSession
-      }
-      return fnFetch(options)
-    },
-    staleTime: 1000 * 60 * 60 * 24
-  })
-
-  return {
-    empresa: data?.content,
-    isFetching
-  }
-}
 
 // ****** MUTATION ******
 export const useMutationConfigQuery = () => {
@@ -56,15 +34,6 @@ export const useMutationConfigQuery = () => {
 
   const updateEmpresa = (formData: FormData) => {
     typeActionRef.current = "mutate_empresa"
-    // const params = {
-    //   url: apiURL + "config/update_empresa",
-    //   method: "POST",
-    //   headers:{ 
-    //     Authorization,
-    //   },
-    //   body: formData
-    // }
-    // mutate(params)
     const options: FnFetchOptions = {
       method: "POST",
       url: apiURL + "config/update_empresa",

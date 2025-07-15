@@ -21,12 +21,15 @@ import Marcas from './pages/marcas/Marcas';
 import Numeraciones from './pages/numeraciones/Numeraciones';
 import Movimientos from './pages/movimientos/Movimientos';
 import Productos from './pages/productos/Productos';
+import { useEmpresaSessionQuery } from './core/hooks/useEmpresaQuery';
 
 
 const Tareas = lazy(() => import("./pages/tareas/Tareas"));
 const Users = lazy(() => import("./pages/users/Users"));
 
+
 function App() {
+  useEmpresaSessionQuery()
   return (
     <Routes>
       <Route element={<PublicRoutes redirectTo="/" />}>

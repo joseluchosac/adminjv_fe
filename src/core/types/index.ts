@@ -28,7 +28,7 @@ export type RestoreForm = {
   code:string; new_password:string; new_password_repeat:string;
 }
 
-// ✅ TIPOS PARA LA TABLA USUARIOS
+// ✅ TIPOS PARA LA TABLA USUARIOS Y PERFILES
 export type User = {
   id: number;
   nombres: string;
@@ -45,6 +45,16 @@ export type User = {
   password: string;
   password_repeat: string;
 }
+export type UserSession = {
+  id: number;
+  nombres: string;
+  apellidos: string;
+  username: string;
+  email: string;
+  rol_id: number;
+  caja_id: number;
+}
+
 export type UserItem = {
   id: number;
   nombres: string;
@@ -59,6 +69,7 @@ export type UserItem = {
   created_at: string;
   updated_at: string;
 }
+
 export interface FilterUsersResp extends FilterResp {
   filas: UserItem[];
 }
@@ -67,6 +78,21 @@ export interface RegisterForm {
   apellidos: string;
   username: string;
   email: string;
+  password: string;
+  password_repeat: string;
+}
+
+export type Profile = {
+  id: number;
+  nombres: string;
+  apellidos: string;
+  username: string;
+  email: string;
+  rol_id: number;
+  caja_id: number;
+  estado: number;
+}
+export interface ProfileForm extends Profile {
   password: string;
   password_repeat: string;
 }
@@ -102,9 +128,7 @@ export type Empresa = {
   ruc: string;
   direccion: string;
   ubigeo_inei: string;
-  departamento: string;
-  provincia: string;
-  distrito: string;
+  dis_prov_dep: string;
   telefono: string;
   email: string;
   simbolo_moneda: string;
@@ -124,9 +148,7 @@ export type EmpresaSession = { // para la sesion
   nombre_comercial: string;
   ruc: string;
   direccion: string;
-  departamento: string;
-  provincia: string;
-  distrito: string;
+  dis_prov_dep: string;
   telefono: string;
   email: string;
   urlLogo: string;
@@ -167,22 +189,6 @@ export type FnFetchOptions = {
   authorization?: string;
   attachedData?: any;
 }
-// observar de abajo
-// export type FilterFetchParam = {
-//   token: string | null;
-//   filterParams: FilterParams;
-//   signal: AbortSignal;
-//   url: string;
-//   curEstab?: number
-// }
-
-// observar el de abajo para eliminar
-// export type FilterFetch = {
-//   page: number;
-//   token: string | null;
-//   filterParams: FilterParams;
-//   signal: AbortSignal
-// }
 
 // ✅ TIPO PARA RESPUESTA DE UNA PETICION DE FILTRO
 type FilterResp = {
@@ -337,11 +343,11 @@ export interface FilterProveedoresResp extends FilterResp {
 }
 
 // ✅ TIPOS PARA UBIGEO
-export interface Ubigeo {
-  ubigeo_inei: string;
-  ubigeo_reniec: string;
-  dis_prov_dep: string;
-}
+// export interface Ubigeo {
+//   ubigeo_inei: string;
+//   ubigeo_reniec: string;
+//   dis_prov_dep: string;
+// }
 export interface UbigeoItem {
   ubigeo_inei: string;
   ubigeo_reniec: string;
@@ -436,3 +442,4 @@ export type NroDocumento = {
   email: string;
   telefono: string;
 }
+

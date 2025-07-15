@@ -4,12 +4,12 @@ import useSessionStore from "../store/useSessionStore"
 import { useEffect, useRef } from "react"
 import useCatalogosStore from "../store/useCatalogosStore"
 import { useNavigate } from "react-router-dom"
-import { Catalogos, TipoComprobante } from "../types/catalogosTypes"
+import { Caja, Catalogos, TipoComprobante } from "../types/catalogosTypes"
 import { FnFetchOptions } from "../types"
 import { fnFetch } from "../services/fnFetch"
 
-type GetProvincias = {departamento:string}
-type GetDistritos = {departamento: string, provincia: string}
+// type GetProvincias = {departamento:string}
+// type GetDistritos = {departamento: string, provincia: string}
 
 type GetCatalogosFetch = {
   content: Catalogos | null;
@@ -17,6 +17,28 @@ type GetCatalogosFetch = {
   msg?: string;
   msgType?: string;
 }
+
+type DataCajas = {content: Caja[]}
+export const useCajasQuery = () => {
+  const tknSession = useSessionStore(state => state.tknSession)
+  const {data, isFetching} = useQuery<DataCajas>({
+    queryKey: ['cajas'],
+    queryFn: () => {
+      const options: FnFetchOptions = {
+        url: apiURL + "catalogos/get_cajas",
+        authorization: "Bearer " + tknSession
+      }
+      return fnFetch(options)
+    },
+    staleTime: 1000 * 60 * 60 * 24
+  })
+
+  return {
+    cajas: data?.content,
+    isFetching
+  }
+}
+
 // ****** GET CATALOGOS ******
 export const useGetCatalogosQuery = () => {
   const tknSession = useSessionStore(state => state.tknSession)
@@ -34,17 +56,7 @@ export const useGetCatalogosQuery = () => {
       return fnFetch(options)
     },
     staleTime: 1000 * 60 * 60,
-    // refetchOnMount: false,
-    // refetchOnWindowFocus: false,
-    // refetchOnReconnect: false,
   })
-
-  useEffect(() => {
-    return () => {
-      // queryClient.cancelQueries({ queryKey: ['catalogos'] })
-      // queryClient.resetQueries<any>({ queryKey: ['catalogos'], exact: true });
-    }
-  },[])
 
   useEffect(() => {
     if(!data) return
@@ -68,6 +80,7 @@ export const useMutationCatalogosQuery = () => {
   const token = useSessionStore(state => state.tknSession)
 
   const {data, isPending, isError, mutate, } = useMutation({
+    mutationKey: ['mutation_catalogos'],
     mutationFn: fnFetch,
     onSuccess: (resp) => {
       if(resp.msgType !== 'success') return
@@ -75,27 +88,27 @@ export const useMutationCatalogosQuery = () => {
     }
   })
 
-  const getProvincias = ({departamento}:GetProvincias) => {
-    fnName.current = getProvincias.name
-    const options: FnFetchOptions = {
-      method: "POST",
-      url: apiURL + "catalogos/get_provincias",
-      body: JSON.stringify({departamento}),
-      authorization: "Bearer " + token,
-    }
-    mutate(options)
-  }
+  // const getProvincias = ({departamento}:GetProvincias) => {
+  //   fnName.current = getProvincias.name
+  //   const options: FnFetchOptions = {
+  //     method: "POST",
+  //     url: apiURL + "catalogos/get_provincias",
+  //     body: JSON.stringify({departamento}),
+  //     authorization: "Bearer " + token,
+  //   }
+  //   mutate(options)
+  // }
 
-  const getDistritos = ({departamento, provincia}: GetDistritos) => {
-    fnName.current = getDistritos.name
-    const options: FnFetchOptions = {
-      method: "POST",
-      url: apiURL + "catalogos/get_distritos",
-      body: JSON.stringify({departamento, provincia}),
-      authorization: "Bearer " + token,
-    }
-    mutate(options)
-  }
+  // const getDistritos = ({departamento, provincia}: GetDistritos) => {
+  //   fnName.current = getDistritos.name
+  //   const options: FnFetchOptions = {
+  //     method: "POST",
+  //     url: apiURL + "catalogos/get_distritos",
+  //     body: JSON.stringify({departamento, provincia}),
+  //     authorization: "Bearer " + token,
+  //   }
+  //   mutate(options)
+  // }
 
   const createTipoComprobante = (param: TipoComprobante) => {
     fnName.current = createTipoComprobante.name
@@ -165,8 +178,8 @@ export const useMutationCatalogosQuery = () => {
     createTipoComprobante,
     updateTipoComprobante,
     deleteTipoComprobante,
-    getProvincias,
-    getDistritos,
+    // getProvincias,
+    // getDistritos,
   }
 }
 

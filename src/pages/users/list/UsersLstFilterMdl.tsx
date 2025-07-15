@@ -15,6 +15,7 @@ import { filterParamsInit } from "../../../core/utils/constants";
 import { useUsers } from "../context/UsersContext";
 import { CampoTable } from "../../../core/types";
 import { LdsBar } from "../../../core/components/Loaders";
+import { useCajasQuery } from "../../../core/hooks/useCatalogosQuery";
 
 const dateRangeInit = { field_name: "", field_label: "", date_from: "", date_to: "" };
 const equalFormInit = { rol_id: "", caja_id: "", estado: ""}
@@ -29,7 +30,7 @@ const UsersLstFilterMdl: React.FC<Props> = ({isFetching, camposUser}) => {
   const [rangeName, setRangeName] = useState("")
   const [equalForm, setEqualForm] = useState(equalFormInit)
   const roles = useCatalogosStore(state => state.catalogos?.roles)
-  const cajas = useCatalogosStore(state => state.catalogos?.cajas)
+  const {cajas} = useCajasQuery()
   
   const {
     filterParamsUsersForm,

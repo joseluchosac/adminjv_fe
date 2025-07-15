@@ -1,21 +1,17 @@
 import { create } from "zustand";
-import { EmpresaSession, Modulo, User } from "../types";
+import { Modulo } from "../types";
 import { lsCurEst, lsTknSessionKey } from "../utils/constants";
 
 interface UseSessionStore {
   tknSession: string | null;
-  empresaSession: EmpresaSession | null;
-  userSession: User | null;
+  setTknSession: (newTknSession:string) => void;
   modulosSesion: Modulo[] | null;
+  setModulosSesion: (newModulosRolSesion: any) => void;
   moduloActual: Modulo | null;
+  setModuloActual: (modulo: Modulo | null) => void;
   curEstab: number;
   setCurEstab: (establecimiento_id: number) => void;
-  setModuloActual: (modulo: Modulo | null) => void;
-  setTknSession: (newTknSession:string) => void;
-  setEmpresaSession: (newEmpresaSession:EmpresaSession) => void;
-  setUserSession: (newUserSession:User) => void;
   resetSessionStore: () => void;
-  setModulosSesion: (newModulosRolSesion: any) => void;
   reset: () => void;
 }
 
@@ -25,8 +21,6 @@ const curEstab = localStorage.getItem(lsCurEst) // Current establecimiento
 const initialState = {
   curEstab: curEstab ? Number(curEstab) : 0,
   tknSession: tknSession,
-  empresaSession: null,
-  userSession: null,
   modulosSesion: null,
   moduloActual: null,
 }
@@ -44,16 +38,9 @@ const useSessionStore = create<UseSessionStore>((set) => ({
       set({tknSession: newTknSession})
       window.localStorage.setItem(lsTknSessionKey,  newTknSession)
     },
-    setEmpresaSession: (newEmpresaSession) => {
-      set({empresaSession: newEmpresaSession})
-    },
-    setUserSession: (newUserSession) => {
-      set({userSession: newUserSession})
-    },
     resetSessionStore: () => {
       window.localStorage.removeItem(lsTknSessionKey)
       set({tknSession: null})
-      set({userSession: null})
       set({modulosSesion: null})
     },
     setModulosSesion: (newModulosRolSesion) => {

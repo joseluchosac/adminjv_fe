@@ -25,9 +25,7 @@ type LoginProps = {
 const Login: React.FC<LoginProps> = ({isPendingEmail,loginForm,setLoginForm,handleShowForm,formsAuth,}) => {
   const {
     setTknSession,
-    setUserSession,
     setModulosSesion,
-    setEmpresaSession,
     curEstab,
     setCurEstab,
   } = useSessionStore()
@@ -66,9 +64,7 @@ const Login: React.FC<LoginProps> = ({isPendingEmail,loginForm,setLoginForm,hand
   useEffect(() => {
     if(dataSignIn && !dataSignIn?.error){
       setTknSession(dataSignIn.content.token)
-      setUserSession(dataSignIn.content.registro)
       setModulosSesion(dataSignIn.content.modulosSesion)
-      setEmpresaSession(dataSignIn.content.empresaSession)
     }
   }, [dataSignIn])
 

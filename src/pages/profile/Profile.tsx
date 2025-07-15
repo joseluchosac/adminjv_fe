@@ -3,13 +3,16 @@ import { useQueryClient } from "@tanstack/react-query";
 import { Button, Card, Col, Container, Form, Row } from "react-bootstrap";
 import { toast } from "react-toastify";
 import Swal from "sweetalert2";
-import useSessionStore from "../../core/store/useSessionStore";
 import useLayoutStore from "../../core/store/useLayoutStore";
-import { Caja, Rol } from "../../core/types/catalogosTypes";
+import { Rol } from "../../core/types/catalogosTypes";
 import { useMutationUsersQuery } from "../../core/hooks/useUsersQuery";
 import useUserActualFormValidate from "./useUserActualFormValidate";
-
-const profileFormInit = {
+import { useCajasQuery } from "../../core/hooks/useCatalogosQuery";
+import {type Profile, ProfileForm, ResponseQuery } from "../../core/types";
+interface DataRoles extends ResponseQuery {
+  content: Rol[]
+}
+const profileFormInit: ProfileForm = {
   id: 0,
   nombres: '',
   apellidos: '',
@@ -17,8 +20,6 @@ const profileFormInit = {
   email: '',
   rol_id: 0,
   caja_id: 0,
-  created_at: '',
-  updated_at: '',
   estado: 1,
   password: '',
   password_repeat: '',
@@ -27,26 +28,27 @@ const profileFormInit = {
 export default function Profile() {
   const [profileForm, setProfileForm] = useState(profileFormInit)
     const queryClient = useQueryClient()
-    const userSession = useSessionStore(state => state.userSession)
-    const setUserSession = useSessionStore(state => state.setUserSession)
     const darkMode = useLayoutStore(state => state.layout.darkMode)
-    const cajas = queryClient.getQueryData(["cajas"]) as Caja[]
-    const roles = queryClient.getQueryData(["roles"]) as Rol[]
-  
+
+    const roles = queryClient.getQueryData<DataRoles>(["roles"])
+    const {cajas} = useCajasQuery()
+    interface DataProfile extends ResponseQuery {
+      content: Profile
+    }
     const {
       data: profile,
       getProfile
-    } = useMutationUsersQuery()
+    } = useMutationUsersQuery<DataProfile>()
 
     const {
       data: respCheckPassword,
       checkPassword
-    } = useMutationUsersQuery()
+    } = useMutationUsersQuery<ResponseQuery>()
 
     const {
       data: mutation,
       updateProfile
-    } = useMutationUsersQuery()
+    } = useMutationUsersQuery<DataProfile>()
     
   
     const {feedbk, validateErr, validated, setValidated} = useUserActualFormValidate(profileForm)
@@ -85,15 +87,13 @@ export default function Profile() {
     }
   
     useEffect(() => {
-      if(!userSession) return
-      getProfile(userSession.id)
+      getProfile()
     }, [])
   
     useEffect(() => {
       if(!profile) return
       if(profile.error) return
       const newForm = {...profileForm, ...profile.content}
-      setUserSession(profile.content)
       setProfileForm(newForm)
     }, [profile])
   
@@ -109,9 +109,7 @@ export default function Profile() {
     useEffect(() => {
       if(!mutation) return
       toast(mutation.msg, {type: mutation.msgType})
-      if(!mutation.error){
-        setUserSession(mutation.content)
-      }
+      // invalidar query de ["user_session"]
     }, [mutation])
   return (
     <Container>
@@ -173,7 +171,7 @@ export default function Profile() {
               </Form.Group>
               <Form.Group as={Col} md={4} xl={3} className="mb-3">
                 <Form.Label>Rol</Form.Label>
-                <div>{roles?.find(el=>el.id == profileForm.rol_id)?.rol}</div>
+                {roles && <div>{roles.content.find(el=>el.id == profileForm.rol_id)?.rol}</div>}
               </Form.Group>
               <h5 className="mt-3">Cambio de contraseña</h5>
               <hr className="mb-2" />

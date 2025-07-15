@@ -11,7 +11,7 @@ import { registerFormInit } from "../../core/utils/constants";
 const Register: React.FC = () => {
   const [registerForm, setRegisterForm] = useState(registerFormInit);
   const {feedbk, validateErr, validated, setValidated} = useRegisterFormValidate(registerForm)
-  const {setTknSession, setUserSession, setModulosSesion} = useSessionStore()
+  const {setTknSession, setModulosSesion} = useSessionStore()
 
   const {
     data: mutation,
@@ -35,7 +35,6 @@ const Register: React.FC = () => {
   useEffect(() => {
     if(mutation && !mutation?.error){
       setTknSession(mutation.content.token)
-      setUserSession(mutation.content.registro)
       setModulosSesion(mutation.content.modulosSesion)
     }
   }, [mutation])

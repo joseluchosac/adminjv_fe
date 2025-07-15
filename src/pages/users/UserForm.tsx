@@ -10,6 +10,7 @@ import { useMutationUsersQuery } from "../../core/hooks/useUsersQuery";
 import useCatalogosStore from "../../core/store/useCatalogosStore";
 import { useUsers } from "./context/UsersContext";
 import { ResponseQuery, User } from "../../core/types";
+import { useCajasQuery } from "../../core/hooks/useCatalogosQuery";
 
 interface DataUser extends ResponseQuery {
   content: User;
@@ -35,6 +36,7 @@ export default function Userform(){
   const {showUserForm, setShowUserForm, currentUserId} = useUsers()
   const darkMode = useLayoutStore(state => state.layout.darkMode)
   const catalogos = useCatalogosStore(state => state.catalogos)
+  const {cajas} = useCajasQuery()
   const {
     register, 
     formState: {errors, isDirty}, 
@@ -239,7 +241,7 @@ export default function Userform(){
                 id="caja_id"
                 {...register('caja_id',{valueAsNumber:true})}
               >
-                {catalogos?.cajas.map((el) => 
+                {cajas && cajas.map((el) => 
                   <option key={el.id} value={el.id}>{el.descripcion}</option>
                 )}
               </Form.Select>

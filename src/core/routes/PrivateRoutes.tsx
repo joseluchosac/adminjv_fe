@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
 import { useMutationUsersQuery } from "../hooks/useUsersQuery";
 import useSessionStore from "../store/useSessionStore";
-import { useMutateModulosQuery } from "../hooks/useModulosQuery";
+import { useModulosSessionQuery, useMutateModulosQuery } from "../hooks/useModulosQuery";
 import { Modulo, ResponseQuery } from "../types";
 import { LdsDots11 } from "../components/Loaders";
 
@@ -16,11 +16,10 @@ const PrivateRoutes: React.FC<Props> = ({ redirectTo }) => {
   const [accessModulo, setAccessModulo] = useState<boolean>(false)
   const navigate = useNavigate()
   const tknSession = useSessionStore(state => state.tknSession)
-  const setUserSession = useSessionStore(state => state.setUserSession)
-  const setEmpresaSession = useSessionStore(state => state.setEmpresaSession)
   const resetSessionStore = useSessionStore(state => state.resetSessionStore)
   const setModulosSesion = useSessionStore(state => state.setModulosSesion)
   const modulosSesion = useSessionStore(state => state.modulosSesion)
+  // const {modulosSession} = useModulosSessionQuery()
   const {
     data: dataCheckAuth,
     checkAuth
@@ -46,8 +45,6 @@ const PrivateRoutes: React.FC<Props> = ({ redirectTo }) => {
       resetSessionStore()
       navigate(redirectTo)
     }else{
-      setUserSession(dataCheckAuth.content.registro)
-      setEmpresaSession(dataCheckAuth.content.empresaSession)
       getModulosSession()
     }
   }, [dataCheckAuth])

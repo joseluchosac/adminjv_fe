@@ -1,5 +1,5 @@
 export interface Catalogos {
-  cajas: Caja[];
+  // cajas: Caja[];
   formas_pago: FormaPago[];
   impuestos: Impuesto[];
   motivos_nota: MotivoNota[];
@@ -11,13 +11,14 @@ export interface Catalogos {
   tipos_movimiento: TipoMovimiento[];
   tipos_operacion: TipoOperacion[];
   unidades_medida: UnidadMedida[];
-  departamentos: Departamento[];
+  // departamentos: Departamento[];
   establecimientos: Establecimiento[];
   tipos_establecimiento: string[];
   categorias_tree: Categoria[];
 }
 export type Caja = {
   id: number;
+  establecimiento_id: number;
   descripcion: string;
   estado: number;
 }
@@ -99,15 +100,15 @@ export type UnidadMedida = {
   descripcion_abv: string;
   estado: number
 }
-export type Ubigeo = {
-  ubigeo_inei: string;
-  departamento: string;
-  provincia: string;
-  distrito: string;
-}
-export type Departamento = {
-  departamento: string;
-}
+// export type Ubigeo = {
+//   ubigeo_inei: string;
+//   departamento: string;
+//   provincia: string;
+//   distrito: string;
+// }
+// export type Departamento = {
+//   departamento: string;
+// }
 export type Provincia = {
   provincia: string;
 }
