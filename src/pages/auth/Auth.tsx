@@ -4,7 +4,7 @@ import { useMutationUsersQuery } from "../../core/hooks/useUsersQuery";
 import { toast, ToastContainer } from "react-toastify";
 import useLayoutStore from "../../core/store/useLayoutStore";
 import Login from "./Login";
-import { LoginForm } from "../../core/types";
+import { LoginForm, QueryResp } from "../../core/types";
 import RecoveryPassword from "./RecoveryPassword";
 
 const formsAuth = {
@@ -17,6 +17,7 @@ const loginFormInit = {
   establecimiento_id: '',
 }
 
+interface EmailQryRes extends QueryResp {content: string}
 const Auth: React.FC = () => {
   const [loginForm, setLoginForm] = useState<LoginForm>(loginFormInit);
   const [currentForm, setCurrentForm] = useState(formsAuth.formOfLogin)
@@ -26,7 +27,7 @@ const Auth: React.FC = () => {
     data: email,
     isPending: isPendingEmail,
     getEmailByUsername
-  } = useMutationUsersQuery()
+  } = useMutationUsersQuery<EmailQryRes>()
 
   const handleShowForm = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
     e.preventDefault()
@@ -66,7 +67,7 @@ const Auth: React.FC = () => {
         {(currentForm === formsAuth.formOfForgot) &&
           <RecoveryPassword
             loginForm={loginForm}
-            email={email.content}
+            email={email ? email.content : ''}
             handleShowForm={handleShowForm}
             formsAuth={formsAuth}
           />

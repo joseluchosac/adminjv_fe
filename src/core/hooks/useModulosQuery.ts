@@ -1,21 +1,21 @@
 const apiURL = import.meta.env.VITE_API_URL;
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import useSessionStore from "../store/useSessionStore"
-import { FnFetchOptions, Modulo, ResponseQuery } from "../types"
+import { FetchOptions, Modulo, QueryResp } from "../types"
 import { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { fnFetch } from "../services/fnFetch";
 
-interface DataModulosSession extends ResponseQuery {content: Modulo[]}
+interface ModulosSessionQryRes extends QueryResp {content: Modulo[]}
 
 type TypeAction = "mutate_modulo" | "mutate_modulos"
 
 export const useModulosSessionQuery = () => {
   const tknSession = useSessionStore(state => state.tknSession)
-  const {data, isFetching} = useQuery<DataModulosSession>({
+  const {data, isFetching} = useQuery<ModulosSessionQryRes>({
     queryKey: ['modulos_session'],
     queryFn: () => {
-      const options: FnFetchOptions = {
+      const options: FetchOptions = {
         method:"POST",
         url: apiURL + "modulos/get_modulos_sesion",
         authorization: "Bearer " + tknSession
@@ -48,7 +48,7 @@ export const useMutateModulosQuery = () => {
   })
 
   const getModulos = () => {
-    const options: FnFetchOptions = {
+    const options: FetchOptions = {
       method: "POST",
       url: apiURL + "modulos/get_modulos",
       authorization: "Bearer " + token,
@@ -57,7 +57,7 @@ export const useMutateModulosQuery = () => {
   }
 
   const getModulosSession = () => {
-    const options: FnFetchOptions = {
+    const options: FetchOptions = {
       method: "POST",
       url: apiURL + "modulos/get_modulos_sesion",
       authorization: "Bearer " + token,
@@ -66,7 +66,7 @@ export const useMutateModulosQuery = () => {
   }
 
   const getModuloRol = (rol_id: number) => {
-    const options: FnFetchOptions = {
+    const options: FetchOptions = {
       method: "POST",
       url: apiURL + "modulos/get_modulo_rol",
       body: JSON.stringify({rol_id}),
@@ -76,7 +76,7 @@ export const useMutateModulosQuery = () => {
   }
 
   const sortModulos = (orderedItems: Modulo[]) => {
-    const options: FnFetchOptions = {
+    const options: FetchOptions = {
       method: "PUT",
       url: apiURL + "modulos/sort_modulos",
       body: JSON.stringify(orderedItems),
@@ -87,7 +87,7 @@ export const useMutateModulosQuery = () => {
 
   const updateModulo = (modulo: Modulo) => {
     typeActionRef.current = "mutate_modulo"
-    const options: FnFetchOptions = {
+    const options: FetchOptions = {
       method: "PUT",
       url: apiURL + "modulos/update_modulo",
       body: JSON.stringify(modulo),
@@ -98,7 +98,7 @@ export const useMutateModulosQuery = () => {
 
   const createModulo = (modulo:  Modulo) => {
     typeActionRef.current = "mutate_modulo"
-    const options: FnFetchOptions = {
+    const options: FetchOptions = {
       method: "POST",
       url: apiURL + "modulos/create_modulo",
       body: JSON.stringify(modulo),
@@ -109,7 +109,7 @@ export const useMutateModulosQuery = () => {
 
   const deleteModulo = (id: number) => {
     typeActionRef.current = "mutate_modulo"
-    const options: FnFetchOptions = {
+    const options: FetchOptions = {
       method: "DELETE",
       url: apiURL + "modulos/delete_modulo",
       body: JSON.stringify({id}),
@@ -119,7 +119,7 @@ export const useMutateModulosQuery = () => {
   }
 
   const updateModulosRoles = (modulos_roles: any) => {
-    const options: FnFetchOptions = {
+    const options: FetchOptions = {
       method: "POST",
       url: apiURL + "modulos/update_modulos_roles",
       body: JSON.stringify(modulos_roles),

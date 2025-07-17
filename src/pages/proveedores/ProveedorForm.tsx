@@ -23,22 +23,22 @@ import {
 import {
   Proveedor,
   NroDocumento,
-  ResponseQuery,
+  QueryResp,
   UbigeoItem,
 } from "../../core/types";
 import useProveedoresStore from "../../core/store/useProveedoresStore";
 import useLayoutStore from "../../core/store/useLayoutStore";
-import useCatalogosStore from "../../core/store/useCatalogosStore";
 import { useMutationProveedoresQuery } from "../../core/hooks/useProveedoresQuery";
 import { LdsBar, LdsEllipsisCenter } from "../../core/components/Loaders";
 import { cropText, debounce } from "../../core/utils/funciones";
 import useSessionStore from "../../core/store/useSessionStore";
 import { fnFetch } from "../../core/services/fnFetch";
+import { useTiposDocumentoQuery } from "../../core/hooks/useCatalogosQuery";
 
-interface DataNroDocumento extends ResponseQuery {
+interface NroDocumentoQryRes extends QueryResp {
   content: NroDocumento;
 }
-interface DataProveedor extends ResponseQuery {
+interface ProveedorQryRes extends QueryResp {
   content: Proveedor;
 }
 
@@ -50,30 +50,30 @@ export default function ProveedorForm() {
   const setLastSettedProveedor = useProveedoresStore((state) => state.setLastSettedProveedor);
   const currentProveedorId = useProveedoresStore((state) => state.currentProveedorId);
   const darkMode = useLayoutStore((state) => state.layout.darkMode);
-  const catalogos = useCatalogosStore((state) => state.catalogos);
   const abortUbigeos = useRef<AbortController | null>(null);
   const token = useSessionStore((state) => state.tknSession);
+  const {tiposDocumento} = useTiposDocumentoQuery()
 
   const {
     data: proveedor,
     isPending: isPendingProveedor,
     isError: isErrorProveedor,
     getProveedor,
-  } = useMutationProveedoresQuery<DataProveedor>();
+  } = useMutationProveedoresQuery<ProveedorQryRes>();
 
   const {
     data: mutation,
     isPending: isPendingMutation,
     createProveedor,
     updateProveedor,
-  } = useMutationProveedoresQuery<DataProveedor>();
+  } = useMutationProveedoresQuery<ProveedorQryRes>();
 
   const {
     data: nroDocumento,
     isPending: isPendingNroDocumento,
     consultarNroDocumento,
     reset: resetNroDocumento,
-  } = useMutationProveedoresQuery<DataNroDocumento>();
+  } = useMutationProveedoresQuery<NroDocumentoQryRes>();
 
   const {
     register,
@@ -252,7 +252,7 @@ export default function ProveedorForm() {
                       : false
                   }
                 >
-                  {catalogos?.tipos_documento.map((el) => (
+                  {tiposDocumento?.map((el) => (
                     <option key={el.id} value={el.codigo}>
                       {el.descripcion}
                     </option>

@@ -7,14 +7,14 @@ import { useForm } from "react-hook-form";
 import { LdsBar, LdsEllipsisCenter } from "../../core/components/Loaders";
 import useLayoutStore from "../../core/store/useLayoutStore";
 import { useMutationMarcasQuery } from "../../core/hooks/useMarcasQuery";
-import { Marca, ResponseQuery } from "../../core/types";
+import { Marca, QueryResp } from "../../core/types";
 import { useMarcas } from "./context/MarcasContext";
 
-interface DataGetMarca extends ResponseQuery {
+interface MarcaQryRes extends QueryResp {
   content: Marca | null;
 }
 type GetMarcaQuery = {
-  data: DataGetMarca | null ;
+  data: MarcaQryRes | null ;
   isPending: boolean;
   isError: boolean;
   getMarca: (id: number) => void

@@ -3,11 +3,9 @@ import MainSidebar from "./sidebar/MainSidebar";
 import { Outlet } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import useLayoutStore from "../../core/store/useLayoutStore";
-import { useGetCatalogosQuery } from "../../core/hooks/useCatalogosQuery";
 
 const MainContent: React.FC = () => {
   const darkMode = useLayoutStore(state => state.layout.darkMode)
-  useGetCatalogosQuery()
   return (
     <>
       <MainHeader />

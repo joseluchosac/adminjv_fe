@@ -1,8 +1,5 @@
-import { createContext, useContext, useEffect, useState } from "react";
-import { FilterInfo, FilterParams } from "../../../core/types";
-import { CategoriaOpc } from "../../../core/types/catalogosTypes";
-import useCatalogosStore from "../../../core/store/useCatalogosStore";
-import { flattenTree } from "../../../core/utils/funciones";
+import { createContext, useContext, useState } from "react";
+import { CategoriaOpc, FilterInfo, FilterParams } from "../../../core/types";
 import { filterInfoInit, filterParamsInit } from "../../../core/utils/constants";
 
 type Modo = {
@@ -55,24 +52,9 @@ export const ProductosProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 // Hook personalizado para usar el contexto
 export const useProductos = () => {
   const context = useContext(ProductosContext);
-  const categoriasTree = useCatalogosStore(state => state.catalogos?.categorias_tree)
-
-  const resetCategoriasOpc = ()=>{
-    if(!categoriasTree) return
-    const categorias = flattenTree(categoriasTree)
-    const resultado: CategoriaOpc[] = categorias.map(el=>{
-      const {id,descripcion, nivel} = el
-      return {id, descripcion, nivel, checked: false}
-    })
-    context?.setCategoriasOpc(resultado)
-  }
-
-  useEffect(()=>{
-    resetCategoriasOpc()
-  }, [categoriasTree])
 
   if (context === undefined) {
     throw new Error('useProductos must be used within an ProductosProvider');
   }
-  return {...context, resetCategoriasOpc};
+  return context;
 };

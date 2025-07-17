@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react"
 import { useNavigate } from "react-router-dom";
 import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import useSessionStore from "../store/useSessionStore"
-import { FilterLaboratoriosResp, FnFetchOptions, Laboratorio } from "../types";
+import { FetchOptions, FilterQueryResp, Laboratorio, LaboratorioItem } from "../types";
 import { filterParamsInit } from "../utils/constants";
 import { fnFetch } from "../services/fnFetch";
 
@@ -12,6 +12,9 @@ type TypeAction =
   | "mutate_laboratorio"
 
 // ****** FILTRAR  ******
+export interface LaboratoriosFilQryRes extends FilterQueryResp {
+  filas: LaboratorioItem[];
+}
 export const useFilterLaboratoriosQuery = () => {
   const [filterParamsLaboratorios, setFilterParamsLaboratorios] = useState(filterParamsInit)
   const token = useSessionStore(state => state.tknSession)
@@ -24,11 +27,11 @@ export const useFilterLaboratoriosQuery = () => {
     isFetching,
     hasNextPage,
     fetchNextPage,
-  } = useInfiniteQuery<FilterLaboratoriosResp, Error>({
+  } = useInfiniteQuery<LaboratoriosFilQryRes, Error>({
     queryKey: ['laboratorios'],
     queryFn: ({pageParam = 1, signal}) => {
       const page = pageParam as number
-      const options: FnFetchOptions = {
+      const options: FetchOptions = {
         method: "POST",
         url: `${apiURL}laboratorios/filter_laboratorios?page=${page}`,
         body: JSON.stringify(filterParamsLaboratorios),
@@ -88,7 +91,7 @@ export const useMutationLaboratoriosQuery = () => {
   })
 
   const getLaboratorio = (id: number) => {
-    const options: FnFetchOptions = {
+    const options: FetchOptions = {
       method: "POST",
       url: apiURL + "laboratorios/get_laboratorio",
       body: JSON.stringify({id}),
@@ -99,7 +102,7 @@ export const useMutationLaboratoriosQuery = () => {
 
   const createLaboratorio = (laboratorio: Laboratorio) => {
     typeActionRef.current = "mutate_laboratorio"
-    const options: FnFetchOptions = {
+    const options: FetchOptions = {
       method: "POST",
       url: apiURL + "laboratorios/create_laboratorio",
       body: JSON.stringify(laboratorio),
@@ -110,7 +113,7 @@ export const useMutationLaboratoriosQuery = () => {
 
   const updateLaboratorio = (laboratorio: Laboratorio) => {
     typeActionRef.current = "mutate_laboratorio"
-    const options: FnFetchOptions = {
+    const options: FetchOptions = {
       method: "PUT",
       url: apiURL + "laboratorios/update_laboratorio",
       body: JSON.stringify(laboratorio),
@@ -121,7 +124,7 @@ export const useMutationLaboratoriosQuery = () => {
 
   const deleteLaboratorio = (id: number) => {
     typeActionRef.current = "mutate_laboratorio"
-    const options: FnFetchOptions = {
+    const options: FetchOptions = {
       method: "DELETE",
       url: apiURL + "laboratorios/delete_laboratorio",
       body: JSON.stringify({id}),

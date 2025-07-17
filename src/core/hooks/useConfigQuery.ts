@@ -3,7 +3,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query"
 import useSessionStore from "../store/useSessionStore"
 import { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { FnFetchOptions } from "../types";
+import { FetchOptions } from "../types";
 import { fnFetch } from "../services/fnFetch";
 
 type TypeAction = 
@@ -34,7 +34,7 @@ export const useMutationConfigQuery = () => {
 
   const updateEmpresa = (formData: FormData) => {
     typeActionRef.current = "mutate_empresa"
-    const options: FnFetchOptions = {
+    const options: FetchOptions = {
       method: "POST",
       url: apiURL + "config/update_empresa",
       body: formData,
@@ -44,7 +44,7 @@ export const useMutationConfigQuery = () => {
   }
 
   const getApisNroDoc = () => {
-    const options: FnFetchOptions = {
+    const options: FetchOptions = {
       method: "POST",
       url: apiURL + "config/get_apis_nro_doc",
       authorization: "Bearer " + token,
@@ -54,7 +54,7 @@ export const useMutationConfigQuery = () => {
 
   const updateApisNroDoc = (form: any) => {
     typeActionRef.current = "mutate_apis_nro_doc"
-    const options: FnFetchOptions = {
+    const options: FetchOptions = {
       method: "POST",
       url: apiURL + "config/update_apis_nro_doc",
       body: JSON.stringify(form),
@@ -64,7 +64,7 @@ export const useMutationConfigQuery = () => {
   }
 
   const getCpeFact = () => {
-    const options: FnFetchOptions = {
+    const options: FetchOptions = {
       method: "POST",
       url: apiURL + "config/get_cpe_fact",
       authorization: "Bearer " + token,
@@ -74,7 +74,7 @@ export const useMutationConfigQuery = () => {
 
   const updateCpeFact = (form: any) => {
     typeActionRef.current = "mutate_cpe_fact"
-    const options: FnFetchOptions = {
+    const options: FetchOptions = {
       method: "POST",
       url: apiURL + "config/update_cpe_fact",
       body: JSON.stringify(form),
@@ -84,7 +84,7 @@ export const useMutationConfigQuery = () => {
   }
 
   const getCpeGuia = () => {
-    const options: FnFetchOptions = {
+    const options: FetchOptions = {
       method: "POST",
       url: apiURL + "config/get_cpe_guia",
       authorization: "Bearer " + token,
@@ -94,7 +94,7 @@ export const useMutationConfigQuery = () => {
   
   const updateCpeGuia = (form: any) => {
     typeActionRef.current = "mutate_cpe_guia"
-    const options: FnFetchOptions = {
+    const options: FetchOptions = {
       method: "POST",
       url: apiURL + "config/update_cpe_guia",
       body: JSON.stringify(form),
@@ -104,7 +104,7 @@ export const useMutationConfigQuery = () => {
   }
 
   const getUsuarioSolSec = () => {
-    const options: FnFetchOptions = {
+    const options: FetchOptions = {
       method: "POST",
       url: apiURL + "config/get_usuario_sol_sec",
       authorization: "Bearer " + token,
@@ -114,7 +114,7 @@ export const useMutationConfigQuery = () => {
   
   const updateUsuarioSolSec = (form: any) => {
     typeActionRef.current = "mutate_usuario_sol_sec"
-    const options: FnFetchOptions = {
+    const options: FetchOptions = {
       method: "POST",
       url: apiURL + "config/update_usuario_sol_sec",
       body: JSON.stringify(form),
@@ -124,7 +124,7 @@ export const useMutationConfigQuery = () => {
   }
 
   const getEmailConfig = () => {
-    const options: FnFetchOptions = {
+    const options: FetchOptions = {
       method: "POST",
       url: apiURL + "config/get_email_config",
       authorization: "Bearer " + token,
@@ -134,7 +134,7 @@ export const useMutationConfigQuery = () => {
   
   const updateEmailConfig = (form: any) => {
     typeActionRef.current = "mutate_email_config"
-    const options: FnFetchOptions = {
+    const options: FetchOptions = {
       method: "POST",
       url: apiURL + "config/update_email_config",
       body: JSON.stringify(form),

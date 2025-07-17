@@ -1,4 +1,4 @@
-import { CampoTable, Proveedor, ProveedorItem, ResponseQuery} from "../../../core/types";
+import { CampoTable, Proveedor, ProveedorItem, QueryResp} from "../../../core/types";
 import { FaEdit, FaToggleOff, FaToggleOn, FaTrash } from "react-icons/fa";
 import { useMutationProveedoresQuery } from "../../../core/hooks/useProveedoresQuery";
 import Swal from "sweetalert2";
@@ -12,7 +12,7 @@ interface Props {
   camposProveedor: CampoTable[]
 }
 
-interface DataProveedor extends ResponseQuery {
+interface ProveedorQryRes extends QueryResp {
   content: Proveedor;
 }
 
@@ -20,7 +20,7 @@ function ProveedoresTblRow({ proveedor, camposProveedor }: Props) {
   const darkMode = useLayoutStore(state => state.layout.darkMode)
   const setCurrentProveedorId = useProveedoresStore(state=>state.setCurrentProveedorId)
   const setShowProveedorForm = useProveedoresStore(state=>state.setShowProveedorForm)
-  const {data, deleteProveedor, setStateProveedor} = useMutationProveedoresQuery<DataProveedor>()
+  const {data, deleteProveedor, setStateProveedor} = useMutationProveedoresQuery<ProveedorQryRes>()
 
   const handleToEdit = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
     e.preventDefault()

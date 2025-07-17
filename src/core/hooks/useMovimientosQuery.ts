@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import useSessionStore from "../store/useSessionStore"
 import useMovimientosStore from "../store/useMovimientosStore"
-import { FilterMovimientosResp, FnFetchOptions, Movimiento, Movimientoform } from "../types"
+import { FetchOptions, FilterQueryResp, Movimiento, Movimientoform, MovimientoItem } from "../types"
 import { fnFetch } from "../services/fnFetch";
 
 type TypeAction = 
@@ -12,6 +12,9 @@ type TypeAction =
 | "mutate_movimiento" 
 
 // ****** FILTRAR ******
+export interface MovimientosFilQryRes extends FilterQueryResp {
+  filas: MovimientoItem[];
+}
 export const useFilterMovimientosQuery = () => {
   // const setFilterParamsMovimientos = useMovimientosStore(state => state.setFilterParamsMovimientos)
   const token = useSessionStore(state => state.tknSession)
@@ -25,11 +28,11 @@ export const useFilterMovimientosQuery = () => {
     isLoading,
     isFetching,
     hasNextPage
-  } = useInfiniteQuery<FilterMovimientosResp, Error>({
+  } = useInfiniteQuery<MovimientosFilQryRes, Error>({
     queryKey: ['movimientos'],
     queryFn: ({pageParam = 1, signal}) => {
       const page = pageParam as number
-      const options: FnFetchOptions = {
+      const options: FetchOptions = {
         method: "POST",
         url: `${apiURL}movimientos/filter_movimientos?page=${page}`,
         body: JSON.stringify(filterParamsMovimientos),
@@ -89,7 +92,7 @@ export const useMutationMovimientosQuery = () => {
 
   const createMovimiento = (movimiento: Movimientoform) => {
     typeActionRef.current = "mutate_movimiento"
-    const options: FnFetchOptions = {
+    const options: FetchOptions = {
       method: "POST",
       url: apiURL + "movimientos/create_movimiento",
       body: JSON.stringify(movimiento),
@@ -100,7 +103,7 @@ export const useMutationMovimientosQuery = () => {
 
   const updateMovimiento = (movimiento: Movimiento) => {
     typeActionRef.current = "mutate_movimiento"
-    const options: FnFetchOptions = {
+    const options: FetchOptions = {
       method: "PUT",
       url: apiURL + "movimientos/update_movimiento",
       body: JSON.stringify(movimiento),

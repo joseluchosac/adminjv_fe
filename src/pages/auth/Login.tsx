@@ -2,15 +2,14 @@ import { Alert, Button, Card, Form, InputGroup } from "react-bootstrap";
 import DynaIcon from "../../core/components/DynaComponents";
 import { Link } from "react-router-dom";
 import { LdsBar } from "../../core/components/Loaders";
-import { FormControlElement, FormsAuth, LoginForm, ResponseQuery } from "../../core/types";
+import { EstablecimientoOption, FormControlElement, FormsAuth, LoginForm, QueryResp } from "../../core/types";
 import { useMutationUsersQuery } from "../../core/hooks/useUsersQuery";
 import useSessionStore from "../../core/store/useSessionStore";
 import { useEffect } from "react";
 import { useMutationEstablecimientosQuery } from "../../core/hooks/useEstablecimientosQuery";
 import { FaStore } from "react-icons/fa";
-import { EstablecimientoOption } from "../../core/types/catalogosTypes";
 
-interface DataSignIn extends ResponseQuery {
+interface SignInQryRes extends QueryResp {
   content: any;
 }
 
@@ -25,7 +24,6 @@ type LoginProps = {
 const Login: React.FC<LoginProps> = ({isPendingEmail,loginForm,setLoginForm,handleShowForm,formsAuth,}) => {
   const {
     setTknSession,
-    setModulosSesion,
     curEstab,
     setCurEstab,
   } = useSessionStore()
@@ -34,7 +32,7 @@ const Login: React.FC<LoginProps> = ({isPendingEmail,loginForm,setLoginForm,hand
     data: dataSignIn,
     isPending: isPendingSignIn,
     signIn
-  } = useMutationUsersQuery<DataSignIn>()
+  } = useMutationUsersQuery<SignInQryRes>()
 
   const {
     data: establecimientos,
@@ -64,7 +62,6 @@ const Login: React.FC<LoginProps> = ({isPendingEmail,loginForm,setLoginForm,hand
   useEffect(() => {
     if(dataSignIn && !dataSignIn?.error){
       setTknSession(dataSignIn.content.token)
-      setModulosSesion(dataSignIn.content.modulosSesion)
     }
   }, [dataSignIn])
 

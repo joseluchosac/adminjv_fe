@@ -5,7 +5,6 @@ import { toast } from "react-toastify";
 import { LdsBar } from "../../../core/components/Loaders";
 import useLayoutStore from "../../../core/store/useLayoutStore";
 import { useMutationMovimientosQuery } from "../../../core/hooks/useMovimientosQuery";
-import useCatalogosStore from "../../../core/store/useCatalogosStore";
 import { type Movimientoform } from "../../../core/types";
 import { useMovimientos } from "../hooks/useMovimientos";
 import MovimientoFormDetalle from "./MovimientoFormDetalle";
@@ -13,12 +12,14 @@ import BusquedaProducto from "./BusquedaProducto";
 import useSessionStore from "../../../core/store/useSessionStore";
 import { movimientoFormInit } from "../context/MovimientosContext";
 import { cropText } from "../../../core/utils/funciones";
+import { useTiposMovimientoQuery } from "../../../core/hooks/useCatalogosQuery";
+import { useEstablecimientosQuery } from "../../../core/hooks/useEstablecimientosQuery";
 
 export default function Movimientoform(){
   const darkMode = useLayoutStore(state => state.layout.darkMode)
-  const establecimientos = useCatalogosStore(state => state.catalogos?.establecimientos)
-  const tipos_movimiento = useCatalogosStore(state => state.catalogos?.tipos_movimiento)
+  const {establecimientos} = useEstablecimientosQuery()
   const curEstab = useSessionStore(state => state.curEstab)
+  const {tiposMovimiento} = useTiposMovimientoQuery()
   const { 
     modo,
     setModo,
@@ -40,11 +41,11 @@ export default function Movimientoform(){
   } = useMutationMovimientosQuery()
   // devuelve un arreglo de tipos de movimiento
   const tiposOpc = ():string[] => {
-    const tipos = tipos_movimiento?.filter(el => el.origen==="interno").map(el=>el.tipo)
+    const tipos = tiposMovimiento?.filter(el => el.origen==="interno").map(el=>el.tipo)
     return tipos ? [...new Set(tipos)] : []
   }
   const conceptosOpc = ():string[] => {
-    const concep = tipos_movimiento?.filter(el => el.origen==="interno" && el.tipo === getValues().tipo)
+    const concep = tiposMovimiento?.filter(el => el.origen==="interno" && el.tipo === getValues().tipo)
     .map(el=>el.concepto)
     return concep ? concep : []
   }

@@ -1,22 +1,20 @@
 import { createContext, useContext, useState } from "react";
-import { FilterCurrent } from "../../../../core/types";
-import { Establecimiento } from "../../../../core/types/catalogosTypes";
+import { FilterInfo } from "../../../../core/types";
 
-const filterEstablecimientosCurrentInit: FilterCurrent = {
+const filterEstablecimientosCurrentInit: FilterInfo = {
+  search: "",
   equals: [],
   between: {field_name: "", field_label: "", range: ""},
   orders: [], 
 }
 
 export interface EstablecimientosContextType {
-  // establecimientos: Establecimiento[] | null;
-  // setEstablecimientos: React.Dispatch<React.SetStateAction<Establecimiento[] | null>>;
   showEstablecimientoForm: boolean;
   setShowEstablecimientoForm: React.Dispatch<React.SetStateAction<boolean>>;
   currentEstablecimientoId: number;
   setCurrentEstablecimientoId: React.Dispatch<React.SetStateAction<number>>;
-  filterEstablecimientosCurrent: FilterCurrent;
-  setFilterEstablecimientosCurrent: React.Dispatch<React.SetStateAction<FilterCurrent>>;
+  filterEstablecimientosCurrent: FilterInfo;
+  setFilterEstablecimientosCurrent: React.Dispatch<React.SetStateAction<FilterInfo>>;
 }
 
 // Crear el contexto con un valor por defecto
@@ -24,15 +22,12 @@ const EstablecimientosContext = createContext<EstablecimientosContextType | unde
 
 // Proveedor del contexto
 export const EstablecimientosProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  // const [establecimientos, setEstablecimientos] = useState<Establecimiento[] | null>(null);
   const [showEstablecimientoForm, setShowEstablecimientoForm] = useState(false);
   const [currentEstablecimientoId, setCurrentEstablecimientoId] = useState(0);
   const [filterEstablecimientosCurrent, setFilterEstablecimientosCurrent] = useState(filterEstablecimientosCurrentInit);
 
   return (
     <EstablecimientosContext.Provider value={{ 
-      // establecimientos, 
-      // setEstablecimientos, 
       showEstablecimientoForm, 
       setShowEstablecimientoForm,
       currentEstablecimientoId,

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import { Button, Card, Col, Container, Form, Row, Table } from "react-bootstrap"
-import { Modulo } from "../../core/types"
+import { Modulo, Rol } from "../../core/types"
 import ModulosRolTree from "./ModulosRolTree"
 import { getModulosTree } from "../../core/utils/funciones"
 import { useMutateModulosQuery } from "../../core/hooks/useModulosQuery"
@@ -8,22 +8,18 @@ import DynaIcon from "../../core/components/DynaComponents"
 import { LdsBar } from "../../core/components/Loaders"
 import Swal from "sweetalert2"
 import useLayoutStore from "../../core/store/useLayoutStore"
-import useSessionStore from "../../core/store/useSessionStore"
-import useCatalogosStore from "../../core/store/useCatalogosStore"
 import { toast } from "react-toastify"
-import { useMutateRolesQuery } from "../../core/hooks/useRolesQuery"
-import { Rol } from "../../core/types/catalogosTypes"
+import { useMutateRolesQuery, useRolesQuery } from "../../core/hooks/useRolesQuery"
 import { rolFormInit } from "../../core/utils/constants"
+import { useQueryClient } from "@tanstack/react-query"
 
 const Roles: React.FC = () => {
   const [rolForm, setRolForm] = useState<Rol>(rolFormInit)
   const [modulosRol, setModulosRol] = useState<Modulo[] | null>(null)
   const [itemsTree, setItemsTree] = useState<Modulo[] | null>(null)
   const darkMode = useLayoutStore(state => state.layout.darkMode)
-  const setModulosSesion = useSessionStore(state => state.setModulosSesion)
-  const catalogos = useCatalogosStore(state => state.catalogos)
-  const updateRolesStore = useCatalogosStore(state => state.updateRolesStore)
-
+  const {roles} = useRolesQuery()
+  const queryClient = useQueryClient()
   const {
     data: modulosSession,
     getModulosSession
@@ -78,7 +74,7 @@ const Roles: React.FC = () => {
   }
 
   const rolToEdit = (id: number) => {
-    const currentRol = catalogos?.roles?.find((el) => el.id === id) as Rol
+    const currentRol = roles?.find((el) => el.id === id) as Rol
     setRolForm(currentRol)
     getModuloRol(id)
   }
@@ -141,7 +137,7 @@ const Roles: React.FC = () => {
     if(!mutationRol) return
     toast(mutationRol.msg, {type: mutationRol.msgType})
     if(mutationRol.content){
-      updateRolesStore(mutationRol.content)
+      queryClient.invalidateQueries({queryKey: ["roles"]})
       resetForm()
     }
   }, [mutationRol])
@@ -149,7 +145,6 @@ const Roles: React.FC = () => {
   useEffect(() => {
     if(!modulosSession) return
     if(modulosSession.content){
-      setModulosSesion(modulosSession.content)
     }
   }, [modulosSession])
 
@@ -204,7 +199,7 @@ const Roles: React.FC = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {catalogos?.roles && catalogos.roles.map((el) => (
+                  {roles && roles.map((el) => (
                     <tr key={el.id}>
                       <td
                          className={(el.id == rolForm.id) ? "text-info" : ""}

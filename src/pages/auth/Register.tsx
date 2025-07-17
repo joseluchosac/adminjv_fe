@@ -7,17 +7,23 @@ import { Link } from "react-router-dom";
 import useRegisterFormValidate from "./hooks/useRegisterFormValidate";
 import useSessionStore from "../../core/store/useSessionStore";
 import { registerFormInit } from "../../core/utils/constants";
+import { QueryResp } from "../../core/types";
 
+interface SignUpQryRes extends QueryResp {
+  content: any
+}
 const Register: React.FC = () => {
   const [registerForm, setRegisterForm] = useState(registerFormInit);
   const {feedbk, validateErr, validated, setValidated} = useRegisterFormValidate(registerForm)
-  const {setTknSession, setModulosSesion} = useSessionStore()
+  const {
+    setTknSession,
+  } = useSessionStore()
 
   const {
-    data: mutation,
+    data: dataSignUp,
     isPending: isPendingMutation,
     signUp, 
-  } = useMutationUsersQuery()
+  } = useMutationUsersQuery<SignUpQryRes>()
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const {name, value} = e.target
@@ -29,15 +35,13 @@ const Register: React.FC = () => {
     setValidated(true)
     if(validateErr) return
     signUp(registerForm)
-    console.log(registerForm)
   };
 
   useEffect(() => {
-    if(mutation && !mutation?.error){
-      setTknSession(mutation.content.token)
-      setModulosSesion(mutation.content.modulosSesion)
+    if(dataSignUp && !dataSignUp?.error){
+      setTknSession(dataSignUp.content.token)
     }
-  }, [mutation])
+  }, [dataSignUp])
   
   return (
     <Container>
@@ -51,9 +55,9 @@ const Register: React.FC = () => {
                 <h3>REGISTRO</h3>
               </div>
               {
-                mutation?.error && !isPendingMutation && 
+                dataSignUp?.error && !isPendingMutation && 
                 <Alert variant="danger" className="p-2 text-wrap text-center">
-                  {mutation.msg}
+                  {dataSignUp.msg}
                 </Alert>
               }
               <Form className="form-register" onSubmit={handleSubmit}>

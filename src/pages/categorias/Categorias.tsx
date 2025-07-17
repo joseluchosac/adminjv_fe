@@ -7,9 +7,9 @@ import { flattenTree } from "../../core/utils/funciones"
 import CategoriasTree from "./CategoriasTree"
 import { LdsBar } from "../../core/components/Loaders"
 import useLayoutStore from "../../core/store/useLayoutStore"
-import { Categoria } from "../../core/types/catalogosTypes"
-import { Padre } from "../../core/types"
-import useCatalogosStore from "../../core/store/useCatalogosStore"
+import { Categoria, Padre } from "../../core/types"
+import { useCategoriasTreeQuery } from "../../core/hooks/useCatalogosQuery"
+import { useQueryClient } from "@tanstack/react-query"
 
 export const categoriaFormInit = {
   id: 0,
@@ -24,8 +24,8 @@ export default function Categorias() {
   const [categoriaForm, setCategoriaForm] = useState<Categoria>(categoriaFormInit)
   const [padres, setPadres] = useState<Padre[] | null>(null)
   const darkMode = useLayoutStore(state => state.layout.darkMode)
-  const categoriasTree = useCatalogosStore(state => state.catalogos?.categorias_tree)
-  const setCatalogosCategoriasTree = useCatalogosStore(state => state.setCatalogosCategoriasTree)
+  const queryClient = useQueryClient()
+  const {categoriasTree} = useCategoriasTreeQuery()
 
   const {
     data: mutation, 
@@ -130,7 +130,7 @@ export default function Categorias() {
       setCategoriaForm(categoriaFormInit)
     }
     if(mutation.content){
-      setCatalogosCategoriasTree(mutation.content)
+      queryClient.invalidateQueries({queryKey:['categorias_tree']})
     }
   }, [mutation])
     

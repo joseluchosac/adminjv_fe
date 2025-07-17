@@ -6,21 +6,13 @@ import { toast } from "react-toastify";
 import { LdsBar, LdsEllipsisCenter } from "../../../core/components/Loaders";
 import useLayoutStore from "../../../core/store/useLayoutStore";
 import { useMutationProductosQuery } from "../../../core/hooks/useProductosQuery";
-import useCatalogosStore from "../../../core/store/useCatalogosStore";
 import { useProductos } from "../context/ProductosContext";
-import { Producto, DataGetProducto } from "../../../core/types";
+import { Producto, ProductoQryRes } from "../../../core/types";
 import CategoriasOpc from "./CategoriasOpc";
 import { LaboratorioSelect, MarcasSelect } from "./Selects";
 import { useMutationMarcasQuery } from "../../../core/hooks/useMarcasQuery";
 import { useMutationLaboratoriosQuery } from "../../../core/hooks/useLaboratoriosQuery";
-
-type GetProductoQuery = {
-  data: DataGetProducto | null ;
-  isPending: boolean;
-  isError: boolean;
-  getProducto: (id: number) => void
-  reset: (producto: any) => void
-}
+import { useImpuestosQuery, useTiposMonedaQuery, useUnidadesMedidaQuery } from "../../../core/hooks/useCatalogosQuery";
 
 const productoFormInit = {
   id: 0,
@@ -58,9 +50,10 @@ export default function Productoform(){
   const [calc, setCalc] = useState(calcInit)
   const [tab, setTab] = useState<string>("precios")
   const darkMode = useLayoutStore(state => state.layout.darkMode)
-  const catalogos = useCatalogosStore(state => state.catalogos)
+  const {tiposMoneda} = useTiposMonedaQuery()
   const { modo, setModo } = useProductos()
-
+  const {unidadesMedida} = useUnidadesMedidaQuery()
+  const {impuestos} = useImpuestosQuery()
   const {
     register,
     control,
@@ -78,14 +71,14 @@ export default function Productoform(){
     isPending: isPendingProducto,
     isError: isErrorProducto,
     getProducto,
-  }: GetProductoQuery = useMutationProductosQuery()
+  } = useMutationProductosQuery<ProductoQryRes>()
 
   const {
     data: mutation,
     isPending: isPendingMutation,
     createProducto, 
     updateProducto, 
-  } = useMutationProductosQuery()
+  } = useMutationProductosQuery<ProductoQryRes>()
   
   const submit = (data: Producto) => {
     // console.log(data)
@@ -133,7 +126,7 @@ export default function Productoform(){
   }, [producto])
   
   useEffect(()=>{
-    let igv = catalogos?.impuestos.find(el=>el.id === watch('impuesto_id_igv'))?.porcentaje
+    let igv = impuestos?.find(el=>el.id === watch('impuesto_id_igv'))?.porcentaje
     igv = igv ? igv : 0
     const valorVenta = watch('precio_venta')/(1 + igv/100)
     setCalc({...calc, valorVenta: parseFloat(valorVenta.toFixed(2))})
@@ -231,7 +224,7 @@ export default function Productoform(){
                       id="unidad_medida_cod"
                       {...register('unidad_medida_cod')}
                     >
-                      {catalogos?.unidades_medida.map((el) => 
+                      {unidadesMedida?.map((el) => 
                         <option key={el.codigo} value={el.codigo}>{el.descripcion}</option>
                       )}
                     </Form.Select>
@@ -271,7 +264,7 @@ export default function Productoform(){
                               id="tipo_moneda_cod"
                               {...register('tipo_moneda_cod')}
                             >
-                              {catalogos?.tipos_moneda.map((el) => 
+                              {tiposMoneda?.map((el) => 
                                 <option key={el.codigo} value={el.codigo}>{el.descripcion}</option>
                               )}
                             </Form.Select>
@@ -282,7 +275,7 @@ export default function Productoform(){
                               id="impuesto_id_igv"
                               {...register('impuesto_id_igv', {valueAsNumber:true})}
                             >
-                              {catalogos?.impuestos.filter(el=>el.afectacion_igv_desc != "ICBPER").map((el) => 
+                              {impuestos?.filter(el=>el.afectacion_igv_desc != "ICBPER").map((el) => 
                                 <option key={el.id} value={el.id}>{`${el.afectacion_igv_desc} (${el.porcentaje}%)`}</option>
                               )}
                             </Form.Select>
@@ -294,7 +287,7 @@ export default function Productoform(){
                               {...register('impuesto_id_icbper', {valueAsNumber:true})}
                             >
                                 <option value={0}></option>
-                              {catalogos?.impuestos.filter(el=>el.afectacion_igv_desc === "ICBPER").map((el) => 
+                              {impuestos?.filter(el=>el.afectacion_igv_desc === "ICBPER").map((el) => 
                                 <option key={el.id} value={el.id}>
                                   {`${el.afectacion_igv_desc} (${el.importe})`}
                                 </option>

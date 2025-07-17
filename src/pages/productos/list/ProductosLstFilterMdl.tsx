@@ -12,10 +12,10 @@ import {
 } from "date-fns";
 import { CampoTable } from "../../../core/types";
 import { useProductos } from "../context/ProductosContext";
-import useCatalogosStore from "../../../core/store/useCatalogosStore";
 import { filterParamsInit } from "../../../core/utils/constants";
 import { LdsBar } from "../../../core/components/Loaders";
 import { useCajasQuery } from "../../../core/hooks/useCatalogosQuery";
+import { useRolesQuery } from "../../../core/hooks/useRolesQuery";
 
 
 const dateRangeInit = { field_name: "", field_label: "", date_from: "", date_to: "" };
@@ -37,7 +37,7 @@ const ProductosLstFilterMdl: React.FC<Props> = ({isFetching, camposProducto}) =>
     setShowProductosFilterMdl
   } = useProductos()
 
-  const roles = useCatalogosStore(state => state.catalogos?.roles)
+  const {roles} = useRolesQuery()
   const {cajas} = useCajasQuery()
   
   const handleChangeOrder = (e: React.ChangeEvent<HTMLSelectElement>) => {

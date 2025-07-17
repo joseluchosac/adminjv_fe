@@ -7,14 +7,14 @@ import { useForm } from "react-hook-form";
 import { LdsBar, LdsEllipsisCenter } from "../../core/components/Loaders";
 import useLayoutStore from "../../core/store/useLayoutStore";
 import { useMutationLaboratoriosQuery } from "../../core/hooks/useLaboratoriosQuery";
-import { Laboratorio, ResponseQuery } from "../../core/types";
+import { Laboratorio, QueryResp } from "../../core/types";
 import { useLaboratorios } from "./context/LaboratoriosContext";
 
-interface DataGetLaboratorio extends ResponseQuery {
+interface LaboratorioQryRes extends QueryResp {
   content: Laboratorio | null;
 }
 type GetLaboratorioQuery = {
-  data: DataGetLaboratorio | null ;
+  data: LaboratorioQryRes | null ;
   isPending: boolean;
   isError: boolean;
   getLaboratorio: (id: number) => void

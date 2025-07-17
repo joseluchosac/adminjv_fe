@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Alert, Button, Card, Form, InputGroup } from "react-bootstrap"
 import { LdsBar } from "../../core/components/Loaders"
 import DynaIcon from "../../core/components/DynaComponents"
-import { FormsAuth, LoginForm } from "../../core/types";
+import { FormsAuth, LoginForm, QueryResp } from "../../core/types";
 import { useMutationUsersQuery } from "../../core/hooks/useUsersQuery";
 import { toast } from "react-toastify";
 
@@ -25,13 +25,13 @@ const RecoveryPassword: React.FC<RecoveryPasswordProps> = ({
     data: dataRestore,
     isPending: isPendingRestore,
     restorePassword
-  } = useMutationUsersQuery()
+  } = useMutationUsersQuery<QueryResp>()
 
   const {
     data: dataSendCode,
     isPending: isPendingSendCode,
     sendCodeRestoration
-  } = useMutationUsersQuery()
+  } = useMutationUsersQuery<QueryResp>()
 
   const handleChangeRestoreForm = (e: React.ChangeEvent<HTMLInputElement>) => {
     setRestoreForm({ ...restoreForm, [e.target.name]: e.target.value });

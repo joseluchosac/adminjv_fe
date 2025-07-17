@@ -23,22 +23,22 @@ import {
 import {
   Cliente,
   NroDocumento,
-  ResponseQuery,
+  QueryResp,
   UbigeoItem,
 } from "../../core/types";
 import useClientesStore from "../../core/store/useClientesStore";
 import useLayoutStore from "../../core/store/useLayoutStore";
-import useCatalogosStore from "../../core/store/useCatalogosStore";
 import { useMutationClientesQuery } from "../../core/hooks/useClientesQuery";
 import { LdsBar, LdsEllipsisCenter } from "../../core/components/Loaders";
 import { cropText, debounce } from "../../core/utils/funciones";
 import useSessionStore from "../../core/store/useSessionStore";
 import { fnFetch } from "../../core/services/fnFetch";
+import { useTiposDocumentoQuery } from "../../core/hooks/useCatalogosQuery";
 
-interface DataNroDocumento extends ResponseQuery {
+interface NroDocumentoQryRes extends QueryResp {
   content: NroDocumento;
 }
-interface DataCliente extends ResponseQuery {
+interface ClienteQryRes extends QueryResp {
   content: Cliente;
 }
 
@@ -50,7 +50,7 @@ export default function ClienteForm() {
   const setLastSettedCliente = useClientesStore((state) => state.setLastSettedCliente);
   const currentClienteId = useClientesStore((state) => state.currentClienteId);
   const darkMode = useLayoutStore((state) => state.layout.darkMode);
-  const catalogos = useCatalogosStore((state) => state.catalogos);
+  const {tiposDocumento} = useTiposDocumentoQuery()
   const abortUbigeos = useRef<AbortController | null>(null);
   const token = useSessionStore((state) => state.tknSession);
 
@@ -59,21 +59,21 @@ export default function ClienteForm() {
     isPending: isPendingCliente,
     isError: isErrorCliente,
     getCliente,
-  } = useMutationClientesQuery<DataCliente>();
+  } = useMutationClientesQuery<ClienteQryRes>();
 
   const {
     data: mutation,
     isPending: isPendingMutation,
     createCliente,
     updateCliente,
-  } = useMutationClientesQuery<DataCliente>();
+  } = useMutationClientesQuery<ClienteQryRes>();
 
   const {
     data: nroDocumento,
     isPending: isPendingNroDocumento,
     consultarNroDocumento,
     reset: resetNroDocumento,
-  } = useMutationClientesQuery<DataNroDocumento>();
+  } = useMutationClientesQuery<NroDocumentoQryRes>();
 
   const {
     register,
@@ -247,7 +247,7 @@ export default function ClienteForm() {
                       : false
                   }
                 >
-                  {catalogos?.tipos_documento.map((el) => (
+                  {tiposDocumento?.map((el) => (
                     <option key={el.id} value={el.codigo}>
                       {el.descripcion}
                     </option>

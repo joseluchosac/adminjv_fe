@@ -1,4 +1,4 @@
-import { CampoTable, Cliente, ClienteItem, ResponseQuery} from "../../../core/types";
+import { CampoTable, Cliente, ClienteItem, QueryResp} from "../../../core/types";
 import { FaEdit, FaToggleOff, FaToggleOn, FaTrash } from "react-icons/fa";
 import { useMutationClientesQuery } from "../../../core/hooks/useClientesQuery";
 import Swal from "sweetalert2";
@@ -12,7 +12,7 @@ interface Props {
   camposCliente: CampoTable[]
 }
 
-interface DataCliente extends ResponseQuery {
+interface ClienteQryRes extends QueryResp {
   content: Cliente;
 }
 
@@ -20,7 +20,7 @@ function ClientesTblRow({ cliente, camposCliente }: Props) {
   const darkMode = useLayoutStore(state => state.layout.darkMode)
   const setCurrentClienteId = useClientesStore(state=>state.setCurrentClienteId)
   const setShowClienteForm = useClientesStore(state=>state.setShowClienteForm)
-  const {data, deleteCliente, setStateCliente} = useMutationClientesQuery<DataCliente>()
+  const {data, deleteCliente, setStateCliente} = useMutationClientesQuery<ClienteQryRes>()
 
   const handleToEdit = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
     e.preventDefault()

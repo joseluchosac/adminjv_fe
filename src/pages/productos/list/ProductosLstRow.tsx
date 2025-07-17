@@ -1,5 +1,5 @@
 import { format, isValid, parseISO } from "date-fns";
-import { CampoTable, ProductoItem } from "../../../core/types";
+import { CampoTable, Producto, ProductoItem, QueryResp } from "../../../core/types";
 import { useProductos } from "../context/ProductosContext";
 import { FaEdit, FaToggleOff, FaToggleOn, FaTrash } from "react-icons/fa";
 import Swal from "sweetalert2";
@@ -13,6 +13,9 @@ interface ProductosLstRowProps {
   camposProducto: CampoTable[]
 }
 
+interface ProductoMutQryRes extends QueryResp {
+  content: Producto | null
+}
 function ProductosLstRow({ producto, camposProducto }: ProductosLstRowProps) {
   const {setModo} = useProductos()
   const darkMode = useLayoutStore(state => state.layout.darkMode)
@@ -22,7 +25,7 @@ function ProductosLstRow({ producto, camposProducto }: ProductosLstRowProps) {
     isPending: isPendingMutation,
     updateEstado,
     deleteProducto, 
-  } = useMutationProductosQuery()
+  } = useMutationProductosQuery<ProductoMutQryRes>()
 
   const validDate = (date:string | undefined, formato = "dd/MM/yyyy") => {
     if(!date) return ''

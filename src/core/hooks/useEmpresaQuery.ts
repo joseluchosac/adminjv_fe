@@ -3,7 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import useSessionStore from "../store/useSessionStore"
 import { useEffect, useRef } from "react"
 import { useNavigate } from "react-router-dom";
-import { Empresa, EmpresaSession, FnFetchOptions, ResponseQuery } from "../types";
+import { Empresa, EmpresaSession, FetchOptions, QueryResp } from "../types";
 import { fnFetch } from "../services/fnFetch";
 
 type TypeAction = "mutate_empresa"
@@ -16,7 +16,7 @@ export const useEmpresaQuery = () => {
   const {data, isFetching} = useQuery<DataEmpresa>({
     queryKey: ['empresa'],
     queryFn: () => {
-      const options: FnFetchOptions = {
+      const options: FetchOptions = {
         url: apiURL + "config/get_empresa",
         authorization: "Bearer " + tknSession
       }
@@ -41,7 +41,7 @@ export const useEmpresaSessionQuery = () => {
   const {data, isFetching} = useQuery<DataEmpresaSession>({
     queryKey: ['empresa_session'],
     queryFn: () => {
-      const options: FnFetchOptions = {
+      const options: FetchOptions = {
         url: apiURL + "config/get_empresa_session",
       }
       return fnFetch(options)
@@ -63,11 +63,11 @@ export const useMutationEmpresaQuery = <T>() => {
   const queryClient = useQueryClient()
   const typeActionRef = useRef<TypeAction | "">("")
 
-  const {data, isPending, isError, mutate, reset } = useMutation<T, Error, FnFetchOptions, unknown>({
+  const {data, isPending, isError, mutate, reset } = useMutation<T, Error, FetchOptions, unknown>({
     mutationKey: ['mut_empresa'],
     mutationFn: fnFetch,
     onSuccess: (resp) => {
-      const r = resp as ResponseQuery
+      const r = resp as QueryResp
       if(r?.msgType !== 'success') return
       queryClient.invalidateQueries({queryKey:["empresa"]}) // Recarga la tabla proveedores
     }
@@ -75,7 +75,7 @@ export const useMutationEmpresaQuery = <T>() => {
 
   const updateEmpresa = (formData: FormData) => {
     typeActionRef.current = "mutate_empresa"
-    const options: FnFetchOptions = {
+    const options: FetchOptions = {
       method: "POST",
       url: apiURL + "config/update_empresa",
       body: formData,
@@ -85,7 +85,7 @@ export const useMutationEmpresaQuery = <T>() => {
   }
 
   useEffect(()=>{
-    const d = data as ResponseQuery
+    const d = data as QueryResp
     if(d?.errorType === "errorToken"){
       resetSessionStore()
       navigate("/auth")

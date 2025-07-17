@@ -11,10 +11,10 @@ import {
   subMonths,
   subWeeks,
 } from "date-fns";
-import useCatalogosStore from "../../core/store/useCatalogosStore";
 import { filterParamsInit } from "../../core/utils/constants";
 import { useMovimientos } from "./hooks/useMovimientos";
 import { useCajasQuery } from "../../core/hooks/useCatalogosQuery";
+import { useRolesQuery } from "../../core/hooks/useRolesQuery";
 
 const dateRangeInit = { field_name: "", field_label: "", date_from: "", date_to: "" };
 const equalFormInit = { rol_id: "", caja_id: "", estado: ""}
@@ -28,7 +28,7 @@ const MovimientosLstFilterMdl: React.FC = () => {
   const filterParamsMovimientos = useMovimientosStore((state) => state.filterParamsMovimientos);
   const setFilterParamsMovimientos = useMovimientosStore(state => state.setFilterParamsMovimientos)
   const camposMovimiento = useMovimientosStore(state => state.camposMovimiento)
-  const roles = useCatalogosStore(state => state.catalogos?.roles)
+  const {roles} = useRolesQuery()
   const {cajas} = useCajasQuery()
   
   const handleChangeOrder = (e: React.ChangeEvent<HTMLSelectElement>) => {

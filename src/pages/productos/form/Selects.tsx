@@ -72,7 +72,7 @@ export function MarcasSelect({
           <SelectAsync
             id="marca_id"
             loadOptions={loadMarcasOptions}
-            defaultOptions
+            // defaultOptions
             styles={darkMode ? selectDark : undefined}
             isClearable
             value={{value:getValues().marca_id, label:getValues().marca}}
@@ -135,7 +135,7 @@ export function LaboratorioSelect({
         render={() => (
           <SelectAsync
             loadOptions={loadLaboratoriosOptions}
-            defaultOptions
+            // defaultOptions
             styles={darkMode ? selectDark : undefined}
             isClearable
             value={{value:getValues().laboratorio_id, label:getValues().laboratorio}}

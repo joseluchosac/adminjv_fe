@@ -3,13 +3,16 @@ import { useCallback, useEffect, useRef, useState } from "react"
 import { useNavigate } from "react-router-dom";
 import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import useSessionStore from "../store/useSessionStore"
-import { FilterMarcasResp, FnFetchOptions, Marca } from "../types";
+import { FetchOptions, FilterQueryResp, Marca, MarcaItem } from "../types";
 import { filterParamsInit } from "../utils/constants";
 import { fnFetch } from "../services/fnFetch";
 
 type TypeAction = "filter_full" | "mutate_marca"
 
 // ****** FILTRAR ******
+export interface MarcasFilQryRes extends FilterQueryResp {
+  filas: MarcaItem[];
+}
 export const useFilterMarcasQuery = () => {
   const [filterParamsMarcas, setFilterParamsMarcas] = useState(filterParamsInit)
   const token = useSessionStore(state => state.tknSession)
@@ -22,11 +25,11 @@ export const useFilterMarcasQuery = () => {
     isFetching,
     hasNextPage,
     fetchNextPage,
-  } = useInfiniteQuery<FilterMarcasResp, Error>({
+  } = useInfiniteQuery<MarcasFilQryRes, Error>({
     queryKey: ['marcas'],
     queryFn: ({pageParam = 1, signal}) => {
       const page = pageParam as number
-      const options: FnFetchOptions = {
+      const options: FetchOptions = {
         method: "POST",
         url: `${apiURL}marcas/filter_marcas?page=${page}`,
         body: JSON.stringify(filterParamsMarcas),
@@ -87,7 +90,7 @@ export const useMutationMarcasQuery = () => {
   })
 
   const getMarca = (id: number) => {
-    const options: FnFetchOptions = {
+    const options: FetchOptions = {
       method: "POST",
       url: apiURL + "marcas/get_marca",
       body: JSON.stringify({id}),
@@ -98,7 +101,7 @@ export const useMutationMarcasQuery = () => {
 
   const createMarca = (marca: Marca) => {
     typeActionRef.current = "mutate_marca"
-    const options: FnFetchOptions = {
+    const options: FetchOptions = {
       method: "POST",
       url: apiURL + "marcas/create_marca",
       body: JSON.stringify(marca),
@@ -109,7 +112,7 @@ export const useMutationMarcasQuery = () => {
 
   const updateMarca = (marca: Marca) => {
     typeActionRef.current = "mutate_marca"
-    const options: FnFetchOptions = {
+    const options: FetchOptions = {
       method: "PUT",
       url: apiURL + "marcas/update_marca",
       body: JSON.stringify(marca),
@@ -120,7 +123,7 @@ export const useMutationMarcasQuery = () => {
 
   const deleteMarca = (id: number) => {
     typeActionRef.current = "mutate_marca"
-    const options: FnFetchOptions = {
+    const options: FetchOptions = {
       method: "DELETE",
       url: apiURL + "marcas/delete_marca",
       body: JSON.stringify({id}),

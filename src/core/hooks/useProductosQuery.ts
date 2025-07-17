@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react"
 import { useNavigate } from "react-router-dom";
 import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import useSessionStore from "../store/useSessionStore"
-import { FilterProductosResp, FnFetchOptions, Producto } from "../types"
+import { FetchOptions, Producto, QueryResp, FilterQueryResp, ProductoItem } from "../types"
 import { filterParamsInit } from "../utils/constants";
 import { fnFetch } from "../services/fnFetch";
 
@@ -11,6 +11,9 @@ type TypeAction =
 "filter_full" 
 | "mutate_producto" 
 
+interface ProductosFilQryRes extends FilterQueryResp {
+  filas: ProductoItem[];
+}
 // ****** FILTRAR ******
 export const useFilterProductosQuery = () => {
   const [filterParamsProductos, setFilterParamsProductos] = useState(filterParamsInit)
@@ -25,11 +28,11 @@ export const useFilterProductosQuery = () => {
     isFetching,
     hasNextPage,
     fetchNextPage,
-  } = useInfiniteQuery<FilterProductosResp, Error>({
+  } = useInfiniteQuery<ProductosFilQryRes, Error>({
     queryKey: ['productos'],
     queryFn: ({pageParam = 1, signal}) => {
       const page = pageParam as number
-      const options: FnFetchOptions = {
+      const options: FetchOptions = {
         method: "POST",
         url: `${apiURL}productos/filter_productos?page=${page}`,
         body: JSON.stringify(filterParamsProductos),
@@ -74,7 +77,7 @@ export const useFilterProductosQuery = () => {
 }
 
 // ****** MUTATION ******
-export const useMutationProductosQuery = () => {
+export const useMutationProductosQuery = <T>() => {
   const resetSessionStore = useSessionStore(state => state.resetSessionStore)
   const navigate = useNavigate()
   const token = useSessionStore(state => state.tknSession)
@@ -83,16 +86,17 @@ export const useMutationProductosQuery = () => {
   const queryClient = useQueryClient()
   const typeActionRef = useRef<TypeAction | "">("")
 
-  const {data, isPending, isError, mutate, } = useMutation({
+  const {data, isPending, isError, mutate, } = useMutation<T, Error, FetchOptions, unknown>({
     mutationFn: fnFetch,
     onSuccess: (resp) => {
-      if(resp.msgType !== 'success') return
+      const r = resp as QueryResp
+      if(r.msgType !== 'success') return
       queryClient.invalidateQueries({queryKey:["productos"]})
     }
   })
 
   const getProducto = (id: number) => {
-    const options: FnFetchOptions = {
+    const options: FetchOptions = {
       method: "POST",
       url: apiURL + "productos/get_producto",
       body: JSON.stringify({id}),
@@ -103,7 +107,7 @@ export const useMutationProductosQuery = () => {
   }
 
   const getProductoByCode = (codigo: string, establecimiento_id: number) => {
-    const options: FnFetchOptions = {
+    const options: FetchOptions = {
       method: "POST",
       url: apiURL + "productos/get_producto_by_code",
       body: JSON.stringify({codigo, establecimiento_id}),
@@ -114,7 +118,7 @@ export const useMutationProductosQuery = () => {
 
   const createProducto = (producto: Producto) => {
     typeActionRef.current = "mutate_producto"
-    const options: FnFetchOptions = {
+    const options: FetchOptions = {
       method: "POST",
       url: apiURL + "productos/create_producto",
       body: JSON.stringify(producto),
@@ -125,7 +129,7 @@ export const useMutationProductosQuery = () => {
 
   const updateProducto = (producto: Producto) => {
     typeActionRef.current = "mutate_producto"
-    const options: FnFetchOptions = {
+    const options: FetchOptions = {
       method: "PUT",
       url: apiURL + "productos/update_producto",
       body: JSON.stringify(producto),
@@ -136,7 +140,7 @@ export const useMutationProductosQuery = () => {
 
   const updateEstado = (estado: {id:number; estado:number}) => {
     typeActionRef.current = "mutate_producto"
-    const options: FnFetchOptions = {
+    const options: FetchOptions = {
       method: "PUT",
       url: apiURL + "productos/update_estado",
       body: JSON.stringify(estado),
@@ -148,7 +152,7 @@ export const useMutationProductosQuery = () => {
 
   const deleteProducto = (id: number) => {
     typeActionRef.current = "mutate_producto"
-    const options: FnFetchOptions = {
+    const options: FetchOptions = {
       method: "DELETE",
       url: apiURL + "productos/delete_producto",
       body: JSON.stringify({id}),
@@ -158,7 +162,8 @@ export const useMutationProductosQuery = () => {
   }
 
   useEffect(()=>{
-    if(data?.errorType === "errorToken"){
+    const r = data as QueryResp
+    if(r?.errorType === "errorToken"){
       resetSessionStore()
       navigate("/auth")
     }

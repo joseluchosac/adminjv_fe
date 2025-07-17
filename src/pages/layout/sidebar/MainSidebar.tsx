@@ -9,6 +9,7 @@ import DynaIcon from '../../../core/components/DynaComponents';
 import useSessionStore from '../../../core/store/useSessionStore';
 import { Modulo } from '../../../core/types';
 import { useEmpresaSessionQuery } from '../../../core/hooks/useEmpresaQuery';
+import { useModulosSessionQuery } from '../../../core/hooks/useModulosQuery';
 
 const MainSidebar:React.FC = () => {
   const [modulosSesionTree, setModulosSesionTree] = useState<any>(null)
@@ -17,9 +18,10 @@ const MainSidebar:React.FC = () => {
   const navSidebarRef = useRef<HTMLElement>(null)
   const layout = useLayoutStore(state => state.layout)
   const setLayout = useLayoutStore(state => state.setLayout)
-  const modulosSesion = useSessionStore(state => state.modulosSesion)
   const setModuloActual = useSessionStore(state => state.setModuloActual)
   const {empresaSession} = useEmpresaSessionQuery()
+
+  const {modulosSession} = useModulosSessionQuery()
 
   const handleSidebarMini = (e:React.MouseEvent) => {
     e.preventDefault();
@@ -43,7 +45,7 @@ const MainSidebar:React.FC = () => {
 
   const activarItem = () => {
     const nombreModulo = location.pathname.split("/").filter(Boolean).pop();
-    const moduloActual = modulosSesion?.find((el: Modulo) => el.nombre === nombreModulo)
+    const moduloActual = modulosSession?.find((el: Modulo) => el.nombre === nombreModulo)
 
     const navLinks = navSidebarRef.current?.querySelectorAll('.nav-link')
     navLinks?.forEach(el=>{
@@ -63,9 +65,9 @@ const MainSidebar:React.FC = () => {
   }
 
   useEffect(() => {
-    if(!modulosSesion) return
-    setModulosSesionTree(getModulosTree(modulosSesion))
-  }, [modulosSesion])
+    if(!modulosSession) return
+    setModulosSesionTree(getModulosTree(modulosSession))
+  }, [modulosSession])
 
   useEffect(() => {
     activarItem()
@@ -89,6 +91,16 @@ const MainSidebar:React.FC = () => {
       document.body.classList.remove("main-sidebar-mini");
     }
   },[layout])
+
+  useEffect(() => {
+    const nombreModulo = location.pathname.split("/").filter(Boolean).pop();
+    if(!nombreModulo) navigate("/home")
+    if(!modulosSession) return
+    const idx = modulosSession.findIndex((el: Modulo) => el.nombre === nombreModulo)
+    if(idx === -1){
+      navigate("/home")
+    }
+  }, [navigate, modulosSession])
 
   return (
     <>

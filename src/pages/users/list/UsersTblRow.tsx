@@ -3,7 +3,7 @@ import { FaEdit, FaToggleOff, FaToggleOn, FaTrash } from "react-icons/fa";
 import Swal from "sweetalert2";
 import { useEffect } from "react";
 import { toast } from "react-toastify";
-import { CampoTable, ResponseQuery, User, UserItem } from "../../../core/types";
+import { CampoTable, QueryResp, User, UserItem } from "../../../core/types";
 import { useUsers } from "../context/UsersContext";
 import useLayoutStore from "../../../core/store/useLayoutStore";
 import { useMutationUsersQuery } from "../../../core/hooks/useUsersQuery";
@@ -12,7 +12,7 @@ interface UsersTblRowProps {
   user: UserItem ;
   camposUser: CampoTable[]
 }
-interface DataMutation extends ResponseQuery {content: User}
+interface UserMutQryRes extends QueryResp {content: User}
 
 function UsersTblRow({ user, camposUser }: UsersTblRowProps) {
   const {setCurrentUserId, setShowUserForm} = useUsers()
@@ -23,7 +23,7 @@ function UsersTblRow({ user, camposUser }: UsersTblRowProps) {
     isPending: isPendingMutation,
     setStateUser,
     deleteUser, 
-  } = useMutationUsersQuery<DataMutation>()
+  } = useMutationUsersQuery<UserMutQryRes>()
 
   const validDate = (date:string | undefined, formato = "dd/MM/yyyy") => {
     if(!date) return ''

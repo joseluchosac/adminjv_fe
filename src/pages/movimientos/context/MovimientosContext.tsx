@@ -1,12 +1,13 @@
 import { createContext, useState } from "react";
-import { FilterCurrent, Movimiento, Movimientoform } from "../../../core/types";
+import { FilterInfo, Movimiento, Movimientoform } from "../../../core/types";
 import { useForm, UseFormReturn } from "react-hook-form";
 
 type Modo = {
   vista: "list" | "edit";
 }
 
-const filterMovimientosCurrentInit: FilterCurrent = {
+const filterMovimientosCurrentInit: FilterInfo = {
+  search: "",
   equals: [],
   between: {field_name: "", field_label: "", range: ""},
   orders: [], 
@@ -16,8 +17,8 @@ export interface MovimientosContextType {
   movimientos: Movimiento[] | null;
   setMovimientos: React.Dispatch<React.SetStateAction<Movimiento[] | null>>;
   userMovimientoForm: UseFormReturn<Movimientoform, any, undefined>
-  filterMovimientosCurrent: FilterCurrent;
-  setFilterMovimientosCurrent: React.Dispatch<React.SetStateAction<FilterCurrent>>;
+  filterMovimientosCurrent: FilterInfo;
+  setFilterMovimientosCurrent: React.Dispatch<React.SetStateAction<FilterInfo>>;
   modo: Modo;
   setModo: React.Dispatch<React.SetStateAction<Modo>>;
   showMovimientosFilterMdl: boolean;

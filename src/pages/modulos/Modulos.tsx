@@ -9,7 +9,6 @@ import Swal from "sweetalert2"
 import useModulos from "./hooks/useModulos"
 import DynaIcon from "../../core/components/DynaComponents"
 import IconsModal from "../../core/components/IconsModal"
-import useSessionStore from "../../core/store/useSessionStore"
 import { LdsBar } from "../../core/components/Loaders"
 import { moduloFormInit } from "../../core/utils/constants"
 
@@ -37,7 +36,6 @@ const Modulos:React.FC = () => {
     getModulos
   } = useModulos()
 
-  const setModulosSesion = useSessionStore(state => state.setModulosSesion)
 
   const {
     data: modulosSession,
@@ -132,7 +130,6 @@ const Modulos:React.FC = () => {
   useEffect(() => {
     if(!modulosSession) return
     if(modulosSession.content){
-      setModulosSesion(modulosSession.content)
     }
   }, [modulosSession])
 

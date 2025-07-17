@@ -1,38 +1,28 @@
 import { useEffect, useRef } from "react";
 import { Button, Card, Table } from "react-bootstrap";
 import { useEstablecimientos } from "./context/EstablecimientosContext";
-import { useMutationEstablecimientosQuery } from "../../../core/hooks/useEstablecimientosQuery";
-import useCatalogosStore from "../../../core/store/useCatalogosStore";
+import { useEstablecimientosQuery, useMutationEstablecimientosQuery } from "../../../core/hooks/useEstablecimientosQuery";
 import { FaEdit, FaToggleOff, FaToggleOn, FaTrash } from "react-icons/fa";
-import { Establecimiento } from "../../../core/types/catalogosTypes";
 import { LdsBar } from "../../../core/components/Loaders";
 import { toast } from "react-toastify";
 import Swal from "sweetalert2";
 import useLayoutStore from "../../../core/store/useLayoutStore";
+import { useQueryClient } from "@tanstack/react-query";
+import { Establecimiento } from "../../../core/types";
 
 const EstablecimientosTbl: React.FC = () => {
-  const establecimientos = useCatalogosStore(state => state.catalogos?.establecimientos)
-  const setEstablecimientos = useCatalogosStore(state => state.setEstablecimientos)
-  const setEstablecimiento = useCatalogosStore(state => state.setEstablecimiento)
-  const delEstablecimiento = useCatalogosStore(state => state.delEstablecimiento)
+  const {establecimientos} = useEstablecimientosQuery()
+  const queryClient = useQueryClient()
   const { setShowEstablecimientoForm, setCurrentEstablecimientoId} = useEstablecimientos()
   const darkMode = useLayoutStore(state => state.layout.darkMode)
   
   const tableRef = useRef<HTMLDivElement | null>(null)
-
-
-  const {
-    data,
-    isPending,
-    getEstablecimientos
-  } = useMutationEstablecimientosQuery()
 
   const {
     data: mutation,
     isPending: isPendingMutation,
     updateEstablecimiento,
     deleteEstablecimiento,
-    typeAction
   } = useMutationEstablecimientosQuery()
 
   const toEdit = (id: number) => {
@@ -66,27 +56,21 @@ const EstablecimientosTbl: React.FC = () => {
     });
   }
 
-  useEffect(() => {
-    getEstablecimientos()
-  }, [])
+  // useEffect(() => {
+  //   getEstablecimientos()
+  // }, [])
 
-  useEffect(() => {
-    if(!data) return
-    if(data.content){
-      setEstablecimientos([...data.content as Establecimiento[]])
-    }
-  }, [data])
+  // useEffect(() => {
+  //   if(!data) return
+  //   if(data.content){
+  //     queryClient.invalidateQueries({queryKey:['establecimientos']})
+  //   }
+  // }, [data])
 
   useEffect(() => {
     if(!mutation) return
     toast(mutation.msg, {type: mutation.msgType})
-    if(mutation.content){
-      if(typeAction === "mutate_establecimiento"){
-        setEstablecimiento(mutation.content as Establecimiento)
-      }else if(typeAction === "delete_establecimiento"){
-        delEstablecimiento(mutation.content)
-      }
-    }
+    queryClient.invalidateQueries({queryKey:['establecimientos']})
   }, [mutation])
 
   return (
@@ -96,7 +80,7 @@ const EstablecimientosTbl: React.FC = () => {
         <Button onClick={handleNuevo}>Nuevo</Button>
       </Card.Header>
       <Card.Body className="p-0">
-        {(isPending || isPendingMutation) && <LdsBar />}
+        {(isPendingMutation) && <LdsBar />}
       <div className="position-relative">
         <div className="table-responsive" style={{ height: "73vh" }} ref={tableRef}>
           {establecimientos && 
@@ -111,7 +95,7 @@ const EstablecimientosTbl: React.FC = () => {
                 </tr>
               </thead>
               <tbody>
-                {establecimientos.map((el) => (
+                {establecimientos?.map((el) => (
                   <tr key={el.id}>
                     <td>
                       <div className="d-flex gap-2 justify-content-start align-items-center">

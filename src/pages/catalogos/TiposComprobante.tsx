@@ -1,25 +1,28 @@
 import { useEffect, useState } from "react"
-import useCatalogosStore from "../../core/store/useCatalogosStore"
 import { Button, Card, Col, Form, Row, Table } from "react-bootstrap"
 import { FaEdit, FaRegTrashAlt, FaToggleOff, FaToggleOn } from "react-icons/fa"
 import { toast } from "react-toastify"
 import Swal from "sweetalert2"
 import useLayoutStore from "../../core/store/useLayoutStore"
-import { useMutationCatalogosQuery } from "../../core/hooks/useCatalogosQuery"
-import { TipoComprobante } from "../../core/types/catalogosTypes"
+import { useMutationCatalogosQuery, useTiposComprobanteQuery } from "../../core/hooks/useCatalogosQuery"
+import { useQueryClient } from "@tanstack/react-query"
+import { TipoComprobante } from "../../core/types"
 
-const formInit = {
+const formInit: TipoComprobante = {
   id: 0,
   codigo: "",
   descripcion: "",
+  serie_pre: "",
+  descripcion_doc:"",
   estado: 1
 }
 export default function TiposComprobante() {
   const [form, setForm] = useState(formInit)
-  const tipos_comprobante = useCatalogosStore(state => state.catalogos?.tipos_comprobante)
+  const {tiposComprobante} = useTiposComprobanteQuery()
   const darkMode = useLayoutStore(state => state.layout.darkMode)
+  const queryClient = useQueryClient()
   const {
-    data, 
+    data: mutation, 
     createTipoComprobante,
     updateTipoComprobante,
     deleteTipoComprobante,
@@ -33,14 +36,14 @@ export default function TiposComprobante() {
   const handleToEdit = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
     e.preventDefault()
     const {id} = e.currentTarget.dataset
-    const toEdit = tipos_comprobante?.find(el=>el.id === Number(id))
+    const toEdit = tiposComprobante?.find(el=>el.id === Number(id))
     if(toEdit) setForm(toEdit)
   }
 
   const handleToggleEstado = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
     e.preventDefault()
     const id = e.currentTarget.dataset.id
-    const new_tipo_comprobante = tipos_comprobante?.find(el => el.id === Number(id)) as TipoComprobante
+    const new_tipo_comprobante = tiposComprobante?.find(el => el.id === Number(id)) as TipoComprobante
     new_tipo_comprobante.estado = (new_tipo_comprobante?.estado === 1) ? 0 : 1
     updateTipoComprobante(new_tipo_comprobante)
   }
@@ -48,7 +51,7 @@ export default function TiposComprobante() {
   const handleDelete = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
     e.preventDefault()
     const id = e.currentTarget.dataset.id
-    const tipo_comprobante = tipos_comprobante?.find(el => el.id === Number(id))
+    const tipo_comprobante = tiposComprobante?.find(el => el.id === Number(id))
     Swal.fire({
       icon: 'question',
       text: `¿Desea eliminar permanentemente a ${tipo_comprobante?.descripcion}?`,
@@ -98,15 +101,11 @@ export default function TiposComprobante() {
   }
 
   useEffect(() => {
-    if(!tipos_comprobante) return
-    // console.log(tipos_comprobante)
-  }, [tipos_comprobante])
-
-  useEffect(() => {
-    if(!data) return
-    toast(data.msg, { type: data.msgType})
+    if(!mutation) return
+    toast(mutation.msg, { type: mutation.msgType})
+    queryClient.invalidateQueries({queryKey: ['tipos_comprobante']})
     handleReset()
-  }, [data])
+  }, [mutation])
 
 
   return (
@@ -172,7 +171,7 @@ export default function TiposComprobante() {
                 </thead>
                 <tbody>
                   {
-                    tipos_comprobante?.map(el => {
+                    tiposComprobante?.map(el => {
                       return (
                         <tr key={el.id}>
                           <td>{el.codigo}</td>

@@ -1,13 +1,33 @@
 const apiURL = import.meta.env.VITE_API_URL;
 import { useEffect, useRef } from "react"
 import { useNavigate } from "react-router-dom";
-import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import useSessionStore from "../store/useSessionStore"
-import { Establecimiento } from "../types/catalogosTypes";
 import { fnFetch } from "../services/fnFetch";
-import { FnFetchOptions } from "../types";
+import { Establecimiento, FetchOptions } from "../types";
 
 type TypeAction = "filter_full" | "mutate_establecimiento" | "delete_establecimiento"
+// ****** ESTABLECIMIENTOS ******
+type DataEstablecimientos = {content: Establecimiento[]}
+export const useEstablecimientosQuery = () => {
+  const tknSession = useSessionStore(state => state.tknSession)
+  const {data, isFetching} = useQuery<DataEstablecimientos>({
+    queryKey: ['establecimientos'],
+    queryFn: () => {
+      const options: FetchOptions = {
+        url: apiURL + "establecimientos/get_establecimientos",
+        authorization: "Bearer " + tknSession
+      }
+      return fnFetch(options)
+    },
+    staleTime: 1000 * 60 * 60 * 24
+  })
+
+  return {
+    establecimientos: data?.content,
+    isFetching
+  }
+}
 
 // ****** MUTATION ******
 export const useMutationEstablecimientosQuery = () => {
@@ -25,17 +45,8 @@ export const useMutationEstablecimientosQuery = () => {
     }
   })
 
-  const getEstablecimientos = () => {
-    const options: FnFetchOptions = {
-      method: "POST",
-      url: apiURL + "establecimientos/get_establecimientos",
-      authorization: "Bearer " + token,
-    }
-    mutate(options)
-  }
-
   const getEstablecimientosOptions = () => {
-    const options: FnFetchOptions = {
+    const options: FetchOptions = {
       method: "POST",
       url: apiURL + "establecimientos/get_establecimientos_options",
     }
@@ -43,7 +54,7 @@ export const useMutationEstablecimientosQuery = () => {
   }
 
   const getEstablecimiento = (id: number) => {
-    const options: FnFetchOptions = {
+    const options: FetchOptions = {
       method: "POST",
       url: apiURL + "establecimientos/get_establecimiento",
       body: JSON.stringify({id}),
@@ -54,7 +65,7 @@ export const useMutationEstablecimientosQuery = () => {
 
   const createEstablecimiento = (establecimiento: Establecimiento) => {
     typeActionRef.current = "mutate_establecimiento"
-    const options: FnFetchOptions = {
+    const options: FetchOptions = {
       method: "POST",
       url: apiURL + "establecimientos/create_establecimiento",
       body: JSON.stringify(establecimiento),
@@ -65,7 +76,7 @@ export const useMutationEstablecimientosQuery = () => {
 
   const updateEstablecimiento = (establecimiento: Establecimiento) => {
     typeActionRef.current = "mutate_establecimiento"
-    const options: FnFetchOptions = {
+    const options: FetchOptions = {
       method: "PUT",
       url: apiURL + "establecimientos/update_establecimiento",
       body: JSON.stringify(establecimiento),
@@ -76,7 +87,7 @@ export const useMutationEstablecimientosQuery = () => {
 
   const deleteEstablecimiento = (id: number) => {
     typeActionRef.current = "delete_establecimiento"
-    const options: FnFetchOptions = {
+    const options: FetchOptions = {
       method: "DELETE",
       url: apiURL + "establecimientos/delete_establecimiento",
       body: JSON.stringify({id}),
@@ -96,7 +107,6 @@ export const useMutationEstablecimientosQuery = () => {
     data, 
     isPending, 
     isError,
-    getEstablecimientos,
     getEstablecimientosOptions,
     getEstablecimiento,
     createEstablecimiento,

@@ -5,6 +5,7 @@ import Modal from 'react-bootstrap/Modal';
 import { useMutationUsersQuery } from '../hooks/useUsersQuery';
 import { LdsBar } from './Loaders';
 import { toast } from 'react-toastify';
+import { QueryResp } from '../types';
 
 type ConfirmPassProps = {
   show: boolean;
@@ -14,7 +15,12 @@ type ConfirmPassProps = {
 
 function ConfirmPass({show, setShow, onSuccess}: ConfirmPassProps) {
   const [password, setPassword] = useState("")
-  const {data, isPending, isError, checkPassword} = useMutationUsersQuery()
+  const {
+    data,
+    isPending,
+    isError,
+    checkPassword
+  } = useMutationUsersQuery<QueryResp>()
 
 
 

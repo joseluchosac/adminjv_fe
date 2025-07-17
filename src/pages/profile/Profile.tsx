@@ -4,14 +4,19 @@ import { Button, Card, Col, Container, Form, Row } from "react-bootstrap";
 import { toast } from "react-toastify";
 import Swal from "sweetalert2";
 import useLayoutStore from "../../core/store/useLayoutStore";
-import { Rol } from "../../core/types/catalogosTypes";
 import { useMutationUsersQuery } from "../../core/hooks/useUsersQuery";
 import useUserActualFormValidate from "./useUserActualFormValidate";
 import { useCajasQuery } from "../../core/hooks/useCatalogosQuery";
-import {type Profile, ProfileForm, ResponseQuery } from "../../core/types";
-interface DataRoles extends ResponseQuery {
+import {type Profile, QueryResp, Rol } from "../../core/types";
+interface RolesQryRes extends QueryResp {
   content: Rol[]
 }
+
+interface ProfileForm extends Profile {
+  password: string;
+  password_repeat: string;
+}
+
 const profileFormInit: ProfileForm = {
   id: 0,
   nombres: '',
@@ -30,25 +35,25 @@ export default function Profile() {
     const queryClient = useQueryClient()
     const darkMode = useLayoutStore(state => state.layout.darkMode)
 
-    const roles = queryClient.getQueryData<DataRoles>(["roles"])
+    const roles = queryClient.getQueryData<RolesQryRes>(["roles"])
     const {cajas} = useCajasQuery()
-    interface DataProfile extends ResponseQuery {
+    interface ProfileQryRes extends QueryResp {
       content: Profile
     }
     const {
       data: profile,
       getProfile
-    } = useMutationUsersQuery<DataProfile>()
+    } = useMutationUsersQuery<ProfileQryRes>()
 
     const {
       data: respCheckPassword,
       checkPassword
-    } = useMutationUsersQuery<ResponseQuery>()
+    } = useMutationUsersQuery<QueryResp>()
 
     const {
       data: mutation,
       updateProfile
-    } = useMutationUsersQuery<DataProfile>()
+    } = useMutationUsersQuery<ProfileQryRes>()
     
   
     const {feedbk, validateErr, validated, setValidated} = useUserActualFormValidate(profileForm)

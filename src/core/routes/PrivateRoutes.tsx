@@ -1,35 +1,24 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
 import { useMutationUsersQuery } from "../hooks/useUsersQuery";
 import useSessionStore from "../store/useSessionStore";
-import { useModulosSessionQuery, useMutateModulosQuery } from "../hooks/useModulosQuery";
-import { Modulo, ResponseQuery } from "../types";
+import { QueryResp } from "../types";
 import { LdsDots11 } from "../components/Loaders";
 
 interface Props { redirectTo: string; }
 
-interface DataCheckAuth extends ResponseQuery {
+interface CheckAuthQryRes extends QueryResp {
   content: any;
 }
 
 const PrivateRoutes: React.FC<Props> = ({ redirectTo }) => {
-  const [accessModulo, setAccessModulo] = useState<boolean>(false)
   const navigate = useNavigate()
   const tknSession = useSessionStore(state => state.tknSession)
   const resetSessionStore = useSessionStore(state => state.resetSessionStore)
-  const setModulosSesion = useSessionStore(state => state.setModulosSesion)
-  const modulosSesion = useSessionStore(state => state.modulosSesion)
-  // const {modulosSession} = useModulosSessionQuery()
   const {
     data: dataCheckAuth,
     checkAuth
-  } = useMutationUsersQuery<DataCheckAuth>()
-
-  const {
-    data: modulosSession,
-    getModulosSession
-  } = useMutateModulosQuery()
-
+  } = useMutationUsersQuery<CheckAuthQryRes>()
 
   useEffect(()=>{
     if(!tknSession){
@@ -44,33 +33,12 @@ const PrivateRoutes: React.FC<Props> = ({ redirectTo }) => {
     if(dataCheckAuth.error){
       resetSessionStore()
       navigate(redirectTo)
-    }else{
-      getModulosSession()
     }
   }, [dataCheckAuth])
 
-  useEffect(() => {
-    if(!modulosSession) return
-    if(modulosSession.content){
-      setModulosSesion(modulosSession.content)
-    }
-  }, [modulosSession])
 
-  useEffect(() => {
-    const nombreModulo = location.pathname.split("/").filter(Boolean).pop();
-    if(!nombreModulo) navigate("/home")
-    if(!modulosSesion) return
-    const idx = modulosSesion.findIndex((el: Modulo) => el.nombre === nombreModulo)
-    if(idx === -1){
-      setAccessModulo(false)
-      navigate("/home")
-    }else{
-      setAccessModulo(true)
-    }
-  }, [navigate, modulosSesion])
-
-  
-  if (!modulosSesion || !accessModulo) {
+  if (!dataCheckAuth?.content)
+     {
     return (
       <div className="position-absolute h-100 w-100 d-flex align-items-center justify-content-center">
         <div> <LdsDots11 /> </div>

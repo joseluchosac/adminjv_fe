@@ -5,8 +5,6 @@ import { lsCurEst, lsTknSessionKey } from "../utils/constants";
 interface UseSessionStore {
   tknSession: string | null;
   setTknSession: (newTknSession:string) => void;
-  modulosSesion: Modulo[] | null;
-  setModulosSesion: (newModulosRolSesion: any) => void;
   moduloActual: Modulo | null;
   setModuloActual: (modulo: Modulo | null) => void;
   curEstab: number;
@@ -21,7 +19,6 @@ const curEstab = localStorage.getItem(lsCurEst) // Current establecimiento
 const initialState = {
   curEstab: curEstab ? Number(curEstab) : 0,
   tknSession: tknSession,
-  modulosSesion: null,
   moduloActual: null,
 }
 
@@ -41,11 +38,8 @@ const useSessionStore = create<UseSessionStore>((set) => ({
     resetSessionStore: () => {
       window.localStorage.removeItem(lsTknSessionKey)
       set({tknSession: null})
-      set({modulosSesion: null})
     },
-    setModulosSesion: (newModulosRolSesion) => {
-      set({modulosSesion: newModulosRolSesion})
-    },
+
     reset: () => set(initialState),
 }))
 

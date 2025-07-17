@@ -6,8 +6,7 @@ import Swal from "sweetalert2";
 import { toast } from "react-toastify";
 import { Controller, useForm } from "react-hook-form";
 import { useEstablecimientos } from "./context/EstablecimientosContext";
-import { ResponseQuery, UbigeoItem } from "../../../core/types";
-import { Establecimiento } from "../../../core/types/catalogosTypes";
+import { Establecimiento, QueryResp, UbigeoItem } from "../../../core/types";
 import useLayoutStore from "../../../core/store/useLayoutStore";
 import { useMutationEstablecimientosQuery } from "../../../core/hooks/useEstablecimientosQuery";
 import { LdsBar, LdsEllipsisCenter } from "../../../core/components/Loaders";
@@ -15,14 +14,15 @@ import SelectAsync from "react-select/async"
 import { debounce } from "../../../core/utils/funciones";
 import { filterParamsInit, selectDark } from "../../../core/utils/constants";
 import useSessionStore from "../../../core/store/useSessionStore";
-import useCatalogosStore from "../../../core/store/useCatalogosStore";
 import { fnFetch } from "../../../core/services/fnFetch";
+import { useQueryClient } from "@tanstack/react-query";
+import { useTiposEstablecimientoQuery } from "../../../core/hooks/useCatalogosQuery";
 
-interface DataGetEstablecimiento extends ResponseQuery {
+interface EstablecimientoQryRes extends QueryResp {
   content: Establecimiento | null;
 }
 type GetEstablecimientoQuery = {
-  data: DataGetEstablecimiento | null ;
+  data: EstablecimientoQryRes | null ;
   isPending: boolean;
   isError: boolean;
   getEstablecimiento: (id: number) => void
@@ -45,8 +45,8 @@ export default function EstablecimientoForm() {
   const {showEstablecimientoForm, setShowEstablecimientoForm, currentEstablecimientoId} = useEstablecimientos()
   const darkMode = useLayoutStore(state => state.layout.darkMode)
   const tknSession = useSessionStore(state => state.tknSession)
-  const tipos_establecimiento = useCatalogosStore(state=>state.catalogos?.tipos_establecimiento)
-  const setEstablecimiento = useCatalogosStore(state=>state.setEstablecimiento)
+  const {tiposEstablecimiento} = useTiposEstablecimientoQuery()
+  const queryClient = useQueryClient()
   const abortUbigeos = useRef<AbortController | null>(null);
 
   const {
@@ -136,7 +136,7 @@ export default function EstablecimientoForm() {
     if(!mutation) return
     toast(mutation.msg, {type: mutation.msgType})
     if(mutation.content){
-      setEstablecimiento(mutation.content)
+      queryClient.invalidateQueries({queryKey:['establecimientos']})
     }
     if(!mutation.error) setShowEstablecimientoForm(false);
   }, [mutation])
@@ -183,7 +183,7 @@ export default function EstablecimientoForm() {
                     required:"Ingrese el código",
                   })}
                 >
-                  {tipos_establecimiento?.map(el=><option key={el}>{el}</option>)}
+                  {tiposEstablecimiento?.map(el=><option key={el}>{el}</option>)}
                 </Form.Select>
                 {errors.tipo && 
                   <div className="invalid-feedback d-block">{errors.tipo.message}</div>

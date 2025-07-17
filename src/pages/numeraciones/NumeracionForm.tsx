@@ -7,8 +7,8 @@ import { LdsBar, LdsEllipsisCenter } from "../../core/components/Loaders";
 import { useEffect } from "react";
 import { useMutationNumeracionesQuery } from "../../core/hooks/useNumeracionesQuery";
 import { toast } from "react-toastify";
-import useCatalogosStore from "../../core/store/useCatalogosStore";
 import { Numeracion } from "../../core/types";
+import { useTiposComprobanteQuery } from "../../core/hooks/useCatalogosQuery";
 
 const formInit: Numeracion = {
   id: 0,
@@ -22,7 +22,7 @@ const formInit: Numeracion = {
 }
 
 export default function NumeracionForm() {
-  const tipos_comprobante = useCatalogosStore(state => state.catalogos?.tipos_comprobante)
+  const {tiposComprobante} = useTiposComprobanteQuery()
   const darkMode = useLayoutStore(state => state.layout.darkMode)
   const {
     setNumeracion,
@@ -116,8 +116,8 @@ export default function NumeracionForm() {
 
   useEffect(() => {
     setValue('serie', `${getValues().serie_pre}${getValues().serie_suf}`)
-    if(!tipos_comprobante) return
-    const tipo_comprobante = tipos_comprobante?.find(el => el.serie_pre === getValues().serie_pre)
+    if(!tiposComprobante) return
+    const tipo_comprobante = tiposComprobante?.find(el => el.serie_pre === getValues().serie_pre)
     setValue('descripcion_doc', tipo_comprobante ? tipo_comprobante.descripcion_doc : "")
   }, [watch("serie_pre"), watch("serie_suf")])
 
@@ -136,7 +136,7 @@ export default function NumeracionForm() {
                 id="serie_pre"
                 {...register('serie_pre',{required: "Ingrese el tipo de comprobante"})}
               >
-                {tipos_comprobante && tipos_comprobante.map((el) => 
+                {tiposComprobante && tiposComprobante.map((el) => 
                   <option key={el.id} value={el.serie_pre}>{el.descripcion_doc}</option>
                 )}
               </Form.Select>

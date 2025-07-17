@@ -1,11 +1,10 @@
+import { useEstablecimientosQuery } from "../../core/hooks/useEstablecimientosQuery"
 import { useNumeraciones } from "./context/NumeracionesContext"
 import { ListGroup } from "react-bootstrap"
-import useCatalogosStore from "../../core/store/useCatalogosStore"
 
 export default function EstablecimientosLst() {
   const {currentEstablecimientoId, setCurrentEstablecimientoId} = useNumeraciones()
-  const establecimientos = useCatalogosStore(state=>state.catalogos?.establecimientos)
-
+  const {establecimientos} = useEstablecimientosQuery()
   const elegirEstablecimiento = (id: number)=>{
     if(id === currentEstablecimientoId) return
     setCurrentEstablecimientoId(id)

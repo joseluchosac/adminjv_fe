@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import DynaIcon from "../../core/components/DynaComponents";
 import Sortable from "sortablejs";
-import { Categoria } from "../../core/types/catalogosTypes";
+import { Categoria } from "../../core/types";
 
 type Props = {
   categoriasTree: Categoria[];

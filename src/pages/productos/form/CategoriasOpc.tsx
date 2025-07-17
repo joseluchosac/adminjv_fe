@@ -1,17 +1,18 @@
 import { useEffect, useState } from "react"
 import { useProductos } from "../context/ProductosContext"
 import { FaCheckSquare, FaRegSquare } from "react-icons/fa"
-import { type CategoriaOpc } from "../../../core/types/catalogosTypes"
 import { UseFormGetValues, UseFormSetValue } from "react-hook-form"
-import { DataGetProducto, Producto } from "../../../core/types"
+import { type CategoriaOpc, ProductoQryRes, Producto } from "../../../core/types"
 import { Button, Card, Col, Collapse, Form, Row } from "react-bootstrap"
 import { useMutateCategoriasQuery } from "../../../core/hooks/useCategoriasQuery"
-import useCatalogosStore from "../../../core/store/useCatalogosStore"
+import { useQueryClient } from "@tanstack/react-query"
+import { flattenTree } from "../../../core/utils/funciones"
+import { useCategoriasTreeQuery } from "../../../core/hooks/useCatalogosQuery"
 
 type Props = {
   setValue: UseFormSetValue<Producto>;
   getValues: UseFormGetValues<Producto>;
-  producto: DataGetProducto | null
+  producto: ProductoQryRes | undefined
 }
 
 const nCategoriaInit = {
@@ -24,8 +25,13 @@ const nCategoriaInit = {
 export default function CategoriaOpc({setValue, getValues, producto}:Props) {
   const [showNewCategoria, setShowNewCategoria] = useState(false);
   const [nCategoria, setNCategoria] = useState(nCategoriaInit)
-  const {categoriasOpc, setCategoriasOpc, modo, resetCategoriasOpc,} = useProductos()
-  const setCatalogosCategoriasTree = useCatalogosStore(state => state.setCatalogosCategoriasTree)
+  const {
+    categoriasOpc,
+    setCategoriasOpc,
+    modo,
+  } = useProductos()
+  const queryClient = useQueryClient()
+  const {categoriasTree} = useCategoriasTreeQuery()
 
   const seleccionarOpcion = (id: number) => {
     const nuevasCategoriasOpc = categoriasOpc?.map(el=>{
@@ -44,15 +50,27 @@ export default function CategoriaOpc({setValue, getValues, producto}:Props) {
     createCategoria(nCategoria)
   }
 
+  const resetCategoriasOpc = ()=>{
+    if(!categoriasTree) return
+    const categorias = flattenTree(categoriasTree)
+    const resultado: CategoriaOpc[] = categorias.map(el=>{
+      const {id,descripcion, nivel} = el
+      return {id, descripcion, nivel, checked: false}
+    })
+    setCategoriasOpc(resultado)
+  }
+
   useEffect(()=>{
     if(modo.vista === "list"){
       if(categoriasOpc?.findIndex(el=>el.checked) != -1){
         resetCategoriasOpc()
       }
-
     }
   },[modo.vista])
 
+  useEffect(()=>{
+    resetCategoriasOpc()
+  }, [categoriasTree])
 
   useEffect(()=>{
     if(!producto) return
@@ -73,7 +91,7 @@ export default function CategoriaOpc({setValue, getValues, producto}:Props) {
 
   useEffect(()=>{
     if(!mutation) return
-    setCatalogosCategoriasTree(mutation.content)
+    queryClient.invalidateQueries({queryKey:['categorias_tree']})
     setNCategoria(nCategoriaInit)
   }, [mutation])
 

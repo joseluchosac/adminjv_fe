@@ -3,7 +3,7 @@ import { useEffect, useRef } from "react"
 import { useNavigate } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query"
 import useSessionStore from "../store/useSessionStore"
-import { FnFetchOptions, Numeracion } from "../types";
+import { FetchOptions, Numeracion } from "../types";
 import { fnFetch } from "../services/fnFetch";
 
 type TypeAction = "filter_full" | "mutate_numeracion" | "delete_numeracion"
@@ -19,12 +19,11 @@ export const useMutationNumeracionesQuery = () => {
     mutationFn: fnFetch,
     onSuccess: (resp) => {
       if(resp.msgType !== 'success') return
-      // queryClient.invalidateQueries({queryKey:["establecimientos"]}) // Recarga la tabla establecimientos
     }
   })
 
   const getNumeraciones = () => {
-    const options: FnFetchOptions = {
+    const options: FetchOptions = {
       method: "POST",
       url: apiURL + "numeraciones/get_numeraciones",
       authorization: "Bearer " + token,
@@ -33,7 +32,7 @@ export const useMutationNumeracionesQuery = () => {
   }
 
   const getNumeracion = (id: number) => {
-    const options: FnFetchOptions = {
+    const options: FetchOptions = {
       method: "POST",
       url: apiURL + "numeraciones/get_numeracion",
       body: JSON.stringify({id}),
@@ -44,7 +43,7 @@ export const useMutationNumeracionesQuery = () => {
 
   const createNumeracion = (numeracion: Numeracion) => {
     typeActionRef.current = "mutate_numeracion"
-    const options: FnFetchOptions = {
+    const options: FetchOptions = {
       method: "POST",
       url: apiURL + "numeraciones/create_numeracion",
       body: JSON.stringify(numeracion),
@@ -55,7 +54,7 @@ export const useMutationNumeracionesQuery = () => {
 
   const updateNumeracion = (numeracion: Numeracion) => {
     typeActionRef.current = "mutate_numeracion"
-    const options: FnFetchOptions = {
+    const options: FetchOptions = {
       method: "PUT",
       url: apiURL + "numeraciones/update_numeracion",
       body: JSON.stringify(numeracion),
@@ -65,7 +64,7 @@ export const useMutationNumeracionesQuery = () => {
   }
   const deleteNumeracion = (id: number) => {
     typeActionRef.current = "delete_numeracion"
-    const options: FnFetchOptions = {
+    const options: FetchOptions = {
       method: "DELETE",
       url: apiURL + "numeraciones/delete_numeracion",
       body: JSON.stringify({id}),

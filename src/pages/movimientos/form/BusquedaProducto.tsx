@@ -3,8 +3,11 @@ import { useMutationProductosQuery } from "../../../core/hooks/useProductosQuery
 import { useEffect, useRef } from "react"
 import { toast } from "react-toastify"
 import { useMovimientos } from "../hooks/useMovimientos"
-import { type MovimientoFormDetalle } from "../../../core/types"
+import { Producto, QueryResp, type MovimientoFormDetalle } from "../../../core/types"
 
+interface ProductoQryRes extends QueryResp {
+  content: Producto;
+}
 export default function BusquedaProducto() {
   const formRef = useRef<HTMLFormElement | null>(null)
   const {
@@ -17,7 +20,7 @@ export default function BusquedaProducto() {
   const {
     data: producto,
     getProductoByCode
-  } = useMutationProductosQuery()
+  } = useMutationProductosQuery<ProductoQryRes>()
 
   const handleSubmit = ((e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -45,8 +48,8 @@ export default function BusquedaProducto() {
             producto_descripcion: producto.content.descripcion,
             marca: producto.content.marca,
             laboratorio: producto.content.laboratorio,
-            precio_costo: parseFloat(producto.content.precio_costo),
-            stock: parseFloat(producto.content.stock),
+            precio_costo: producto.content.precio_costo,
+            stock: producto.content.stock,
             cantidad: 1,
             observacion: ""
           }

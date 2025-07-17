@@ -1,4 +1,4 @@
-import { FnFetchOptions } from "../types"
+import { FetchOptions } from "../types"
 
 export const fnFetch = async({
   method = "GET",
@@ -9,7 +9,7 @@ export const fnFetch = async({
   head_contentType = "",
   authorization = "",
   attachedData = null,
-}: FnFetchOptions) => {
+}: FetchOptions) => {
   let options: RequestInit  = {
     method,
   }

@@ -3,9 +3,8 @@ import { useMutation, useQueryClient } from "@tanstack/react-query"
 import useSessionStore from "../store/useSessionStore"
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Categoria } from "../types/catalogosTypes";
 import { fnFetch } from "../services/fnFetch";
-import { FnFetchOptions } from "../types";
+import { Categoria, FetchOptions } from "../types";
 
 // ****** MUTATION ******
 export const useMutateCategoriasQuery = () => {
@@ -22,7 +21,7 @@ export const useMutateCategoriasQuery = () => {
   })
 
   const sortCategorias = (orderedItems: Categoria[]) => {
-    const options: FnFetchOptions = {
+    const options: FetchOptions = {
       method: "PUT",
       url: apiURL + "categorias/sort_categorias",
       body: JSON.stringify(orderedItems),
@@ -32,7 +31,7 @@ export const useMutateCategoriasQuery = () => {
   }
 
   const createCategoria = (categoria:  Categoria) => {
-    const options: FnFetchOptions = {
+    const options: FetchOptions = {
       method: "POST",
       url: apiURL + "categorias/create_categoria",
       body: JSON.stringify(categoria),
@@ -42,7 +41,7 @@ export const useMutateCategoriasQuery = () => {
   }
 
   const updateCategoria = (categoria: Categoria) => {
-    const options: FnFetchOptions = {
+    const options: FetchOptions = {
       method: "PUT",
       url: apiURL + "categorias/update_categoria",
       body: JSON.stringify(categoria),
@@ -52,7 +51,7 @@ export const useMutateCategoriasQuery = () => {
   }
 
   const deleteCategoria = (id: number) => {
-    const options: FnFetchOptions = {
+    const options: FetchOptions = {
       method: "DELETE",
       url: apiURL + "categorias/delete_categoria",
       body: JSON.stringify({id}),

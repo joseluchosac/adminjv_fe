@@ -8,7 +8,7 @@ import { MdHideImage, MdImage } from "react-icons/md"
 import { FaUndo } from "react-icons/fa"
 import { useQueryClient } from "@tanstack/react-query"
 import useSessionStore from "../../../core/store/useSessionStore"
-import { ResponseQuery, UbigeoItem, type Empresa } from "../../../core/types"
+import { QueryResp, UbigeoItem, type Empresa } from "../../../core/types"
 import { LdsEllipsisCenter } from "../../../core/components/Loaders"
 import { ConfirmPass } from "../../../core/components/ConfirmsMdl"
 import { debounce } from "../../../core/utils/funciones"
@@ -30,7 +30,7 @@ export default function Empresa() {
     data: mutation,
     isPending: isPendingMutation, 
     updateEmpresa 
-  } = useMutationEmpresaQuery<ResponseQuery>()
+  } = useMutationEmpresaQuery<QueryResp>()
 
   const {
     register, 

@@ -2,13 +2,24 @@
 export declare type FormControlElement = HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement;
 
 // ✅ TIPOS PARA LAS RESPUESTAS DE LA API (el content se le agrega despues)
-export interface ResponseQuery {
+export interface QueryResp {
   error?: boolean;
   msg?: string;
   msgType?: "default" | "error" | "info" | "success" | "warning";
   errorType?: string;
 }
-
+// ✅ TIPO PARA LA RESPUESTA DE UNA PETICION DE FILTROS
+export type FilterQueryResp = {
+  num_regs: number;
+  pages: number;
+  page: number;
+  next: number;
+  previous: number;
+  offset: number;
+  error?: boolean;
+  msg?: string;
+  msgTye?: string
+}
 // ✅ TIPOS PARA EL CAMPO DE UNA TABLA
 export type CampoTable = {
   field_name: string;
@@ -45,6 +56,7 @@ export type User = {
   password: string;
   password_repeat: string;
 }
+
 export type UserSession = {
   id: number;
   nombres: string;
@@ -70,9 +82,6 @@ export type UserItem = {
   updated_at: string;
 }
 
-export interface FilterUsersResp extends FilterResp {
-  filas: UserItem[];
-}
 export interface RegisterForm {
   nombres: string;
   apellidos: string;
@@ -92,10 +101,7 @@ export type Profile = {
   caja_id: number;
   estado: number;
 }
-export interface ProfileForm extends Profile {
-  password: string;
-  password_repeat: string;
-}
+
 
 // ✅ TIPOS PARA LA TABLA MODULOS
 export interface Modulo {
@@ -154,7 +160,7 @@ export type EmpresaSession = { // para la sesion
   urlLogo: string;
 }
 
-// ✅ TIPOS PARA FILTROS GENERALES
+// ✅ TIPOS PARA LOS PARAMETROS DE FILTROS GENERALES
 export interface FilterParams {
   offset: number;
   search: string;
@@ -179,8 +185,9 @@ type FilterParamsBetween = {
   range: string
 }
 
-export type FnFetchOptions = {
-  method?: "GET" | "POST" | "PUT" | "DELETE";
+// ✅ TIPOS PARA LAS OPCIONES DEL FETCH
+export type FetchOptions = {
+  method?: "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
   url: string;
   body?: BodyInit | null | undefined;
   includeCredentials?: boolean;
@@ -190,22 +197,9 @@ export type FnFetchOptions = {
   attachedData?: any;
 }
 
-// ✅ TIPO PARA RESPUESTA DE UNA PETICION DE FILTRO
-type FilterResp = {
-  num_regs: number;
-  pages: number;
-  page: number;
-  next: number;
-  previous: number;
-  offset: number;
-  error?: boolean;
-  msg?: string;
-  msgTye?: string
-}
+
 // ✅ TIPO PARA MOSTRAR LA INFORMACION DEL FILTRO
 export type FilterInfo = Omit<FilterParams, "offset">
-// eliminar el de abajo
-export type FilterCurrent = Omit<FilterParams, "offset" | "search">
 
 // ✅ TIPOS PARA PRODUCTO
 export interface Producto {
@@ -233,7 +227,6 @@ export interface Producto {
   created_at: string;
   updated_at: string;
 }
-
 export type ProductoItem = {
   id: number;
   establecimiento_id: number;
@@ -250,12 +243,8 @@ export type ProductoItem = {
   created_at: string;
   updated_at: string;
 }
-
-export interface FilterProductosResp extends FilterResp {
-  filas: ProductoItem[];
-}
-export interface DataGetProducto extends ResponseQuery {
-  content: Producto | null;
+export interface ProductoQryRes extends QueryResp {
+  content: Producto;
 }
 
 // ✅ TIPOS PARA TABLA LABORATORIOS
@@ -269,24 +258,19 @@ export type LaboratorioItem = {
   nombre: string;
   estado: number;
 }
-export interface FilterLaboratoriosResp extends FilterResp {
-  filas: LaboratorioItem[];
-}
+
 // ✅TIPOS PARA TABLA MARCAS 
 export interface Marca {
   id: number;
   nombre: string;
   estado: number;
 }
-
 export type MarcaItem = {
   id: number;
   nombre: string;
   estado: number;
 }
-export interface FilterMarcasResp extends FilterResp {
-  filas: MarcaItem[];
-}
+
 // ✅ TIPOS PARA CLIENTE
 export type Cliente = {
   id: number;
@@ -311,9 +295,7 @@ export type ClienteItem = {
   telefono: string;
   estado: number;
 }
-export interface FilterClientesResp extends FilterResp {
-  filas: ClienteItem[];
-}
+
 // ✅ TIPOS PARA PROVEEDOR
 export type Proveedor = {
   id: number;
@@ -338,24 +320,12 @@ export type ProveedorItem = {
   telefono: string;
   estado: number;
 }
-export interface FilterProveedoresResp extends FilterResp {
-  filas: ProveedorItem[];
-}
-
-// ✅ TIPOS PARA UBIGEO
-// export interface Ubigeo {
-//   ubigeo_inei: string;
-//   ubigeo_reniec: string;
-//   dis_prov_dep: string;
-// }
 export interface UbigeoItem {
   ubigeo_inei: string;
   ubigeo_reniec: string;
   dis_prov_dep: string;
 }
-export interface FilterUbigeosResp extends FilterResp {
-  filas: UbigeoItem[];
-}
+
 // ✅ TIPOS PARA MOVIMIENTO
 export type Movimiento = {
   id: number;
@@ -379,9 +349,6 @@ export type MovimientoItem = {
   estado: number;
   created_at: string;
 }
-export interface FilterMovimientosResp extends FilterResp {
-  filas: MovimientoItem[];
-}
 export type Movimientoform = {
   establecimiento_id: number;
   tipo: string;
@@ -391,7 +358,6 @@ export type Movimientoform = {
   observacion: string;
   detalle: MovimientoFormDetalle[];
 }
-
 export type MovimientoFormDetalle = {
   tmp_id: number;
   codigo: string;
@@ -405,12 +371,6 @@ export type MovimientoFormDetalle = {
   precio_costo: number;
   observacion: string;
 }
-
-export interface DataGetMovimiento extends ResponseQuery {
-  content: Movimiento | null;
-}
-
-
 export type Numeracion = {
   id: number;
   establecimiento_id: number;
@@ -421,14 +381,6 @@ export type Numeracion = {
   correlativo: number;
   estado: number;
 }
-// observar de abajo para su eliminacion
-export interface MutationFetch {
-  url?: string;
-  method?: string;
-  headers?: any;
-  body?: any
-}
-
 export type NroDocumento = {
   id: number;
   nombre_razon_social: string;
@@ -442,4 +394,123 @@ export type NroDocumento = {
   email: string;
   telefono: string;
 }
-
+export type Caja = {
+  id: number;
+  establecimiento_id: number;
+  descripcion: string;
+  estado: number;
+}
+export type FormaPago = {
+  id: number;
+  descripcion: string;
+  estado: number;
+}
+export type Impuesto = {
+  id: number;
+  afectacion_igv_cod: string;
+  afectacion_igv_desc: string;
+  letra_tributo: string;
+  codigo_tributo: string;
+  nombre_tributo: string;
+  tipo_tributo: string;
+  porcentaje: number;
+  importe: number;
+  pred:number;
+  estado: number
+}
+export type MotivoNota = {
+  codigo : string;
+  descripcion : string; 
+  estado : number; 
+  id : number;
+  tipo : string;
+  tipo_comprobante_cod : string
+}
+export type Rol = {
+  id: number;
+  rol: string;
+  estado?: number
+}
+export type TipoComprobante = {
+  id: number;
+  codigo: string;
+  descripcion: string;
+  serie_pre: string;
+  descripcion_doc: string;
+  estado: number
+}
+export type TipoDocumento = {
+  id: number;
+  codigo: string;
+  descripcion: string;
+  descripcion_abv: string;
+  estado: number;
+}
+export type TipoMoneda = {
+  id: number;
+  codigo: string;
+  descripcion: string;
+  simbolo: string;
+  pred: number;
+  estado: number;
+}
+export type TipoMovimientoCaja = {
+  id: number;
+  descripcion: string;
+  estado: number
+}
+export type TipoMovimiento = {
+  id: number;
+  tipo: string;
+  concepto: string;
+  origen: string;
+  estado: number
+}
+export type TipoOperacion = {
+  codigo: string;
+  descripcion: string;
+  estado: number
+}
+export type UnidadMedida = {
+  codigo: string;
+  descripcion: string;
+  descripcion_abv: string;
+  estado: number
+}
+export type Provincia = {
+  provincia: string;
+}
+export type Distrito = {
+  distrito: string;
+  ubigeo_inei: string;
+}
+export type Establecimiento = {
+  id: number;
+  tipo: string;
+  codigo: string;
+  descripcion: string;
+  direccion: string;
+  ubigeo_inei: string;
+  dis_prov_dep: string;
+  telefono: string;
+  email: string;
+  estado: number;
+}
+export type EstablecimientoOption = {
+  id: number;
+  codigo: string;
+  descripcion: string;
+}
+export type Categoria = {
+  id: number;
+  descripcion: string;
+  padre_id: number;
+  orden: number;
+  children?: any;
+}
+export type CategoriaOpc = {
+  id: number;
+  descripcion: string;
+  nivel: number;
+  checked: false
+}

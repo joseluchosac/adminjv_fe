@@ -7,15 +7,14 @@ import { toast } from "react-toastify";
 import { LdsBar, LdsEllipsisCenter } from "../../core/components/Loaders";
 import useLayoutStore from "../../core/store/useLayoutStore";
 import { useMutationUsersQuery } from "../../core/hooks/useUsersQuery";
-import useCatalogosStore from "../../core/store/useCatalogosStore";
 import { useUsers } from "./context/UsersContext";
-import { ResponseQuery, User } from "../../core/types";
+import { QueryResp, User } from "../../core/types";
 import { useCajasQuery } from "../../core/hooks/useCatalogosQuery";
+import { useRolesQuery } from "../../core/hooks/useRolesQuery";
 
-interface DataUser extends ResponseQuery {
+interface UserQryRes extends QueryResp {
   content: User;
 }
-
 
 const userFormInit = {
   id: 0,
@@ -35,7 +34,7 @@ const userFormInit = {
 export default function Userform(){
   const {showUserForm, setShowUserForm, currentUserId} = useUsers()
   const darkMode = useLayoutStore(state => state.layout.darkMode)
-  const catalogos = useCatalogosStore(state => state.catalogos)
+  const {roles} = useRolesQuery()  
   const {cajas} = useCajasQuery()
   const {
     register, 
@@ -50,14 +49,14 @@ export default function Userform(){
     isPending: isPendingUser,
     isError: isErrorUser,
     getUser
-  }= useMutationUsersQuery<DataUser>()
+  }= useMutationUsersQuery<UserQryRes>()
 
   const {
     data: mutation,
     isPending: isPendingMutation,
     createUser, 
     updateUser, 
-  } = useMutationUsersQuery<DataUser>()
+  } = useMutationUsersQuery<UserQryRes>()
   
   const submit = (data: User) => {
     Swal.fire({
@@ -230,7 +229,7 @@ export default function Userform(){
                 id="rol_id"
                 {...register('rol_id',{valueAsNumber:true})}
               >
-                {catalogos?.roles.map((el) => 
+                {roles?.map((el) => 
                   <option key={el.id} value={el.id}>{el.rol}</option>
                 )}
               </Form.Select>

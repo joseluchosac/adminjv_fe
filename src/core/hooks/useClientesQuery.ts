@@ -3,13 +3,16 @@ import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-q
 import useSessionStore from "../store/useSessionStore"
 import { useEffect, useRef, useState } from "react"
 import { useNavigate } from "react-router-dom";
-import { Cliente, FilterClientesResp, FnFetchOptions, ResponseQuery } from "../types";
+import { Cliente, ClienteItem, FetchOptions, FilterQueryResp, QueryResp } from "../types";
 import { filterParamsInit } from "../utils/constants";
 import { fnFetch } from "../services/fnFetch";
 
 type TypeAction = "mutate_cliente" | "consultar_nro_doc"
 
 // ****** FILTRAR ******
+export interface ClientesFilQryRes extends FilterQueryResp {
+  filas: ClienteItem[];
+}
 export const useFilterClientesQuery = () => {
   const [filterParamsClientes, setFilterParamsClientes] = useState(filterParamsInit)
   const token = useSessionStore(state => state.tknSession)
@@ -22,11 +25,11 @@ export const useFilterClientesQuery = () => {
     isFetching,
     hasNextPage,
     fetchNextPage,
-  } = useInfiniteQuery<FilterClientesResp, Error>({
+  } = useInfiniteQuery<ClientesFilQryRes, Error>({
     queryKey: ['clientes'],
     queryFn: ({pageParam = 1, signal}) => {
       const page = pageParam as number
-      const options: FnFetchOptions = {
+      const options: FetchOptions = {
         method: "POST",
         url: `${apiURL}clientes/filter_clientes?page=${page}`,
         body: JSON.stringify(filterParamsClientes),
@@ -78,18 +81,18 @@ export const useMutationClientesQuery = <T>() => {
   const typeActionRef = useRef<TypeAction | "">("")
 
 // ****** MUTATION ******
-  const {data, isPending, isError, mutate, reset} = useMutation<T, Error, FnFetchOptions, unknown>({
+  const {data, isPending, isError, mutate, reset} = useMutation<T, Error, FetchOptions, unknown>({
     mutationKey:["clientes_mut"],
     mutationFn: fnFetch,
     onSuccess: (resp) => {
-      const r = resp as ResponseQuery
+      const r = resp as QueryResp
       if(r?.msgType !== 'success') return
       queryClient.invalidateQueries({queryKey:["clientes"]}) // Recarga la tabla clientes
     }
   })
 
   const getCliente = (id: number) => {
-    const options: FnFetchOptions = {
+    const options: FetchOptions = {
       method: "POST",
       url: apiURL + "clientes/get_cliente",
       body: JSON.stringify({id}),
@@ -100,7 +103,7 @@ export const useMutationClientesQuery = <T>() => {
 
   const createCliente = (cliente: Cliente) => {
     typeActionRef.current = "mutate_cliente"
-    const options: FnFetchOptions = {
+    const options: FetchOptions = {
       method: "POST",
       url: apiURL + "clientes/create_cliente",
       body: JSON.stringify(cliente),
@@ -111,7 +114,7 @@ export const useMutationClientesQuery = <T>() => {
 
   const updateCliente = (cliente: Cliente) => {
     typeActionRef.current = "mutate_cliente"
-    const options: FnFetchOptions = {
+    const options: FetchOptions = {
       method: "POST",
       url: apiURL + "clientes/update_cliente",
       body: JSON.stringify(cliente),
@@ -122,7 +125,7 @@ export const useMutationClientesQuery = <T>() => {
 
   const setStateCliente = (estado: number) => {
     typeActionRef.current = "mutate_cliente"
-    const options: FnFetchOptions = {
+    const options: FetchOptions = {
       method: "POST",
       url: apiURL + "clientes/set_state_cliente",
       body: JSON.stringify({estado}),
@@ -133,7 +136,7 @@ export const useMutationClientesQuery = <T>() => {
 
   const deleteCliente = (id: number) => {
     typeActionRef.current = "mutate_cliente"
-    const options: FnFetchOptions = {
+    const options: FetchOptions = {
       method: "DELETE",
       url: apiURL + "clientes/delete_cliente",
       body: JSON.stringify({id}),
@@ -144,7 +147,7 @@ export const useMutationClientesQuery = <T>() => {
 
   const consultarNroDocumento = (param: any) => {
     typeActionRef.current = "consultar_nro_doc"
-    const options: FnFetchOptions = {
+    const options: FetchOptions = {
       method: "POST",
       url: apiURL + "clientes/consultar_nro_documento",
       body: JSON.stringify(param),
@@ -154,7 +157,7 @@ export const useMutationClientesQuery = <T>() => {
   }
 
   useEffect(()=>{
-    const r = data as ResponseQuery
+    const r = data as QueryResp
     if(r?.errorType === "errorToken"){
       resetSessionStore()
       navigate("/auth")
