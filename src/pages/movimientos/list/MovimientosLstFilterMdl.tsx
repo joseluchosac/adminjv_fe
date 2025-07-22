@@ -1,5 +1,4 @@
 import Modal from "react-bootstrap/Modal";
-import useMovimientosStore from "../../core/store/useMovimientosStore";
 import { Badge, Button, Col, Form, Row, Tab, Tabs } from "react-bootstrap";
 import { useEffect, useState } from "react";
 import {
@@ -11,37 +10,46 @@ import {
   subMonths,
   subWeeks,
 } from "date-fns";
-import { filterParamsInit } from "../../core/utils/constants";
-import { useMovimientos } from "./hooks/useMovimientos";
-import { useCajasQuery } from "../../core/hooks/useCatalogosQuery";
-import { useRolesQuery } from "../../core/hooks/useRolesQuery";
+import { filterParamsInit } from "../../../core/utils/constants";
+import { useMovimientos } from "../hooks/useMovimientos";
+import { CampoTable } from "../../../core/types";
+import { LdsBar } from "../../../core/components/Loaders";
+import { useEstablecimientosQuery } from "../../../core/hooks/useEstablecimientosQuery";
+import { useTiposMovimientoQuery } from "../../../core/hooks/useCatalogosQuery";
 
 const dateRangeInit = { field_name: "", field_label: "", date_from: "", date_to: "" };
-const equalFormInit = { rol_id: "", caja_id: "", estado: ""}
+const equalFormInit = { establecimiento_id: "", tipo: ""}
 
-const MovimientosLstFilterMdl: React.FC = () => {
+type Props = {
+  isFetching: boolean;
+  camposMovimiento: CampoTable[]
+}
+
+const MovimientosLstFilterMdl: React.FC<Props> = ({isFetching, camposMovimiento}) => {
   const [tabName, setTabName] = useState("order")
   const [dateRange, setDateRange] = useState(dateRangeInit);
   const [rangeName, setRangeName] = useState("")
   const [equalForm, setEqualForm] = useState(equalFormInit)
-  const {showMovimientosFilterMdl, setShowMovimientosFilterMdl} = useMovimientos()
-  const filterParamsMovimientos = useMovimientosStore((state) => state.filterParamsMovimientos);
-  const setFilterParamsMovimientos = useMovimientosStore(state => state.setFilterParamsMovimientos)
-  const camposMovimiento = useMovimientosStore(state => state.camposMovimiento)
-  const {roles} = useRolesQuery()
-  const {cajas} = useCajasQuery()
+  const {establecimientos} = useEstablecimientosQuery()
+  const {tiposMovimiento} = useTiposMovimientoQuery()
+  const {
+    filterParamsMovimientosForm,
+    setFilterParamsMovimientosForm,
+    showMovimientosFilterMdl,
+    setShowMovimientosFilterMdl
+  } = useMovimientos()
   
   const handleChangeOrder = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const field_name = e.target.value
     const field_label = e.currentTarget.options[e.currentTarget.selectedIndex].textContent || ""
     const newOrders = field_name ? [{field_name, order_dir: "ASC", field_label}] : []
-    setFilterParamsMovimientos({...filterParamsMovimientos, orders: newOrders})
+    setFilterParamsMovimientosForm({...filterParamsMovimientosForm, orders: newOrders})
   }
 
   const handleChangeOrderDir = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const order_dir = e.target.value
-    const newOrders = [{...filterParamsMovimientos.orders[0], order_dir}]
-    setFilterParamsMovimientos({...filterParamsMovimientos, orders: newOrders})
+    const newOrders = [{...filterParamsMovimientosForm.orders[0], order_dir}]
+    setFilterParamsMovimientosForm({...filterParamsMovimientosForm, orders: newOrders})
   }
 
   const handleChangeEqual = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -49,7 +57,7 @@ const MovimientosLstFilterMdl: React.FC = () => {
     const { name: field_name, value: field_value } = e.currentTarget;
     const label_value = e.currentTarget.options[e.currentTarget.selectedIndex].textContent || ""
     setEqualForm({...equalForm, [field_name]:field_value})
-    let { equals } = filterParamsMovimientos;
+    let { equals } = filterParamsMovimientosForm;
     const idx = equals.findIndex(el => el.field_name === field_name)
     if(!field_value){
       equals = equals.filter(el => el.field_name !== field_name)
@@ -60,7 +68,7 @@ const MovimientosLstFilterMdl: React.FC = () => {
         equals[idx] = {field_name, field_value, label_name, label_value}
       }
     }
-    setFilterParamsMovimientos({ ...filterParamsMovimientos, equals: [...equals] });
+    setFilterParamsMovimientosForm({ ...filterParamsMovimientosForm, equals: [...equals] });
   }
 
   const handleSelectCampoRange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -124,32 +132,32 @@ const MovimientosLstFilterMdl: React.FC = () => {
         (dateRange.date_to ? dateRange.date_to + " 23:59:59" : ""),
     };
     if (
-      filterParamsMovimientos.between.field_name == newBetween.field_name &&
-      filterParamsMovimientos.between.range == newBetween.range
+      filterParamsMovimientosForm.between.field_name == newBetween.field_name &&
+      filterParamsMovimientosForm.between.range == newBetween.range
     ) return;
-    setFilterParamsMovimientos({ ...filterParamsMovimientos, between: newBetween });
+    setFilterParamsMovimientosForm({ ...filterParamsMovimientosForm, between: newBetween });
   };
 
   const handleUnbetween = () => {
     setDateRange(dateRangeInit);
     setRangeName("")
-    if(!filterParamsMovimientos.between.field_name) return
-    setFilterParamsMovimientos({...filterParamsMovimientos, between: filterParamsInit.between})
+    if(!filterParamsMovimientosForm.between.field_name) return
+    setFilterParamsMovimientosForm({...filterParamsMovimientosForm, between: filterParamsInit.between})
     
   }
 
   
   useEffect(() => {
     if(showMovimientosFilterMdl){
-      if(!filterParamsMovimientos.between.field_name){
+      if(!filterParamsMovimientosForm.between.field_name){
         handleUnbetween()
       }
-      const {range, field_name, field_label} = filterParamsMovimientos.between
+      const {range, field_name, field_label} = filterParamsMovimientosForm.between
       const date_from = range ? range.split(", ")[0].split(" ")[0] : ""
       const date_to = range ? range.split(", ")[1].split(" ")[0] : ""
       setDateRange({field_name, field_label, date_from, date_to})
       const newEqualForm = structuredClone(equalFormInit)
-      for (const el of filterParamsMovimientos.equals) {
+      for (const el of filterParamsMovimientosForm.equals) {
         const field_name = el.field_name as keyof typeof equalFormInit
         newEqualForm[field_name] = el.field_value
       }
@@ -163,6 +171,7 @@ const MovimientosLstFilterMdl: React.FC = () => {
       onHide={()=>setShowMovimientosFilterMdl(false)}
     >
       <Modal.Body>
+        {isFetching && <LdsBar />}
         <Tabs
           activeKey={tabName}
           onSelect={(k) => setTabName(k as string)}
@@ -175,7 +184,7 @@ const MovimientosLstFilterMdl: React.FC = () => {
                 <Form.Select
                   id="f_order"
                   name="order"
-                  value={filterParamsMovimientos.orders.length ? filterParamsMovimientos.orders[0].field_name : ""}
+                  value={filterParamsMovimientosForm.orders.length ? filterParamsMovimientosForm.orders[0].field_name : ""}
                   onChange={handleChangeOrder}
                 >
                   <option value="">Ninguno</option>
@@ -189,7 +198,7 @@ const MovimientosLstFilterMdl: React.FC = () => {
                 <Form.Select
                   id="f_order_dir"
                   name="order_dir"
-                  value={filterParamsMovimientos.orders.length ? filterParamsMovimientos.orders[0].order_dir : "ASC"}
+                  value={filterParamsMovimientosForm.orders.length ? filterParamsMovimientosForm.orders[0].order_dir : "ASC"}
                   onChange={handleChangeOrderDir}
                 >
                   <option value="ASC">Ascendente</option>
@@ -202,31 +211,15 @@ const MovimientosLstFilterMdl: React.FC = () => {
           <Tab eventKey="equals" title="Igual a">
             <Form>
               <Form.Group as={Col} className="mb-3">
-                <Form.Label htmlFor="f_rol_id">Rol</Form.Label>
+                <Form.Label htmlFor="f_establecimiento_id">Establecimiento</Form.Label>
                 <Form.Select
-                  id="f_rol_id"
-                  name="rol_id"
-                  value={equalForm.rol_id}
+                  id="f_establecimiento_id"
+                  name="establecimiento_id"
+                  value={equalForm.establecimiento_id}
                   onChange={handleChangeEqual}
                 >
                   <option value="">Todos</option>
-                  {roles?.map((el) => (
-                    <option key={el.id} value={el.id}>
-                      {el.rol}
-                    </option>
-                  ))}
-                </Form.Select>
-              </Form.Group>
-              <Form.Group as={Col} className="mb-3">
-                <Form.Label htmlFor="f_caja_id">Caja</Form.Label>
-                <Form.Select
-                  id="f_caja_id"
-                  name="caja_id"
-                  value={equalForm.caja_id}
-                  onChange={handleChangeEqual}
-                >
-                  <option value="">Todos</option>
-                  {cajas?.map((el) => (
+                  {establecimientos?.map((el) => (
                     <option key={el.id} value={el.id}>
                       {el.descripcion}
                     </option>
@@ -234,16 +227,17 @@ const MovimientosLstFilterMdl: React.FC = () => {
                 </Form.Select>
               </Form.Group>
               <Form.Group as={Col} className="mb-3">
-                <Form.Label htmlFor="f_estado">Estado</Form.Label>
+                <Form.Label htmlFor="f_tipo">Tipo movimiento</Form.Label>
                 <Form.Select
-                  id="f_estado"
-                  name="estado"
-                  value={equalForm.estado}
+                  id="f_tipo"
+                  name="tipo"
+                  value={equalForm.tipo}
                   onChange={handleChangeEqual}
                 >
                   <option value="">Todos</option>
-                  <option value="1">Habilidato</option>
-                  <option value="0">Deshabilitado</option>
+                  {tiposMovimiento && [...new Set(tiposMovimiento.map(el=>el.tipo))].map((el) => (
+                    <option key={el} value={el}>{el}</option>
+                  ))}
                 </Form.Select>
               </Form.Group>
             </Form>

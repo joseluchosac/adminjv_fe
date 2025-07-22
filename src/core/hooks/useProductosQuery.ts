@@ -11,10 +11,10 @@ type TypeAction =
 "filter_full" 
 | "mutate_producto" 
 
+// ****** FILTRAR ******
 interface ProductosFilQryRes extends FilterQueryResp {
   filas: ProductoItem[];
 }
-// ****** FILTRAR ******
 export const useFilterProductosQuery = () => {
   const [filterParamsProductos, setFilterParamsProductos] = useState(filterParamsInit)
   const token = useSessionStore(state => state.tknSession)

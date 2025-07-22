@@ -1,11 +1,11 @@
 const apiURL = import.meta.env.VITE_API_URL;
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useNavigate } from "react-router-dom";
 import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import useSessionStore from "../store/useSessionStore"
-import useMovimientosStore from "../store/useMovimientosStore"
 import { FetchOptions, FilterQueryResp, Movimiento, Movimientoform, MovimientoItem } from "../types"
 import { fnFetch } from "../services/fnFetch";
+import { filterParamsInit } from "../utils/constants";
 
 type TypeAction = 
 "filter_full" 
@@ -16,9 +16,8 @@ export interface MovimientosFilQryRes extends FilterQueryResp {
   filas: MovimientoItem[];
 }
 export const useFilterMovimientosQuery = () => {
-  // const setFilterParamsMovimientos = useMovimientosStore(state => state.setFilterParamsMovimientos)
+  const [filterParamsMovimientos, setFilterParamsMovimientos] = useState(filterParamsInit)
   const token = useSessionStore(state => state.tknSession)
-  const filterParamsMovimientos = useMovimientosStore(state => state.filterParamsMovimientos)
   const queryClient = useQueryClient()
 
   const {
@@ -51,6 +50,8 @@ export const useFilterMovimientosQuery = () => {
 
   const resetear = ()=>{
     queryClient.resetQueries({ queryKey: ['movimientos'], exact: true });
+    setFilterParamsMovimientos(filterParamsInit)
+
   }
 
   useEffect(() => {
@@ -69,7 +70,8 @@ export const useFilterMovimientosQuery = () => {
     isLoading, 
     isFetching, 
     hasNextPage, 
-    fetchNextPage, 
+    fetchNextPage,
+    setFilterParamsMovimientos
   }
 }
 

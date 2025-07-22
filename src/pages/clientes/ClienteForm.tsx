@@ -38,16 +38,19 @@ import { useTiposDocumentoQuery } from "../../core/hooks/useCatalogosQuery";
 interface NroDocumentoQryRes extends QueryResp {
   content: NroDocumento;
 }
-interface ClienteQryRes extends QueryResp {
+type ClienteQryRes = QueryResp & {
   content: Cliente;
 }
 
-export default function ClienteForm() {
+type Props = {
+  onMutation?: (cliente: Cliente)=>void;
+}
+
+export default function ClienteForm({onMutation}:Props) {
   const showClienteForm = useClientesStore((state) => state.showClienteForm);
   const setShowClienteForm = useClientesStore(
     (state) => state.setShowClienteForm
   );
-  const setLastSettedCliente = useClientesStore((state) => state.setLastSettedCliente);
   const currentClienteId = useClientesStore((state) => state.currentClienteId);
   const darkMode = useLayoutStore((state) => state.layout.darkMode);
   const {tiposDocumento} = useTiposDocumentoQuery()
@@ -156,10 +159,6 @@ export default function ClienteForm() {
   };
 
   useEffect(() => {
-    setLastSettedCliente(null)
-  }, []);
-  
-  useEffect(() => {
     if (showClienteForm) {
       if (currentClienteId) {
         getCliente(currentClienteId);
@@ -205,9 +204,13 @@ export default function ClienteForm() {
 
   useEffect(() => {
     if (!mutation) return;
-    if (!mutation.error) setShowClienteForm(false);
+    if(mutation?.msgType === 'success'){
+      if(onMutation){
+        onMutation(mutation.content)
+      }
+      setShowClienteForm(false)
+    }
     toast(mutation.msg, { type: mutation.msgType });
-    setLastSettedCliente(mutation.content)
   }, [mutation]);
 
   return (

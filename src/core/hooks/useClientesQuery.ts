@@ -1,11 +1,11 @@
 const apiURL = import.meta.env.VITE_API_URL;
 import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import useSessionStore from "../store/useSessionStore"
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useRef } from "react"
 import { useNavigate } from "react-router-dom";
 import { Cliente, ClienteItem, FetchOptions, FilterQueryResp, QueryResp } from "../types";
-import { filterParamsInit } from "../utils/constants";
 import { fnFetch } from "../services/fnFetch";
+import useClientesStore from "../store/useClientesStore";
 
 type TypeAction = "mutate_cliente" | "consultar_nro_doc"
 
@@ -14,9 +14,12 @@ export interface ClientesFilQryRes extends FilterQueryResp {
   filas: ClienteItem[];
 }
 export const useFilterClientesQuery = () => {
-  const [filterParamsClientes, setFilterParamsClientes] = useState(filterParamsInit)
+  const filterParamsClientes = useClientesStore(state => state.filterParamsClientes)
+  const filterParamsClientesForm = useClientesStore(state => state.filterParamsClientesForm)
+  const setFilterParamsClientes = useClientesStore(state => state.setFilterParamsClientes)
+  const isMounted = useRef(false);
+
   const token = useSessionStore(state => state.tknSession)
-  const queryClient = useQueryClient()
 
   const {
     data,
@@ -25,6 +28,7 @@ export const useFilterClientesQuery = () => {
     isFetching,
     hasNextPage,
     fetchNextPage,
+    refetch
   } = useInfiniteQuery<ClientesFilQryRes, Error>({
     queryKey: ['clientes'],
     queryFn: ({pageParam = 1, signal}) => {
@@ -45,20 +49,17 @@ export const useFilterClientesQuery = () => {
     getPreviousPageParam: (lastPage) => lastPage.previous ?? undefined,
     staleTime: 1000 * 60 * 5 
   })
-
-  const resetear = ()=>{
-    queryClient.resetQueries({ queryKey: ['clientes'], exact: true });
-    setFilterParamsClientes(filterParamsInit)
-  }
-
-  useEffect(() => {
-    return () => {
-      resetear()
-    }
-  },[])
   
   useEffect(() => {
-    queryClient.invalidateQueries({queryKey:["clientes"]})
+    setFilterParamsClientes({...filterParamsClientesForm})
+  }, [filterParamsClientesForm])
+
+  useEffect(() => {
+    if(isMounted.current){
+      refetch() // Se ejecuta solo al cambiar estado, no al montar
+    }else{
+      isMounted.current = true
+    }
   }, [filterParamsClientes])
 
   return {
@@ -68,7 +69,6 @@ export const useFilterClientesQuery = () => {
     isFetching, 
     hasNextPage, 
     fetchNextPage,
-    setFilterParamsClientes,
   }
 }
 
@@ -115,7 +115,7 @@ export const useMutationClientesQuery = <T>() => {
   const updateCliente = (cliente: Cliente) => {
     typeActionRef.current = "mutate_cliente"
     const options: FetchOptions = {
-      method: "POST",
+      method: "PUT",
       url: apiURL + "clientes/update_cliente",
       body: JSON.stringify(cliente),
       authorization: "Bearer " + token,

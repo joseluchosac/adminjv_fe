@@ -7,6 +7,7 @@ import useLayoutStore from "../../../core/store/useLayoutStore";
 import { useMutationProductosQuery } from "../../../core/hooks/useProductosQuery";
 import { useEffect } from "react";
 import { toast } from "react-toastify";
+import useSessionStore from "../../../core/store/useSessionStore";
 
 interface ProductosLstRowProps {
   producto: ProductoItem ;
@@ -19,6 +20,7 @@ interface ProductoMutQryRes extends QueryResp {
 function ProductosLstRow({ producto, camposProducto }: ProductosLstRowProps) {
   const {setModo} = useProductos()
   const darkMode = useLayoutStore(state => state.layout.darkMode)
+  const curEstab = useSessionStore(state => state.curEstab)
 
   const {
     data: mutation,
@@ -92,19 +94,15 @@ function ProductosLstRow({ producto, camposProducto }: ProductosLstRowProps) {
               </td>
             )
           }
-          case "created_at":
-          case "updated_at": {
-            return <td key={el.field_name}>{validDate(producto[el.field_name ], 'dd/MM/yyyy')}</td>
-          }
           case "descripcion":{
             return (
               <td 
                 key={el.field_name}
                 className="overflow-hidden text-wrap"
                 style={{minWidth: "300px", maxWidth:"450px"}}
-                title={producto[el.field_name as keyof ProductoItem] as string}
+                title={producto[el.field_name] as string}
               >
-                <div>{producto[el.field_name as keyof ProductoItem]}</div>
+                <div>{producto[el.field_name]}</div>
                 <div className="d-flex gap-3 text-muted">
                   {producto.marca ? <div><small>{producto.marca}</small></div> :''}
                   {producto.laboratorio ? <div><small>{producto.laboratorio}</small></div> :''}
@@ -114,11 +112,12 @@ function ProductosLstRow({ producto, camposProducto }: ProductosLstRowProps) {
               </td>
             )
           }
-          case "stock": {
-            return <td key={el.field_name}>{parseFloat(producto[el.field_name as keyof ProductoItem] as string)} {producto.unidad}</td>
+          case "stocks": {
+            const stock = producto.stocks.find(el=>parseFloat(el.e) === curEstab)
+            return <td key={el.field_name}>{stock?.s} {producto.unidad_medida_cod}</td>
           }
           default: {
-            return <td key={el.field_name}>{producto[el.field_name as keyof ProductoItem]}</td>
+            return <td key={el.field_name}>{producto[el.field_name as keyof Omit<ProductoItem, 'stocks'> ]}</td>
           }
         }
       })}

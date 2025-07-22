@@ -176,19 +176,17 @@ export const camposLaboratorioInit: CampoTable[] = [
 ]
 export const camposProductoInit: CampoTable[] = [
   {show: true, orderable: false, order_dir:"", field_name: "acciones", field_label:"Acciones",},
-  {show: true, orderable: false, order_dir:"", field_name: "establecimiento_id", field_label:"estab id",},
   {show: false, orderable: true, order_dir:"", field_name: "id", field_label:"Id",},
   {show: false, orderable: true, order_dir:"", field_name: "codigo", field_label:"Codigo",},
+  {show: false, orderable: true, order_dir:"", field_name: "barcode", field_label:"Cód. barras",},
   {show: true, orderable: true, order_dir:"", field_name: "descripcion", field_label:"Descripcion",},
   {show: false, orderable: false, order_dir:"", field_name: "marca_id", field_label:"Marca id",},
   {show: false, orderable: true, order_dir:"", field_name: "marca", field_label:"Marca",},
   {show: false, orderable: false, order_dir:"", field_name: "laboratorio_id", field_label:"Laboratorio id",},
   {show: false, orderable: true, order_dir:"", field_name: "laboratorio", field_label:"Lab",},
-  {show: false, orderable: true, order_dir:"", field_name: "barcode", field_label:"Cód. barras",},
-  {show: true, orderable: true, order_dir:"", field_name: "stock", field_label:"Stock",},
+  {show: true, orderable: true, order_dir:"", field_name: "stocks", field_label:"Stock",},
+  {show: true, orderable: true, order_dir:"", field_name: "undad_medida_cod", field_label:"Unidad",},
   {show: false, orderable: false, order_dir:"", field_name: "estado", field_label:"Estado",},
-  {show: true, orderable: true, order_dir:"", field_name: "created_at", field_label:"F creacion",},
-  {show: true, orderable: true, order_dir:"", field_name: "updated_at", field_label:"F actualización",},    
 ]
 export const camposClienteInit: CampoTable[] = [
   {show: true, orderable: false, order_dir: "", field_name: "acciones", field_label:"",},
@@ -207,4 +205,16 @@ export const camposProveedorInit: CampoTable[] = [
   {show: true, orderable: true, order_dir:"", field_name: "direccion", field_label:"Dirección",},
   {show: true, orderable: true, order_dir:"", field_name: "email", field_label:"Correo",},
   {show: true, orderable: true, order_dir:"", field_name: "telefono", field_label:"Teléf.",},
+]
+export const camposMovimientoInit: CampoTable[] = [
+    {show: true, orderable: false, order_dir:"", field_name: "acciones", field_label:"Acciones",},
+    {show: false, orderable: true, order_dir:"", field_name: "id", field_label:"Id",},
+    {show: false, orderable: false, order_dir:"", field_name: "establecimiento_id", field_label:"Establecimiento id",},
+    {show: true, orderable: true, order_dir:"", field_name: "establecimiento", field_label:"Establecimiento",},
+    {show: true, orderable: true, order_dir:"", field_name: "fecha", field_label:"Fecha",},
+    {show: true, orderable: true, order_dir:"", field_name: "numeracion", field_label:"Numeración",},
+    {show: true, orderable: true, order_dir:"", field_name: "tipo", field_label:"Tipo",},
+    {show: true, orderable: true, order_dir:"", field_name: "concepto", field_label:"Concepto",},
+    {show: false, orderable: true, order_dir:"", field_name: "estado", field_label:"Estado",},
+    {show: false, orderable: true, order_dir:"", field_name: "created_at", field_label:"Creado",},
 ]

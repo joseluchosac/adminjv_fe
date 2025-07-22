@@ -229,7 +229,6 @@ export interface Producto {
 }
 export type ProductoItem = {
   id: number;
-  establecimiento_id: number;
   codigo: string;
   barcode: string;
   descripcion: string;
@@ -237,12 +236,11 @@ export type ProductoItem = {
   marca: string;
   laboratorio_id: number;
   laboratorio: string;
-  stock: number;
-  unidad: string;
+  stocks: stocksItem[];
+  unidad_medida_cod: string;
   estado: number;
-  created_at: string;
-  updated_at: string;
 }
+type stocksItem = {e:string, s:string}
 export interface ProductoQryRes extends QueryResp {
   content: Producto;
 }
@@ -351,6 +349,7 @@ export type MovimientoItem = {
 }
 export type Movimientoform = {
   establecimiento_id: number;
+  campo_stock: string;
   tipo: string;
   serie_pre: string;
   concepto: string;
@@ -494,6 +493,7 @@ export type Establecimiento = {
   dis_prov_dep: string;
   telefono: string;
   email: string;
+  campo_stock: string;
   estado: number;
 }
 export type EstablecimientoOption = {

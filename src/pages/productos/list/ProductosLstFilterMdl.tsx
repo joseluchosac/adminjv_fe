@@ -24,6 +24,7 @@ type Props = {
   isFetching: boolean;
   camposProducto: CampoTable[]
 }
+
 const ProductosLstFilterMdl: React.FC<Props> = ({isFetching, camposProducto}) => {
   const [tabName, setTabName] = useState("order")
   const [dateRange, setDateRange] = useState(dateRangeInit);

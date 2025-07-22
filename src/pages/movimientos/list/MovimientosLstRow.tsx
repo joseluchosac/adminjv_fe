@@ -1,10 +1,10 @@
 import { format, isValid, parseISO } from "date-fns";
-import { CampoTable, Movimiento } from "../../core/types";
+import { CampoTable, Movimiento } from "../../../core/types";
 import { FaEdit, FaToggleOff, FaToggleOn, FaTrash } from "react-icons/fa";
-import { useMutationMovimientosQuery } from "../../core/hooks/useMovimientosQuery";
+import { useMutationMovimientosQuery } from "../../../core/hooks/useMovimientosQuery";
 import { useEffect } from "react";
 import { toast } from "react-toastify";
-import { useMovimientos } from "./hooks/useMovimientos";
+import { useMovimientos } from "../hooks/useMovimientos";
 
 interface MovimientosLstRowProps {
   movimiento: Movimiento ;

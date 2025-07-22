@@ -28,7 +28,7 @@ type GetEstablecimientoQuery = {
   getEstablecimiento: (id: number) => void
 }
 
-const establecimientoFormInit = {
+const establecimientoFormInit: Establecimiento = {
   id: 0,
   codigo: "",
   tipo: "",
@@ -38,6 +38,7 @@ const establecimientoFormInit = {
   dis_prov_dep: "",
   telefono: "",
   email: "",
+  campo_stock: "",
   estado: 1,
 }
 
@@ -189,7 +190,7 @@ export default function EstablecimientoForm() {
                   <div className="invalid-feedback d-block">{errors.tipo.message}</div>
                 }
               </Form.Group>
-              <Form.Group as={Col} md={12} className="mb-3">
+              <Form.Group as={Col} md={8} className="mb-3">
                 <Form.Label htmlFor="descripcion">Descripción</Form.Label>
                 <Form.Control
                   id="descripcion"
@@ -199,6 +200,16 @@ export default function EstablecimientoForm() {
                 />
                 {errors.descripcion && 
                   <div className="invalid-feedback d-block">{errors.descripcion.message}</div>
+                }
+              </Form.Group>
+              <Form.Group as={Col} md={4} className="mb-3">
+                <Form.Label htmlFor="campo_stock">Campo stock</Form.Label>
+                <Form.Control
+                  id="campo_stock"
+                  {...register('campo_stock',{ required:"Ingrese la dirección"})}
+                />
+                {errors.campo_stock && 
+                  <div className="invalid-feedback d-block">{errors.campo_stock.message}</div>
                 }
               </Form.Group>
               <Form.Group as={Col} md={12} className="mb-3">

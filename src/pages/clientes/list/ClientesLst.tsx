@@ -3,21 +3,19 @@ import { Card, Container, Table } from "react-bootstrap";
 import { toast } from "react-toastify";
 import DynaIcon from "../../../core/components/DynaComponents";
 import { LdsBar, LdsEllipsisCenter } from "../../../core/components/Loaders";
-import { useClientes } from "../context/ClientesContext";
 import { useFilterClientesQuery } from "../../../core/hooks/useClientesQuery";
 import { camposClienteInit } from "../../../core/utils/constants";
 import ClientesHead from "./ClientesHead";
 import ClientesTblRow from "./ClientesTblRow";
+import useClientesStore from "../../../core/store/useClientesStore";
 
 export default function ClientesLst() {
   const [ camposCliente, setCamposCliente ] = useState(camposClienteInit)
   const tableRef = useRef<HTMLDivElement | null>(null)
   const ldsEllipsisRef = useRef<HTMLDivElement | null>(null)
-  const {
-    setFilterInfoClientes,
-    filterParamsClientesForm,
-    setFilterParamsClientesForm,
-  } = useClientes()
+  const setFilterInfoClientes = useClientesStore(state => state.setFilterInfoClientes)
+  const filterParamsClientesForm = useClientesStore(state => state.filterParamsClientesForm)
+  const setFilterParamsClientesForm = useClientesStore(state => state.setFilterParamsClientesForm)
 
   const {
     data,
@@ -26,7 +24,6 @@ export default function ClientesLst() {
     isFetching,
     isError,
     hasNextPage,
-    setFilterParamsClientes
   } = useFilterClientesQuery();
 
   const sort = (field_name:string, field_label: string, ctrlKey: boolean) => {
@@ -60,10 +57,6 @@ export default function ClientesLst() {
       }
     }
   };
-
-  useEffect(() => {
-    setFilterParamsClientes(filterParamsClientesForm)
-  }, [filterParamsClientesForm])
   
   useEffect(()=>{
     if(data?.pages[0].error || isError){

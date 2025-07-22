@@ -1,25 +1,23 @@
-import { useEffect, useState } from "react";
 import { Badge, Button, Col, Form, InputGroup, Row, Stack } from "react-bootstrap";
 import { BsSearch } from "react-icons/bs";
 import { useDebounce } from "react-use";
 import DynaIcon from "../../../core/components/DynaComponents";
-import { useClientes } from "../context/ClientesContext";
 import { filterParamsInit } from "../../../core/utils/constants";
 import useClientesStore from "../../../core/store/useClientesStore";
 
 export default function ClientesHead() {
-  const [inputSearch, setInputSearch] = useState("")
   const setShowClienteForm = useClientesStore(state => state.setShowClienteForm)
   const setCurrentClienteId = useClientesStore(state => state.setCurrentClienteId)
-  const {
-    filterInfoClientes,
-    filterParamsClientesForm,
-    setFilterParamsClientesForm
-  } = useClientes()
+  const filterInfoClientes = useClientesStore(state => state.filterInfoClientes)
+  const filterParamsClientesForm = useClientesStore(state => state.filterParamsClientesForm)
+  const setFilterParamsClientesForm = useClientesStore(state => state.setFilterParamsClientesForm)
+  const inputSearch = useClientesStore(state => state.inputSearch)
+  const setInputSearch = useClientesStore(state => state.setInputSearch)
 
   useDebounce(() => { 
     if (inputSearch.toLowerCase().trim() == filterParamsClientesForm.search.toLowerCase().trim()) return
     setFilterParamsClientesForm({ ...filterParamsClientesForm, search: inputSearch.trim() });
+    console.log("hola")
   }, 500, [inputSearch]);
 
   const handleUnsort = () => {
@@ -30,11 +28,6 @@ export default function ClientesHead() {
     setCurrentClienteId(0)
     setShowClienteForm(true);
   };
-
-  useEffect(()=>{
-    setInputSearch(filterParamsClientesForm.search)
-  }, [])
-
 
   return (
     <div className="mb-2 pt-2">
@@ -49,7 +42,9 @@ export default function ClientesHead() {
               name="search"
               type="search"
               value={inputSearch}
-              onChange={(e) => setInputSearch(e.target.value)}
+              onChange={(e) => {
+                setInputSearch(e.target.value)
+              }}
             />
             <Button variant="outline-secondary" className="px-2 py-1">
               <BsSearch />

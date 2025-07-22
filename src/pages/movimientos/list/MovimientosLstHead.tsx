@@ -1,33 +1,31 @@
 const apiDOCS = import.meta.env.VITE_DOCS_URL;
 import { useEffect, useState } from 'react'
 import { Badge, Button, Col, Container, Dropdown, Form, Row, Stack } from 'react-bootstrap'
-import { LdsBar } from '../../core/components/Loaders'
+import { LdsBar } from '../../../core/components/Loaders'
 import { FaFileExcel, FaFilePdf, FaFilter } from 'react-icons/fa'
-import DynaIcon from '../../core/components/DynaComponents'
+import DynaIcon from '../../../core/components/DynaComponents'
 import { useDebounce } from 'react-use'
-import { filterParamsInit } from '../../core/utils/constants'
-import { objToUriBase64 } from '../../core/utils/funciones'
-import useMovimientosStore from '../../core/store/useMovimientosStore';
-import { useFilterMovimientosQuery } from '../../core/hooks/useMovimientosQuery';
-import { useMovimientos } from './hooks/useMovimientos';
+import { filterParamsInit } from '../../../core/utils/constants'
+import { objToUriBase64 } from '../../../core/utils/funciones'
+import { useMovimientos } from '../hooks/useMovimientos';
 
-export default function MovimientosLstHead() {
+type Props = {isFetching: boolean}
+
+export default function MovimientosLstHead({isFetching}: Props) {
   const [inputSearch, setInputSearch] = useState("")
-  const filterParamsMovimientos = useMovimientosStore(state => state.filterParamsMovimientos)
-  const setFilterParamsMovimientos = useMovimientosStore(state => state.setFilterParamsMovimientos)
 
   const {
-    filterMovimientosCurrent, 
+    filterInfoMovimientos,
+    filterParamsMovimientosForm,
+    setFilterParamsMovimientosForm,
     setShowMovimientosFilterMdl,
     modo,
     setModo,
   } = useMovimientos()
 
-  const { isFetching: isFetchingMovimientos } = useFilterMovimientosQuery();
-
   useDebounce(() => { 
-    if (inputSearch.toLowerCase().trim() == filterParamsMovimientos.search.toLowerCase().trim()) return
-    setFilterParamsMovimientos({ ...filterParamsMovimientos, search: inputSearch.trim() });
+    if (inputSearch.toLowerCase().trim() == filterParamsMovimientosForm.search.toLowerCase().trim()) return
+    setFilterParamsMovimientosForm({ ...filterParamsMovimientosForm, search: inputSearch.trim() });
   }, 500, [inputSearch]);
   const handleSetShowMovimientosFilterMdl = (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
     e.preventDefault()
@@ -36,18 +34,18 @@ export default function MovimientosLstHead() {
   const handleUnequal = (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
     const {field_name} = e.currentTarget.dataset
     if(field_name){
-      let { equals } = filterParamsMovimientos;
+      let { equals } = filterParamsMovimientosForm;
       equals = equals.filter(el => el.field_name !== field_name)
-      setFilterParamsMovimientos({ ...filterParamsMovimientos, equals: [...equals] });
+      setFilterParamsMovimientosForm({ ...filterParamsMovimientosForm, equals: [...equals] });
     }
   };
   
   const handleUnsort = () => {
-    setFilterParamsMovimientos({...filterParamsMovimientos, orders: filterParamsInit.orders})
+    setFilterParamsMovimientosForm({...filterParamsMovimientosForm, orders: filterParamsInit.orders})
   };
 
   const handleUnbetween = () => {
-    setFilterParamsMovimientos({...filterParamsMovimientos, between: filterParamsInit.between})
+    setFilterParamsMovimientosForm({...filterParamsMovimientosForm, between: filterParamsInit.between})
   }
 
   const handleNuevo = () => {
@@ -55,7 +53,7 @@ export default function MovimientosLstHead() {
   };
 
   const getDateRangeInfo = () => {
-    const {between} = filterParamsMovimientos
+    const {between} = filterParamsMovimientosForm
     if(!between.field_name) return ""
     let date_from = between.range.split(",")[0].split(" ")[0]
     let date_to = between.range.split(",")[1].trim().split(" ")[0]
@@ -68,18 +66,18 @@ export default function MovimientosLstHead() {
   }
 
   const handleTraerTodo = () => {
-    const param = objToUriBase64(filterParamsMovimientos)
+    const param = objToUriBase64(filterParamsMovimientosForm)
     window.open(apiDOCS+"pdf/?action=movimientos_report&p=" + param)
   }
 
   useEffect(()=>{
-    setInputSearch(filterParamsMovimientos.search)
+    setInputSearch(filterParamsMovimientosForm.search)
   }, [])
 
 
   return (
       <Container className={`mb-2 pt-2 position-relative ${modo.vista === "edit" ? "d-none" : ""}`}>
-          {isFetchingMovimientos && <LdsBar />}
+          {isFetching && <LdsBar />}
         <Row className="align-items-center">
           <Col sm className="text-center text-sm-start">
             <h5>Lista de Movimientos</h5>
@@ -133,27 +131,27 @@ export default function MovimientosLstHead() {
               <Stack
                 direction="horizontal"
                 gap={2}
-                className={`${filterMovimientosCurrent.orders.length ? "" : "d-none"}`}
+                className={`${filterInfoMovimientos.orders.length ? "" : "d-none"}`}
               >
                 <Badge bg="secondary" role="button" onClick={handleUnsort} className="d-flex gap-1">
                   <DynaIcon name="FaCircleXmark"  className="pr-4" />
                     ORDEN:
                     <div className="text-wrap">
-                      {filterMovimientosCurrent.orders.map((el) => el.field_label).join(", ")}
+                      {filterInfoMovimientos.orders.map((el) => el.field_label).join(", ")}
                     </div>
                 </Badge>
               </Stack>
-                {(filterMovimientosCurrent.between.field_name.length !== 0) &&
+                {(filterInfoMovimientos.between.field_name.length !== 0) &&
                   <Stack direction="horizontal" gap={2} className="flex-wrap">
                     <Badge bg="secondary" role="button" onClick={handleUnbetween} className="d-flex gap-1">
                       <DynaIcon name="FaCircleXmark"  className="pr-4" />
-                      {`${filterMovimientosCurrent.between.field_label}: `}
+                      {`${filterInfoMovimientos.between.field_label}: `}
                       <div className="text-wrap">{getDateRangeInfo()}</div>
                     </Badge>
                   </Stack>
                 }
               <Stack direction="horizontal" gap={2}>
-                {filterMovimientosCurrent.equals.map((el, idx) => {
+                {filterInfoMovimientos.equals.map((el, idx) => {
                   return (
                     <Badge 
                       bg="secondary" 

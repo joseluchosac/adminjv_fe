@@ -41,13 +41,15 @@ interface NroDocumentoQryRes extends QueryResp {
 interface ProveedorQryRes extends QueryResp {
   content: Proveedor;
 }
+type Props = {
+  onMutation?: (proveedor: Proveedor)=>void;
+}
 
-export default function ProveedorForm() {
+export default function ProveedorForm({onMutation}:Props) {
   const showProveedorForm = useProveedoresStore((state) => state.showProveedorForm);
   const setShowProveedorForm = useProveedoresStore(
     (state) => state.setShowProveedorForm
   );
-  const setLastSettedProveedor = useProveedoresStore((state) => state.setLastSettedProveedor);
   const currentProveedorId = useProveedoresStore((state) => state.currentProveedorId);
   const darkMode = useLayoutStore((state) => state.layout.darkMode);
   const abortUbigeos = useRef<AbortController | null>(null);
@@ -156,10 +158,6 @@ export default function ProveedorForm() {
   };
 
   useEffect(() => {
-    setLastSettedProveedor(null)
-  }, []);
-  
-  useEffect(() => {
     if (showProveedorForm) {
       if (currentProveedorId) {
         getProveedor(currentProveedorId);
@@ -181,11 +179,6 @@ export default function ProveedorForm() {
       setValue("telefono", nroDocumento.content.telefono);
       setValue("api", 1, { shouldDirty: true });
     } else {
-      // setValue("nombre_razon_social", "");
-      // setValue("api", 0);
-      // setValue("direccion", "");
-      // setValue("ubigeo_inei", "", { shouldDirty: true });
-      // setValue("dis_prov_dep", "");
       toast(nroDocumento.msg, { type: nroDocumento.msgType });
     }
   }, [nroDocumento]);
@@ -208,11 +201,15 @@ export default function ProveedorForm() {
     setShowProveedorForm(false);
   }, [isErrorProveedor]);
 
-  useEffect(() => {
+  useEffect(() => {  
     if (!mutation) return;
-    if (!mutation.error) setShowProveedorForm(false);
+    if(mutation?.msgType === 'success'){
+      if(onMutation){
+        onMutation(mutation.content)
+      }
+      setShowProveedorForm(false)
+    }
     toast(mutation.msg, { type: mutation.msgType });
-    setLastSettedProveedor(mutation.content)
   }, [mutation]);
 
   return (

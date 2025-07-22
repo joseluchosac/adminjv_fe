@@ -1,32 +1,28 @@
 import { createContext, useState } from "react";
-import { FilterInfo, Movimiento, Movimientoform } from "../../../core/types";
+import { FilterInfo, FilterParams, Movimientoform } from "../../../core/types";
 import { useForm, UseFormReturn } from "react-hook-form";
+import { filterInfoInit, filterParamsInit } from "../../../core/utils/constants";
 
 type Modo = {
   vista: "list" | "edit";
-}
-
-const filterMovimientosCurrentInit: FilterInfo = {
-  search: "",
-  equals: [],
-  between: {field_name: "", field_label: "", range: ""},
-  orders: [], 
+  movimientoId: number;
 }
 
 export interface MovimientosContextType {
-  movimientos: Movimiento[] | null;
-  setMovimientos: React.Dispatch<React.SetStateAction<Movimiento[] | null>>;
-  userMovimientoForm: UseFormReturn<Movimientoform, any, undefined>
-  filterMovimientosCurrent: FilterInfo;
-  setFilterMovimientosCurrent: React.Dispatch<React.SetStateAction<FilterInfo>>;
+  userMovimientoForm: UseFormReturn<Movimientoform, any, undefined>;
   modo: Modo;
   setModo: React.Dispatch<React.SetStateAction<Modo>>;
   showMovimientosFilterMdl: boolean;
   setShowMovimientosFilterMdl: React.Dispatch<React.SetStateAction<boolean>>;
+  filterInfoMovimientos: FilterInfo;
+  setFilterInfoMovimientos: React.Dispatch<React.SetStateAction<FilterInfo>>;
+  filterParamsMovimientosForm: FilterParams;
+  setFilterParamsMovimientosForm: React.Dispatch<React.SetStateAction<FilterParams>>;
 }
 
 export const movimientoFormInit: Movimientoform = {
   establecimiento_id: 0,
+  campo_stock: "",
   tipo: "",
   serie_pre: "M",
   concepto: "",
@@ -40,24 +36,24 @@ export const MovimientosContext = createContext<MovimientosContextType | undefin
 
 // Proveedor del contexto
 export const MovimientosProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [movimientos, setMovimientos] = useState<Movimiento[] | null>(null);
-  const [modo, setModo] = useState<Modo>({vista: "list"});
-  const [filterMovimientosCurrent, setFilterMovimientosCurrent] = useState(filterMovimientosCurrentInit);
+  const [modo, setModo] = useState<Modo>({vista: "list", movimientoId: 0});
+  const [filterInfoMovimientos, setFilterInfoMovimientos] = useState(filterInfoInit);
   const [showMovimientosFilterMdl, setShowMovimientosFilterMdl] = useState(false);
+  const [filterParamsMovimientosForm, setFilterParamsMovimientosForm] = useState(filterParamsInit);
 
   const userMovimientoForm = useForm<Movimientoform>({defaultValues: movimientoFormInit})
 
   return (
     <MovimientosContext.Provider value={{ 
-      movimientos, 
-      setMovimientos,
       userMovimientoForm,
       modo,
       setModo,
+      filterInfoMovimientos,
+      setFilterInfoMovimientos,
       showMovimientosFilterMdl,
       setShowMovimientosFilterMdl,
-      filterMovimientosCurrent,
-      setFilterMovimientosCurrent,
+      filterParamsMovimientosForm,
+      setFilterParamsMovimientosForm,
     }}>
       {children}
     </MovimientosContext.Provider>

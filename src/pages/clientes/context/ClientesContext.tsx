@@ -18,7 +18,7 @@ export const ClientesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [filterParamsClientesForm, setFilterParamsClientesForm] = useState(filterParamsInit);
 
   return (
-    <ClientesContext.Provider value={{ 
+    <ClientesContext.Provider value={{
       filterInfoClientes,
       setFilterInfoClientes,
       filterParamsClientesForm,
