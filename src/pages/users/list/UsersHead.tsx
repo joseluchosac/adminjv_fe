@@ -1,83 +1,91 @@
 const apiDOCS = import.meta.env.VITE_DOCS_URL;
-import { useEffect, useState } from 'react'
-import { Badge, Button, Col, Container, Dropdown, Form, Row, Stack } from 'react-bootstrap'
-import { LdsBar } from '../../../core/components/Loaders'
-import { FaFileExcel, FaFilePdf, FaFilter } from 'react-icons/fa'
-import DynaIcon from '../../../core/components/DynaComponents'
-import { useDebounce } from 'react-use'
-import { filterParamsInit } from '../../../core/utils/constants'
-import { objToUriBase64 } from '../../../core/utils/funciones'
-import { useUsers } from '../context/UsersContext';
+import { useEffect, useState } from "react";
+import {
+  Badge,
+  Button,
+  Col,
+  Container,
+  Dropdown,
+  Form,
+  Row,
+  Stack,
+} from "react-bootstrap";
+import { LdsBar } from "../../../core/components/Loaders";
+import { FaFileExcel, FaFilePdf, FaFilter } from "react-icons/fa";
+import DynaIcon from "../../../core/components/DynaComponents";
+import { useDebounce } from "react-use";
+import { objToUriBase64 } from "../../../core/utils/funciones";
+import { useUsers } from "../context/UsersContext";
 
-type Props = {isFetching: boolean}
+type Props = { isFetching: boolean };
 
-export default function UsersHead({isFetching}: Props) {
-  const [inputSearch, setInputSearch] = useState("")
+export default function UsersHead({ isFetching }: Props) {
+  const [inputSearch, setInputSearch] = useState("");
 
   const {
     setShowUserForm,
     setCurrentUserId,
-    filterInfoUsers,
+    infoFilterUsers: { equal, between, order },
     filterParamsUsersForm,
     setFilterParamsUsersForm,
-    setShowUsersFilterMdl
-  } = useUsers()
+    setShowUsersFilterMdl,
+  } = useUsers();
 
+  useDebounce(
+    () => {
+      if (
+        inputSearch.toLowerCase().trim() ==
+        filterParamsUsersForm.search.toLowerCase().trim()
+      )
+        return;
+      setFilterParamsUsersForm({
+        ...filterParamsUsersForm,
+        search: inputSearch.trim(),
+      });
+    },
+    500,
+    [inputSearch]
+  );
 
-  useDebounce(() => { 
-    if (inputSearch.toLowerCase().trim() == filterParamsUsersForm.search.toLowerCase().trim()) return
-    setFilterParamsUsersForm({ ...filterParamsUsersForm, search: inputSearch.trim() });
-  }, 500, [inputSearch]);
+  const handleSetShowUsersFilterMdl = (
+    e: React.MouseEvent<HTMLElement, MouseEvent>
+  ) => {
+    e.preventDefault();
+    setShowUsersFilterMdl(true);
+  };
 
-  const handleSetShowUsersFilterMdl = (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
-    e.preventDefault()
-    setShowUsersFilterMdl(true)
-  }
-
-  const handleUnequal = (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
-    const {field_name} = e.currentTarget.dataset
-    if(field_name){
-      let { equals } = filterParamsUsersForm;
-      equals = equals.filter(el => el.field_name !== field_name)
-      setFilterParamsUsersForm({ ...filterParamsUsersForm, equals: [...equals] });
+  const resetEqual = (field_name: string) => {
+    if (field_name) {
+      let { equal } = filterParamsUsersForm;
+      equal = equal.filter((el) => el.field_name !== field_name);
+      setFilterParamsUsersForm({ ...filterParamsUsersForm, equal: [...equal] });
     }
   };
-  
-  const handleUnsort = () => {
-    setFilterParamsUsersForm({...filterParamsUsersForm, orders: filterParamsInit.orders})
+  const resetBetween = (field_name: string) => {
+    let { between } = filterParamsUsersForm;
+    between = between.filter((el) => el.field_name !== field_name);
+    setFilterParamsUsersForm({
+      ...filterParamsUsersForm,
+      between: [...between],
+    });
+  };
+  const resetSort = () => {
+    setFilterParamsUsersForm({ ...filterParamsUsersForm, order: [] });
   };
 
-  const handleUnbetween = () => {
-    setFilterParamsUsersForm({...filterParamsUsersForm, between: filterParamsInit.between})
-  }
-
   const handleNuevo = () => {
-    setCurrentUserId(0)
+    setCurrentUserId(0);
     setShowUserForm(true);
   };
 
-  const getDateRangeInfo = () => {
-    const {between} = filterParamsUsersForm
-    if(!between.field_name) return ""
-    let date_from = between.range.split(",")[0].split(" ")[0]
-    let date_to = between.range.split(",")[1].trim().split(" ")[0]
-    date_from = date_from.split("-").reverse().join("/")
-    date_to = date_to.split("-").reverse().join("/")
-    let range = (date_from == date_to)
-      ? date_from 
-      : `Entre ${date_from} y ${date_to}`
-    return range
-  }
-
   const handleTraerTodo = () => {
-    const param = objToUriBase64(filterParamsUsersForm)
-    window.open(apiDOCS+"pdf/?action=users_report&p=" + param)
-  }
+    const param = objToUriBase64(filterParamsUsersForm);
+    window.open(apiDOCS + "pdf/?action=users_report&p=" + param);
+  };
 
-  useEffect(()=>{
-    setInputSearch(filterParamsUsersForm.search)
-  }, [])
-
+  useEffect(() => {
+    setInputSearch(filterParamsUsersForm.search);
+  }, []);
 
   return (
     <Container className="mb-2 pt-2 position-relative">
@@ -91,36 +99,41 @@ export default function UsersHead({isFetching}: Props) {
             type="search"
             placeholder="Buscar"
             value={inputSearch}
-            onChange={(e)=>setInputSearch(e.target.value)}
-            />
+            onChange={(e) => setInputSearch(e.target.value)}
+          />
         </Col>
         <Col className="text-center flex-sm-grow-0">
           <div className="d-flex justify-content-center align-items-center gap-3">
             <div className="d-flex">
-              <div 
-                role="button" 
+              <div
+                role="button"
                 className="d-flex align-items-center px-2 boton-icon"
                 title="Generar archivo xls"
                 onClick={handleTraerTodo}
               >
-                <FaFileExcel className="fs-5 text-success"/>
+                <FaFileExcel className="fs-5 text-success" />
               </div>
-              <div 
-                role="button" 
-                className="d-flex align-items-center px-2 boton-icon" 
+              <div
+                role="button"
+                className="d-flex align-items-center px-2 boton-icon"
                 title="Generar archivo pdf"
                 onClick={handleTraerTodo}
               >
-                <FaFilePdf className="fs-5 text-danger"/>
+                <FaFilePdf className="fs-5 text-danger" />
               </div>
             </div>
-            <Dropdown style={{zIndex:"1030"}}>
-              <Dropdown.Toggle split  variant="outline-secondary" />
+            <Dropdown style={{ zIndex: "1030" }}>
+              <Dropdown.Toggle split variant="outline-secondary" />
               <Dropdown.Menu>
-                <Dropdown.Item href="#" onClick={handleSetShowUsersFilterMdl} className='d-flex gap-2 align-items-center'>
-                  <FaFilter/><div>Mostrar filtros</div>
+                <Dropdown.Item
+                  href="#"
+                  onClick={handleSetShowUsersFilterMdl}
+                  className="d-flex gap-2 align-items-center"
+                >
+                  <FaFilter />
+                  <div>Mostrar filtros</div>
                 </Dropdown.Item>
-              </Dropdown.Menu>                
+              </Dropdown.Menu>
             </Dropdown>
             <Button onClick={handleNuevo} variant="primary">
               Nuevo
@@ -131,48 +144,64 @@ export default function UsersHead({isFetching}: Props) {
       <Row className="align-items-center">
         <Col className="text-end">
           <div className="d-flex gap-2 flex-wrap">
-            <Stack
-              direction="horizontal"
-              gap={2}
-              className={`${filterInfoUsers.orders.length ? "" : "d-none"}`}
-            >
-              <Badge bg="secondary" role="button" onClick={handleUnsort} className="d-flex gap-1">
-                <DynaIcon name="FaCircleXmark"  className="pr-4" />
+            {Boolean(equal.length) && (
+              <Stack direction="horizontal" gap={2} className="flex-wrap">
+                {equal.map((el, idx) => (
+                  <Badge
+                    bg="secondary"
+                    role="button"
+                    onClick={() => resetEqual(el.field_name)}
+                    className="d-flex gap-1"
+                    key={idx}
+                  >
+                    <DynaIcon name="FaCircleXmark" className="pr-4" />
+                    <div>
+                      {el.field_label}: {el.field_value}
+                    </div>
+                  </Badge>
+                ))}
+              </Stack>
+            )}
+            {Boolean(between.length) && (
+              <Stack direction="horizontal" gap={2} className="flex-wrap">
+                {between.map((el, idx) => (
+                  <Badge
+                    bg="secondary"
+                    role="button"
+                    onClick={() => resetBetween(el.field_name)}
+                    className="d-flex gap-1"
+                    key={idx}
+                  >
+                    <DynaIcon name="FaCircleXmark" className="pr-4" />
+                    <div>
+                      {`${el.field_label}: de ${el.from.split(" ")[0]} a ${
+                        el.to.split(" ")[0]
+                      }`}
+                    </div>
+                  </Badge>
+                ))}
+              </Stack>
+            )}
+            {Boolean(order.length) && (
+              <Stack direction="horizontal" gap={2} className="flex-wrap">
+                <Badge
+                  bg="secondary"
+                  role="button"
+                  className="d-flex gap-1"
+                  title="Quitar orden"
+                  onClick={resetSort}
+                >
+                  <DynaIcon name="FaCircleXmark" className="pr-4" />
                   ORDEN:
                   <div className="text-wrap">
-                    {filterInfoUsers.orders.map((el) => el.field_label).join(", ")}
+                    {order.map((el) => el.field_label).join(", ")}
                   </div>
-              </Badge>
-            </Stack>
-              {(filterInfoUsers.between.field_name.length !== 0) &&
-                <Stack direction="horizontal" gap={2} className="flex-wrap">
-                  <Badge bg="secondary" role="button" onClick={handleUnbetween} className="d-flex gap-1">
-                    <DynaIcon name="FaCircleXmark"  className="pr-4" />
-                    {`${filterInfoUsers.between.field_label}: `}
-                    <div className="text-wrap">{getDateRangeInfo()}</div>
-                  </Badge>
-                </Stack>
-              }
-            <Stack direction="horizontal" gap={2}>
-              {filterInfoUsers.equals.map((el, idx) => {
-                return (
-                  <Badge 
-                    bg="secondary" 
-                    role="button" 
-                    onClick={handleUnequal} 
-                    className="d-flex gap-1" 
-                    key={idx}
-                    data-field_name={el.field_name}
-                  >
-                    <DynaIcon name="FaCircleXmark"  className="pr-4" />
-                    <div>{el.label_name}: {el.label_value}</div>
-                  </Badge>
-                )
-              })}
-            </Stack>
+                </Badge>
+              </Stack>
+            )}
           </div>
         </Col>
       </Row>
     </Container>
-  )
+  );
 }

@@ -4,7 +4,7 @@ import { toast } from "react-toastify";
 import { useUsers } from "../context/UsersContext";
 import { useFilterUsersQuery } from "../../../core/hooks/useUsersQuery";
 import DynaIcon from "../../../core/components/DynaComponents";
-import { UserItem } from "../../../core/types";
+import { OrderItem, UserItem } from "../../../core/types";
 import { LdsEllipsisCenter } from "../../../core/components/Loaders";
 import UsersHead from "./UsersHead";
 import UsersTblRow from "./UsersTblRow";
@@ -15,7 +15,7 @@ import { camposUserInit } from "../../../core/utils/constants";
 export default function UsersLst() {
   const [ camposUser, setCamposUser] = useState(camposUserInit)
   const {
-    setFilterInfoUsers,
+    setInfoFilterUsers,
     filterParamsUsersForm,
     setFilterParamsUsersForm,
   } = useUsers()
@@ -34,32 +34,32 @@ export default function UsersLst() {
   const ldsEllipsisRef = useRef<HTMLDivElement | null>(null)
 
   const sort = (field_name:string, field_label: string, ctrlKey: boolean) => {
-    const orderIdx = filterParamsUsersForm.orders.findIndex(el => el.field_name === field_name)
+    const orderIdx = filterParamsUsersForm.order.findIndex(el => el.field_name === field_name)
     if(ctrlKey){
       if(orderIdx === -1){
-        const newOrder = {field_name, order_dir: "ASC", field_label}
-        setFilterParamsUsersForm({...filterParamsUsersForm, orders: [...filterParamsUsersForm.orders, newOrder]})
+        const newOrder: OrderItem = {field_name, order_dir: "ASC", field_label}
+        setFilterParamsUsersForm({...filterParamsUsersForm, order: [...filterParamsUsersForm.order, newOrder]})
       }else{
-        let newOrders = structuredClone(filterParamsUsersForm.orders)
+        let newOrders = structuredClone(filterParamsUsersForm.order)
         if(newOrders[orderIdx].order_dir == "ASC"){
           newOrders[orderIdx] = {field_name, order_dir: "DESC", field_label}
-          setFilterParamsUsersForm({...filterParamsUsersForm, orders: newOrders})
+          setFilterParamsUsersForm({...filterParamsUsersForm, order: newOrders})
         }else{
           newOrders = newOrders.filter(el=>el.field_name !== field_name)
-          setFilterParamsUsersForm({...filterParamsUsersForm, orders: newOrders})
+          setFilterParamsUsersForm({...filterParamsUsersForm, order: newOrders})
         }
       }
     }else{
-      if(orderIdx === -1){
-        const newOrder = {field_name, order_dir: "ASC", field_label}
-        setFilterParamsUsersForm({...filterParamsUsersForm, orders: [newOrder]})
+      if(orderIdx === -1){// Si no esta ordenado
+        const newOrder: OrderItem = {field_name, order_dir: "ASC", field_label}
+        setFilterParamsUsersForm({...filterParamsUsersForm, order: [newOrder]})
       }else{
-        let newOrders = structuredClone(filterParamsUsersForm.orders)
+        let newOrders = structuredClone(filterParamsUsersForm.order)
         if(newOrders[orderIdx].order_dir == "ASC"){
-          const newOrder = {field_name, order_dir: "DESC", field_label}
-          setFilterParamsUsersForm({...filterParamsUsersForm, orders: [newOrder]})
+          const newOrder: OrderItem = {field_name, order_dir: "DESC", field_label}
+          setFilterParamsUsersForm({...filterParamsUsersForm, order: [newOrder]})
         }else{
-          setFilterParamsUsersForm({...filterParamsUsersForm, orders: []})
+          setFilterParamsUsersForm({...filterParamsUsersForm, order: []})
         }
       }
     }
@@ -79,11 +79,11 @@ export default function UsersLst() {
       return
     }
     if(!isFetching){
-      const {search, equals, between, orders} = filterParamsUsersForm
-      setFilterInfoUsers({search, equals, between, orders})
+      const {search, equal, between, order} = filterParamsUsersForm
+      setInfoFilterUsers({search, equal, between, order})
       const newCamposUsers = camposUser.map(el=>{
-        const order = orders.find(order => order.field_name === el.field_name)
-        return order ? {...el, order_dir: order?.order_dir} : {...el, order_dir: ""}
+        const orderh = order.find(order => order.field_name === el.field_name)
+        return orderh ? {...el, order_dir: orderh?.order_dir} : {...el, order_dir: ""}
       })
       setCamposUser(newCamposUsers)
     }

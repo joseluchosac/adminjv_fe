@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import useSessionStore from "../store/useSessionStore"
 import { FilterQueryResp, FetchOptions, LoginForm, RegisterForm, QueryResp, User, UserItem, UserSession } from "../types"
-import { filterParamsInit } from "../utils/constants";
+import { filterParamInit, filterParamsInit } from "../utils/constants";
 import { fnFetch } from "../services/fnFetch";
 
 type TypeAction = 
@@ -45,10 +45,9 @@ interface UsersFilQryRes extends FilterQueryResp {
   filas: UserItem[];
 }
 export const useFilterUsersQuery = () => {
-  const [filterParamsUsers, setFilterParamsUsers] = useState(filterParamsInit)
+  const [filterParamsUsers, setFilterParamsUsers] = useState(filterParamInit)
   const token = useSessionStore(state => state.tknSession)
   const queryClient = useQueryClient()
-
   const {
     data,
     isError,
@@ -62,7 +61,7 @@ export const useFilterUsersQuery = () => {
       const page = pageParam as number
       const options: FetchOptions = {
         method: "POST",
-        url: `${apiURL}users/filter_users?page=${page}`,
+        url: `${apiURL}users/filter_users2?page=${page}`,
         body: JSON.stringify(filterParamsUsers),
         authorization: "Bearer " + token,
         signal
@@ -78,7 +77,7 @@ export const useFilterUsersQuery = () => {
   })
   const resetear = ()=>{
     queryClient.resetQueries({ queryKey: ['users'], exact: true });
-    setFilterParamsUsers(filterParamsInit)
+    setFilterParamsUsers(filterParamInit)
   }
 
   useEffect(() => {

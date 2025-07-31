@@ -10,15 +10,15 @@ import {
   subMonths,
   subWeeks,
 } from "date-fns";
-import { filterParamsInit } from "../../../core/utils/constants";
+// import { filterParamsInit } from "../../../core/utils/constants";
 import { useUsers } from "../context/UsersContext";
-import { CampoTable } from "../../../core/types";
+import { CampoTable, EqualItem, OrderItem } from "../../../core/types";
 import { LdsBar } from "../../../core/components/Loaders";
 import { useCajasQuery } from "../../../core/hooks/useCatalogosQuery";
 import { useRolesQuery } from "../../../core/hooks/useRolesQuery";
 
-const dateRangeInit = { field_name: "", field_label: "", date_from: "", date_to: "" };
-const equalFormInit = { rol_id: "", caja_id: "", estado: ""}
+const dateRangeInit = { field_name: "", field_label: "", from: "", to: "" };
+const equalFormInit = { rol: "", caja: "", estado: ""}
 
 type Props = {
   isFetching: boolean;
@@ -31,7 +31,7 @@ const UsersLstFilterMdl: React.FC<Props> = ({isFetching, camposUser}) => {
   const [equalForm, setEqualForm] = useState(equalFormInit)
   const {roles} = useRolesQuery()
   const {cajas} = useCajasQuery()
-  
+
   const {
     filterParamsUsersForm,
     setFilterParamsUsersForm,
@@ -39,36 +39,35 @@ const UsersLstFilterMdl: React.FC<Props> = ({isFetching, camposUser}) => {
     setShowUsersFilterMdl
   } = useUsers()
 
+
+
   const handleChangeOrder = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const field_name = e.target.value
     const field_label = e.currentTarget.options[e.currentTarget.selectedIndex].textContent || ""
-    const newOrders = field_name ? [{field_name, order_dir: "ASC", field_label}] : []
-    setFilterParamsUsersForm({...filterParamsUsersForm, orders: newOrders})
+    const newOrders: OrderItem[] = field_name ? [{field_name, order_dir: "ASC", field_label}] : []
+    setFilterParamsUsersForm({...filterParamsUsersForm, order: newOrders})
   }
 
   const handleChangeOrderDir = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const order_dir = e.target.value
-    const newOrders = [{...filterParamsUsersForm.orders[0], order_dir}]
-    setFilterParamsUsersForm({...filterParamsUsersForm, orders: newOrders})
+    const order_dir = e.target.value as "ASC" | "DESC"
+    const newOrders: OrderItem[] = [{...filterParamsUsersForm.order[0], order_dir}]
+    setFilterParamsUsersForm({...filterParamsUsersForm, order: newOrders})
   }
 
-  const handleChangeEqual = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const label_name = e.currentTarget.previousElementSibling?.textContent || ""
-    const { name: field_name, value: field_value } = e.currentTarget;
-    const label_value = e.currentTarget.options[e.currentTarget.selectedIndex].textContent || ""
-    setEqualForm({...equalForm, [field_name]:field_value})
-    let { equals } = filterParamsUsersForm;
-    const idx = equals.findIndex(el => el.field_name === field_name)
+  const filterEqual = ({field_name, field_value, field_label}: EqualItem) => {
+    setEqualForm({...equalForm, [field_name]: field_value})
+    let equalClone = structuredClone(filterParamsUsersForm.equal);
     if(!field_value){
-      equals = equals.filter(el => el.field_name !== field_name)
+      equalClone = equalClone.filter(el => el.field_name !== field_name)
     }else{
+      const idx = equalClone.findIndex(el => el.field_name === field_name)
       if(idx === -1){
-        equals = [ ...equals, {field_name, field_value, label_name, label_value} ]
+        equalClone = [ ...equalClone, {field_name, field_value, field_label} ]
       }else{
-        equals[idx] = {field_name, field_value, label_name, label_value}
+        equalClone[idx] = {field_name, field_value, field_label}
       }
     }
-    setFilterParamsUsersForm({ ...filterParamsUsersForm, equals: [...equals] });
+    setFilterParamsUsersForm({ ...filterParamsUsersForm, equal: equalClone });
   }
 
   const handleSelectCampoRange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -84,11 +83,11 @@ const UsersLstFilterMdl: React.FC<Props> = ({isFetching, camposUser}) => {
 
   const handleChangeDate = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.currentTarget;
-    if (name === "date_from") {
-      setDateRange({ ...dateRange, [name]: value, date_to: value });
-    } else if (name === "date_to") {
+    if (name === "from") {
+      setDateRange({ ...dateRange, [name]: value, to: value });
+    } else if (name === "to") {
       if (value === "") {
-        setDateRange({ ...dateRange, [name]: dateRange.date_from });
+        setDateRange({ ...dateRange, [name]: dateRange.from });
       } else {
         setDateRange({ ...dateRange, [name]: value });
       }
@@ -116,53 +115,47 @@ const UsersLstFilterMdl: React.FC<Props> = ({isFetching, camposUser}) => {
     }
     const startFormatDate = format(startDate, "yyyy-MM-dd");
     const endFormatDate = format(endDate, "yyyy-MM-dd");
-    setDateRange({ ...dateRange, date_from: startFormatDate, date_to: endFormatDate });
+    setDateRange({ ...dateRange, from: startFormatDate, to: endFormatDate });
     if(range_name){
       setRangeName(range_name)
     }
   };
 
   const handleFilterBetween = () => {
-    if(!dateRange.field_name || !dateRange.date_from || !dateRange.date_to) return
+    if(!dateRange.field_name || !dateRange.from || !dateRange.to) return
     const newBetween = {
       field_name: dateRange.field_name,
       field_label: dateRange.field_label,
-      range:
-        (dateRange.date_from ? dateRange.date_from + " 00:00:00, " : "") +
-        (dateRange.date_to ? dateRange.date_to + " 23:59:59" : ""),
+      from: dateRange.from ? dateRange.from + " 00:00:00" : "",
+      to: dateRange.to ? dateRange.to + " 23:59:59" : "",
     };
-    if (
-      filterParamsUsersForm.between.field_name == newBetween.field_name &&
-      filterParamsUsersForm.between.range == newBetween.range
-    ) return;
-    setFilterParamsUsersForm({ ...filterParamsUsersForm, between: newBetween });
+    setFilterParamsUsersForm({ ...filterParamsUsersForm, between: [newBetween] });
   };
 
   const handleUnbetween = () => {
     setDateRange(dateRangeInit);
     setRangeName("")
-    if(!filterParamsUsersForm.between.field_name) return
-    setFilterParamsUsersForm({...filterParamsUsersForm, between: filterParamsInit.between})
-    
+    if(!filterParamsUsersForm.between.length) return
+    setFilterParamsUsersForm({...filterParamsUsersForm, between: []})
   }
 
   
   useEffect(() => {
-    if(showUsersFilterMdl){
-      if(!filterParamsUsersForm.between.field_name){
-        handleUnbetween()
-      }
-      const {range, field_name, field_label} = filterParamsUsersForm.between
-      const date_from = range ? range.split(", ")[0].split(" ")[0] : ""
-      const date_to = range ? range.split(", ")[1].split(" ")[0] : ""
-      setDateRange({field_name, field_label, date_from, date_to})
-      const newEqualForm = structuredClone(equalFormInit)
-      for (const el of filterParamsUsersForm.equals) {
-        const field_name = el.field_name as keyof typeof equalFormInit
-        newEqualForm[field_name] = el.field_value
-      }
-      setEqualForm(newEqualForm)
-    }
+    // if(showUsersFilterMdl){
+    //   if(!filterParamsUsersForm.between.field_name){
+    //     handleUnbetween()
+    //   }
+    //   const {range, field_name, field_label} = filterParamsUsersForm.between
+    //   const from = range ? range.split(", ")[0].split(" ")[0] : ""
+    //   const to = range ? range.split(", ")[1].split(" ")[0] : ""
+    //   setDateRange({field_name, field_label, from, to})
+    //   const newEqualForm = structuredClone(equalFormInit)
+    //   for (const el of filterParamsUsersForm.equal) {
+    //     const field_name = el.field_name as keyof typeof equalFormInit
+    //     newEqualForm[field_name] = el.field_value
+    //   }
+    //   setEqualForm(newEqualForm)
+    // }
   },[showUsersFilterMdl])
   
   return (
@@ -184,7 +177,7 @@ const UsersLstFilterMdl: React.FC<Props> = ({isFetching, camposUser}) => {
                 <Form.Select
                   id="f_order"
                   name="order"
-                  value={filterParamsUsersForm.orders.length ? filterParamsUsersForm.orders[0].field_name : ""}
+                  value={filterParamsUsersForm.order.length ? filterParamsUsersForm.order[0].field_name : ""}
                   onChange={handleChangeOrder}
                 >
                   <option value="">Ninguno</option>
@@ -198,7 +191,7 @@ const UsersLstFilterMdl: React.FC<Props> = ({isFetching, camposUser}) => {
                 <Form.Select
                   id="f_order_dir"
                   name="order_dir"
-                  value={filterParamsUsersForm.orders.length ? filterParamsUsersForm.orders[0].order_dir : "ASC"}
+                  value={filterParamsUsersForm.order.length ? filterParamsUsersForm.order[0].order_dir : "ASC"}
                   onChange={handleChangeOrderDir}
                 >
                   <option value="ASC">Ascendente</option>
@@ -208,35 +201,45 @@ const UsersLstFilterMdl: React.FC<Props> = ({isFetching, camposUser}) => {
 
             </Row>
           </Tab>
-          <Tab eventKey="equals" title="Igual a">
+          <Tab eventKey="equal" title="Igual a">
             <Form>
               <Form.Group as={Col} className="mb-3">
-                <Form.Label htmlFor="f_rol_id">Rol</Form.Label>
+                <Form.Label htmlFor="f_rol">Rol</Form.Label>
                 <Form.Select
-                  id="f_rol_id"
-                  name="rol_id"
-                  value={equalForm.rol_id}
-                  onChange={handleChangeEqual}
+                  id="f_rol"
+                  value={equalForm.rol}
+                  onChange={(e)=>{
+                    filterEqual({
+                      field_name:'rol',
+                      field_value: e.target.value,
+                      field_label: "Rol"
+                    })
+                  }}
                 >
                   <option value="">Todos</option>
                   {roles?.map((el) => (
-                    <option key={el.id} value={el.id}>
+                    <option key={el.id} value={el.rol}>
                       {el.rol}
                     </option>
                   ))}
                 </Form.Select>
               </Form.Group>
               <Form.Group as={Col} className="mb-3">
-                <Form.Label htmlFor="f_caja_id">Caja</Form.Label>
+                <Form.Label htmlFor="f_caja">Caja</Form.Label>
                 <Form.Select
-                  id="f_caja_id"
-                  name="caja_id"
-                  value={equalForm.caja_id}
-                  onChange={handleChangeEqual}
+                  id="f_caja"
+                  value={equalForm.caja}
+                  onChange={(e)=>{
+                    filterEqual({
+                      field_name:'caja',
+                      field_value: e.target.value,
+                      field_label: "Caja"
+                    })
+                  }}
                 >
                   <option value="">Todos</option>
                   {cajas?.map((el) => (
-                    <option key={el.id} value={el.id}>
+                    <option key={el.id} value={el.descripcion}>
                       {el.descripcion}
                     </option>
                   ))}
@@ -248,7 +251,13 @@ const UsersLstFilterMdl: React.FC<Props> = ({isFetching, camposUser}) => {
                   id="f_estado"
                   name="estado"
                   value={equalForm.estado}
-                  onChange={handleChangeEqual}
+                  onChange={(e)=>{
+                    filterEqual({
+                      field_name:'estado',
+                      field_value: e.target.value,
+                      field_label: "Estado"
+                    })
+                  }}
                 >
                   <option value="">Todos</option>
                   <option value="1">Habilidato</option>
@@ -279,8 +288,8 @@ const UsersLstFilterMdl: React.FC<Props> = ({isFetching, camposUser}) => {
                 <Form.Control
                   disabled={!Boolean(dateRange.field_name)}
                   type="date"
-                  name="date_from"
-                  value={dateRange.date_from}
+                  name="from"
+                  value={dateRange.from}
                   onChange={handleChangeDate}
                 />
               </Col>
@@ -289,10 +298,10 @@ const UsersLstFilterMdl: React.FC<Props> = ({isFetching, camposUser}) => {
               </Form.Label>
               <Col sm="5">
                 <Form.Control
-                  disabled={!Boolean(dateRange.date_from)}
+                  disabled={!Boolean(dateRange.from)}
                   type="date"
-                  name="date_to"
-                  value={dateRange.date_to}
+                  name="to"
+                  value={dateRange.to}
                   onChange={handleChangeDate}
                 />
               </Col>

@@ -159,6 +159,31 @@ export type EmpresaSession = { // para la sesion
   email: string;
   urlLogo: string;
 }
+// ✅✅✅ TIPOS PARA LOS PARAMETROS DE FILTROS GENERALES NUEVO ✅✅✅
+export interface FilterParam {
+  offset: number;
+  search: string;
+  equal: EqualItem[];
+  between: BetweenItem[];
+  order: OrderItem[];
+}
+
+export type EqualItem = {
+  field_name: string;
+  field_value: string | string[] | number[];
+  field_label: string;
+}
+export type BetweenItem = {
+  field_name: string;
+  from: string;
+  to: string;
+  field_label: string;
+}
+export type OrderItem = {
+  field_name: string;
+  order_dir: "ASC" | "DESC";
+  field_label: string;
+}
 
 // ✅ TIPOS PARA LOS PARAMETROS DE FILTROS GENERALES
 export interface FilterParams {
@@ -168,23 +193,22 @@ export interface FilterParams {
   between: FilterParamsBetween;
   orders: FilterParamsOrder[];
 }
-type FilterParamsOrder = {
-  field_name: string;
-  order_dir: string;
-  field_label: string
-}
 type FilterParamsEqual = {
-  field_name: string;
-  field_value: string; //antes value
-  label_name: string; // antes text
-  label_value: string // antes campo_text
+  field_name: string; // rol_id
+  field_value: string; // 3
+  label_name: string; // rol
+  label_value: string // vendedor
 }
 type FilterParamsBetween = {
   field_name: string;
   field_label: string;
   range: string
 }
-
+type FilterParamsOrder = {
+  field_name: string;
+  order_dir: string;
+  field_label: string
+}
 // ✅ TIPOS PARA LAS OPCIONES DEL FETCH
 export type FetchOptions = {
   method?: "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
@@ -199,6 +223,7 @@ export type FetchOptions = {
 
 
 // ✅ TIPO PARA MOSTRAR LA INFORMACION DEL FILTRO
+export type InfoFilter = Omit<FilterParam, "offset">
 export type FilterInfo = Omit<FilterParams, "offset">
 
 // ✅ TIPOS PARA PRODUCTO

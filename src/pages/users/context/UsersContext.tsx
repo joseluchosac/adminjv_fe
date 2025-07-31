@@ -1,6 +1,6 @@
 import { createContext, useContext, useState } from "react";
-import { FilterInfo, FilterParams } from "../../../core/types";
-import { filterInfoInit, filterParamsInit } from "../../../core/utils/constants";
+import { FilterParam, InfoFilter } from "../../../core/types";
+import { filterParamInit, InfoFilterInit } from "../../../core/utils/constants";
 
 export interface UsersContextType {
   showUserForm: boolean;
@@ -9,10 +9,10 @@ export interface UsersContextType {
   setShowUsersFilterMdl: React.Dispatch<React.SetStateAction<boolean>>;
   currentUserId: number;
   setCurrentUserId: React.Dispatch<React.SetStateAction<number>>;
-  filterInfoUsers: FilterInfo;
-  setFilterInfoUsers: React.Dispatch<React.SetStateAction<FilterInfo>>;
-  filterParamsUsersForm: FilterParams;
-  setFilterParamsUsersForm: React.Dispatch<React.SetStateAction<FilterParams>>;
+  infoFilterUsers: InfoFilter;
+  setInfoFilterUsers: React.Dispatch<React.SetStateAction<InfoFilter>>;
+  filterParamsUsersForm: FilterParam;
+  setFilterParamsUsersForm: React.Dispatch<React.SetStateAction<FilterParam>>;
 }
 
 // Crear el contexto con un valor por defecto
@@ -23,8 +23,8 @@ export const UsersProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [showUserForm, setShowUserForm] = useState(false);
   const [currentUserId, setCurrentUserId] = useState(0);
   const [showUsersFilterMdl, setShowUsersFilterMdl] = useState(false);
-  const [filterInfoUsers, setFilterInfoUsers] = useState(filterInfoInit);
-  const [filterParamsUsersForm, setFilterParamsUsersForm] = useState(filterParamsInit);
+  const [infoFilterUsers, setInfoFilterUsers] = useState(InfoFilterInit);
+  const [filterParamsUsersForm, setFilterParamsUsersForm] = useState(filterParamInit);
   return (
     <UsersContext.Provider value={{ 
       showUserForm, 
@@ -33,8 +33,8 @@ export const UsersProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       setShowUsersFilterMdl,
       currentUserId,
       setCurrentUserId,
-      filterInfoUsers,
-      setFilterInfoUsers,
+      infoFilterUsers,
+      setInfoFilterUsers,
       filterParamsUsersForm,
       setFilterParamsUsersForm,
     }}>
