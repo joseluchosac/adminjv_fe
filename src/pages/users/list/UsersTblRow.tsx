@@ -15,7 +15,7 @@ interface UsersTblRowProps {
 interface UserMutQryRes extends QueryResp {content: User}
 
 function UsersTblRow({ user, camposUser }: UsersTblRowProps) {
-  const {setCurrentUserId, setShowUserForm} = useUsers()
+  const { dispatchUsers } = useUsers()
   const darkMode = useLayoutStore(state => state.layout.darkMode)
 
   const {
@@ -31,8 +31,14 @@ function UsersTblRow({ user, camposUser }: UsersTblRowProps) {
   }
 
   const handleToEdit = () => {
-    setCurrentUserId(user.id)
-    setShowUserForm(true)
+    dispatchUsers({
+      type: 'SET_CURRENT_USER_ID',
+      payload: user.id
+    });
+    dispatchUsers({
+      type: 'SET_SHOW_USER_FORM',
+      payload: true
+    });
   }
 
   const handleDelete = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
@@ -54,7 +60,7 @@ function UsersTblRow({ user, camposUser }: UsersTblRowProps) {
   }
 
   const toggleEstado = () => {
-    setStateUser(user.estado ? 0 : 1)
+    setStateUser({estado: user.estado ? 0 : 1, id: user.id})
   }
 
 
@@ -68,10 +74,10 @@ function UsersTblRow({ user, camposUser }: UsersTblRowProps) {
       {camposUser.filter(el=>el.show).map(el => {
         switch (el.field_name){
           case "acciones": {
-           if(isPendingMutation) return <td key={el.field_name}>...</td>  
             return (
               <td key={el.field_name}>
-                <div className="d-flex gap-2 justify-content-start">
+                <div className="d-flex gap-2 justify-content-start position-relative">
+                  <div className={`position-absolute w-100 h-100 ${!isPendingMutation ? 'd-none' : ''}`} style={{backgroundColor: "rgb(0,0,0,0.1)"}}></div>
                   <a onClick={handleToEdit} href="#" className="" title="Editar">
                     <FaEdit />
                   </a>

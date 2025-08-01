@@ -15,9 +15,8 @@ import { camposUserInit } from "../../../core/utils/constants";
 export default function UsersLst() {
   const [ camposUser, setCamposUser] = useState(camposUserInit)
   const {
-    setInfoFilterUsers,
-    filterParamsUsersForm,
-    setFilterParamsUsersForm,
+    stateUsers: { filterParamsUsersForm },
+    dispatchUsers
   } = useUsers()
   
   const {
@@ -38,28 +37,46 @@ export default function UsersLst() {
     if(ctrlKey){
       if(orderIdx === -1){
         const newOrder: OrderItem = {field_name, order_dir: "ASC", field_label}
-        setFilterParamsUsersForm({...filterParamsUsersForm, order: [...filterParamsUsersForm.order, newOrder]})
+        dispatchUsers({
+          type: 'SET_FILTER_PARAMS_USERS_FORM',
+          payload: {...filterParamsUsersForm, order: [...filterParamsUsersForm.order, newOrder]}
+        });
       }else{
         let newOrders = structuredClone(filterParamsUsersForm.order)
         if(newOrders[orderIdx].order_dir == "ASC"){
           newOrders[orderIdx] = {field_name, order_dir: "DESC", field_label}
-          setFilterParamsUsersForm({...filterParamsUsersForm, order: newOrders})
+          dispatchUsers({
+            type: 'SET_FILTER_PARAMS_USERS_FORM',
+            payload: {...filterParamsUsersForm, order: newOrders}
+          });
         }else{
           newOrders = newOrders.filter(el=>el.field_name !== field_name)
-          setFilterParamsUsersForm({...filterParamsUsersForm, order: newOrders})
+          dispatchUsers({
+            type: 'SET_FILTER_PARAMS_USERS_FORM',
+            payload: {...filterParamsUsersForm, order: newOrders}
+          });
         }
       }
     }else{
       if(orderIdx === -1){// Si no esta ordenado
         const newOrder: OrderItem = {field_name, order_dir: "ASC", field_label}
-        setFilterParamsUsersForm({...filterParamsUsersForm, order: [newOrder]})
+        dispatchUsers({
+          type: 'SET_FILTER_PARAMS_USERS_FORM',
+          payload: {...filterParamsUsersForm, order: [newOrder]}
+        });
       }else{
         let newOrders = structuredClone(filterParamsUsersForm.order)
         if(newOrders[orderIdx].order_dir == "ASC"){
           const newOrder: OrderItem = {field_name, order_dir: "DESC", field_label}
-          setFilterParamsUsersForm({...filterParamsUsersForm, order: [newOrder]})
+          dispatchUsers({
+            type: 'SET_FILTER_PARAMS_USERS_FORM',
+            payload: {...filterParamsUsersForm, order: [newOrder]}
+          });
         }else{
-          setFilterParamsUsersForm({...filterParamsUsersForm, order: []})
+          dispatchUsers({
+            type: 'SET_FILTER_PARAMS_USERS_FORM',
+            payload: {...filterParamsUsersForm, order: []}
+          });
         }
       }
     }
@@ -80,7 +97,10 @@ export default function UsersLst() {
     }
     if(!isFetching){
       const {search, equal, between, order} = filterParamsUsersForm
-      setInfoFilterUsers({search, equal, between, order})
+      dispatchUsers({
+        type: 'SET_INFO_FILTER_USERS',
+        payload: {search, equal, between, order}
+      });
       const newCamposUsers = camposUser.map(el=>{
         const orderh = order.find(order => order.field_name === el.field_name)
         return orderh ? {...el, order_dir: orderh?.order_dir} : {...el, order_dir: ""}
@@ -94,6 +114,7 @@ export default function UsersLst() {
       <UsersHead isFetching={isFetching}/>
       <Card className="overflow-hidden">
         <div className="position-relative">
+          <LdsEllipsisCenter innerRef={ldsEllipsisRef} className={`position-absolute ${isFetching ? '' : 'd-none'}`} />
           <div className="table-responsive" style={{ height: "73vh" }} ref={tableRef}>
             <Table striped hover className="mb-1">
               <thead className="sticky-top">

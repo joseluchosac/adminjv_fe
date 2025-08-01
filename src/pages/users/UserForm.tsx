@@ -11,28 +11,17 @@ import { useUsers } from "./context/UsersContext";
 import { QueryResp, User } from "../../core/types";
 import { useCajasQuery } from "../../core/hooks/useCatalogosQuery";
 import { useRolesQuery } from "../../core/hooks/useRolesQuery";
+import { userFormInit } from "../../core/utils/constants";
 
 interface UserQryRes extends QueryResp {
   content: User;
 }
 
-const userFormInit = {
-  id: 0,
-  nombres: "",
-  apellidos: "",
-  username: "",
-  email: "",
-  rol_id: 2,
-  rol:"",
-  caja_id: 1,
-  caja:"",
-  estado: 1,
-  password: '',
-  password_repeat: '',
-}
-
 export default function Userform(){
-  const {showUserForm, setShowUserForm, currentUserId} = useUsers()
+  const {
+    stateUsers: { showUserForm, currentUserId },
+    dispatchUsers
+  } = useUsers()
   const darkMode = useLayoutStore(state => state.layout.darkMode)
   const {roles} = useRolesQuery()  
   const {cajas} = useCajasQuery()
@@ -94,7 +83,10 @@ export default function Userform(){
     if(!user) return
     if(user.error){
       toast.error("Error al obtener los datos")
-      setShowUserForm(false);
+      dispatchUsers({
+        type: 'SET_SHOW_USER_FORM',
+        payload: false,
+      });
     }else{
       if(user.content) reset(user.content)
     }
@@ -103,17 +95,35 @@ export default function Userform(){
   useEffect(() => {
     if(!isErrorUser) return
     toast.error("Error de conexion")
-    setShowUserForm(false);
+    dispatchUsers({
+      type: 'SET_SHOW_USER_FORM',
+      payload: false,
+    });
   }, [isErrorUser])
 
   useEffect(() => {
     if(!mutation) return
-    if(!mutation.error) setShowUserForm(false);
+    if(!mutation.error) {
+      dispatchUsers({
+      type: 'SET_SHOW_USER_FORM',
+      payload: false,
+    });
+    };
     toast(mutation.msg, {type: mutation.msgType})
   }, [mutation])
 
   return (
-    <Modal show={showUserForm} onHide={()=>setShowUserForm(false)} backdrop="static" size="lg" >
+    <Modal
+      show={showUserForm}
+      backdrop="static"
+      size="lg"
+      onHide={()=>
+        dispatchUsers({
+          type: 'SET_SHOW_USER_FORM',
+          payload: false,
+        })
+      }
+    >
       <Modal.Header closeButton>
         <Modal.Title>{currentUserId ? "Editar usuario" : "Nuevo usuario"}</Modal.Title>
       </Modal.Header>
@@ -263,7 +273,12 @@ export default function Userform(){
             <Button
               variant="seccondary"
               type="button"
-              onClick={()=>setShowUserForm(false)}
+              onClick={()=>
+                dispatchUsers({
+                  type: 'SET_SHOW_USER_FORM',
+                  payload: false,
+                })
+              }
             >Cerrar</Button>
 
 

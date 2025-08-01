@@ -1,6 +1,6 @@
 import Modal from "react-bootstrap/Modal";
 import { Badge, Button, Col, Form, Row, Tab, Tabs } from "react-bootstrap";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   endOfMonth,
   endOfWeek,
@@ -10,7 +10,6 @@ import {
   subMonths,
   subWeeks,
 } from "date-fns";
-// import { filterParamsInit } from "../../../core/utils/constants";
 import { useUsers } from "../context/UsersContext";
 import { CampoTable, EqualItem, OrderItem } from "../../../core/types";
 import { LdsBar } from "../../../core/components/Loaders";
@@ -33,25 +32,27 @@ const UsersLstFilterMdl: React.FC<Props> = ({isFetching, camposUser}) => {
   const {cajas} = useCajasQuery()
 
   const {
-    filterParamsUsersForm,
-    setFilterParamsUsersForm,
-    showUsersFilterMdl,
-    setShowUsersFilterMdl
+    stateUsers: { filterParamsUsersForm, showUsersFilterMdl },
+    dispatchUsers
   } = useUsers()
-
-
 
   const handleChangeOrder = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const field_name = e.target.value
     const field_label = e.currentTarget.options[e.currentTarget.selectedIndex].textContent || ""
     const newOrders: OrderItem[] = field_name ? [{field_name, order_dir: "ASC", field_label}] : []
-    setFilterParamsUsersForm({...filterParamsUsersForm, order: newOrders})
+    dispatchUsers({
+      type: 'SET_FILTER_PARAMS_USERS_FORM',
+      payload: {...filterParamsUsersForm, order: newOrders}
+    });
   }
 
   const handleChangeOrderDir = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const order_dir = e.target.value as "ASC" | "DESC"
     const newOrders: OrderItem[] = [{...filterParamsUsersForm.order[0], order_dir}]
-    setFilterParamsUsersForm({...filterParamsUsersForm, order: newOrders})
+    dispatchUsers({
+      type: 'SET_FILTER_PARAMS_USERS_FORM',
+      payload: {...filterParamsUsersForm, order: newOrders}
+    });
   }
 
   const filterEqual = ({field_name, field_value, field_label}: EqualItem) => {
@@ -67,7 +68,10 @@ const UsersLstFilterMdl: React.FC<Props> = ({isFetching, camposUser}) => {
         equalClone[idx] = {field_name, field_value, field_label}
       }
     }
-    setFilterParamsUsersForm({ ...filterParamsUsersForm, equal: equalClone });
+    dispatchUsers({
+      type: 'SET_FILTER_PARAMS_USERS_FORM',
+      payload: { ...filterParamsUsersForm, equal: equalClone }
+    });
   }
 
   const handleSelectCampoRange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -129,39 +133,40 @@ const UsersLstFilterMdl: React.FC<Props> = ({isFetching, camposUser}) => {
       from: dateRange.from ? dateRange.from + " 00:00:00" : "",
       to: dateRange.to ? dateRange.to + " 23:59:59" : "",
     };
-    setFilterParamsUsersForm({ ...filterParamsUsersForm, between: [newBetween] });
+    dispatchUsers({
+      type: 'SET_FILTER_PARAMS_USERS_FORM',
+      payload: {
+        ...filterParamsUsersForm,
+        between: [newBetween],
+      },
+    });
   };
 
   const handleUnbetween = () => {
     setDateRange(dateRangeInit);
     setRangeName("")
     if(!filterParamsUsersForm.between.length) return
-    setFilterParamsUsersForm({...filterParamsUsersForm, between: []})
+    dispatchUsers({
+      type: 'SET_FILTER_PARAMS_USERS_FORM',
+      payload: {
+        ...filterParamsUsersForm,
+        between: [],
+      },
+    });
   }
 
   
-  useEffect(() => {
-    // if(showUsersFilterMdl){
-    //   if(!filterParamsUsersForm.between.field_name){
-    //     handleUnbetween()
-    //   }
-    //   const {range, field_name, field_label} = filterParamsUsersForm.between
-    //   const from = range ? range.split(", ")[0].split(" ")[0] : ""
-    //   const to = range ? range.split(", ")[1].split(" ")[0] : ""
-    //   setDateRange({field_name, field_label, from, to})
-    //   const newEqualForm = structuredClone(equalFormInit)
-    //   for (const el of filterParamsUsersForm.equal) {
-    //     const field_name = el.field_name as keyof typeof equalFormInit
-    //     newEqualForm[field_name] = el.field_value
-    //   }
-    //   setEqualForm(newEqualForm)
-    // }
-  },[showUsersFilterMdl])
+
   
   return (
     <Modal 
       show={showUsersFilterMdl} 
-      onHide={()=>setShowUsersFilterMdl(false)}
+      onHide={()=>
+        dispatchUsers({
+          type: 'SET_SHOW_USERS_FILTER_MDL',
+          payload: false,
+        })
+      }
     >
       <Modal.Body>
         {isFetching && <LdsBar />}

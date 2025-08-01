@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import useSessionStore from "../store/useSessionStore"
 import { FilterQueryResp, FetchOptions, LoginForm, RegisterForm, QueryResp, User, UserItem, UserSession } from "../types"
-import { filterParamInit, filterParamsInit } from "../utils/constants";
+import { filterParamInit } from "../utils/constants";
 import { fnFetch } from "../services/fnFetch";
 
 type TypeAction = 
@@ -154,19 +154,6 @@ export const useMutationUsersQuery = <T>() => {
     }
   })
 
-  // const filterUserFull = () => {// Sin Paginacion
-  //   typeActionRef.current = "filter_full"
-  //   const params = {
-  //     url: apiURL + "users/filter_users_full",
-  //     method: "POST",
-  //     headers:{ 
-  //       Authorization,
-  //     },
-  //     body: JSON.stringify(filterParamsUsers),
-  //   }
-  //   mutate(params)
-  // }
-
   const getUser = (id: number) => {
     const options: FetchOptions = {
       method: "POST",
@@ -218,12 +205,12 @@ export const useMutationUsersQuery = <T>() => {
     mutate(options)
   }
 
-  const setStateUser = (estado: number) => {
+  const setStateUser = (data: {estado: number, id: number}) => {
     typeActionRef.current = "mutate_user"
     const options: FetchOptions = {
       method: "PUT",
       url: apiURL + "users/set_state_user",
-      body: JSON.stringify({estado}),
+      body: JSON.stringify(data),
       authorization: "Bearer " + token,
     }
     mutate(options)

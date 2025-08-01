@@ -23,12 +23,10 @@ export default function UsersHead({ isFetching }: Props) {
   const [inputSearch, setInputSearch] = useState("");
 
   const {
-    setShowUserForm,
-    setCurrentUserId,
-    infoFilterUsers: { equal, between, order },
-    filterParamsUsersForm,
-    setFilterParamsUsersForm,
-    setShowUsersFilterMdl,
+    stateUsers:{
+      filterParamsUsersForm,
+      infoFilterUsers: { equal, between, order }},
+    dispatchUsers
   } = useUsers();
 
   useDebounce(
@@ -36,11 +34,13 @@ export default function UsersHead({ isFetching }: Props) {
       if (
         inputSearch.toLowerCase().trim() ==
         filterParamsUsersForm.search.toLowerCase().trim()
-      )
-        return;
-      setFilterParamsUsersForm({
-        ...filterParamsUsersForm,
-        search: inputSearch.trim(),
+      ) return;
+      dispatchUsers({
+        type: 'SET_FILTER_PARAMS_USERS_FORM',
+        payload: {
+          ...filterParamsUsersForm,
+          search: inputSearch.trim(),
+        },
       });
     },
     500,
@@ -51,31 +51,46 @@ export default function UsersHead({ isFetching }: Props) {
     e: React.MouseEvent<HTMLElement, MouseEvent>
   ) => {
     e.preventDefault();
-    setShowUsersFilterMdl(true);
+    dispatchUsers({
+      type: 'SET_SHOW_USERS_FILTER_MDL',
+      payload: true,
+    });
   };
 
   const resetEqual = (field_name: string) => {
     if (field_name) {
       let { equal } = filterParamsUsersForm;
       equal = equal.filter((el) => el.field_name !== field_name);
-      setFilterParamsUsersForm({ ...filterParamsUsersForm, equal: [...equal] });
+      dispatchUsers({
+        type: 'SET_FILTER_PARAMS_USERS_FORM',
+        payload: { ...filterParamsUsersForm, equal: [...equal] },
+      });
     }
   };
   const resetBetween = (field_name: string) => {
     let { between } = filterParamsUsersForm;
     between = between.filter((el) => el.field_name !== field_name);
-    setFilterParamsUsersForm({
-      ...filterParamsUsersForm,
-      between: [...between],
+    dispatchUsers({
+      type: 'SET_FILTER_PARAMS_USERS_FORM',
+      payload: { ...filterParamsUsersForm, between: [...between] },
     });
   };
   const resetSort = () => {
-    setFilterParamsUsersForm({ ...filterParamsUsersForm, order: [] });
+    dispatchUsers({
+      type: 'SET_FILTER_PARAMS_USERS_FORM',
+      payload: { ...filterParamsUsersForm, order: [] },
+    });
   };
 
   const handleNuevo = () => {
-    setCurrentUserId(0);
-    setShowUserForm(true);
+    dispatchUsers({
+      type: "SET_CURRENT_USER_ID",
+      payload: 0,
+    });
+    dispatchUsers({
+      type: "SET_SHOW_USER_FORM",
+      payload: true,
+    });
   };
 
   const handleTraerTodo = () => {
@@ -146,8 +161,9 @@ export default function UsersHead({ isFetching }: Props) {
           <div className="d-flex gap-2 flex-wrap">
             {Boolean(equal.length) && (
               <Stack direction="horizontal" gap={2} className="flex-wrap">
-                {equal.map((el, idx) => (
-                  <Badge
+                {equal.map((el, idx) => {
+                  const value = el.field_label === "Estado" ? el.field_value === "1" ? "Habilitado" : "Deshabilitado" : el.field_value;
+                  return (<Badge
                     bg="secondary"
                     role="button"
                     onClick={() => resetEqual(el.field_name)}
@@ -156,10 +172,10 @@ export default function UsersHead({ isFetching }: Props) {
                   >
                     <DynaIcon name="FaCircleXmark" className="pr-4" />
                     <div>
-                      {el.field_label}: {el.field_value}
+                      {el.field_label}: {value}
                     </div>
-                  </Badge>
-                ))}
+                  </Badge>)
+})}
               </Stack>
             )}
             {Boolean(between.length) && (

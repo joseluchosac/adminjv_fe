@@ -1,43 +1,19 @@
-import { createContext, useContext, useState } from "react";
-import { FilterParam, InfoFilter } from "../../../core/types";
-import { filterParamInit, InfoFilterInit } from "../../../core/utils/constants";
+import { createContext, Dispatch, ReactNode, useContext, useReducer } from "react";
+import { UsersActionsType, usersReducer, usersStateInit, UsersStateType } from "../reducers/users-reducer";
 
 export interface UsersContextType {
-  showUserForm: boolean;
-  setShowUserForm: React.Dispatch<React.SetStateAction<boolean>>;
-  showUsersFilterMdl: boolean;
-  setShowUsersFilterMdl: React.Dispatch<React.SetStateAction<boolean>>;
-  currentUserId: number;
-  setCurrentUserId: React.Dispatch<React.SetStateAction<number>>;
-  infoFilterUsers: InfoFilter;
-  setInfoFilterUsers: React.Dispatch<React.SetStateAction<InfoFilter>>;
-  filterParamsUsersForm: FilterParam;
-  setFilterParamsUsersForm: React.Dispatch<React.SetStateAction<FilterParam>>;
+  stateUsers: UsersStateType;
+  dispatchUsers: Dispatch<UsersActionsType>;
 }
 
 // Crear el contexto con un valor por defecto
 const UsersContext = createContext<UsersContextType | undefined>(undefined);
 
 // Proveedor del contexto
-export const UsersProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [showUserForm, setShowUserForm] = useState(false);
-  const [currentUserId, setCurrentUserId] = useState(0);
-  const [showUsersFilterMdl, setShowUsersFilterMdl] = useState(false);
-  const [infoFilterUsers, setInfoFilterUsers] = useState(InfoFilterInit);
-  const [filterParamsUsersForm, setFilterParamsUsersForm] = useState(filterParamInit);
+export const UsersProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  const [stateUsers, dispatchUsers] = useReducer(usersReducer, usersStateInit);
   return (
-    <UsersContext.Provider value={{ 
-      showUserForm, 
-      setShowUserForm,
-      showUsersFilterMdl,
-      setShowUsersFilterMdl,
-      currentUserId,
-      setCurrentUserId,
-      infoFilterUsers,
-      setInfoFilterUsers,
-      filterParamsUsersForm,
-      setFilterParamsUsersForm,
-    }}>
+    <UsersContext.Provider value={{ stateUsers, dispatchUsers}}>
       {children}
     </UsersContext.Provider>
   );

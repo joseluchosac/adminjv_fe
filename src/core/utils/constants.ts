@@ -248,4 +248,19 @@ export const camposMovimientoInit: CampoTable[] = [
     {show: true, orderable: true, order_dir:"", field_name: "concepto", field_label:"Concepto",},
     {show: false, orderable: true, order_dir:"", field_name: "estado", field_label:"Estado",},
     {show: false, orderable: true, order_dir:"", field_name: "created_at", field_label:"Creado",},
-]
+];
+
+export const userFormInit = {
+  id: 0,
+  nombres: "",
+  apellidos: "",
+  username: "",
+  email: "",
+  rol_id: 2,
+  rol:"",
+  caja_id: 1,
+  caja:"",
+  estado: 1,
+  password: '',
+  password_repeat: '',
+}
