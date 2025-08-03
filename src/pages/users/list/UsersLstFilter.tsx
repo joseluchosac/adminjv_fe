@@ -1,6 +1,6 @@
 import Modal from "react-bootstrap/Modal";
-import { Badge, Button, Col, Form, Row, Tab, Tabs } from "react-bootstrap";
-import { useState } from "react";
+import { Button, Col, Form, Row, Tab, Tabs } from "react-bootstrap";
+import { useEffect, useMemo, useState } from "react";
 import {
   endOfMonth,
   endOfWeek,
@@ -15,24 +15,23 @@ import { CampoTable, EqualItem, OrderItem } from "../../../core/types";
 import { LdsBar } from "../../../core/components/Loaders";
 import { useCajasQuery } from "../../../core/hooks/useCatalogosQuery";
 import { useRolesQuery } from "../../../core/hooks/useRolesQuery";
+import { toast } from "react-toastify";
 
-const dateRangeInit = { field_name: "", field_label: "", from: "", to: "" };
-const equalFormInit = { rol: "", caja: "", estado: ""}
-
+const betweenFormInit = {
+  range: { field_name: "", field_label: "", from: "", to: "" },
+  rangeName: ""
+};
 type Props = {
   isFetching: boolean;
   camposUser: CampoTable[]
 }
-const UsersLstFilterMdl: React.FC<Props> = ({isFetching, camposUser}) => {
+const UsersLstFilter: React.FC<Props> = ({isFetching, camposUser}) => {
   const [tabName, setTabName] = useState("order")
-  const [dateRange, setDateRange] = useState(dateRangeInit);
-  const [rangeName, setRangeName] = useState("")
-  const [equalForm, setEqualForm] = useState(equalFormInit)
+  const [betweenForm, setBetweenForm] = useState(betweenFormInit);
   const {roles} = useRolesQuery()
   const {cajas} = useCajasQuery()
-
   const {
-    stateUsers: { filterParamsUsersForm, showUsersFilterMdl },
+    stateUsers: { filterParamUsersForm, showUsersFilterMdl },
     dispatchUsers
   } = useUsers()
 
@@ -42,22 +41,30 @@ const UsersLstFilterMdl: React.FC<Props> = ({isFetching, camposUser}) => {
     const newOrders: OrderItem[] = field_name ? [{field_name, order_dir: "ASC", field_label}] : []
     dispatchUsers({
       type: 'SET_FILTER_PARAMS_USERS_FORM',
-      payload: {...filterParamsUsersForm, order: newOrders}
+      payload: {...filterParamUsersForm, order: newOrders}
     });
   }
 
   const handleChangeOrderDir = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const order_dir = e.target.value as "ASC" | "DESC"
-    const newOrders: OrderItem[] = [{...filterParamsUsersForm.order[0], order_dir}]
+    const newOrders: OrderItem[] = [{...filterParamUsersForm.order[0], order_dir}]
     dispatchUsers({
       type: 'SET_FILTER_PARAMS_USERS_FORM',
-      payload: {...filterParamsUsersForm, order: newOrders}
+      payload: {...filterParamUsersForm, order: newOrders}
     });
   }
 
+  const equals = useMemo(() => {
+    const equalsInit = {
+      rol: filterParamUsersForm.equal.find(el => el.field_name === "rol")?.field_value || "",
+      caja: filterParamUsersForm.equal.find(el => el.field_name === "caja")?.field_value || "",
+      estado: filterParamUsersForm.equal.find(el => el.field_name === "estado")?.field_value || ""
+    }
+    return equalsInit
+  }, [filterParamUsersForm.equal]);
+
   const filterEqual = ({field_name, field_value, field_label}: EqualItem) => {
-    setEqualForm({...equalForm, [field_name]: field_value})
-    let equalClone = structuredClone(filterParamsUsersForm.equal);
+    let equalClone = structuredClone(filterParamUsersForm.equal);
     if(!field_value){
       equalClone = equalClone.filter(el => el.field_name !== field_name)
     }else{
@@ -70,7 +77,7 @@ const UsersLstFilterMdl: React.FC<Props> = ({isFetching, camposUser}) => {
     }
     dispatchUsers({
       type: 'SET_FILTER_PARAMS_USERS_FORM',
-      payload: { ...filterParamsUsersForm, equal: equalClone }
+      payload: { ...filterParamUsersForm, equal: equalClone }
     });
   }
 
@@ -78,86 +85,102 @@ const UsersLstFilterMdl: React.FC<Props> = ({isFetching, camposUser}) => {
     const field_name = e.currentTarget.value;
     const field_label = e.currentTarget.options[e.currentTarget.selectedIndex].textContent || ""
     if (!field_name) {
-      setDateRange(dateRangeInit);
-      setRangeName("")
+      setBetweenForm(betweenFormInit);
     } else {
-      setDateRange({ ...dateRange, field_name, field_label });
+      setBetweenForm({...betweenForm, range: { ...betweenForm.range, field_name, field_label } });
     }
   };
 
   const handleChangeDate = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.currentTarget;
     if (name === "from") {
-      setDateRange({ ...dateRange, [name]: value, to: value });
+      setBetweenForm({ ...betweenForm, range: { ...betweenForm.range, [name]: value, to: value } });
     } else if (name === "to") {
       if (value === "") {
-        setDateRange({ ...dateRange, [name]: dateRange.from });
+        setBetweenForm({ ...betweenForm, range: { ...betweenForm.range, [name]: betweenForm.range.from} });
       } else {
-        setDateRange({ ...dateRange, [name]: value });
+        setBetweenForm({ ...betweenForm, range: { ...betweenForm.range, [name]: value } });
       }
     }
-    setRangeName("")
   };
 
-  const handleRangePred = (e: React.MouseEvent<HTMLElement>) => {
-    const { range_name } = e.currentTarget.dataset;
-    if (!dateRange.field_name) return;
+  const rangePred = (rangeName: string) => {
     let startDate = new Date();
     let endDate = new Date();
-    if (range_name === "lastWeek") {
-      startDate = startOfWeek(subWeeks(new Date(), 1), { weekStartsOn: 0 });
-      endDate = endOfWeek(subWeeks(new Date(), 1), { weekStartsOn: 0 });
-    } else if (range_name === "thisWeek") {
+    if (rangeName === "today") {
+      // No agregar nada
+    } else if (rangeName === "thisWeek") {
       startDate = startOfWeek(new Date(), { weekStartsOn: 0 });
       endDate = endOfWeek(new Date(), { weekStartsOn: 0 });
-    } else if (range_name === "lastMonth") {
-      startDate = startOfMonth(subMonths(new Date(), 1));
-      endDate = endOfMonth(subMonths(new Date(), 1));
-    } else if (range_name === "thisMonth") {
+    } else if (rangeName === "thisMonth") {
       startDate = startOfMonth(new Date());
       endDate = endOfMonth(new Date());
+    } else if (rangeName === "thisYear") {
+      startDate = new Date(new Date().getFullYear(), 0, 1);
+      endDate = new Date(new Date().getFullYear(), 11, 31);
+    } else if (rangeName === "lastWeek") {
+      startDate = startOfWeek(subWeeks(new Date(), 1), { weekStartsOn: 0 });
+      endDate = endOfWeek(subWeeks(new Date(), 1), { weekStartsOn: 0 });
+    }  else if (rangeName === "lastMonth") {
+      startDate = startOfMonth(subMonths(new Date(), 1));
+      endDate = endOfMonth(subMonths(new Date(), 1));
+    } else if (rangeName === "lastYear") {
+      startDate = new Date(new Date().getFullYear() - 1, 0, 1);
+      endDate = new Date(new Date().getFullYear() - 1, 11, 31);
+    } else {
+      setBetweenForm({...betweenForm, range: {...betweenForm.range, from:'', to:''}})
+      return
     }
     const startFormatDate = format(startDate, "yyyy-MM-dd");
     const endFormatDate = format(endDate, "yyyy-MM-dd");
-    setDateRange({ ...dateRange, from: startFormatDate, to: endFormatDate });
-    if(range_name){
-      setRangeName(range_name)
-    }
-  };
+    setBetweenForm({
+      ...betweenForm,
+      range: {...betweenForm.range, from:startFormatDate, to:endFormatDate}
+    })
+  }
 
   const handleFilterBetween = () => {
-    if(!dateRange.field_name || !dateRange.from || !dateRange.to) return
+    const {range} = betweenForm
+    if(!range.field_name) return toast.warning("Elija el campo a filtrar")
+    if(!range.from) return toast.warning("Ingrese el rango inicial")
+    if(!range.to) return toast.warning("Ingrese el rango final")
     const newBetween = {
-      field_name: dateRange.field_name,
-      field_label: dateRange.field_label,
-      from: dateRange.from ? dateRange.from + " 00:00:00" : "",
-      to: dateRange.to ? dateRange.to + " 23:59:59" : "",
+      field_name: range.field_name,
+      field_label: range.field_label,
+      from: range.from ? range.from + " 00:00:00" : "",
+      to: range.to ? range.to + " 23:59:59" : "",
     };
     dispatchUsers({
       type: 'SET_FILTER_PARAMS_USERS_FORM',
       payload: {
-        ...filterParamsUsersForm,
+        ...filterParamUsersForm,
         between: [newBetween],
       },
     });
   };
 
   const handleUnbetween = () => {
-    setDateRange(dateRangeInit);
-    setRangeName("")
-    if(!filterParamsUsersForm.between.length) return
+    setBetweenForm(betweenFormInit)
+    if(!filterParamUsersForm.between.length) return
     dispatchUsers({
       type: 'SET_FILTER_PARAMS_USERS_FORM',
       payload: {
-        ...filterParamsUsersForm,
+        ...filterParamUsersForm,
         between: [],
       },
     });
   }
 
-  
+ useEffect(() => {
+  rangePred(betweenForm.rangeName)
+ }, [betweenForm.rangeName])
 
-  
+ useEffect(() => {
+  if(!filterParamUsersForm.between.length){
+    handleUnbetween()
+  }
+ }, [filterParamUsersForm.between])
+
   return (
     <Modal 
       show={showUsersFilterMdl} 
@@ -168,6 +191,9 @@ const UsersLstFilterMdl: React.FC<Props> = ({isFetching, camposUser}) => {
         })
       }
     >
+      <Modal.Header closeButton className="py-2">
+        <Modal.Title>Filtros</Modal.Title>
+      </Modal.Header>
       <Modal.Body>
         {isFetching && <LdsBar />}
         <Tabs
@@ -182,7 +208,7 @@ const UsersLstFilterMdl: React.FC<Props> = ({isFetching, camposUser}) => {
                 <Form.Select
                   id="f_order"
                   name="order"
-                  value={filterParamsUsersForm.order.length ? filterParamsUsersForm.order[0].field_name : ""}
+                  value={filterParamUsersForm.order.length ? filterParamUsersForm.order[0].field_name : ""}
                   onChange={handleChangeOrder}
                 >
                   <option value="">Ninguno</option>
@@ -196,14 +222,13 @@ const UsersLstFilterMdl: React.FC<Props> = ({isFetching, camposUser}) => {
                 <Form.Select
                   id="f_order_dir"
                   name="order_dir"
-                  value={filterParamsUsersForm.order.length ? filterParamsUsersForm.order[0].order_dir : "ASC"}
+                  value={filterParamUsersForm.order.length ? filterParamUsersForm.order[0].order_dir : "ASC"}
                   onChange={handleChangeOrderDir}
                 >
                   <option value="ASC">Ascendente</option>
                   <option value="DESC">Descendente</option>
                 </Form.Select>
               </Form.Group>
-
             </Row>
           </Tab>
           <Tab eventKey="equal" title="Igual a">
@@ -212,7 +237,7 @@ const UsersLstFilterMdl: React.FC<Props> = ({isFetching, camposUser}) => {
                 <Form.Label htmlFor="f_rol">Rol</Form.Label>
                 <Form.Select
                   id="f_rol"
-                  value={equalForm.rol}
+                  value={equals.rol as string}
                   onChange={(e)=>{
                     filterEqual({
                       field_name:'rol',
@@ -233,7 +258,7 @@ const UsersLstFilterMdl: React.FC<Props> = ({isFetching, camposUser}) => {
                 <Form.Label htmlFor="f_caja">Caja</Form.Label>
                 <Form.Select
                   id="f_caja"
-                  value={equalForm.caja}
+                  value={equals.caja as string}
                   onChange={(e)=>{
                     filterEqual({
                       field_name:'caja',
@@ -255,7 +280,7 @@ const UsersLstFilterMdl: React.FC<Props> = ({isFetching, camposUser}) => {
                 <Form.Select
                   id="f_estado"
                   name="estado"
-                  value={equalForm.estado}
+                  value={equals.estado as string}
                   onChange={(e)=>{
                     filterEqual({
                       field_name:'estado',
@@ -272,18 +297,40 @@ const UsersLstFilterMdl: React.FC<Props> = ({isFetching, camposUser}) => {
             </Form>
           </Tab>
           <Tab eventKey="between" title="Rango">
-            <Form.Group as={Col} className="mb-3">
-              <Form.Label htmlFor="f_entre">Rango de fechas</Form.Label>
-              <Form.Select
-                id="f_entre"
-                name="field_name"
-                value={dateRange.field_name}
-                onChange={handleSelectCampoRange}
-              >
-                <option value="">Ninguno</option>
-                <option value="created_at">Fecha de creación</option>
-                <option value="updated_at">Fecha de actualización</option>
-              </Form.Select>
+            <Form.Group as={Row} className="mb-3">
+              <Col sm={6} className="mb-3">
+                <Form.Label htmlFor="f_entre">Campo</Form.Label>
+                <Form.Select
+                  id="f_entre"
+                  name="field_name"
+                  value={betweenForm.range.field_name}
+                  onChange={handleSelectCampoRange}
+                >
+                  <option value="">Ninguno</option>
+                  <option value="created_at">Fecha de creación</option>
+                  <option value="updated_at">Fecha de actualización</option>
+                </Form.Select>
+              </Col>
+              <Col sm={6} className="mb-3">
+                <Form.Label htmlFor="periodos">Periodos</Form.Label>
+                <Form.Select
+                  id="periodos"
+                  name="periodos"
+                  value={betweenForm.rangeName}
+                  onChange={(e) => {
+                    setBetweenForm({...betweenForm, rangeName: e.currentTarget.value})
+                  }}
+                >
+                  <option value="">Personalizado</option>
+                  <option value="today">Hoy</option>
+                  <option value="thisWeek">Semana actual</option>
+                  <option value="lastWeek">Semana pasada</option>
+                  <option value="thisMonth">Mes actual</option>
+                  <option value="lastMonth">Mes pasado</option>
+                  <option value="thisYear">Año actual</option>
+                  <option value="lastYear">Año pasado</option>
+                </Form.Select>
+              </Col>
             </Form.Group>
             <Form.Group as={Row}>
               <Form.Label column sm="1">
@@ -291,10 +338,10 @@ const UsersLstFilterMdl: React.FC<Props> = ({isFetching, camposUser}) => {
               </Form.Label>
               <Col sm="5">
                 <Form.Control
-                  disabled={!Boolean(dateRange.field_name)}
+                  disabled={Boolean(betweenForm.rangeName)}
                   type="date"
                   name="from"
-                  value={dateRange.from}
+                  value={betweenForm.range.from}
                   onChange={handleChangeDate}
                 />
               </Col>
@@ -303,56 +350,14 @@ const UsersLstFilterMdl: React.FC<Props> = ({isFetching, camposUser}) => {
               </Form.Label>
               <Col sm="5">
                 <Form.Control
-                  disabled={!Boolean(dateRange.from)}
+                  disabled={Boolean(betweenForm.rangeName)}
                   type="date"
                   name="to"
-                  value={dateRange.to}
+                  value={betweenForm.range.to}
                   onChange={handleChangeDate}
                 />
               </Col>
             </Form.Group>
-            <div className="d-flex gap-3 my-3 flex-wrap">
-              <Badge
-                bg={rangeName === "lastMonth" ? "success" : ""}
-                role="button"
-                onClick={handleRangePred}
-                data-range_name="lastMonth"
-                >
-                Mes pasado
-              </Badge>
-              <Badge
-                bg={rangeName === "lastWeek" ? "success" : ""}
-                role="button"
-                onClick={handleRangePred}
-                data-range_name="lastWeek"
-                >
-                Semana pasada
-              </Badge>
-              <Badge 
-                bg={rangeName === "today" ? "success" : ""}
-                role="button" 
-                onClick={handleRangePred} 
-                data-range_name="today"
-                >
-                Hoy
-              </Badge>
-              <Badge
-                bg={rangeName === "thisWeek" ? "success" : ""}
-                role="button"
-                onClick={handleRangePred}
-                data-range_name="thisWeek"
-                >
-                Esta semana
-              </Badge>
-              <Badge
-                bg={rangeName === "thisMonth" ? "success" : ""}
-                role="button"
-                onClick={handleRangePred}
-                data-range_name="thisMonth"
-              >
-                Este mes
-              </Badge>
-            </div>
             <Form.Group className="mt-4">
               <Col className="text-end">
                 <Button onClick={handleUnbetween} variant="secondary" className="mx-3">Eliminar rango</Button>
@@ -366,4 +371,4 @@ const UsersLstFilterMdl: React.FC<Props> = ({isFetching, camposUser}) => {
   );
 }
 
-export default UsersLstFilterMdl;
+export default UsersLstFilter;

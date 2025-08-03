@@ -5,8 +5,8 @@ import {
   Button,
   Col,
   Container,
-  Dropdown,
   Form,
+  InputGroup,
   Row,
   Stack,
 } from "react-bootstrap";
@@ -24,7 +24,7 @@ export default function UsersHead({ isFetching }: Props) {
 
   const {
     stateUsers:{
-      filterParamsUsersForm,
+      filterParamUsersForm,
       infoFilterUsers: { equal, between, order }},
     dispatchUsers
   } = useUsers();
@@ -33,12 +33,12 @@ export default function UsersHead({ isFetching }: Props) {
     () => {
       if (
         inputSearch.toLowerCase().trim() ==
-        filterParamsUsersForm.search.toLowerCase().trim()
+        filterParamUsersForm.search.toLowerCase().trim()
       ) return;
       dispatchUsers({
         type: 'SET_FILTER_PARAMS_USERS_FORM',
         payload: {
-          ...filterParamsUsersForm,
+          ...filterParamUsersForm,
           search: inputSearch.trim(),
         },
       });
@@ -59,26 +59,26 @@ export default function UsersHead({ isFetching }: Props) {
 
   const resetEqual = (field_name: string) => {
     if (field_name) {
-      let { equal } = filterParamsUsersForm;
+      let { equal } = filterParamUsersForm;
       equal = equal.filter((el) => el.field_name !== field_name);
       dispatchUsers({
         type: 'SET_FILTER_PARAMS_USERS_FORM',
-        payload: { ...filterParamsUsersForm, equal: [...equal] },
+        payload: { ...filterParamUsersForm, equal: [...equal] },
       });
     }
   };
   const resetBetween = (field_name: string) => {
-    let { between } = filterParamsUsersForm;
+    let { between } = filterParamUsersForm;
     between = between.filter((el) => el.field_name !== field_name);
     dispatchUsers({
       type: 'SET_FILTER_PARAMS_USERS_FORM',
-      payload: { ...filterParamsUsersForm, between: [...between] },
+      payload: { ...filterParamUsersForm, between: [...between] },
     });
   };
   const resetSort = () => {
     dispatchUsers({
       type: 'SET_FILTER_PARAMS_USERS_FORM',
-      payload: { ...filterParamsUsersForm, order: [] },
+      payload: { ...filterParamUsersForm, order: [] },
     });
   };
 
@@ -94,28 +94,38 @@ export default function UsersHead({ isFetching }: Props) {
   };
 
   const handleTraerTodo = () => {
-    const param = objToUriBase64(filterParamsUsersForm);
+    const param = objToUriBase64(filterParamUsersForm);
     window.open(apiDOCS + "pdf/?action=users_report&p=" + param);
   };
 
   useEffect(() => {
-    setInputSearch(filterParamsUsersForm.search);
+    setInputSearch(filterParamUsersForm.search);
   }, []);
 
   return (
     <Container className="mb-2 pt-2 position-relative">
       {isFetching && <LdsBar />}
-      <Row className="align-items-center">
+      <Row className="align-items-center mb-2">
         <Col sm className="text-center text-sm-start">
           <h5>Lista de Usuarios</h5>
         </Col>
         <Col sm className="text-center text-sm-start mb-3 mb-sm-0">
+        <InputGroup>
           <Form.Control
             type="search"
             placeholder="Buscar"
             value={inputSearch}
             onChange={(e) => setInputSearch(e.target.value)}
           />
+          <Button
+            variant="outline-secondary"
+            className="border-secondary-subtle"
+            onClick={handleSetShowUsersFilterMdl}
+            title="Mostrar filtros"
+          >
+            <FaFilter />
+          </Button>
+        </InputGroup>
         </Col>
         <Col className="text-center flex-sm-grow-0">
           <div className="d-flex justify-content-center align-items-center gap-3">
@@ -137,19 +147,6 @@ export default function UsersHead({ isFetching }: Props) {
                 <FaFilePdf className="fs-5 text-danger" />
               </div>
             </div>
-            <Dropdown style={{ zIndex: "1030" }}>
-              <Dropdown.Toggle split variant="outline-secondary" />
-              <Dropdown.Menu>
-                <Dropdown.Item
-                  href="#"
-                  onClick={handleSetShowUsersFilterMdl}
-                  className="d-flex gap-2 align-items-center"
-                >
-                  <FaFilter />
-                  <div>Mostrar filtros</div>
-                </Dropdown.Item>
-              </Dropdown.Menu>
-            </Dropdown>
             <Button onClick={handleNuevo} variant="primary">
               Nuevo
             </Button>

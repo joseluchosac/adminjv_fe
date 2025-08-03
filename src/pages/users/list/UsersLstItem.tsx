@@ -3,18 +3,18 @@ import { FaEdit, FaToggleOff, FaToggleOn, FaTrash } from "react-icons/fa";
 import Swal from "sweetalert2";
 import { useEffect } from "react";
 import { toast } from "react-toastify";
-import { CampoTable, QueryResp, User, UserItem } from "../../../core/types";
+import { CampoTable, QueryResp, UserItem } from "../../../core/types";
 import { useUsers } from "../context/UsersContext";
 import useLayoutStore from "../../../core/store/useLayoutStore";
 import { useMutationUsersQuery } from "../../../core/hooks/useUsersQuery";
 
-interface UsersTblRowProps {
+interface UsersLstItemProps {
   user: UserItem ;
   camposUser: CampoTable[]
 }
-interface UserMutQryRes extends QueryResp {content: User}
+interface UserMutQryRes extends QueryResp {content: UserItem}
 
-function UsersTblRow({ user, camposUser }: UsersTblRowProps) {
+function UsersLstItem({ user, camposUser }: UsersLstItemProps) {
   const { dispatchUsers } = useUsers()
   const darkMode = useLayoutStore(state => state.layout.darkMode)
 
@@ -109,4 +109,4 @@ function UsersTblRow({ user, camposUser }: UsersTblRowProps) {
   );
 }
 
-export default UsersTblRow;
+export default UsersLstItem;

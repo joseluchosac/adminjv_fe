@@ -6,7 +6,7 @@ export type UsersStateType = {
   currentUserId: number | null;
   showUsersFilterMdl: boolean;
   infoFilterUsers: InfoFilter;
-  filterParamsUsersForm: FilterParam;
+  filterParamUsersForm: FilterParam;
 }
 
 export type UsersActionsType = 
@@ -21,7 +21,7 @@ export const usersStateInit: UsersStateType = {
   currentUserId: null,
   showUsersFilterMdl: false,
   infoFilterUsers: InfoFilterInit,
-  filterParamsUsersForm: filterParamInit,
+  filterParamUsersForm: filterParamInit,
 }
 
 export const usersReducer = (
@@ -38,7 +38,7 @@ export const usersReducer = (
     case 'SET_INFO_FILTER_USERS':
       {return { ...state, infoFilterUsers: action.payload }};
     case 'SET_FILTER_PARAMS_USERS_FORM':
-      {return { ...state, filterParamsUsersForm: action.payload }};
+      {return { ...state, filterParamUsersForm: action.payload }};
     default:
       return state;
   }

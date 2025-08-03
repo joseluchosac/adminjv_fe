@@ -1,15 +1,28 @@
 const apiURL = import.meta.env.VITE_API_URL;
 import { useEffect, useRef, useState } from "react"
 import { useNavigate } from "react-router-dom";
-import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { InfiniteData, useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import useSessionStore from "../store/useSessionStore"
-import { FilterQueryResp, FetchOptions, LoginForm, RegisterForm, QueryResp, User, UserItem, UserSession } from "../types"
+import { 
+  FilterQueryResp,
+  FetchOptions,
+  LoginForm, 
+  QueryResp, 
+  UserItem, 
+  UserSession, 
+  UserFormType,
+  RegisterFormType,
+  ProfileFormType
+} from "../types"
 import { filterParamInit } from "../utils/constants";
 import { fnFetch } from "../services/fnFetch";
 
 type TypeAction = 
-"filter_full" 
-| "mutate_user" 
+"mutate_user" 
+| "mutate_create_user" 
+| "mutate_update_user" 
+| "mutate_delete_user" 
+| "mutate_state_user" 
 | "mutate_profile" 
 | "sign_up"
 | "login"
@@ -61,7 +74,7 @@ export const useFilterUsersQuery = () => {
       const page = pageParam as number
       const options: FetchOptions = {
         method: "POST",
-        url: `${apiURL}users/filter_users2?page=${page}`,
+        url: `${apiURL}users/filter_users?page=${page}`,
         body: JSON.stringify(filterParamsUsers),
         authorization: "Bearer " + token,
         signal
@@ -119,39 +132,52 @@ export const useMutationUsersQuery = <T>() => {
   const {data, isPending, isError, mutate, } = useMutation<T, Error, FetchOptions, unknown>({
     mutationKey: ['mutation_users'],
     mutationFn: fnFetch,
-    // onMutate: async ({param}) => {
-      // 1: Optimista
-      // await queryClient.cancelQueries({ queryKey: ['users'], exact: true })
-      // queryClient.setQueryData(["users"], (oldData: InfiniteData<any, unknown> | undefined) => {
-      //   let newData = structuredClone(oldData)
-      //   oldData?.pages.forEach((page, idxPage) => { 
-      //     const idxUser = page.content.findIndex((el: User)=>el.id === param.id)
-      //     if(idxUser !== -1 && newData){
-      //       newData.pages[idxPage].content[idxUser] = param
-      //     }
-      //   })
-      //   return {...newData, pages: newData?.pages}
-      // })
+    // onMutate: (datoMutate) => {// 1: Optimista
+    //   // console.log("onMutate", datoMutate)
     // },
     onSuccess: (resp) => {
       const r = resp as QueryResp
       if(r?.msgType !== 'success') return
-      queryClient.invalidateQueries({queryKey:["users"]})
-
-      // 1: Actualizando la lista manualmente
-      // queryClient.setQueryData(["users"], (oldData: InfiniteData<any, unknown> | undefined) => {
-      //   let newData = structuredClone(oldData)
-      //   oldData?.pages.forEach((page, idxPage) => { 
-      //     const idxUser = page.content.findIndex((el: User)=>el.id === resp.registro.id)
-      //     if(idxUser !== -1 && newData){
-      //       newData.pages[idxPage].content[idxUser] = resp.registro
-      //     }
-      //   })
-      //   return {...newData, pages: newData?.pages}
-      // })
-
+      if(typeActionRef.current === "mutate_create_user") {
+        const createdUser = r.content as UserItem
+        queryClient.setQueryData(["users"], (oldData: InfiniteData<UsersFilQryRes, unknown> | undefined) => {
+          const pages = structuredClone(oldData?.pages)
+          if(pages && pages.length > 0){
+            pages[0].filas.unshift(createdUser as UserItem) // Agrega el nuevo usuario al inicio de la primera página
+          }
+          return {...oldData, pages}
+        })
+      }else if(typeActionRef.current === "mutate_state_user" || typeActionRef.current === "mutate_update_user") {
+        const updatedUser = r.content as UserItem
+        queryClient.setQueryData(["users"], (oldData: InfiniteData<UsersFilQryRes, unknown> | undefined) => {
+          const pages = structuredClone(oldData?.pages)
+          for(let idxPage in pages){
+            const idxFila = pages[parseInt(idxPage)].filas.findIndex((el: UserItem)=>el.id === updatedUser.id)
+            if(idxFila !== -1){
+              pages[parseInt(idxPage)].filas[idxFila] = updatedUser // Actualiza el usuario en la lista
+              break
+            }
+          }
+          return {...oldData, pages}
+        })
+      }else if(typeActionRef.current === "mutate_delete_user") {
+        const deletedUserId = r.content as UserItem["id"]
+        queryClient.setQueryData(["users"], (oldData: InfiniteData<UsersFilQryRes, unknown> | undefined) => {
+          let pages = structuredClone(oldData?.pages)
+          for(let idxPage in pages){
+            const idxFila = pages[parseInt(idxPage)].filas.findIndex((el: UserItem)=>el.id === deletedUserId)
+            if(idxFila !== -1){
+              let filasFiltradas = pages[parseInt(idxPage)].filas.filter(el => el.id !== deletedUserId) // Elimina el usuario de la fila
+              pages[parseInt(idxPage)].filas = filasFiltradas
+              break
+            }
+          }
+          return {...oldData, pages}
+        })
+      } 
       // 2: Haciendo refetch de la lista
-    }
+      // queryClient.invalidateQueries({queryKey:["users"]})
+    },
   })
 
   const getUser = (id: number) => {
@@ -164,17 +190,8 @@ export const useMutationUsersQuery = <T>() => {
     mutate(options)
   }
 
-  const getProfile = () => {
-    const options: FetchOptions = {
-      method: "POST",
-      url: apiURL + "users/get_profile",
-      authorization: "Bearer " + token,
-    }
-    mutate(options)
-  }
-
-  const createUser = (user: User) => {
-    typeActionRef.current = "mutate_user"
+  const createUser = (user: UserFormType) => {
+    typeActionRef.current = "mutate_create_user"
     const options: FetchOptions = {
       method: "POST",
       url: apiURL + "users/create_user",
@@ -184,18 +201,8 @@ export const useMutationUsersQuery = <T>() => {
     mutate(options)
   }
 
-  const signUp = (registro: RegisterForm) => { // registrarse
-    typeActionRef.current = "sign_up"
-    const options: FetchOptions = {
-      method: "POST",
-      url: apiURL + "users/sign_up",
-      body: JSON.stringify(registro),
-    }
-    mutate(options)
-  }
-
-  const updateUser = (user: User) => {
-    typeActionRef.current = "mutate_user"
+  const updateUser = (user: UserFormType) => {
+    typeActionRef.current = "mutate_update_user"
     const options: FetchOptions = {
       method: "PUT",
       url: apiURL + "users/update_user",
@@ -206,7 +213,7 @@ export const useMutationUsersQuery = <T>() => {
   }
 
   const setStateUser = (data: {estado: number, id: number}) => {
-    typeActionRef.current = "mutate_user"
+    typeActionRef.current = "mutate_state_user"
     const options: FetchOptions = {
       method: "PUT",
       url: apiURL + "users/set_state_user",
@@ -216,7 +223,27 @@ export const useMutationUsersQuery = <T>() => {
     mutate(options)
   }
 
-  const updateProfile = (user: User) => {
+  const deleteUser = (id: number) => {
+    typeActionRef.current = "mutate_delete_user"
+    const options: FetchOptions = {
+      method: "DELETE",
+      url: apiURL + "users/delete_user",
+      body: JSON.stringify({id}),
+      authorization: "Bearer " + token,
+    }
+    mutate(options)
+  }
+
+  const getProfile = () => { // Obtener perfil del usuario
+    const options: FetchOptions = {
+      method: "POST",
+      url: apiURL + "users/get_profile",
+      authorization: "Bearer " + token,
+    }
+    mutate(options)
+  }
+
+  const updateProfile = (user: ProfileFormType) => {
     typeActionRef.current = "mutate_profile"
     const options: FetchOptions = {
       method: "PUT",
@@ -227,13 +254,12 @@ export const useMutationUsersQuery = <T>() => {
     mutate(options)
   }
 
-  const deleteUser = (id: number) => {
-    typeActionRef.current = "mutate_user"
+  const signUp = (registro: RegisterFormType) => { // registrarse
+    typeActionRef.current = "sign_up"
     const options: FetchOptions = {
-      method: "DELETE",
-      url: apiURL + "users/delete_user",
-      body: JSON.stringify({id}),
-      authorization: "Bearer " + token,
+      method: "POST",
+      url: apiURL + "users/sign_up",
+      body: JSON.stringify(registro),
     }
     mutate(options)
   }
@@ -248,7 +274,7 @@ export const useMutationUsersQuery = <T>() => {
     mutate(options)
   }
 
-  const checkAuth = () => {
+  const checkAuth = () => { // Verificar autenticacion
     typeActionRef.current = "check_auth"
     const options: FetchOptions = {
       method: "POST",

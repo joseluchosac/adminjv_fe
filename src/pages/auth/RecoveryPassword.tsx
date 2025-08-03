@@ -20,7 +20,7 @@ const RecoveryPassword: React.FC<RecoveryPasswordProps> = ({
   formsAuth,
 }) => {
 
-  const [restoreForm, setRestoreForm] = useState({code:"", new_password:"", new_password_repeat:""})
+  const [restoreForm, setRestoreForm] = useState({code:"", new_password:"", new_confirm_password:""})
   const {
     data: dataRestore,
     isPending: isPendingRestore,
@@ -102,8 +102,8 @@ const RecoveryPassword: React.FC<RecoveryPasswordProps> = ({
           <Form.Control
             placeholder="Repetir nueva contraseña"
             type="password"
-            name="new_password_repeat"
-            value={restoreForm.new_password_repeat}
+            name="new_confirm_password"
+            value={restoreForm.new_confirm_password}
             onChange={handleChangeRestoreForm}
           />
           <InputGroup.Text id="basic-addon2"><DynaIcon name="FaLock" /></InputGroup.Text>

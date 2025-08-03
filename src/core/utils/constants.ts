@@ -49,15 +49,6 @@ export const lsTknSessionKey = "lsTknSession"
 export const lsCurEst = "lsCurEst"
 
 
-export const registerFormInit = {
-  nombres: "",
-  apellidos: "",
-  username: "",
-  email:"",
-  password: "",
-  password_repeat: '',
-}
-
 //--> MODULOS
 // *****************************************************
 export const moduloFormInit = {
@@ -186,9 +177,7 @@ export const camposUserInit: CampoTable[] = [
   {show: true, orderable: true, order_dir:"", field_name: "email", field_label:"Email",},
   {show: false, orderable: false, order_dir:"", field_name: "estado", field_label:"Estado",},
   {show: true, orderable: true, order_dir:"", field_name: "rol", field_label:"Rol",},
-  {show: false, orderable: false, order_dir:"", field_name: "rol_id", field_label:"Rol Id",},
   {show: true, orderable: true, order_dir:"", field_name: "caja", field_label:"Caja",},
-  {show: false, orderable: false, order_dir:"", field_name: "caja_id", field_label:"CajaID",},
   {show: true, orderable: true, order_dir:"", field_name: "created_at", field_label:"F creación",},
   {show: true, orderable: true, order_dir:"", field_name: "updated_at", field_label:"F actualización",},
 ]
@@ -256,11 +245,8 @@ export const userFormInit = {
   apellidos: "",
   username: "",
   email: "",
-  rol_id: 2,
-  rol:"",
-  caja_id: 1,
-  caja:"",
-  estado: 1,
+  rol_id: 0,
+  caja_id: 0,
   password: '',
-  password_repeat: '',
+  confirm_password: '',
 }

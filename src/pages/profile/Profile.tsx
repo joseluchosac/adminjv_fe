@@ -1,47 +1,36 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Button, Card, Col, Container, Form, Row } from "react-bootstrap";
 import { toast } from "react-toastify";
 import Swal from "sweetalert2";
 import useLayoutStore from "../../core/store/useLayoutStore";
 import { useMutationUsersQuery } from "../../core/hooks/useUsersQuery";
-import useUserActualFormValidate from "./useUserActualFormValidate";
-import { useCajasQuery } from "../../core/hooks/useCatalogosQuery";
-import {type Profile, QueryResp, Rol } from "../../core/types";
-interface RolesQryRes extends QueryResp {
-  content: Rol[]
-}
+import {type Profile, ProfileFormType, QueryResp } from "../../core/types";
+import { useForm } from "react-hook-form";
+import { profileFormSchema } from "../../core/types/schemas";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { LdsEllipsisCenter } from "../../core/components/Loaders";
 
-interface ProfileForm extends Profile {
-  password: string;
-  password_repeat: string;
-}
-
-const profileFormInit: ProfileForm = {
-  id: 0,
-  nombres: '',
-  apellidos: '',
-  username: '',
-  email: '',
-  rol_id: 0,
-  caja_id: 0,
-  estado: 1,
-  password: '',
-  password_repeat: '',
+interface ProfileQryRes extends QueryResp {
+  content: Profile
 }
 
 export default function Profile() {
-  const [profileForm, setProfileForm] = useState(profileFormInit)
     const queryClient = useQueryClient()
     const darkMode = useLayoutStore(state => state.layout.darkMode)
+    const {
+      register,
+      formState: { errors },
+      handleSubmit,
+      reset,
+      getValues,
+    } = useForm<ProfileFormType>({
+      resolver: zodResolver(profileFormSchema),
+    })
 
-    const roles = queryClient.getQueryData<RolesQryRes>(["roles"])
-    const {cajas} = useCajasQuery()
-    interface ProfileQryRes extends QueryResp {
-      content: Profile
-    }
     const {
       data: profile,
+      isPending: isPendingProfile,
       getProfile
     } = useMutationUsersQuery<ProfileQryRes>()
 
@@ -52,28 +41,17 @@ export default function Profile() {
 
     const {
       data: mutation,
+      isPending: isPendingMutation,
       updateProfile
     } = useMutationUsersQuery<ProfileQryRes>()
     
   
-    const {feedbk, validateErr, validated, setValidated} = useUserActualFormValidate(profileForm)
-    const wasModify = useRef(false)
   
     const actualizar = () => {
       queryClient.invalidateQueries({queryKey:["check_auth"]})
     }
   
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      wasModify.current = true
-      const {name, value} = e.currentTarget
-      if(!profileForm) return
-      setProfileForm({ ...profileForm, [name]: value });
-    }
-  
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-      e.preventDefault()
-      setValidated(true)
-      if(validateErr) return
+    const onSubmit = () => {
       Swal.fire({
         text: "Ingrese su contraseña para guardar los cambios",
         input: "password",
@@ -97,9 +75,7 @@ export default function Profile() {
   
     useEffect(() => {
       if(!profile) return
-      if(profile.error) return
-      const newForm = {...profileForm, ...profile.content}
-      setProfileForm(newForm)
+      reset(profile.content)
     }, [profile])
   
     useEffect(() => {
@@ -107,7 +83,7 @@ export default function Profile() {
       if(respCheckPassword.error){
         toast.error(respCheckPassword.msg)
       }else{
-        updateProfile(profileForm)
+        updateProfile(getValues())
       }
     }, [respCheckPassword])
   
@@ -122,61 +98,69 @@ export default function Profile() {
         <Card.Header>
           <h4>Mis datos</h4>
         </Card.Header>
-        <Card.Body>
-          <Form onSubmit={handleSubmit}>
+        <Card.Body className="position-relative">
+          {(isPendingProfile || isPendingMutation) && <LdsEllipsisCenter />}
+          <Form onSubmit={handleSubmit(onSubmit)}>
             <Row>
               <Form.Group as={Col} md={6} xl={4} className="mb-3">
                 <Form.Label htmlFor="nombres">Nombres</Form.Label>
                 <Form.Control
-                  type="text"
-                  name="nombres"
                   id="nombres"
-                  value={profileForm?.nombres}
-                  onChange={handleChange}
+                  {...register("nombres")}
                 />
-                {validated && feedbk.nombres && <div className="invalid-feedback d-block">{feedbk.nombres}</div>}
+                {errors.nombres && (
+                  <Form.Text className="text-danger">
+                    {errors.nombres.message}
+                  </Form.Text>
+                )}
               </Form.Group>
               <Form.Group as={Col} md={6} xl={4} className="mb-3">
                 <Form.Label htmlFor="apellidos">Apellidos</Form.Label>
                 <Form.Control
-                  type="text"
-                  name="apellidos"
                   id="apellidos"
-                  value={profileForm?.apellidos}
-                  onChange={handleChange}
+                  {...register("apellidos")}
                 />
-                {validated && feedbk.nombres && <div className="invalid-feedback d-block">{feedbk.nombres}</div>}
+                {errors.apellidos && (
+                  <Form.Text className="text-danger">
+                    {errors.apellidos.message}
+                  </Form.Text>
+                )}
               </Form.Group>
               <Form.Group as={Col} md={6} xl={4} className="mb-3">
                 <Form.Label htmlFor="username">Usuario</Form.Label>
                 <Form.Control
                   disabled
-                  type="text"
-                  name="username"
                   id="username"
-                  value={profileForm?.username}
-                  onChange={handleChange}
+                  {...register("username")}
                 />
-                {validated && feedbk.username && <div className="invalid-feedback d-block">{feedbk.username}</div>}
               </Form.Group>
               <Form.Group as={Col} md={6} xl={4} className="mb-3">
                 <Form.Label htmlFor="email">E-mail</Form.Label>
                 <Form.Control
-                  type="text"
-                  name="email"
                   id="email"
-                  value={profileForm?.email}
-                  onChange={handleChange}
+                  {...register("email")}
                 />
-                {validated && feedbk.email && <div className="invalid-feedback d-block">{feedbk.email}</div>}
+                {errors.email && (
+                  <Form.Text className="text-danger">
+                    {errors.email.message}
+                  </Form.Text>
+                )}
               </Form.Group>
-              <Form.Group as={Col} md={4} xl={3} className="mb-3">
-                <Form.Label>Caja</Form.Label>
-                <div>{cajas?.find(el=>el.id == profileForm.caja_id)?.descripcion}</div>
+              <Form.Group as={Col} md={6} xl={4} className="mb-3">
+                <Form.Label htmlFor="rol">Rol</Form.Label>
+                <Form.Control
+                  disabled
+                  id="rol"
+                  {...register("rol")}
+                />
               </Form.Group>
-              <Form.Group as={Col} md={4} xl={3} className="mb-3">
-                <Form.Label>Rol</Form.Label>
-                {roles && <div>{roles.content.find(el=>el.id == profileForm.rol_id)?.rol}</div>}
+              <Form.Group as={Col} md={6} xl={4} className="mb-3">
+                <Form.Label htmlFor="caja">Caja</Form.Label>
+                <Form.Control
+                  disabled
+                  id="caja"
+                  {...register("caja")}
+                />
               </Form.Group>
               <h5 className="mt-3">Cambio de contraseña</h5>
               <hr className="mb-2" />
@@ -184,26 +168,30 @@ export default function Profile() {
                 Ingrese una nueva contraseña si desea cambiar la actual
               </small>
               <Form.Group as={Col} md={6} xl={4} className="mb-3">
-                <Form.Label htmlFor="password">Nueva contraseña</Form.Label>
+                <Form.Label htmlFor="new_password">Nueva contraseña</Form.Label>
                 <Form.Control
+                  id="new_password"
                   type="password"
-                  name="password"
-                  id="password"
-                  value={profileForm?.password}
-                  onChange={handleChange}
+                  {...register("new_password")}
                 />
-                {validated && feedbk.password && <div className="invalid-feedback d-block">{feedbk.password}</div>}
+                {errors.new_password && (
+                  <Form.Text className="text-danger">
+                    {errors.new_password.message}
+                  </Form.Text>
+                )}
               </Form.Group>
               <Form.Group as={Col} md={6} xl={4} className="mb-3">
-                <Form.Label htmlFor="password_repeat">Repetir nueva contraseña</Form.Label>
+                <Form.Label htmlFor="confirm_new_password">Confirmar nueva contraseña</Form.Label>
                 <Form.Control
+                  id="confirm_new_password"
                   type="password"
-                  name="password_repeat"
-                  id="password_repeat"
-                  value={profileForm?.password_repeat}
-                  onChange={handleChange}
+                  {...register("confirm_new_password")}
                 />
-                {validated && feedbk.password_repeat && <div className="invalid-feedback d-block">{feedbk.password_repeat}</div>}
+                {errors.confirm_new_password && (
+                  <Form.Text className="text-danger">
+                    {errors.confirm_new_password.message}
+                  </Form.Text>
+                )}
               </Form.Group>
             </Row>
             <div className="d-flex gap-2 justify-content-end">

@@ -7,15 +7,15 @@ import DynaIcon from "../../../core/components/DynaComponents";
 import { OrderItem, UserItem } from "../../../core/types";
 import { LdsEllipsisCenter } from "../../../core/components/Loaders";
 import UsersHead from "./UsersHead";
-import UsersTblRow from "./UsersTblRow";
-import UsersLstFilterMdl from "./UsersLstFilterMdl";
+import UsersLstFilter from "./UsersLstFilter";
 import { camposUserInit } from "../../../core/utils/constants";
+import UsersLstItem from "./UsersLstItem";
 
 
 export default function UsersLst() {
   const [ camposUser, setCamposUser] = useState(camposUserInit)
   const {
-    stateUsers: { filterParamsUsersForm },
+    stateUsers: { filterParamUsersForm },
     dispatchUsers
   } = useUsers()
   
@@ -33,27 +33,27 @@ export default function UsersLst() {
   const ldsEllipsisRef = useRef<HTMLDivElement | null>(null)
 
   const sort = (field_name:string, field_label: string, ctrlKey: boolean) => {
-    const orderIdx = filterParamsUsersForm.order.findIndex(el => el.field_name === field_name)
+    const orderIdx = filterParamUsersForm.order.findIndex(el => el.field_name === field_name)
     if(ctrlKey){
       if(orderIdx === -1){
         const newOrder: OrderItem = {field_name, order_dir: "ASC", field_label}
         dispatchUsers({
           type: 'SET_FILTER_PARAMS_USERS_FORM',
-          payload: {...filterParamsUsersForm, order: [...filterParamsUsersForm.order, newOrder]}
+          payload: {...filterParamUsersForm, order: [...filterParamUsersForm.order, newOrder]}
         });
       }else{
-        let newOrders = structuredClone(filterParamsUsersForm.order)
+        let newOrders = structuredClone(filterParamUsersForm.order)
         if(newOrders[orderIdx].order_dir == "ASC"){
           newOrders[orderIdx] = {field_name, order_dir: "DESC", field_label}
           dispatchUsers({
             type: 'SET_FILTER_PARAMS_USERS_FORM',
-            payload: {...filterParamsUsersForm, order: newOrders}
+            payload: {...filterParamUsersForm, order: newOrders}
           });
         }else{
           newOrders = newOrders.filter(el=>el.field_name !== field_name)
           dispatchUsers({
             type: 'SET_FILTER_PARAMS_USERS_FORM',
-            payload: {...filterParamsUsersForm, order: newOrders}
+            payload: {...filterParamUsersForm, order: newOrders}
           });
         }
       }
@@ -62,20 +62,20 @@ export default function UsersLst() {
         const newOrder: OrderItem = {field_name, order_dir: "ASC", field_label}
         dispatchUsers({
           type: 'SET_FILTER_PARAMS_USERS_FORM',
-          payload: {...filterParamsUsersForm, order: [newOrder]}
+          payload: {...filterParamUsersForm, order: [newOrder]}
         });
       }else{
-        let newOrders = structuredClone(filterParamsUsersForm.order)
+        let newOrders = structuredClone(filterParamUsersForm.order)
         if(newOrders[orderIdx].order_dir == "ASC"){
           const newOrder: OrderItem = {field_name, order_dir: "DESC", field_label}
           dispatchUsers({
             type: 'SET_FILTER_PARAMS_USERS_FORM',
-            payload: {...filterParamsUsersForm, order: [newOrder]}
+            payload: {...filterParamUsersForm, order: [newOrder]}
           });
         }else{
           dispatchUsers({
             type: 'SET_FILTER_PARAMS_USERS_FORM',
-            payload: {...filterParamsUsersForm, order: []}
+            payload: {...filterParamUsersForm, order: []}
           });
         }
       }
@@ -87,8 +87,8 @@ export default function UsersLst() {
   };
 
   useEffect(() => {
-    setFilterParamsUsers(filterParamsUsersForm)
-  }, [filterParamsUsersForm])
+    setFilterParamsUsers(filterParamUsersForm)
+  }, [filterParamUsersForm])
 
   useEffect(()=>{
     if(data?.pages[0].error || isError){
@@ -96,7 +96,7 @@ export default function UsersLst() {
       return
     }
     if(!isFetching){
-      const {search, equal, between, order} = filterParamsUsersForm
+      const {search, equal, between, order} = filterParamUsersForm
       dispatchUsers({
         type: 'SET_INFO_FILTER_USERS',
         payload: {search, equal, between, order}
@@ -147,7 +147,7 @@ export default function UsersLst() {
               </thead>
               <tbody>
                 {data && data?.pages.flatMap(el => el.filas).map((user: UserItem) => (
-                  <UsersTblRow key={user.id} user={user} camposUser={camposUser}/>
+                  <UsersLstItem key={user.id} user={user} camposUser={camposUser}/>
                 ))}
               </tbody>
             </Table>
@@ -164,7 +164,7 @@ export default function UsersLst() {
           {isError && <div className="text-danger">Error de conexion</div>}
         </div>
       </Card>
-      <UsersLstFilterMdl isFetching={isFetching} camposUser={camposUser} />
+      <UsersLstFilter isFetching={isFetching} camposUser={camposUser} />
     </>
   )
 }

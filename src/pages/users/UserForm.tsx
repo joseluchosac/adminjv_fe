@@ -2,19 +2,21 @@ import { useEffect } from "react";
 import Modal from "react-bootstrap/Modal";
 import { Button, Col, Form, Row, Spinner } from "react-bootstrap";
 import { useForm } from "react-hook-form";
-import Swal from "sweetalert2";
 import { toast } from "react-toastify";
+import Swal from "sweetalert2" ;
 import { LdsBar, LdsEllipsisCenter } from "../../core/components/Loaders";
 import useLayoutStore from "../../core/store/useLayoutStore";
 import { useMutationUsersQuery } from "../../core/hooks/useUsersQuery";
 import { useUsers } from "./context/UsersContext";
-import { QueryResp, User } from "../../core/types";
+import { QueryResp, UserFormType, } from "../../core/types";
 import { useCajasQuery } from "../../core/hooks/useCatalogosQuery";
 import { useRolesQuery } from "../../core/hooks/useRolesQuery";
 import { userFormInit } from "../../core/utils/constants";
-
+import {zodResolver} from "@hookform/resolvers/zod";
+import { userFormSchema } from "../../core/types/schemas";
 interface UserQryRes extends QueryResp {
-  content: User;
+  content: UserFormType | null;
+  errors?: Record<string, string[]>;
 }
 
 export default function Userform(){
@@ -22,16 +24,21 @@ export default function Userform(){
     stateUsers: { showUserForm, currentUserId },
     dispatchUsers
   } = useUsers()
+
   const darkMode = useLayoutStore(state => state.layout.darkMode)
   const {roles} = useRolesQuery()  
   const {cajas} = useCajasQuery()
+
   const {
     register, 
     formState: {errors, isDirty}, 
-    handleSubmit, 
+    handleSubmit,
+    setError,
     reset,
-    watch,
-  } = useForm<User>({defaultValues: userFormInit})
+  } = useForm<UserFormType>({
+    defaultValues: userFormInit,
+    resolver: zodResolver(userFormSchema),
+  })
   
   const {
     data: user,
@@ -47,7 +54,7 @@ export default function Userform(){
     updateUser, 
   } = useMutationUsersQuery<UserQryRes>()
   
-  const submit = (data: User) => {
+  const submit = (data: UserFormType) => {
     Swal.fire({
       icon: 'question',
       text: data.id
@@ -104,13 +111,20 @@ export default function Userform(){
   useEffect(() => {
     if(!mutation) return
     if(!mutation.error) {
-      dispatchUsers({
-      type: 'SET_SHOW_USER_FORM',
-      payload: false,
-    });
+      dispatchUsers({type: 'SET_SHOW_USER_FORM',payload: false});
     };
+    if(mutation?.errors){
+       Object.entries(mutation.errors).forEach(([field, messages]) => {
+        const f = field as keyof UserFormType;
+        setError(f, {
+          type: 'server',
+          message: Array.isArray(messages) ? messages.join(' ') : messages,
+        });
+      });
+    }
     toast(mutation.msg, {type: mutation.msgType})
   }, [mutation])
+
 
   return (
     <Modal
@@ -135,11 +149,7 @@ export default function Userform(){
               <Form.Label htmlFor="nombres">Nombres</Form.Label>
               <Form.Control
                 id="nombres"
-                {...register('nombres', {
-                  required: "Los nombres son requeridos",
-                  minLength: {value: 3, message:"Se permite mínimo 3 caracteres"},
-                  maxLength: {value: 50, message:"Se permite máximo 50 caracteres"}
-                })}
+                {...register('nombres')}
               />
               {errors.nombres && 
                 <div className="invalid-feedback d-block">{errors.nombres.message}</div>
@@ -148,11 +158,7 @@ export default function Userform(){
               <Form.Label htmlFor="apellidos">Apellidos</Form.Label>
               <Form.Control
                 id="apellidos"
-                {...register('apellidos', {
-                  required:"Los apellidos son requeridos",
-                  minLength: {value: 3, message:"Se permite mínimo 3 caracteres"},
-                  maxLength: {value: 50, message:"Se permite máximo 50 caracteres"}
-                })}
+                {...register('apellidos')}
               />
               {errors.apellidos && 
                 <div className="invalid-feedback d-block">{errors.apellidos.message}</div>
@@ -163,15 +169,7 @@ export default function Userform(){
               <Form.Control
                 id="username"
                 disabled={currentUserId ? true : false}
-                {...register('username', {
-                  required:"El nombre de usuario es requerido",
-                  minLength: {value: 3, message:"Se permite mínimo 3 caracteres"},
-                  maxLength: {value: 50, message:"Se permite máximo 50 caracteres"},
-                  pattern: {
-                    value: /^[a-zA-ZÑñÁáÉéÍíÓóÚúÜü0-9]+$/,
-                    message: 'Solo se permiten letras y números sin espacios'
-                  }
-                })}
+                {...register('username')}
               />
               {errors.username && 
                 <div className="invalid-feedback d-block">{errors.username.message}</div>
@@ -183,12 +181,7 @@ export default function Userform(){
                 type="text"
                 id="email"
                 disabled={currentUserId ? true : false}
-                {...register('email', {
-                  pattern: {
-                    value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                    message: 'Formato de email no valido'
-                  }
-                })}
+                {...register('email')}
               />
               {errors.email && 
                 <div className="invalid-feedback d-block">{errors.email.message}</div>
@@ -201,73 +194,51 @@ export default function Userform(){
                   <Form.Control
                     type="password"
                     id="password"
-                    {...register('password', {
-                      required: 'La contraseña es obligatoria',
-                      pattern: {
-                        value: /^[A-Za-z\d@$!%*?&]{6,}$/,
-                        message: 'La contraseña debe tener al menos 6 caracteres sin espacios'
-                      }
-                    })}
+                    {...register('password')}
                   />
                   {errors.password && 
                     <div className="invalid-feedback d-block">{errors.password.message}</div>
                   } 
                 </Form.Group>
                 <Form.Group as={Col} md={6} xl={4} className="mb-3">
-                  <Form.Label htmlFor="password_repeat">Repetir contraseña</Form.Label>
+                  <Form.Label htmlFor="confirm_password">Repetir contraseña</Form.Label>
                   <Form.Control
                     type="password"
-                    id="password_repeat"
-                    {...register('password_repeat', {
-                      validate: (val: string) => {
-                        if (watch('password') != val) {
-                          return "los passwords no son iguales";
-                        }
-                      },
-                    })}
+                    id="confirm_password"
+                    {...register('confirm_password')}
                   />
-                  {errors.password_repeat && 
-                    <div className="invalid-feedback d-block">{errors.password_repeat.message}</div>
+                  {errors.confirm_password && 
+                    <div className="invalid-feedback d-block">{errors.confirm_password.message}</div>
                   }
                 </Form.Group>
               </>
             }
-
-            <Form.Group as={Col} md={4} xl={3} className="mb-3">
+            <Form.Group as={Col} md={6} xl={4} className="mb-3">
               <Form.Label htmlFor="rol_id">Rol</Form.Label>
               <Form.Select
                 id="rol_id"
                 {...register('rol_id',{valueAsNumber:true})}
               >
+                <option value="0">-- Seleccione</option>
                 {roles?.map((el) => 
                   <option key={el.id} value={el.id}>{el.rol}</option>
                 )}
               </Form.Select>
+              {errors.rol_id && <div className="invalid-feedback d-block">{errors.rol_id.message}</div>}
             </Form.Group>
-            <Form.Group as={Col} md={4} xl={3} className="mb-3">
+            <Form.Group as={Col} md={6} xl={4} className="mb-3">
               <Form.Label htmlFor="caja_id">Caja</Form.Label>
               <Form.Select
                 id="caja_id"
                 {...register('caja_id',{valueAsNumber:true})}
               >
+                <option value="0">-- Seleccione</option>
                 {cajas && cajas.map((el) => 
                   <option key={el.id} value={el.id}>{el.descripcion}</option>
                 )}
               </Form.Select>
+              {errors.caja_id && <div className="invalid-feedback d-block">{errors.caja_id.message}</div>}
             </Form.Group>
-            { Boolean(currentUserId) &&
-              <Form.Group as={Col} md={4} xl={3} className="mb-3">
-                <Form.Label htmlFor="estado">Estado</Form.Label>
-                <Form.Select
-                  disabled
-                  id="estado"
-                  {...register('estado',{valueAsNumber:true})}
-                >
-                  <option value="0">Deshabilitado</option>
-                  <option value="1">Habilitado</option>
-                </Form.Select>
-              </Form.Group>
-            }
           </Row>
           <div className="d-flex gap-2 justify-content-end">
             <Button
@@ -280,8 +251,6 @@ export default function Userform(){
                 })
               }
             >Cerrar</Button>
-
-
             <Button 
               variant="primary" 
               type="submit"
