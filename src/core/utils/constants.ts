@@ -1,4 +1,4 @@
-import { CampoTable, Cliente, FilterInfo, InfoFilter, FilterParam, FilterParams, Proveedor } from "../types";
+import { BetweenItem, CampoTable, Cliente, CommonPeriod, FilterInfo, FilterParam, FilterParams, Proveedor } from "../types";
 
 //--> CLAVES PARA LOCAL STORAGE
 export const ls_layoutKey = "ls_layout"
@@ -66,7 +66,32 @@ export const rolFormInit = {
   id: 0,
   rol: "",
 }
+// ✅✅NUEVA ESTRUCTURA FILTER PARAMS✅✅
+export const filterParamInit: FilterParam = {
+  offset: 25,
+  search: "",
+  equal: [],
+  between: [],
+  order: []
+}
 
+/* const ejemploFilterParam = {
+  offset: 25,
+  search: "joel",
+  equal: [
+    { fieldName: 'rol_id', fieldValue: [2,3] },
+    { fieldName: 'estado', fieldValue: 1 }
+  ],
+  between: [
+    { fieldName: 'created_at', from: '2024-12-17', to: '2024-12-19' },
+    { fieldName: 'updated_at', from: '2025-03-21', to: '2025-12-18' }
+  ],
+  order: [
+    { fieldName: 'apellidos', dir: 'ASC' },
+    { fieldName: 'nombres', dir: 'DESC' }
+  ]
+} */
+// Para deprecar
 export const filterParamsInit: FilterParams = {
     offset: 25,
     search: "",
@@ -99,31 +124,7 @@ export const filterParamsInit: FilterParams = {
 */
 
 
-// ✅✅NUEVA ESTRUCTURA FILTER PARAMS✅✅
-export const filterParamInit: FilterParam = {
-  offset: 25,
-  search: "",
-  equal: [],
-  between: [],
-  order: []
-}
 
-/* const ejemploFilterParam = {
-  offset: 25,
-  search: "joel",
-  equal: [
-    { fieldName: 'rol_id', fieldValue: [2,3] },
-    { fieldName: 'estado', fieldValue: 1 }
-  ],
-  between: [
-    { fieldName: 'created_at', from: '2024-12-17', to: '2024-12-19' },
-    { fieldName: 'updated_at', from: '2025-03-21', to: '2025-12-18' }
-  ],
-  order: [
-    { fieldName: 'apellidos', dir: 'ASC' },
-    { fieldName: 'nombres', dir: 'DESC' }
-  ]
-} */
 //--> ROLES
 // *****************************************************
 export const filterInfoInit: FilterInfo = {
@@ -131,12 +132,6 @@ export const filterInfoInit: FilterInfo = {
   equals: [],
   between: {field_name: "", field_label: "", range: ""},
   orders: [], 
-}
-export const InfoFilterInit: InfoFilter = {
-  search:"",
-  equal: [],
-  between: [],
-  order: [], 
 }
 
 //--> CLIENTES
@@ -167,6 +162,18 @@ export const proveedorFormInit: Proveedor = {
   telefono: "",
   api: 0,
 }
+export const betweenItemInit: BetweenItem = { field_name: "", field_label: "", from: "", to: "", betweenName:"" };
+
+
+export const commonPeriods: CommonPeriod[] = [
+  {key: "today", text:"Hoy"},
+  {key: "thisWeek", text:"Esta semana"},
+  {key: "lastWeek", text:"Semana pasada"},
+  {key: "thisMonth", text:"Este mes"},
+  {key: "lastMonth", text:"Mes pasado"},
+  {key: "thisYear", text:"Este año"},
+  {key: "lastYear", text:"Año pasado"},
+]
 
 export const camposUserInit: CampoTable[] = [
   {show: true, orderable: false, order_dir:"", field_name: "acciones", field_label:"Acciones",},

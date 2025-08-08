@@ -3,19 +3,18 @@ import { FaEdit, FaToggleOff, FaToggleOn, FaTrash } from "react-icons/fa";
 import Swal from "sweetalert2";
 import { useEffect } from "react";
 import { toast } from "react-toastify";
-import { CampoTable, QueryResp, UserItem } from "../../../core/types";
+import { QueryResp, UserItem } from "../../../core/types";
 import { useUsers } from "../context/UsersContext";
 import useLayoutStore from "../../../core/store/useLayoutStore";
 import { useMutationUsersQuery } from "../../../core/hooks/useUsersQuery";
 
 interface UsersLstItemProps {
   user: UserItem ;
-  camposUser: CampoTable[]
 }
 interface UserMutQryRes extends QueryResp {content: UserItem}
 
-function UsersLstItem({ user, camposUser }: UsersLstItemProps) {
-  const { dispatchUsers } = useUsers()
+function UsersLstItem({ user }: UsersLstItemProps) {
+  const { dispatchUsers, stateUsers: {camposUser} } = useUsers()
   const darkMode = useLayoutStore(state => state.layout.darkMode)
 
   const {
@@ -30,14 +29,11 @@ function UsersLstItem({ user, camposUser }: UsersLstItemProps) {
     return isValid(parseISO(date)) ? format(date, formato) : ''
   }
 
-  const handleToEdit = () => {
-    dispatchUsers({
-      type: 'SET_CURRENT_USER_ID',
-      payload: user.id
-    });
+  const handleToEdit = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
+    e.preventDefault()
     dispatchUsers({
       type: 'SET_SHOW_USER_FORM',
-      payload: true
+      payload: {showUserForm: true, currentUserId: user.id},
     });
   }
 

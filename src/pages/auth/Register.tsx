@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { Alert, Button, Card, Col, Container, Form, Row } from "react-bootstrap";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import "./auth.css";
+import "../../assets/css/auth.css";
 import { useMutationUsersQuery } from "../../core/hooks/useUsersQuery";
 import { LdsEllipsisCenter } from "../../core/components/Loaders";
 import { Link } from "react-router-dom";

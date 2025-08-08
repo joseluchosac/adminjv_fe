@@ -1,5 +1,9 @@
 import { z } from "zod";
-import { profileFormSchema, registerFormSchema, userFormSchema } from "./schemas";
+import {
+  profileFormSchema,
+  registerFormSchema,
+  userFormSchema,
+} from "./schemas";
 
 // ✅ TIPO PARA EL EVENTO ON CHANGE DE UN ELEMENTO DE FORMULARIO
 export declare type FormControlElement =
@@ -11,10 +15,9 @@ export declare type FormControlElement =
 export interface QueryResp {
   content?: any; // Puede ser cualquier tipo de contenido
   error?: boolean;
-  errors?: any;
   msg?: string;
   msgType?: "default" | "error" | "info" | "success" | "warning";
-  errorType?: string;
+  errorType?: string | null;
 }
 // ✅ TIPO PARA LA RESPUESTA DE UNA PETICION DE FILTROS
 export type FilterQueryResp = {
@@ -193,9 +196,10 @@ export type EqualItem = {
 };
 export type BetweenItem = {
   field_name: string;
+  field_label: string;
   from: string;
   to: string;
-  field_label: string;
+  betweenName?: string;
 };
 export type OrderItem = {
   field_name: string;
@@ -204,6 +208,7 @@ export type OrderItem = {
 };
 
 // ✅ TIPOS PARA LOS PARAMETROS DE FILTROS GENERALES
+// Para deprecar
 export interface FilterParams {
   offset: number;
   search: string;
@@ -240,7 +245,7 @@ export type FetchOptions = {
 };
 
 // ✅ TIPO PARA MOSTRAR LA INFORMACION DEL FILTRO
-export type InfoFilter = Omit<FilterParam, "offset">;
+// Para deprecar
 export type FilterInfo = Omit<FilterParams, "offset">;
 
 // ✅ TIPOS PARA PRODUCTO
@@ -556,3 +561,17 @@ export type CategoriaOpc = {
   nivel: number;
   checked: false;
 };
+
+export type CommonPeriod = {
+  key:
+    | "today"
+    | "thisWeek"
+    | "lastWeek"
+    | "thisMonth"
+    | "lastMonth"
+    | "thisYear"
+    | "lastYear";
+  text: string;
+};
+
+export type ContentValidate = Record<string, string[]>

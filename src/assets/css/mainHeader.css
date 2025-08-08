@@ -13,6 +13,9 @@
   align-items: center;
   gap: 5px;
 }
+.colorcito {
+  background-color: crimson;
+}
 /* R E S P O N S I V E */
 @media (min-width: 768px) {
   .main-header {

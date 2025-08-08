@@ -1,24 +1,18 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef, } from "react";
 import { Card, Table } from "react-bootstrap";
-import { toast } from "react-toastify";
-import { useUsers } from "../context/UsersContext";
 import { useFilterUsersQuery } from "../../../core/hooks/useUsersQuery";
 import DynaIcon from "../../../core/components/DynaComponents";
-import { OrderItem, UserItem } from "../../../core/types";
+import { UserItem } from "../../../core/types";
 import { LdsEllipsisCenter } from "../../../core/components/Loaders";
 import UsersHead from "./UsersHead";
-import UsersLstFilter from "./UsersLstFilter";
-import { camposUserInit } from "../../../core/utils/constants";
+import UsersFilter from "./UsersFilter";
 import UsersLstItem from "./UsersLstItem";
 
 
 export default function UsersLst() {
-  const [ camposUser, setCamposUser] = useState(camposUserInit)
-  const {
-    stateUsers: { filterParamUsersForm },
-    dispatchUsers
-  } = useUsers()
-  
+  const tableRef = useRef<HTMLDivElement | null>(null)
+  const ldsEllipsisRef = useRef<HTMLDivElement | null>(null)
+
   const {
     data,
     fetchNextPage,
@@ -26,92 +20,32 @@ export default function UsersLst() {
     isFetching,
     isError,
     hasNextPage,
-    setFilterParamsUsers
+    dispatchUsers,
+    camposUser
   } = useFilterUsersQuery();
   
-  const tableRef = useRef<HTMLDivElement | null>(null)
-  const ldsEllipsisRef = useRef<HTMLDivElement | null>(null)
+
 
   const sort = (field_name:string, field_label: string, ctrlKey: boolean) => {
-    const orderIdx = filterParamUsersForm.order.findIndex(el => el.field_name === field_name)
-    if(ctrlKey){
-      if(orderIdx === -1){
-        const newOrder: OrderItem = {field_name, order_dir: "ASC", field_label}
-        dispatchUsers({
-          type: 'SET_FILTER_PARAMS_USERS_FORM',
-          payload: {...filterParamUsersForm, order: [...filterParamUsersForm.order, newOrder]}
-        });
-      }else{
-        let newOrders = structuredClone(filterParamUsersForm.order)
-        if(newOrders[orderIdx].order_dir == "ASC"){
-          newOrders[orderIdx] = {field_name, order_dir: "DESC", field_label}
-          dispatchUsers({
-            type: 'SET_FILTER_PARAMS_USERS_FORM',
-            payload: {...filterParamUsersForm, order: newOrders}
-          });
-        }else{
-          newOrders = newOrders.filter(el=>el.field_name !== field_name)
-          dispatchUsers({
-            type: 'SET_FILTER_PARAMS_USERS_FORM',
-            payload: {...filterParamUsersForm, order: newOrders}
-          });
-        }
-      }
-    }else{
-      if(orderIdx === -1){// Si no esta ordenado
-        const newOrder: OrderItem = {field_name, order_dir: "ASC", field_label}
-        dispatchUsers({
-          type: 'SET_FILTER_PARAMS_USERS_FORM',
-          payload: {...filterParamUsersForm, order: [newOrder]}
-        });
-      }else{
-        let newOrders = structuredClone(filterParamUsersForm.order)
-        if(newOrders[orderIdx].order_dir == "ASC"){
-          const newOrder: OrderItem = {field_name, order_dir: "DESC", field_label}
-          dispatchUsers({
-            type: 'SET_FILTER_PARAMS_USERS_FORM',
-            payload: {...filterParamUsersForm, order: [newOrder]}
-          });
-        }else{
-          dispatchUsers({
-            type: 'SET_FILTER_PARAMS_USERS_FORM',
-            payload: {...filterParamUsersForm, order: []}
-          });
-        }
-      }
-    }
+    dispatchUsers({
+      type: 'SET_USER_FILTER_FORM_SORT_TABLE',
+      payload: {field_name, field_label, ctrlKey}
+    })
   };
 
-  const handleNextPage = () => {
-    fetchNextPage();
-  };
+  const info = () => {
+    let mostrando  = data?.pages.reduce((acum, curval)=>{
+      return acum + curval.filas.length
+    },0)
+    const total = data?.pages[0]?.num_regs || 0
+    return total ? `${mostrando} de ${total} reg` : ' '
+  }
 
-  useEffect(() => {
-    setFilterParamsUsers(filterParamUsersForm)
-  }, [filterParamUsersForm])
-
-  useEffect(()=>{
-    if(data?.pages[0].error || isError){
-      toast.error("Error al obtener registros")
-      return
-    }
-    if(!isFetching){
-      const {search, equal, between, order} = filterParamUsersForm
-      dispatchUsers({
-        type: 'SET_INFO_FILTER_USERS',
-        payload: {search, equal, between, order}
-      });
-      const newCamposUsers = camposUser.map(el=>{
-        const orderh = order.find(order => order.field_name === el.field_name)
-        return orderh ? {...el, order_dir: orderh?.order_dir} : {...el, order_dir: ""}
-      })
-      setCamposUser(newCamposUsers)
-    }
-  },[data, isError, isFetching])
+  const handleNextPage = () => {fetchNextPage()};
 
   return (
     <>
-      <UsersHead isFetching={isFetching}/>
+      <UsersHead isFetching={isFetching} info={info()}/>
       <Card className="overflow-hidden">
         <div className="position-relative">
           <LdsEllipsisCenter innerRef={ldsEllipsisRef} className={`position-absolute ${isFetching ? '' : 'd-none'}`} />
@@ -147,7 +81,7 @@ export default function UsersLst() {
               </thead>
               <tbody>
                 {data && data?.pages.flatMap(el => el.filas).map((user: UserItem) => (
-                  <UsersLstItem key={user.id} user={user} camposUser={camposUser}/>
+                  <UsersLstItem key={user.id} user={user}/>
                 ))}
               </tbody>
             </Table>
@@ -164,7 +98,7 @@ export default function UsersLst() {
           {isError && <div className="text-danger">Error de conexion</div>}
         </div>
       </Card>
-      <UsersLstFilter isFetching={isFetching} camposUser={camposUser} />
+      <UsersFilter isFetching={isFetching}  />
     </>
   )
 }

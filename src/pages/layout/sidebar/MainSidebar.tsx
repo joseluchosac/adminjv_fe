@@ -1,4 +1,4 @@
-import './MainSidebar.css'
+import "../../../assets/css/mainSidebar.css";
 import { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from 'react-router-dom';
 import NavItems from './NavItems';
@@ -62,6 +62,7 @@ const MainSidebar:React.FC = () => {
     if(moduloActual){
       setModuloActual(moduloActual)
     }
+    document.title = (moduloActual?.nombre  || "") + " - " + empresaSession?.nombre_comercial
   }
 
   useEffect(() => {

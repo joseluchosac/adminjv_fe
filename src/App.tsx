@@ -24,12 +24,12 @@ import Productos from './pages/productos/Productos';
 import { useEmpresaSessionQuery } from './core/hooks/useEmpresaQuery';
 
 
-const Tareas = lazy(() => import("./pages/tareas/Tareas"));
 const Users = lazy(() => import("./pages/users/Users"));
 
 
 function App() {
   useEmpresaSessionQuery()
+
   return (
     <Routes>
       <Route element={<PublicRoutes redirectTo="/" />}>
@@ -41,9 +41,6 @@ function App() {
           <Route path="/" element={<Navigate to="/home" />} />
           <Route path="home" element={<Home />} />
           <Route path="comprobantes" element={<Comprobantes />} />
-          <Route path="pos"
-            element={<Suspense fallback={<div>Loading...</div>}><Tareas /></Suspense>} 
-          />
           <Route path="users" 
             element={<Suspense fallback={<div>Loading...</div>}><Users /></Suspense>}  
           />

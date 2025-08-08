@@ -8,15 +8,15 @@ import { LdsBar, LdsEllipsisCenter } from "../../core/components/Loaders";
 import useLayoutStore from "../../core/store/useLayoutStore";
 import { useMutationUsersQuery } from "../../core/hooks/useUsersQuery";
 import { useUsers } from "./context/UsersContext";
-import { QueryResp, UserFormType, } from "../../core/types";
+import { ContentValidate, QueryResp, UserFormType, } from "../../core/types";
 import { useCajasQuery } from "../../core/hooks/useCatalogosQuery";
 import { useRolesQuery } from "../../core/hooks/useRolesQuery";
 import { userFormInit } from "../../core/utils/constants";
 import {zodResolver} from "@hookform/resolvers/zod";
 import { userFormSchema } from "../../core/types/schemas";
+
 interface UserQryRes extends QueryResp {
-  content: UserFormType | null;
-  errors?: Record<string, string[]>;
+  content: UserFormType | ContentValidate | null;
 }
 
 export default function Userform(){
@@ -78,6 +78,13 @@ export default function Userform(){
     });
   };
 
+  const closeForm = () => {
+    dispatchUsers({
+      type: 'SET_SHOW_USER_FORM',
+      payload: {showUserForm: false, currentUserId: null},
+    });
+  }
+
   useEffect(() => {
     if(showUserForm){
       if(currentUserId) getUser(currentUserId)
@@ -90,10 +97,7 @@ export default function Userform(){
     if(!user) return
     if(user.error){
       toast.error("Error al obtener los datos")
-      dispatchUsers({
-        type: 'SET_SHOW_USER_FORM',
-        payload: false,
-      });
+      closeForm();
     }else{
       if(user.content) reset(user.content)
     }
@@ -102,27 +106,27 @@ export default function Userform(){
   useEffect(() => {
     if(!isErrorUser) return
     toast.error("Error de conexion")
-    dispatchUsers({
-      type: 'SET_SHOW_USER_FORM',
-      payload: false,
-    });
+    closeForm();
   }, [isErrorUser])
 
   useEffect(() => {
     if(!mutation) return
-    if(!mutation.error) {
-      dispatchUsers({type: 'SET_SHOW_USER_FORM',payload: false});
-    };
-    if(mutation?.errors){
-       Object.entries(mutation.errors).forEach(([field, messages]) => {
-        const f = field as keyof UserFormType;
-        setError(f, {
-          type: 'server',
-          message: Array.isArray(messages) ? messages.join(' ') : messages,
+    if(mutation.error) {
+      if(mutation?.errorType === "validation" && mutation.content){
+         Object.entries(mutation.content).forEach(([field, messages]) => {
+          const f = field as keyof UserFormType;
+          setError(f, {
+            type: 'server',
+            message: Array.isArray(messages) ? messages.join(' ') : messages,
+          });
         });
-      });
-    }
-    toast(mutation.msg, {type: mutation.msgType})
+      }else{
+        toast(mutation.msg, {type: mutation.msgType})
+      }
+    }else{
+      toast(mutation.msg, {type: mutation.msgType})
+      closeForm();
+    };
   }, [mutation])
 
 
@@ -130,13 +134,8 @@ export default function Userform(){
     <Modal
       show={showUserForm}
       backdrop="static"
-      size="lg"
-      onHide={()=>
-        dispatchUsers({
-          type: 'SET_SHOW_USER_FORM',
-          payload: false,
-        })
-      }
+      size="md"
+      onHide={()=> closeForm()}
     >
       <Modal.Header closeButton>
         <Modal.Title>{currentUserId ? "Editar usuario" : "Nuevo usuario"}</Modal.Title>
@@ -145,37 +144,32 @@ export default function Userform(){
         <Form onSubmit={handleSubmit(submit)} id="form_users">
           {isPendingMutation && <LdsBar />}
           <Row>
-            <Form.Group as={Col} md={6} xl={4} className="mb-3">
+            <Form.Group as={Col} md={6} className="mb-3">
               <Form.Label htmlFor="nombres">Nombres</Form.Label>
               <Form.Control
                 id="nombres"
                 {...register('nombres')}
               />
-              {errors.nombres && 
-                <div className="invalid-feedback d-block">{errors.nombres.message}</div>
-              }        </Form.Group>
-            <Form.Group as={Col} md={6} xl={4} className="mb-3">
+              {errors.nombres && <Fdbk msg={errors.nombres?.message} />}
+              </Form.Group>
+            <Form.Group as={Col} md={6} className="mb-3">
               <Form.Label htmlFor="apellidos">Apellidos</Form.Label>
               <Form.Control
                 id="apellidos"
                 {...register('apellidos')}
               />
-              {errors.apellidos && 
-                <div className="invalid-feedback d-block">{errors.apellidos.message}</div>
-              }
+              {errors.apellidos && <Fdbk msg={errors.apellidos?.message} />}
             </Form.Group>
-            <Form.Group as={Col} md={6} xl={4} className="mb-3">
+            <Form.Group as={Col} md={6} className="mb-3">
               <Form.Label htmlFor="username">Usuario</Form.Label>
               <Form.Control
                 id="username"
                 disabled={currentUserId ? true : false}
                 {...register('username')}
               />
-              {errors.username && 
-                <div className="invalid-feedback d-block">{errors.username.message}</div>
-              }
+              {errors.username && <Fdbk msg={errors.username?.message} />}
             </Form.Group>
-            <Form.Group as={Col} md={6} xl={4} className="mb-3">
+            <Form.Group as={Col} md={6} className="mb-3">
               <Form.Label htmlFor="email">Email</Form.Label>
               <Form.Control
                 type="text"
@@ -183,37 +177,31 @@ export default function Userform(){
                 disabled={currentUserId ? true : false}
                 {...register('email')}
               />
-              {errors.email && 
-                <div className="invalid-feedback d-block">{errors.email.message}</div>
-              }        
+              {errors.email && <Fdbk msg={errors.email?.message} />}       
             </Form.Group>
             {!Boolean(currentUserId) &&
               <>
-                <Form.Group as={Col} md={6} xl={4} className="mb-3">
+                <Form.Group as={Col} md={6} className="mb-3">
                   <Form.Label htmlFor="password">Contraseña</Form.Label>
                   <Form.Control
                     type="password"
                     id="password"
                     {...register('password')}
                   />
-                  {errors.password && 
-                    <div className="invalid-feedback d-block">{errors.password.message}</div>
-                  } 
+                  {errors.password && <Fdbk msg={errors.password?.message} />}
                 </Form.Group>
-                <Form.Group as={Col} md={6} xl={4} className="mb-3">
+                <Form.Group as={Col} md={6} className="mb-3">
                   <Form.Label htmlFor="confirm_password">Repetir contraseña</Form.Label>
                   <Form.Control
                     type="password"
                     id="confirm_password"
                     {...register('confirm_password')}
                   />
-                  {errors.confirm_password && 
-                    <div className="invalid-feedback d-block">{errors.confirm_password.message}</div>
-                  }
+                  {errors.confirm_password && <Fdbk msg={errors.confirm_password?.message} />}
                 </Form.Group>
               </>
             }
-            <Form.Group as={Col} md={6} xl={4} className="mb-3">
+            <Form.Group as={Col} md={6} className="mb-3">
               <Form.Label htmlFor="rol_id">Rol</Form.Label>
               <Form.Select
                 id="rol_id"
@@ -224,9 +212,9 @@ export default function Userform(){
                   <option key={el.id} value={el.id}>{el.rol}</option>
                 )}
               </Form.Select>
-              {errors.rol_id && <div className="invalid-feedback d-block">{errors.rol_id.message}</div>}
+              {errors.rol_id && <Fdbk msg={errors.rol_id?.message} />}
             </Form.Group>
-            <Form.Group as={Col} md={6} xl={4} className="mb-3">
+            <Form.Group as={Col} md={6} className="mb-3">
               <Form.Label htmlFor="caja_id">Caja</Form.Label>
               <Form.Select
                 id="caja_id"
@@ -237,19 +225,14 @@ export default function Userform(){
                   <option key={el.id} value={el.id}>{el.descripcion}</option>
                 )}
               </Form.Select>
-              {errors.caja_id && <div className="invalid-feedback d-block">{errors.caja_id.message}</div>}
+              {errors.caja_id && <Fdbk msg={errors.caja_id?.message} />}
             </Form.Group>
           </Row>
           <div className="d-flex gap-2 justify-content-end">
             <Button
               variant="seccondary"
               type="button"
-              onClick={()=>
-                dispatchUsers({
-                  type: 'SET_SHOW_USER_FORM',
-                  payload: false,
-                })
-              }
+              onClick={()=>closeForm()}
             >Cerrar</Button>
             <Button 
               variant="primary" 
@@ -275,5 +258,10 @@ export default function Userform(){
   )
 }
 
+function Fdbk({msg}:{msg:string | undefined}){
+  return (
+    <div className="invalid-feedback d-block">{msg}</div>
+  )
+}
 
 

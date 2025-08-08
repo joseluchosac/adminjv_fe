@@ -1,4 +1,4 @@
-import "./Loaders.css";
+import "../../assets/css/loaders.css";
 interface DivProps  extends React.HTMLAttributes<HTMLDivElement> {}
 
 export function LdsEllipsisCenter({className, innerRef}:any) {

@@ -1,7 +1,15 @@
 // Genera arbol a partir de un arreglo de objetos
 
-import { Modulo } from "../types";
-
+import { CommonPeriod, Modulo } from "../types";
+import {
+  endOfMonth,
+  endOfWeek,
+  format,
+  startOfMonth,
+  startOfWeek,
+  subMonths,
+  subWeeks,
+} from "date-fns";
 
 
 export function getModulosTree(data: Modulo[]): Modulo[] {
@@ -223,4 +231,35 @@ export function cadena(longitud: number): string {
 // ✅ FUNCION QUE RECORTA UNA CADENA DE TEXTO AUMENTANDO '...'
 export function cropText(texto: string, limite = 20) {
   return texto.length > limite ? texto.slice(0, limite) + '...' : texto;
+}
+
+// ✅ FUNCION QUE RETORNA UN OBJETO DE DOS ELEMENTOS QUE CONTIENEN UN
+// RANGO DE FECHAS A PARTIR DE UN NOMBRE QUE RECIBE
+export function getDateRangePeriod(value: CommonPeriod["key"]):{from:string; to:string}{
+  const ymd = "yyy-MM-dd"
+  let from=""
+  let to=""
+  if (value === "today") {
+    from = format(new Date(), ymd);
+    to = from;
+  } else if (value === "thisWeek") {
+    from = format(startOfWeek(new Date(), { weekStartsOn: 0 }), ymd);
+    to = format(endOfWeek(new Date(), { weekStartsOn: 0 }),  ymd);
+  } else if (value === "lastWeek") {
+    from = format(startOfWeek(subWeeks(new Date(), 1), { weekStartsOn: 0 }), ymd);
+    to = format(endOfWeek(subWeeks(new Date(), 1), { weekStartsOn: 0 }), ymd);
+  } else if (value === "thisMonth") {
+    from = format(startOfMonth(new Date()), ymd );
+    to = format(endOfMonth(new Date()), ymd );
+  }  else if (value === "lastMonth") {
+    from = format(startOfMonth(subMonths(new Date(), 1)), ymd);
+    to = format(endOfMonth(subMonths(new Date(), 1)), ymd);
+  } else if (value === "thisYear") {
+    from = format(new Date(new Date().getFullYear(), 0, 1), ymd);
+    to = format(new Date(new Date().getFullYear(), 11, 31), ymd);
+  } else if (value === "lastYear") {
+    from = format(new Date(new Date().getFullYear() - 1, 0, 1), ymd);
+    to = format(new Date(new Date().getFullYear() - 1, 11, 31), ymd);
+  }
+  return {from, to}
 }

@@ -1,5 +1,5 @@
 const apiURL = import.meta.env.VITE_API_URL;
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useRef } from "react"
 import { useNavigate } from "react-router-dom";
 import { InfiniteData, useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import useSessionStore from "../store/useSessionStore"
@@ -12,10 +12,12 @@ import {
   UserSession, 
   UserFormType,
   RegisterFormType,
-  ProfileFormType
+  ProfileFormType,
 } from "../types"
-import { filterParamInit } from "../utils/constants";
 import { fnFetch } from "../services/fnFetch";
+import { useUsers } from "../../pages/users/context/UsersContext";
+import { useDebounce } from "react-use";
+import { toast } from "react-toastify";
 
 type TypeAction = 
 "mutate_user" 
@@ -58,9 +60,14 @@ interface UsersFilQryRes extends FilterQueryResp {
   filas: UserItem[];
 }
 export const useFilterUsersQuery = () => {
-  const [filterParamsUsers, setFilterParamsUsers] = useState(filterParamInit)
   const token = useSessionStore(state => state.tknSession)
   const queryClient = useQueryClient()
+
+  const {
+    stateUsers: {userFilterForm, userFilterParam ,camposUser},
+    dispatchUsers
+  } = useUsers()
+
   const {
     data,
     isError,
@@ -75,7 +82,7 @@ export const useFilterUsersQuery = () => {
       const options: FetchOptions = {
         method: "POST",
         url: `${apiURL}users/filter_users?page=${page}`,
-        body: JSON.stringify(filterParamsUsers),
+        body: JSON.stringify(userFilterParam),
         authorization: "Bearer " + token,
         signal
       }
@@ -86,12 +93,21 @@ export const useFilterUsersQuery = () => {
       return lastPage.next != 0 ? lastPage.next : undefined
     },
     getPreviousPageParam: (lastPage) => lastPage.previous ?? undefined,
-    staleTime: 1000 * 60 * 5 
-  })
+    staleTime: 1000 * 60 * 5
+  });
+
   const resetear = ()=>{
     queryClient.resetQueries({ queryKey: ['users'], exact: true });
-    setFilterParamsUsers(filterParamInit)
   }
+
+  useDebounce(() => {
+      if (
+        userFilterForm.search.toLowerCase().trim() ==
+        userFilterParam.search.toLowerCase().trim()
+      ) return;
+      dispatchUsers({type: "SET_USER_FILTER_PARAM"})
+    }, 500, [userFilterForm.search]
+  );
 
   useEffect(() => {
     return () => {
@@ -100,15 +116,28 @@ export const useFilterUsersQuery = () => {
   },[])
   
   useEffect(() => {
-    queryClient.invalidateQueries({queryKey:["users"]})
-  }, [filterParamsUsers])
+    dispatchUsers({type: "SET_USER_FILTER_PARAM"})
+  }, [userFilterForm.order, userFilterForm.equal])
 
-  // useEffect(()=>{
-  //   if(data?.pages[data?.pages.length-1].errorType === "errorToken"){
-  //     // resetSessionStore()
-  //     navigate("/auth")
-  //   }
-  // },[data])
+  useEffect(() => {
+    dispatchUsers({type: "SET_USER_FILTER_PARAM_BETWEEN"})
+  }, [userFilterForm.between])
+
+  useEffect(() => {
+    queryClient.invalidateQueries({queryKey:["users"]})
+  }, [userFilterParam])
+
+  useEffect(()=>{
+    if(data?.pages[0].error || isError){
+      toast.error("Error al obtener registros")
+      return
+    }
+    if(!isFetching){
+      dispatchUsers({type: 'SET_USER_FILTER_INFO'});
+    }
+  },[data, isError, isFetching])
+
+
 
   return {
     data,
@@ -117,7 +146,8 @@ export const useFilterUsersQuery = () => {
     isFetching, 
     hasNextPage, 
     fetchNextPage,
-    setFilterParamsUsers
+    dispatchUsers,
+    camposUser,
   }
 }
 
@@ -132,25 +162,37 @@ export const useMutationUsersQuery = <T>() => {
   const {data, isPending, isError, mutate, } = useMutation<T, Error, FetchOptions, unknown>({
     mutationKey: ['mutation_users'],
     mutationFn: fnFetch,
-    // onMutate: (datoMutate) => {// 1: Optimista
+    // onMutate: (datoMutate) => {// 1: Manual optimista antes del success
     //   // console.log("onMutate", datoMutate)
     // },
     onSuccess: (resp) => {
       const r = resp as QueryResp
       if(r?.msgType !== 'success') return
+      // 2: Haciendo refetch de la lista
+      // queryClient.invalidateQueries({queryKey:["users"]})
+      // 3: Manual: Actualiza los registros despues de un success
       if(typeActionRef.current === "mutate_create_user") {
         const createdUser = r.content as UserItem
         queryClient.setQueryData(["users"], (oldData: InfiniteData<UsersFilQryRes, unknown> | undefined) => {
           const pages = structuredClone(oldData?.pages)
+          if((pages?.length || 0) < 4){ // hacer refetch si se cumple esta condicion
+            queryClient.invalidateQueries({queryKey:["users"]})
+            return oldData
+          }
           if(pages && pages.length > 0){
             pages[0].filas.unshift(createdUser as UserItem) // Agrega el nuevo usuario al inicio de la primera página
+            pages[0].num_regs = pages[0].num_regs + 1
           }
-          return {...oldData, pages}
+          return {...oldData, pages, }
         })
-      }else if(typeActionRef.current === "mutate_state_user" || typeActionRef.current === "mutate_update_user") {
+      }else if(typeActionRef.current === "mutate_update_user" || typeActionRef.current === "mutate_state_user") {
         const updatedUser = r.content as UserItem
         queryClient.setQueryData(["users"], (oldData: InfiniteData<UsersFilQryRes, unknown> | undefined) => {
           const pages = structuredClone(oldData?.pages)
+          if((pages?.length || 0) < 4){
+            queryClient.invalidateQueries({queryKey:["users"]})
+            return oldData
+          }
           for(let idxPage in pages){
             const idxFila = pages[parseInt(idxPage)].filas.findIndex((el: UserItem)=>el.id === updatedUser.id)
             if(idxFila !== -1){
@@ -164,19 +206,22 @@ export const useMutationUsersQuery = <T>() => {
         const deletedUserId = r.content as UserItem["id"]
         queryClient.setQueryData(["users"], (oldData: InfiniteData<UsersFilQryRes, unknown> | undefined) => {
           let pages = structuredClone(oldData?.pages)
+          if((pages?.length || 0) < 4){
+            queryClient.invalidateQueries({queryKey:["users"]})
+            return oldData
+          }
           for(let idxPage in pages){
             const idxFila = pages[parseInt(idxPage)].filas.findIndex((el: UserItem)=>el.id === deletedUserId)
             if(idxFila !== -1){
               let filasFiltradas = pages[parseInt(idxPage)].filas.filter(el => el.id !== deletedUserId) // Elimina el usuario de la fila
               pages[parseInt(idxPage)].filas = filasFiltradas
+              pages[0].num_regs = pages[0].num_regs - 1
               break
             }
           }
           return {...oldData, pages}
         })
       } 
-      // 2: Haciendo refetch de la lista
-      // queryClient.invalidateQueries({queryKey:["users"]})
     },
   })
 

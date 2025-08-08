@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import "./auth.css";
+import "../../assets/css/auth.css";
 import { useMutationUsersQuery } from "../../core/hooks/useUsersQuery";
 import { toast, ToastContainer } from "react-toastify";
 import useLayoutStore from "../../core/store/useLayoutStore";
