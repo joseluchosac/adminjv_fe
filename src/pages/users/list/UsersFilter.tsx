@@ -49,7 +49,7 @@ const UsersLstFilter: React.FC<Props> = ({isFetching}) => {
     });
   }
 
-  const handleFilterField = (e: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleFilterBetweenField = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const field_name = e.currentTarget.value;
     const field_label = e.currentTarget.options[e.currentTarget.selectedIndex].textContent || ""
     dispatchUsers({
@@ -58,14 +58,14 @@ const UsersLstFilter: React.FC<Props> = ({isFetching}) => {
     });
   };
 
-  const filterPeriod = (periodKey: CommonPeriod["key"]) => {
+  const filterBetweenPeriod = (periodKey: CommonPeriod["key"]) => {
     dispatchUsers({
       type: 'SET_USER_FILTER_FORM_BETWEEN_PERIOD',
       payload: { periodKey }
     });
   }
 
-  const handleFilterDate = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFilterBetweenDate = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.currentTarget;
     dispatchUsers({
       type: 'SET_USER_FILTER_FORM_BETWEEN_DATE',
@@ -200,7 +200,7 @@ const UsersLstFilter: React.FC<Props> = ({isFetching}) => {
                   id="f_entre"
                   name="field_name"
                   value={userFilterForm.between[0]?.field_name || ""}
-                  onChange={handleFilterField}
+                  onChange={handleFilterBetweenField}
                 >
                   <option value="">Ninguno</option>
                   <option value="created_at">F. Creación</option>
@@ -215,7 +215,7 @@ const UsersLstFilter: React.FC<Props> = ({isFetching}) => {
                   disabled={!Boolean(userFilterForm.between[0]?.field_name)}
                   value={userFilterForm.between[0]?.betweenName || ""}
                   onChange={(e) => {
-                    filterPeriod(e.target.value as CommonPeriod["key"])                    
+                    filterBetweenPeriod(e.target.value as CommonPeriod["key"])                    
                   }}
                 >
                   <option value="">Personalizado</option>
@@ -226,7 +226,7 @@ const UsersLstFilter: React.FC<Props> = ({isFetching}) => {
               </Col>
             </Form.Group>
             <Form.Group as={Row}>
-              <Form.Label column sm="1">
+              <Form.Label column sm="1" htmlFor="from">
                 Del
               </Form.Label>
               <Col sm="5">
@@ -234,11 +234,12 @@ const UsersLstFilter: React.FC<Props> = ({isFetching}) => {
                   disabled={!Boolean(userFilterForm.between[0]?.field_name) || Boolean(userFilterForm.between[0]?.betweenName)}
                   type="date"
                   name="from"
-                  value={userFilterForm.between[0]?.from || ""}
-                  onChange={handleFilterDate}
+                  id="from"
+                  value={userFilterForm.between[0]?.from.split(" ")[0] || ""}
+                  onChange={handleFilterBetweenDate}
                 />
               </Col>
-              <Form.Label column sm="1">
+              <Form.Label column sm="1" htmlFor="to">
                 Al
               </Form.Label>
               <Col sm="5">
@@ -246,8 +247,9 @@ const UsersLstFilter: React.FC<Props> = ({isFetching}) => {
                   disabled={!Boolean(userFilterForm.between[0]?.field_name) || Boolean(userFilterForm.between[0]?.betweenName)}
                   type="date"
                   name="to"
-                  value={userFilterForm.between[0]?.to || ""}
-                  onChange={handleFilterDate}
+                  id="to"
+                  value={userFilterForm.between[0]?.to.split(" ")[0] || ""}
+                  onChange={handleFilterBetweenDate}
                 />
               </Col>
             </Form.Group>

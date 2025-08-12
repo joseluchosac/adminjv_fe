@@ -169,16 +169,18 @@ export const usersReducer = (
       let from = ""
       let to = ""
       if(name === "from"){
-        const dateFrom = new Date(value)
-        const dateTo = new Date(cloneBetweenItem.to)
+        const dateFrom = new Date(value.split(" ")[0]) // obtiene solo la fecha sin la hora
+        const dateTo = new Date(cloneBetweenItem.to.split(" ")[0]) // obtiene solo la fecha sin la hora
         from = value
         to = (dateFrom.getTime() <= dateTo.getTime()) ? cloneBetweenItem.to : value
       }else if(name === "to"){
-        const dateFrom = new Date(cloneBetweenItem.from)
-        const dateTo = new Date(value)
+        const dateFrom = new Date(cloneBetweenItem.from.split(" ")[0])
+        const dateTo = new Date(value.split(" ")[0])
         from = (dateFrom.getTime() <= dateTo.getTime()) ? cloneBetweenItem.from : value
         to = value
       }
+      from = from ? from + " 00:00:00" : ""
+      to = to ? to + " 23:59:59" : ""
       return { ...state, userFilterForm: { ...state.userFilterForm, between: [{...cloneBetweenItem, from, to}] } }
     }
     
@@ -190,8 +192,10 @@ export const usersReducer = (
         state.userFilterForm.between[0]?.from && 
         state.userFilterForm.between[0]?.to
       ){
-        const from = state.userFilterForm.between[0]?.from + " 00:00:00"
-        const to = state.userFilterForm.between[0]?.to + " 23:59:59"
+        const from = state.userFilterForm.between[0]?.from
+        const to = state.userFilterForm.between[0]?.to
+        // const from = state.userFilterForm.between[0]?.from + " 00:00:00"
+        // const to = state.userFilterForm.between[0]?.to + " 23:59:59"
         const newUserFilterParam = { 
           ...state.userFilterParam, 
           between: [{...state.userFilterForm.between[0], from, to}] }

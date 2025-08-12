@@ -21,7 +21,8 @@ export default function UsersHead({ isFetching, info }: Props) {
   const {
     stateUsers:{
       userFilterInfo: { equal, between, order },
-      userFilterForm
+      userFilterForm,
+      userFilterParam
     },
     dispatchUsers
   } = useUsers();
@@ -60,9 +61,9 @@ export default function UsersHead({ isFetching, info }: Props) {
   };
 
   const handleTraerTodo = () => {
-    const param = objToUriBase64(userFilterForm);
-    console.log(apiDOCS + "pdf/?action=users_report&p=" + param)
-    // window.open(apiDOCS + "pdf/?action=users_report&p=" + param);
+    const param = objToUriBase64(userFilterParam);
+    // console.log(apiDOCS + "pdf/?action=users_report&p=" + param)
+    window.open(apiDOCS + "pdf/?action=users_report&p=" + param);
   };
 
 
@@ -77,6 +78,7 @@ export default function UsersHead({ isFetching, info }: Props) {
           <InputGroup>
             <Form.Control
               type="search"
+              name="search"
               placeholder="Buscar"
               value={userFilterForm.search}
               onChange={(e) => {

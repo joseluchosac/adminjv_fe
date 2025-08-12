@@ -164,6 +164,7 @@ export default function Userform(){
               <Form.Label htmlFor="username">Usuario</Form.Label>
               <Form.Control
                 id="username"
+                autoComplete="false"
                 disabled={currentUserId ? true : false}
                 {...register('username')}
               />
@@ -174,6 +175,7 @@ export default function Userform(){
               <Form.Control
                 type="text"
                 id="email"
+                autoComplete="false"
                 disabled={currentUserId ? true : false}
                 {...register('email')}
               />

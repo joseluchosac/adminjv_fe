@@ -261,5 +261,7 @@ export function getDateRangePeriod(value: CommonPeriod["key"]):{from:string; to:
     from = format(new Date(new Date().getFullYear() - 1, 0, 1), ymd);
     to = format(new Date(new Date().getFullYear() - 1, 11, 31), ymd);
   }
+  from = from ? from + " 00:00:00" : ""
+  to = to ? to + " 23:59:59" : ""
   return {from, to}
 }
