@@ -14,7 +14,7 @@ import {
   RegisterFormType,
   ProfileFormType,
 } from "../../app/types"
-import { useUsers } from "../../features/users/context/UsersContext";
+import { useUsers } from "../../pages/users/context/UsersContext";
 import { useDebounce } from "react-use";
 import { toast } from "react-toastify";
 import { fnFetch } from "../fnFetch";

@@ -11,6 +11,15 @@ export declare type FormControlElement =
   | HTMLSelectElement
   | HTMLTextAreaElement;
 
+// ✅ TIPOS PARA LAS RESPUESTAS GENERICAS DE LA API
+export interface ApiGenericResp {
+  content?: any; // Puede ser cualquier tipo de contenido
+  error: boolean;
+  msg: string;
+  msgType: "default" | "error" | "info" | "success" | "warning";
+  errorType: string | null;
+}
+// Evaluar deprecamiento
 // ✅ TIPOS PARA LAS RESPUESTAS DE LA API (el content se le agrega despues)
 export interface QueryResp {
   content?: any; // Puede ser cualquier tipo de contenido
@@ -140,13 +149,6 @@ export interface Padre {
   descripcion: string;
 }
 
-// ✅ TIPOS PARA LA TABLA TAREAS
-export interface TareaT {
-  id: number;
-  descripcion: string;
-  encargado: string;
-}
-
 // ✅ TIPOS PARA LA TABLA CONFIGURACIONES
 export type Empresa = {
   razon_social: string;
@@ -169,8 +171,8 @@ export type Empresa = {
   fileCertificado: any;
 };
 
-export type EmpresaSession = {
-  // para la sesion
+export interface EmpresaInfo {
+  // Informacion de la empresa
   razon_social: string;
   nombre_comercial: string;
   ruc: string;
@@ -180,6 +182,7 @@ export type EmpresaSession = {
   email: string;
   urlLogo: string;
 };
+
 // ✅✅✅ TIPOS PARA LOS PARAMETROS DE FILTROS GENERALES NUEVO ✅✅✅
 export interface FilterParam {
   offset: number;

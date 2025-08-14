@@ -59,7 +59,7 @@ function HeaderLayout () {
             style={{ maxHeight: "100px" }}
             navbarScroll
           >
-            <Link to="/home" className="nav-link">Home</Link>
+            <Link to="/dashboard" className="nav-link">Dashboard</Link>
             <Link to="/ventas" className="nav-link">venta</Link>
           </Nav>
           <Nav>

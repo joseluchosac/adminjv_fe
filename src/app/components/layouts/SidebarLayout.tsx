@@ -6,10 +6,10 @@ import { LdsEllipsisCenter } from '../Loaders';
 import useLayoutStore from '../../store/useLayoutStore';
 import DynaIcon from '../DynaComponents';
 import useSessionStore from '../../store/useSessionStore';
-import { Modulo } from '../../types';
-import { useEmpresaSessionQuery } from '../../../api/queries/useEmpresaQuery';
+import { EmpresaInfo, Modulo } from '../../types';
 import { useModulosSessionQuery } from '../../../api/queries/useModulosQuery';
 import SidebarNavItems from "./SidebarNavItems";
+import { useQueryClient } from "@tanstack/react-query";
 
 const SidebarLayout:React.FC = () => {
   const [modulosSesionTree, setModulosSesionTree] = useState<any>(null)
@@ -19,8 +19,8 @@ const SidebarLayout:React.FC = () => {
   const layout = useLayoutStore(state => state.layout)
   const setLayout = useLayoutStore(state => state.setLayout)
   const setModuloActual = useSessionStore(state => state.setModuloActual)
-  const {empresaSession} = useEmpresaSessionQuery()
-
+  const queryClient = useQueryClient()
+  const empresa = queryClient.getQueryData(["empresa_info"]) as EmpresaInfo
   const {modulosSession} = useModulosSessionQuery()
 
   const handleSidebarMini = (e:React.MouseEvent) => {
@@ -63,8 +63,8 @@ const SidebarLayout:React.FC = () => {
     }
     document.body.classList.remove("sidebar-show-responsive");
     document.title = moduloActual?.descripcion
-    ? `${moduloActual?.descripcion} - ${empresaSession?.nombre_comercial}`
-    : empresaSession?.nombre_comercial || "Mi Empresa"
+    ? `${moduloActual?.descripcion} - ${empresa.nombre_comercial}`
+    : empresa.nombre_comercial || "Mi Empresa"
   }
 
   useEffect(() => {
@@ -97,11 +97,11 @@ const SidebarLayout:React.FC = () => {
 
   useEffect(() => {
     const nombreModulo = location.pathname.split("/").filter(Boolean).pop();
-    if(!nombreModulo) navigate("/home")
+    // if(!nombreModulo) navigate("/home")
     if(!modulosSession) return
     const idx = modulosSession.findIndex((el: Modulo) => el.nombre === nombreModulo)
     if(idx === -1){
-      navigate("/home")
+      // navigate("/home")
     }
   }, [navigate, modulosSession])
 
@@ -113,8 +113,8 @@ const SidebarLayout:React.FC = () => {
       <aside className="main-sidebar">
         <div className="brand">
           <a onClick={handleSidebarMini} href="#" className="nav-link">
-            <img src={empresaSession?.urlLogo} alt="Logo empresa" className="" />
-            <span className='text-wrap'>{empresaSession?.nombre_comercial}</span>
+            <img src={empresa.urlLogo} alt="Logo empresa" className="" />
+            <span className='text-wrap'>{empresa.nombre_comercial}</span>
           </a>
         </div>
         <nav className='nav-sidebar' ref={navSidebarRef} style={{position:"relative"}}>

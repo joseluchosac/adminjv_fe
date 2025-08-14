@@ -3,12 +3,11 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import useSessionStore from "../../app/store/useSessionStore"
 import { useEffect, useRef } from "react"
 import { useNavigate } from "react-router-dom";
-import { Empresa, EmpresaSession, FetchOptions, QueryResp } from "../../app/types";
+import { ApiGenericResp, Empresa, EmpresaInfo, FetchOptions, QueryResp } from "../../app/types";
 import { fnFetch } from "../fnFetch";
 
 type TypeAction = "mutate_empresa"
 type DataEmpresa = {content: Empresa}
-type DataEmpresaSession = {content: EmpresaSession}
 
 export const useEmpresaQuery = () => {
   const tknSession = useSessionStore(state => state.tknSession)
@@ -37,20 +36,21 @@ export const useEmpresaQuery = () => {
   }
 }
 
-export const useEmpresaSessionQuery = () => {
-  const {data, isFetching} = useQuery<DataEmpresaSession>({
-    queryKey: ['empresa_session'],
+type EmpresaInfoResp = EmpresaInfo | ApiGenericResp
+export const useEmpresaInfoQuery = () => {
+  const {data, isFetching} = useQuery<EmpresaInfoResp>({
+    queryKey: ['empresa_info'],
     queryFn: () => {
       const options: FetchOptions = {
-        url: apiURL + "config/get_empresa_session",
+        url: apiURL + "config/get_empresa_info",
       }
       return fnFetch(options)
     },
-    staleTime: 1000 * 60 * 60 * 24
+    staleTime: 1000 * 60 * 60 * 5
   })
-
+ 
   return {
-    empresaSession: data?.content,
+    data,
     isFetching
   }
 }
