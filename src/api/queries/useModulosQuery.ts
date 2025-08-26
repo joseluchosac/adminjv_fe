@@ -6,13 +6,20 @@ import { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { fnFetch } from "../fnFetch";
 
-interface ModulosSessionQryRes extends QueryResp {content: Modulo[]}
-
 type TypeAction = "mutate_modulo" | "mutate_modulos"
+
+export type ModulosSessionQryRes = Modulo[] | QueryResp
+// export function isErrModulosSession(response: ModulosSessionQryRes): response is QueryResp {
+//   return (response as QueryResp).error !== undefined;
+// }
+export function isModulosSessionRes(response: ModulosSessionQryRes): response is Modulo[] {
+  return ('error' in response || (response as QueryResp).error == true);
+}
 
 export const useModulosSessionQuery = () => {
   const tknSession = useSessionStore(state => state.tknSession)
-  const {data, isFetching} = useQuery<ModulosSessionQryRes>({
+  const queryClient = useQueryClient()
+  const {data, isFetching, refetch} = useQuery<ModulosSessionQryRes>({
     queryKey: ['modulos_session'],
     queryFn: () => {
       const options: FetchOptions = {
@@ -25,8 +32,16 @@ export const useModulosSessionQuery = () => {
     staleTime: 1000 * 60 * 60 * 24
   })
 
+  useEffect(()=>{
+    if(!tknSession) {
+      queryClient.setQueryData(['modulos_session'], ()=>{return null})
+    }else(
+      refetch()
+    )
+  },[tknSession])
+
   return {
-    modulosSession: data?.content,
+    data,
     isFetching
   }
 }
@@ -51,15 +66,6 @@ export const useMutateModulosQuery = () => {
     const options: FetchOptions = {
       method: "POST",
       url: apiURL + "modulos/get_modulos",
-      authorization: "Bearer " + token,
-    }
-    mutate(options)
-  }
-
-  const getModulosSession = () => {
-    const options: FetchOptions = {
-      method: "POST",
-      url: apiURL + "modulos/get_modulos_sesion",
       authorization: "Bearer " + token,
     }
     mutate(options)
@@ -143,7 +149,6 @@ export const useMutateModulosQuery = () => {
     deleteModulo, 
     sortModulos,
     getModulos,
-    getModulosSession,
     getModuloRol,
     updateModulosRoles,
   }

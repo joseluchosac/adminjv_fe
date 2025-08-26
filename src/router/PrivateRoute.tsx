@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
 import { useMutationUsersQuery } from "../api/queries/useUsersQuery";
 import SidebarLayout from "../app/components/layouts/SidebarLayout";
-import { QueryResp } from "../app/types";
+import { Profile, QueryResp } from "../app/types";
 import useSessionStore from "../app/store/useSessionStore";
 import { LdsDots11 } from "../app/components/Loaders";
 import HeaderLayout from "../app/components/layouts/HeaderLayout";
@@ -10,7 +10,7 @@ import HeaderLayout from "../app/components/layouts/HeaderLayout";
 interface Props { redirectTo: string; }
 
 interface CheckAuthQryRes extends QueryResp {
-  content: any;
+  profile?: Profile;
 }
 
 const PrivateRoute: React.FC<Props> = ({ redirectTo }) => {
@@ -39,7 +39,7 @@ const PrivateRoute: React.FC<Props> = ({ redirectTo }) => {
   }, [dataCheckAuth])
 
 
-  if (!dataCheckAuth?.content)
+  if (!dataCheckAuth?.profile)
      {
     return (
       <div className="position-absolute h-100 w-100 d-flex align-items-center justify-content-center">

@@ -1,22 +1,19 @@
-import { useEffect, useRef, useState } from "react";
-import { Card, Container, Table } from "react-bootstrap";
-import { toast } from "react-toastify";
-import DynaIcon from "../../../app/components/DynaComponents";
-import { LdsBar, LdsEllipsisCenter } from "../../../app/components/Loaders";
+import { useRef } from "react";
+import { Card, Table } from "react-bootstrap";
 import { useFilterClientesQuery } from "../../../api/queries/useClientesQuery";
-import { camposClienteInit } from "../../../app/utils/constants";
-import ClientesHead from "./ClientesHead";
-import ClientesTblRow from "./ClientesTblRow";
 import useClientesStore from "../../../app/store/useClientesStore";
+import { LdsBar, LdsEllipsisCenter } from "../../../app/components/Loaders";
+import DynaIcon from "../../../app/components/DynaComponents";
+import ClientesHead from "./ClientesHead";
+import { ClientesFilter } from "./ClientesFilter";
+import ClientesListItem from "./ClientesLstItem";
 
 export default function ClientesLst() {
-  const [ camposCliente, setCamposCliente ] = useState(camposClienteInit)
   const tableRef = useRef<HTMLDivElement | null>(null)
   const ldsEllipsisRef = useRef<HTMLDivElement | null>(null)
-  const setFilterInfoClientes = useClientesStore(state => state.setFilterInfoClientes)
-  const filterParamsClientesForm = useClientesStore(state => state.filterParamsClientesForm)
-  const setFilterParamsClientesForm = useClientesStore(state => state.setFilterParamsClientesForm)
-
+  const camposCliente = useClientesStore(state => state.camposCliente)
+  const setClienteFilterFormSortTable = useClientesStore(state => state.setClienteFilterFormSortTable)
+  
   const {
     data,
     fetchNextPage,
@@ -24,104 +21,70 @@ export default function ClientesLst() {
     isFetching,
     isError,
     hasNextPage,
-  } = useFilterClientesQuery();
-
-  const sort = (field_name:string, field_label: string, ctrlKey: boolean) => {
-    const orderIdx = filterParamsClientesForm.orders.findIndex(el => el.field_name === field_name)
-    if(ctrlKey){
-      if(orderIdx === -1){
-        const newOrder = {field_name, order_dir: "ASC", field_label}
-        setFilterParamsClientesForm({...filterParamsClientesForm, orders: [...filterParamsClientesForm.orders, newOrder]})
-      }else{
-        let newOrders = structuredClone(filterParamsClientesForm.orders)
-        if(newOrders[orderIdx].order_dir == "ASC"){
-          newOrders[orderIdx] = {field_name, order_dir: "DESC", field_label}
-          setFilterParamsClientesForm({...filterParamsClientesForm, orders: newOrders})
-        }else{
-          newOrders = newOrders.filter(el=>el.field_name !== field_name)
-          setFilterParamsClientesForm({...filterParamsClientesForm, orders: newOrders})
-        }
-      }
-    }else{
-      if(orderIdx === -1){
-        const newOrder = {field_name, order_dir: "ASC", field_label}
-        setFilterParamsClientesForm({...filterParamsClientesForm, orders: [newOrder]})
-      }else{
-        let newOrders = structuredClone(filterParamsClientesForm.orders)
-        if(newOrders[orderIdx].order_dir == "ASC"){
-          const newOrder = {field_name, order_dir: "DESC", field_label}
-          setFilterParamsClientesForm({...filterParamsClientesForm, orders: [newOrder]})
-        }else{
-          setFilterParamsClientesForm({...filterParamsClientesForm, orders: []})
-        }
-      }
-    }
-  };
+  } = useFilterClientesQuery()
   
-  useEffect(()=>{
-    if(data?.pages[0].error || isError){
-      toast.error("Error al obtener registros")
-      return
-    }
-    if(!isFetching){
-      const {search, equals, between, orders} = filterParamsClientesForm
-      setFilterInfoClientes({search, equals, between, orders})
-      const newCamposClientes = camposCliente.map(el=>{
-        const order = orders.find(order => order.field_name === el.field_name)
-        return order ? {...el, order_dir: order?.order_dir} : {...el, order_dir: ""}
-      })
-      setCamposCliente(newCamposClientes)
-    }
-  },[data, isError, isFetching])
+  const sort = (field_name:string, field_label: string, ctrlKey: boolean) => {
+    setClienteFilterFormSortTable({field_name, field_label, ctrlKey})
+  };
+
+  const info = () => {
+    let mostrando  = data?.pages.reduce((acum, curval)=>{
+      return acum + curval.filas.length
+    },0)
+    const total = data?.pages[0]?.num_regs || 0
+    return total ? `${mostrando} de ${total} reg` : ' '
+  }
+
+  const handleNextPage = () => {fetchNextPage()};
+
 
   return (
-    <Container className="position-relative">
+    <div className="position-relative">
       {isFetching && <LdsBar />}
-      <ClientesHead />
-      <Card className="overflow-hidden mx-auto" >
+      <ClientesHead info={info()}/>
+      <ClientesFilter isFetching={isFetching} />
+      <Card className="overflow-hidden">
         <div className="position-relative">
           <div className="table-responsive" style={{ height: "73vh" }} ref={tableRef}>
-            {data && 
-              <Table striped hover className="mb-1">
-                <thead className="sticky-top">
-                  <tr className="text-nowrap">
-                    {camposCliente && camposCliente.map((el) => {
-                      return ( el.show && (
-                        <th
-                          key={el.field_name}
-                          onClick={(e)=>{
-                            if(!el.orderable) return
-                            sort(el.field_name, el.field_label, e.ctrlKey)
-                          }}
-                          role={el.orderable ? "button" : "columnheader"}
-                        >
-                          <div className="d-flex gap-1">
-                            <div>{el.field_label}</div>
-                            <div>
-                              {el.order_dir == "ASC" 
-                                ? (<DynaIcon className="text-warning" name="FaArrowDownAZ" />) 
-                                : el.order_dir == "DESC"
-                                  ? (<DynaIcon className="text-warning" name="FaArrowDownZA" />)
-                                  : ("")
-                              }
-                            </div>
+            <Table striped hover className="mb-1">
+              <thead className="sticky-top">
+                <tr className="text-nowrap">
+                  {camposCliente && camposCliente.filter(el=>el.show).map((el) => {
+                    return (
+                      <th
+                        key={el.field_name}
+                        onClick={(e) => {
+                          if(!el.orderable) return
+                          sort(el.field_name, el.field_label, e.ctrlKey)
+                        }}
+                        role={el.orderable ? "button" : "columnheader"}
+                      >
+                        <div className="d-flex gap-1">
+                          <div>{el.field_label}</div>
+                          <div>
+                            {el.order_dir == "ASC" 
+                              ? (<DynaIcon className="text-warning" name="FaArrowDownAZ" />) 
+                              : el.order_dir == "DESC"
+                                ? (<DynaIcon className="text-warning" name="FaArrowDownZA" />)
+                                : ("")
+                            }
                           </div>
-                        </th>
-                      ));
-                    })}
-                  </tr>
-                </thead>
-                <tbody>
-                  {data && data?.pages.flatMap(el => el.filas).map((cliente) => (
-                    <ClientesTblRow key={cliente.id} cliente={cliente} camposCliente={camposCliente}/>
-                  ))}
-                </tbody>
-              </Table>
-            }
+                        </div>
+                      </th>
+                    );
+                  })}
+                </tr>
+              </thead>
+              <tbody>
+                {data && data?.pages.flatMap(el => el.filas).map((cliente) => (
+                  <ClientesListItem key={cliente.id} cliente={cliente}/>
+                ))}
+              </tbody>
+            </Table>
             <div className="position-relative">
               {hasNextPage &&
                 <div className="m-3">
-                  <button onClick={()=>fetchNextPage()} className="btn btn-success">Cargar mas registros</button>
+                  <button onClick={handleNextPage} className="btn btn-success">Cargar mas registros</button>
                 </div>
               }
               {(data?.pages[0].num_regs === 0) && <div>No hay registros para mostrar</div>}
@@ -131,6 +94,6 @@ export default function ClientesLst() {
           {isError && <div className="text-danger">Error de conexion</div>}
         </div>
       </Card>
-    </Container>
+    </div>
   )
 }

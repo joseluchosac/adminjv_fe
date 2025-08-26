@@ -265,3 +265,50 @@ export function getDateRangePeriod(value: CommonPeriod["key"]):{from:string; to:
   to = to ? to + " 23:59:59" : ""
   return {from, to}
 }
+
+
+
+export function deepEqualUnordered<T>(a: T, b: T): boolean {
+  // Compara dos objetos de forma profunda sin importar el orden
+  if (a === b) return true;
+
+  if (typeof a !== "object" || typeof b !== "object" || a === null || b === null) {
+    return false;
+  }
+
+  if (Array.isArray(a) && Array.isArray(b)) {
+    if (a.length !== b.length) return false;
+
+    const matched: boolean[] = new Array(b.length).fill(false);
+
+    for (const itemA of a) {
+      let found = false;
+      for (let i = 0; i < b.length; i++) {
+        if (!matched[i] && deepEqualUnordered(itemA, b[i])) {
+          matched[i] = true;
+          found = true;
+          break;
+        }
+      }
+      if (!found) return false;
+    }
+
+    return true;
+  }
+
+  const keysA = Object.keys(a as object);
+  const keysB = Object.keys(b as object);
+
+  if (keysA.length !== keysB.length) return false;
+
+  for (const key of keysA) {
+    if (!keysB.includes(key)) return false;
+
+    const valA = (a as Record<string, unknown>)[key];
+    const valB = (b as Record<string, unknown>)[key];
+
+    if (!deepEqualUnordered(valA, valB)) return false;
+  }
+
+  return true;
+}

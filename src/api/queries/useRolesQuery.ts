@@ -6,10 +6,11 @@ import { useEffect } from "react";
 import { FetchOptions, QueryResp, Rol } from "../../app/types";
 import { fnFetch } from "../fnFetch";
 
-interface RolesQryRes extends QueryResp {content: Rol[]}
+type RolesQryRes = Rol[] | QueryResp
+
 export const useRolesQuery = () => {
   const tknSession = useSessionStore(state => state.tknSession)
-  const {data, isFetching} = useQuery<RolesQryRes>({
+  const {data, isFetching, isLoading, isError} = useQuery<RolesQryRes>({
     queryKey: ['roles'],
     queryFn: () => {
       const options: FetchOptions = {
@@ -18,44 +19,48 @@ export const useRolesQuery = () => {
       }
       return fnFetch(options)
     },
-    staleTime: 1000 * 60 * 60 * 24
+    staleTime: 1000 * 60 * 60 * 12
   })
 
   return {
-    roles: data?.content,
-    isFetching
+    roles: data,
+    isFetching,
+    isLoading,
+    isError
   }
 }
+
 // ****** MUTATE ROLES ******
-export const useMutateRolesQuery = () => {
+export const useMutateRolesQuery = <T>() => {
   const resetSessionStore = useSessionStore(state => state.resetSessionStore)
   const navigate = useNavigate()
   const token = useSessionStore(state => state.tknSession)
   const queryClient = useQueryClient()
 
-  const {mutate, isPending, data} = useMutation({
+  const {mutate, isPending, data} = useMutation<T, Error, FetchOptions, unknown>({
     mutationFn: fnFetch,
     onSuccess: (resp) => {
-      if(resp.msgType !== 'success') return
+      const r = resp as QueryResp
+      if(r.msgType !== 'success') return
       queryClient.invalidateQueries({queryKey:["roles"]})
       queryClient.invalidateQueries({queryKey:["modulos_rol"]})
     }
   })
 
-  const updateRol = (param:any) => {
+  const createRol = (param:any) => {
     const options: FetchOptions = {
-      method: "PUT",
-      url: apiURL + "roles/update_rol",
+      method: "POST",
+      url: apiURL + "roles/create_rol",
       body: JSON.stringify(param),
       authorization: "Bearer " + token,
     }
     mutate(options)
   }
-  
-  const createRol = (param:any) => {
+
+  const updateRol = (param:any) => {
     const options: FetchOptions = {
-      method: "POST",
-      url: apiURL + "roles/create_rol",
+      method: "PUT",
+      url: apiURL + "roles/update_rol",
       body: JSON.stringify(param),
       authorization: "Bearer " + token,
     }
@@ -73,7 +78,8 @@ export const useMutateRolesQuery = () => {
   }
 
   useEffect(()=>{
-    if(data?.errorType === "errorToken"){
+    const r = data as QueryResp
+    if(r?.errorType === "errorToken"){
       resetSessionStore()
       navigate("/auth")
     }

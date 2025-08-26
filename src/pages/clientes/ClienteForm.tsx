@@ -35,15 +35,22 @@ import useSessionStore from "../../app/store/useSessionStore";
 import { useTiposDocumentoQuery } from "../../api/queries/useCatalogosQuery";
 import { fnFetch } from "../../api/fnFetch";
 
-interface NroDocumentoQryRes extends QueryResp {
-  content: NroDocumento;
-}
-type ClienteQryRes = QueryResp & {
-  content: Cliente;
+type NroDocumentoRes = NroDocumento | QueryResp
+export function isErrNroDocumentoRes(response: NroDocumentoRes): response is QueryResp {
+  return ('error' in response || (response as QueryResp).error == true);
 }
 
+type ClienteRes = Cliente | QueryResp
+export function isErrClienteRes(response: ClienteRes): response is QueryResp {
+  return ('error' in response || (response as QueryResp).error == true);
+}
+
+type MutationRes = QueryResp & {
+  cliente?: Cliente
+};
+
 type Props = {
-  onMutation?: (cliente: Cliente)=>void;
+  onMutation?: (cliente: Cliente | undefined)=>void;
 }
 
 export default function ClienteForm({onMutation}:Props) {
@@ -58,25 +65,25 @@ export default function ClienteForm({onMutation}:Props) {
   const token = useSessionStore((state) => state.tknSession);
 
   const {
-    data: cliente,
+    data: clienteRes,
     isPending: isPendingCliente,
     isError: isErrorCliente,
     getCliente,
-  } = useMutationClientesQuery<ClienteQryRes>();
+  } = useMutationClientesQuery<ClienteRes>();
 
   const {
-    data: mutation,
+    data: mutationRes,
     isPending: isPendingMutation,
     createCliente,
     updateCliente,
-  } = useMutationClientesQuery<ClienteQryRes>();
+  } = useMutationClientesQuery<MutationRes>();
 
   const {
-    data: nroDocumento,
+    data: nroDocumentoRes,
     isPending: isPendingNroDocumento,
     consultarNroDocumento,
     reset: resetNroDocumento,
-  } = useMutationClientesQuery<NroDocumentoQryRes>();
+  } = useMutationClientesQuery<NroDocumentoRes>();
 
   const {
     register,
@@ -122,8 +129,6 @@ export default function ClienteForm({onMutation}:Props) {
   };
 
   const submit = (data: Cliente) => {
-    // console.log(data)
-    // return
     Swal.fire({
       icon: "question",
       text: data.id
@@ -149,13 +154,13 @@ export default function ClienteForm({onMutation}:Props) {
 
   const resetForm = () => {
     reset(clienteFormInit);
-    if(nroDocumento){
+    if(nroDocumentoRes){
       resetNroDocumento();
     }
   };
 
   const handleClose = () => {
-    setShowClienteForm(false);
+    setShowClienteForm({showClienteForm: false, currentClienteId: 0});
   };
 
   useEffect(() => {
@@ -169,49 +174,47 @@ export default function ClienteForm({onMutation}:Props) {
   }, [showClienteForm]);
 
   useEffect(() => {
-    if (!nroDocumento) return;
-    if (!nroDocumento.error) {
-      setValue("id", nroDocumento.content.id);
-      setValue("nombre_razon_social", nroDocumento.content.nombre_razon_social);
-      setValue("direccion", nroDocumento.content.direccion);
-      setValue("ubigeo_inei", nroDocumento.content.ubigeo);
-      setValue("dis_prov_dep", nroDocumento.content.dis_prov_dep);
-      setValue("email", nroDocumento.content.email);
-      setValue("telefono", nroDocumento.content.telefono);
+    if (!nroDocumentoRes) return;
+    if (isErrNroDocumentoRes(nroDocumentoRes)){
+      toast(nroDocumentoRes.msg, { type: nroDocumentoRes.msgType });
+    }else{
+      setValue("id", nroDocumentoRes.id || 0);
+      setValue("nombre_razon_social", nroDocumentoRes.nombre_razon_social || "");
+      setValue("direccion", nroDocumentoRes.direccion || "");
+      setValue("ubigeo_inei", nroDocumentoRes.ubigeo || "");
+      setValue("dis_prov_dep", nroDocumentoRes.dis_prov_dep || "");
+      setValue("email", nroDocumentoRes.email || "");
+      setValue("telefono", nroDocumentoRes.telefono || "");
       setValue("api", 1, { shouldDirty: true });
-    } else {
-      toast(nroDocumento.msg, { type: nroDocumento.msgType });
     }
-  }, [nroDocumento]);
+  }, [nroDocumentoRes]);
 
   useEffect(() => {
-    if (!cliente) return;
-    if (cliente.error) {
-      toast.error("Error al obtener los datos");
-      setShowClienteForm(false);
-    } else {
-      if (cliente.content) {
-        reset(cliente.content);
-      }
+    if (!clienteRes) return;
+    if(isErrClienteRes(clienteRes)){
+      toast.error("Error al obtener el cliente");
+      setShowClienteForm({showClienteForm: false, currentClienteId: 0});
+    }else{
+      reset(clienteRes);
     }
-  }, [cliente]);
+  }, [clienteRes]);
 
   useEffect(() => {
     if (!isErrorCliente) return;
     toast.error("Error de conexion");
-    setShowClienteForm(false);
+    setShowClienteForm({showClienteForm: false, currentClienteId: 0});
   }, [isErrorCliente]);
 
   useEffect(() => {
-    if (!mutation) return;
-    if(mutation?.msgType === 'success'){
+    if (!mutationRes) return;
+    if(mutationRes?.msgType === 'success'){
       if(onMutation){
-        onMutation(mutation.content)
+        onMutation(mutationRes?.cliente)
       }
-      setShowClienteForm(false)
+      setShowClienteForm({showClienteForm: false, currentClienteId: 0})
     }
-    toast(mutation.msg, { type: mutation.msgType });
-  }, [mutation]);
+    toast(mutationRes.msg, { type: mutationRes.msgType });
+  }, [mutationRes]);
 
   return (
     <div>
@@ -244,7 +247,7 @@ export default function ClienteForm({onMutation}:Props) {
                     },
                   })}
                   disabled={
-                    nroDocumento?.content?.nombre_razon_social ||
+                    (nroDocumentoRes as NroDocumento)?.nombre_razon_social ||
                     currentClienteId
                       ? true
                       : false
@@ -268,15 +271,15 @@ export default function ClienteForm({onMutation}:Props) {
                   className="d-flex justify-content-between"
                 >
                   <div>Nro Doc</div>
-                  {nroDocumento?.content && (
+                  {(nroDocumentoRes as NroDocumento) && (
                     <Badge
                       bg={
-                        nroDocumento?.content.estado_sunat == "ACTIVO"
+                        (nroDocumentoRes as NroDocumento)?.estado_sunat == "ACTIVO"
                           ? "success"
                           : "warning"
                       }
                     >
-                      {nroDocumento?.content.estado_sunat}
+                      {(nroDocumentoRes as NroDocumento)?.estado_sunat}
                     </Badge>
                   )}
                 </Form.Label>
@@ -295,7 +298,7 @@ export default function ClienteForm({onMutation}:Props) {
                       },
                     })}
                     disabled={
-                      nroDocumento?.content?.nombre_razon_social ||
+                      (nroDocumentoRes as NroDocumento)?.nombre_razon_social ||
                       currentClienteId
                         ? true
                         : false
@@ -333,7 +336,7 @@ export default function ClienteForm({onMutation}:Props) {
                     },
                   })}
                   disabled={
-                    nroDocumento?.content?.nombre_razon_social ? true : false
+                    (nroDocumentoRes as NroDocumento)?.nombre_razon_social ? true : false
                   }
                 />
                 {errors.nombre_razon_social && (
@@ -348,15 +351,15 @@ export default function ClienteForm({onMutation}:Props) {
                   className="d-flex justify-content-between"
                 >
                   <div>Dirección</div>
-                  {nroDocumento?.content && (
+                  {(nroDocumentoRes as NroDocumento) && (
                     <Badge
                       bg={
-                        nroDocumento?.content?.condicion_sunat == "HABIDO"
+                        (nroDocumentoRes as NroDocumento)?.condicion_sunat == "HABIDO"
                           ? "success"
                           : "warning"
                       }
                     >
-                      {nroDocumento?.content?.condicion_sunat}
+                      {(nroDocumentoRes as NroDocumento)?.condicion_sunat}
                     </Badge>
                   )}
                 </Form.Label>
@@ -377,7 +380,7 @@ export default function ClienteForm({onMutation}:Props) {
                       }
                     },
                   })}
-                  disabled={nroDocumento?.content?.direccion ? true : false}
+                  disabled={(nroDocumentoRes as NroDocumento)?.direccion ? true : false}
                 />
                 {errors.direccion && (
                   <div className="invalid-feedback d-block">
@@ -405,6 +408,7 @@ export default function ClienteForm({onMutation}:Props) {
                         // defaultOptions
                         styles={darkMode ? selectDark : undefined}
                         isClearable
+                        isDisabled={(nroDocumentoRes as NroDocumento)?.ubigeo ? true : false}
                         value={{
                           value: getValues().ubigeo_inei,
                           label: getValues().dis_prov_dep,

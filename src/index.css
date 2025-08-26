@@ -18,6 +18,7 @@
   --color-warn: rgb(255 187 51);
   --color-error: rgb(254 78 78);
 }
+
 :root[data-bs-theme="dark"] {
   --color-fondo1: #262c30;
   --color-fondo2: #343a40;
@@ -57,4 +58,6 @@ body {
     margin-left: var(--w-main-sidebar-mini);
   }
 }
+
+/* ✅ OTROS ESTILOS */
 

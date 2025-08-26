@@ -1,47 +1,38 @@
-import { format, isValid, parseISO } from "date-fns";
+import { MarcaItem} from "../../../app/types";
 import { FaEdit, FaToggleOff, FaToggleOn, FaTrash } from "react-icons/fa";
+import { useMutationMarcasQuery } from "../../../api/queries/useMarcasQuery";
 import Swal from "sweetalert2";
+import useLayoutStore from "../../../app/store/useLayoutStore";
 import { useEffect } from "react";
 import { toast } from "react-toastify";
-import { QueryResp, UserItem } from "../../../app/types";
-import { useUsers } from "../context/UsersContext";
-import useLayoutStore from "../../../app/store/useLayoutStore";
-import { useMutationUsersQuery } from "../../../api/queries/useUsersQuery";
+import useMarcasStore from "../../../app/store/useMarcasStore";
 
 interface Props {
-  user: UserItem ;
+  marca: MarcaItem ;
 }
-interface UserMutQryRes extends QueryResp {content: UserItem}
 
-function UsersLstItem({ user }: Props) {
-  const { dispatchUsers, stateUsers: {camposUser} } = useUsers()
+function MarcasListItem({ marca }: Props) {
   const darkMode = useLayoutStore(state => state.layout.darkMode)
+  const camposMarca = useMarcasStore(state => state.camposMarca)
+  const setShowMarcaForm = useMarcasStore(state=>state.setShowMarcaForm)
 
   const {
     data: mutation,
     isPending: isPendingMutation,
-    setStateUser,
-    deleteUser, 
-  } = useMutationUsersQuery<UserMutQryRes>()
-
-  const validDate = (date:string | undefined, formato = "dd/MM/yyyy") => {
-    if(!date) return ''
-    return isValid(parseISO(date)) ? format(date, formato) : ''
-  }
+    deleteMarca,
+    setStateMarca,
+  } = useMutationMarcasQuery()
 
   const handleToEdit = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
     e.preventDefault()
-    dispatchUsers({
-      type: 'SET_SHOW_USER_FORM',
-      payload: {showUserForm: true, currentUserId: user.id},
-    });
+    setShowMarcaForm({showMarcaForm: true, currentMarcaId: marca.id})
   }
-
+  
   const handleDelete = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
     e.preventDefault()
     Swal.fire({
       icon: 'question',
-      text: `¿Desea eliminar al usuario ${user.username}?`,
+      text: `¿Desea eliminar al marca ${marca.nombre}?`,
       showCancelButton: true,
       confirmButtonText: "Sí",
       cancelButtonText: 'Cancelar',
@@ -50,26 +41,25 @@ function UsersLstItem({ user }: Props) {
       }
     }).then((result) => {
       if (result.isConfirmed) {
-        deleteUser(user.id)
+        deleteMarca(marca.id)
       }
     });
   }
 
   const toggleEstado = () => {
-    setStateUser({estado: user.estado ? 0 : 1, id: user.id})
+    setStateMarca({estado: marca.estado ? 0 : 1, id: marca.id})
   }
-
 
   useEffect(() => {
     if(!mutation) return
     toast(mutation.msg, { type: mutation.msgType})
   }, [mutation])
-
+  
   return (
     <tr className="text-nowrap">
-      {camposUser.filter(el=>el.show).map(el => {
-        switch (el.field_name){
-          case "acciones": {
+      {camposMarca.filter(el=>el.show).map((el) => {
+        switch (el.field_name) {
+          case "acciones":{
             return (
               <td key={el.field_name}>
                 <div className="d-flex gap-2 justify-content-start position-relative">
@@ -80,7 +70,7 @@ function UsersLstItem({ user }: Props) {
                   <a onClick={handleDelete} href="#" title="Eliminar">
                     <FaTrash className="text-danger"/>
                   </a>
-                  {user.estado == 0
+                  {marca.estado == 0
                     ? <div role="button" onClick={toggleEstado} title="Habilitar" data-estado="0">
                         <FaToggleOff className="text-muted" size={"1.3rem"} />
                       </div>
@@ -92,14 +82,11 @@ function UsersLstItem({ user }: Props) {
               </td>
             )
           }
-          case "created_at":
-          case "updated_at": {
-            return <td key={el.field_name}>{validDate(user[el.field_name ], 'dd/MM/yyyy')}</td>
-          }
-          default: {
+ 
+          default:{
             return (
-              <td key={el.field_name} className={`${user.estado == 0 ? 'text-body-tertiary' : ''}`}>
-                {user[el.field_name as keyof UserItem]}
+              <td key={el.field_name} className={`${marca.estado == 0 ? 'text-body-tertiary' : ''}`}>
+                  {marca[el.field_name as keyof MarcaItem]}
               </td>
             )
           }
@@ -109,4 +96,4 @@ function UsersLstItem({ user }: Props) {
   );
 }
 
-export default UsersLstItem;
+export default MarcasListItem;

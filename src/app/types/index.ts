@@ -1,7 +1,9 @@
 import { z } from "zod";
 import {
   profileFormSchema,
-  registerFormSchema,
+  recoveryFormSchema,
+  signInFormSchema,
+  signUpFormSchema,
   userFormSchema,
 } from "./schemas";
 
@@ -30,6 +32,7 @@ export interface QueryResp {
 }
 // ✅ TIPO PARA LA RESPUESTA DE UNA PETICION DE FILTROS
 export type FilterQueryResp = {
+  // filas: any;
   num_regs: number;
   pages: number;
   page: number;
@@ -40,6 +43,7 @@ export type FilterQueryResp = {
   msg?: string;
   msgTye?: string;
 };
+
 // ✅ TIPOS PARA EL CAMPO DE UNA TABLA
 export type CampoTable = {
   field_name: string;
@@ -49,15 +53,15 @@ export type CampoTable = {
   show: boolean;
 };
 // ✅ TIPO PARA EL MODULO AUTH
-export type FormsAuth = {
-  formOfLogin: string;
-  formOfForgot: string;
-};
-export type LoginForm = {
-  username: string;
-  password: string;
-  establecimiento_id: string;
-};
+// export type FormsAuth = {
+//   formOfLogin: string;
+//   formOfForgot: string;
+// };
+// export type LoginForm = {
+//   username: string;
+//   password: string;
+//   establecimiento_id: string;
+// };
 export type RestoreForm = {
   code: string;
   new_password: string;
@@ -81,7 +85,7 @@ export type User = {
   confirm_password: string;
 };
 // tipos para el formulario de usuario
-export type UserFormType = z.infer<typeof userFormSchema>;
+export type UserFormSchema = z.infer<typeof userFormSchema>;
 // tipos para los items de lista de usuarios
 export type UserItem = {
   id: number;
@@ -95,7 +99,7 @@ export type UserItem = {
   created_at: string;
   updated_at: string;
 };
-export type RegisterFormType = z.infer<typeof registerFormSchema>;
+// export type RegisterFormSchema = z.infer<typeof registerFormSchema>;
 
 // Depreacarted, use UserFormType instead
 // export type UserForm = {
@@ -170,9 +174,13 @@ export type Empresa = {
   fileLogo: any;
   fileCertificado: any;
 };
-
+export type EstablecimientoOpc = {
+  id: number;
+  codigo: string;
+  descripcion: string;
+};
 export interface EmpresaInfo {
-  // Informacion de la empresa
+  // Informacion de la empresa y establecimientos para opciones
   razon_social: string;
   nombre_comercial: string;
   ruc: string;
@@ -181,6 +189,7 @@ export interface EmpresaInfo {
   telefono: string;
   email: string;
   urlLogo: string;
+  establecimientosOpc:  EstablecimientoOpc[];
 };
 
 // ✅✅✅ TIPOS PARA LOS PARAMETROS DE FILTROS GENERALES NUEVO ✅✅✅
@@ -546,11 +555,7 @@ export type Establecimiento = {
   campo_stock: string;
   estado: number;
 };
-export type EstablecimientoOption = {
-  id: number;
-  codigo: string;
-  descripcion: string;
-};
+
 export type Categoria = {
   id: number;
   descripcion: string;
@@ -577,4 +582,13 @@ export type CommonPeriod = {
   text: string;
 };
 
+// ContentValidate: es un tipo generico de la forma Record<K,V> representa un tipo de
+// objeto cuya clave es K y valor V
+// Datos de validaciones de formulario obtenidos desde el back-end
+// de la forma:  { username:["El usuario no puede tener espacios"], ... }
 export type ContentValidate = Record<string, string[]>
+
+
+export type SignInFormSchema = z.infer<typeof signInFormSchema>
+export type SignUpFormSchema = z.infer<typeof signUpFormSchema>
+export type RecoveryFormSchema = z.infer<typeof recoveryFormSchema>

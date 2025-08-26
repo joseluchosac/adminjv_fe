@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import { Button, Card, Col, Container, Form, Row, Table } from "react-bootstrap"
-import { Modulo, Rol } from "../../app/types"
+import { Modulo, QueryResp, Rol } from "../../app/types"
 import ModulosRolTree from "./ModulosRolTree"
 import { getModulosTree } from "../../app/utils/funciones"
 import { useMutateModulosQuery } from "../../api/queries/useModulosQuery"
@@ -10,21 +10,27 @@ import Swal from "sweetalert2"
 import useLayoutStore from "../../app/store/useLayoutStore"
 import { toast } from "react-toastify"
 import { useMutateRolesQuery, useRolesQuery } from "../../api/queries/useRolesQuery"
-import { rolFormInit } from "../../app/utils/constants"
 import { useQueryClient } from "@tanstack/react-query"
+
+interface MutateRol extends QueryResp {
+  rol?: Rol
+}
+const rolFormInit = {id: 0, rol: ""}
 
 const RolesPage: React.FC = () => {
   const [rolForm, setRolForm] = useState<Rol>(rolFormInit)
   const [modulosRol, setModulosRol] = useState<Modulo[] | null>(null)
   const [itemsTree, setItemsTree] = useState<Modulo[] | null>(null)
   const darkMode = useLayoutStore(state => state.layout.darkMode)
-  const {roles} = useRolesQuery()
   const queryClient = useQueryClient()
-  const {
-    data: modulosSession,
-    getModulosSession
-  } = useMutateModulosQuery()
 
+  const {
+    roles,
+    isFetching: isFetchingRoles,
+    isLoading: isLoadingRoles,
+    isError: isErrorRoles,
+  } = useRolesQuery()
+  
   const {
     data: moduloRol,
     isPending: isPendingModuloRol,
@@ -43,7 +49,7 @@ const RolesPage: React.FC = () => {
     createRol,
     updateRol,
     deleteRol,
-  } = useMutateRolesQuery()
+  } = useMutateRolesQuery<MutateRol>()
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const {name, value} = e.currentTarget
@@ -74,7 +80,9 @@ const RolesPage: React.FC = () => {
   }
 
   const rolToEdit = (id: number) => {
-    const currentRol = roles?.find((el) => el.id === id) as Rol
+    if(!roles) return
+    if(('error' in roles) && roles.error) return
+    const currentRol = (roles as Rol[])?.find((el) => el.id === id) as Rol
     setRolForm(currentRol)
     getModuloRol(id)
   }
@@ -130,23 +138,16 @@ const RolesPage: React.FC = () => {
   useEffect(() => {
     if(!mutationModulosRoles) return
     toast(mutationModulosRoles.msg, {type: mutationModulosRoles.msgType})
-    getModulosSession()
   }, [mutationModulosRoles])
   
   useEffect(() => {
     if(!mutationRol) return
     toast(mutationRol.msg, {type: mutationRol.msgType})
-    if(mutationRol.content){
+    if(mutationRol.rol){
       queryClient.invalidateQueries({queryKey: ["roles"]})
       resetForm()
     }
   }, [mutationRol])
-
-  useEffect(() => {
-    if(!modulosSession) return
-    if(modulosSession.content){
-    }
-  }, [modulosSession])
 
   useEffect(() => {
     if(!moduloRol) return
@@ -157,6 +158,17 @@ const RolesPage: React.FC = () => {
     }
   }, [moduloRol])
 
+  if(isLoadingRoles){
+    return (
+      <div className="position-relative">
+        <LdsBar />
+      </div>
+    )
+  }
+
+  if(!roles || isErrorRoles || ("error" in roles && roles.error)){
+    return <div>Error al obtener los roles</div>
+  }
 
   return (
     <Container style={{maxWidth: "991.98px"}}>
@@ -165,7 +177,7 @@ const RolesPage: React.FC = () => {
           <Card>
             <Card.Header>ROLES</Card.Header>
             <Card.Body className="position-relative">
-              {isPendingMutationRol && <LdsBar />}
+              {isPendingMutationRol && isFetchingRoles && <LdsBar />}
               <Form onSubmit={handleSubmit}>
                 <Row>
                   <Col>
@@ -199,7 +211,7 @@ const RolesPage: React.FC = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {roles && roles.map((el) => (
+                  {roles && !("error" in roles) && (roles as Rol[]).map((el) => (
                     <tr key={el.id}>
                       <td
                          className={(el.id == rolForm.id) ? "text-info" : ""}

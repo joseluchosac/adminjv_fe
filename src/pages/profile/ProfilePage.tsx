@@ -4,15 +4,16 @@ import { toast } from "react-toastify";
 import Swal from "sweetalert2";
 import useLayoutStore from "../../app/store/useLayoutStore";
 import { useMutationUsersQuery } from "../../api/queries/useUsersQuery";
-import {type Profile, ProfileFormType, QueryResp } from "../../app/types";
+import {ApiGenericResp, type Profile, ProfileFormType, QueryResp } from "../../app/types";
 import { useForm } from "react-hook-form";
 import { profileFormSchema } from "../../app/types/schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { LdsEllipsisCenter } from "../../app/components/Loaders";
 
-interface ProfileQryRes extends QueryResp {
+interface MutatateProfile extends ApiGenericResp {
   content: Profile
 }
+type GetProfile = Profile | ApiGenericResp
 
 export default function ProfilePage() {
     const darkMode = useLayoutStore(state => state.layout.darkMode)
@@ -30,7 +31,7 @@ export default function ProfilePage() {
       data: profile,
       isPending: isPendingProfile,
       getProfile
-    } = useMutationUsersQuery<ProfileQryRes>()
+    } = useMutationUsersQuery<GetProfile>()
 
     const {
       data: respCheckPassword,
@@ -41,7 +42,7 @@ export default function ProfilePage() {
       data: mutation,
       isPending: isPendingMutation,
       updateProfile
-    } = useMutationUsersQuery<ProfileQryRes>()
+    } = useMutationUsersQuery<MutatateProfile>()
     
   
   
@@ -73,7 +74,11 @@ export default function ProfilePage() {
   
     useEffect(() => {
       if(!profile) return
-      reset(profile.content)
+      if("error" in profile && profile.error){
+        toast(profile.msg || "Hubo un error al obtener los datos", {type: profile.msgType})
+        return
+      }
+      reset(profile as Profile)
     }, [profile])
   
     useEffect(() => {
@@ -88,7 +93,6 @@ export default function ProfilePage() {
     useEffect(() => {
       if(!mutation) return
       toast(mutation.msg, {type: mutation.msgType})
-      // invalidar query de ["user_session"]
     }, [mutation])
   return (
     <Container>

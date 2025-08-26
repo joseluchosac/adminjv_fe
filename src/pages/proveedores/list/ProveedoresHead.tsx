@@ -1,43 +1,47 @@
-import { useEffect, useState } from "react";
-import { Badge, Button, Col, Form, InputGroup, Row, Stack } from "react-bootstrap";
-import { BsSearch } from "react-icons/bs";
-import { useDebounce } from "react-use";
+import { Badge, Button, Col, Container, Form, InputGroup, Row, Stack } from "react-bootstrap";
+import { BsFiletypePdf, BsFiletypeXlsx } from "react-icons/bs";
 import DynaIcon from "../../../app/components/DynaComponents";
-import { useProveedores } from "../context/ProveedoresContext";
-import { filterParamsInit } from "../../../app/utils/constants";
 import useProveedoresStore from "../../../app/store/useProveedoresStore";
+// import { objToUriBase64 } from "../../../app/utils/funciones";
+import { FaFilter } from "react-icons/fa";
 
-export default function ProveedoresHead() {
-  const [inputSearch, setInputSearch] = useState("")
+type Props = { info:string };
+
+export default function ProveedoresHead({info}: Props) {
+  const {equal, between, order} = useProveedoresStore(state => state.proveedorFilterInfo)
+  const proveedorFilterForm = useProveedoresStore(state => state.proveedorFilterForm)
+  // const proveedorFilterParam = useProveedoresStore(state => state.proveedorFilterParam)
+  const setShowProveedorFilter = useProveedoresStore(state => state.setShowProveedorFilter)
+  const setProveedorFilterForm = useProveedoresStore(state => state.setProveedorFilterForm)
   const setShowProveedorForm = useProveedoresStore(state => state.setShowProveedorForm)
-  const setCurrentProveedorId = useProveedoresStore(state => state.setCurrentProveedorId)
-  const {
-    filterInfoProveedores,
-    filterParamsProveedoresForm,
-    setFilterParamsProveedoresForm
-  } = useProveedores()
+  const setProveedorFilterFormResetEqualItem = useProveedoresStore(state => state.setProveedorFilterFormResetEqualItem)
 
-  useDebounce(() => { 
-    if (inputSearch.toLowerCase().trim() == filterParamsProveedoresForm.search.toLowerCase().trim()) return
-    setFilterParamsProveedoresForm({ ...filterParamsProveedoresForm, search: inputSearch.trim() });
-  }, 500, [inputSearch]);
+  const handleSetShowProveedoresFilterMdl = (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
+    e.preventDefault();
+    setShowProveedorFilter(true)
+  };
 
-  const handleUnsort = () => {
-    setFilterParamsProveedoresForm({...filterParamsProveedoresForm, orders: filterParamsInit.orders})
+  const resetBetweenItem = (field_name: string) => {
+    let { between } = proveedorFilterForm;
+    between = between.filter((el) => el.field_name !== field_name);
+    setProveedorFilterForm({ ...proveedorFilterForm, between: [...between] })
+  };
+
+  const resetSort = () => {
+    setProveedorFilterForm({ ...proveedorFilterForm, order: [] })
   };
 
   const handleNuevo = () => {
-    setCurrentProveedorId(0)
-    setShowProveedorForm(true);
+    setShowProveedorForm({showProveedorForm: true, currentProveedorId: 0})
   };
 
-  useEffect(()=>{
-    setInputSearch(filterParamsProveedoresForm.search)
-  }, [])
-
+  const handleTraerTodo = () => {
+    // const param = objToUriBase64(proveedorFilterParam);
+    // window.open(apiDOCS + "pdf/?action=proveedores_report&p=" + param);
+  };
 
   return (
-    <div className="mb-2 pt-2">
+    <Container className="mb-2 pt-2 position-relative">
       <Row className="align-items-center mb-2">
         <Col sm className="text-center text-sm-start">
           <h5>Lista de Proveedores</h5>
@@ -45,19 +49,40 @@ export default function ProveedoresHead() {
         <Col sm className="text-center text-sm-start mb-3 mb-sm-0">
           <InputGroup>
             <Form.Control
-              size="sm"
               name="search"
               type="search"
-              value={inputSearch}
-              onChange={(e) => setInputSearch(e.target.value)}
+              placeholder="Buscar"
+              value={proveedorFilterForm.search}
+              onChange={(e) => {
+                setProveedorFilterForm({ ...proveedorFilterForm, search: e.target.value })
+              }}
             />
-            <Button variant="outline-secondary" className="px-2 py-1">
-              <BsSearch />
+            <Button
+              variant="outline-secondary" 
+              className="px-2 py-1"
+              title="Mostrar filtros"
+              onClick={handleSetShowProveedoresFilterMdl}
+            >
+              <FaFilter />
             </Button>
           </InputGroup>
         </Col>
         <Col className="text-center flex-sm-grow-0">
           <div className="d-flex justify-content-center align-items-center gap-3">
+            <div className="d-flex">
+              <Button variant="outline-success" className="border-0"
+                title="Generar archivo excel"
+                onClick={handleTraerTodo}
+              >
+                <BsFiletypeXlsx className="fs-5" />
+              </Button>
+              <Button variant="outline-danger" className="border-0"
+                title="Generar archivo pdf"
+                onClick={handleTraerTodo}
+              >
+                <BsFiletypePdf className="fs-5" />
+              </Button>
+            </div>
             <Button onClick={handleNuevo} variant="primary">
               Nuevo
             </Button>
@@ -67,22 +92,69 @@ export default function ProveedoresHead() {
       <Row className="align-items-center">
         <Col className="text-end">
           <div className="d-flex gap-2 flex-wrap">
-            <Stack
-              direction="horizontal"
-              gap={2}
-              className={`${filterInfoProveedores.orders.length ? "" : "d-none"}`}
-            >
-              <Badge bg="secondary" role="button" onClick={handleUnsort} className="d-flex gap-1">
-                <DynaIcon name="FaCircleXmark"  className="pr-4" />
-                  ORDEN:
+            <div>{info}</div>
+            {Boolean(equal.length) && (
+              <Stack direction="horizontal" gap={2} className="flex-wrap">
+                {equal.map((el, idx) => {
+                  const value = el.field_label === "Estado" ? el.field_value === "1" ? "Habilitado" : "Deshabilitado" : el.field_value;
+                  return (<Badge
+                    bg="secondary"
+                    role="button"
+                    onClick={() => {
+                      setProveedorFilterFormResetEqualItem({field_name: el.field_name})
+                    }}
+                    className="d-flex gap-1"
+                    key={idx}
+                  >
+                    <DynaIcon name="FaCircleXmark" className="pr-4" />
+                    <div>
+                      {el.field_label}: {value}
+                    </div>
+                  </Badge>)
+                })}
+              </Stack>
+            )}
+            {Boolean(between.length && between[0].from && between[0].to) && (
+              <Stack direction="horizontal" gap={2} className="flex-wrap">
+                {between.map((el, idx) => (
+                  <Badge
+                    bg="secondary"
+                    role="button"
+                    onClick={() => resetBetweenItem(el.field_name)}
+                    className="d-flex gap-1"
+                    key={idx}
+                  >
+                    <DynaIcon name="FaCircleXmark" className="pr-4" />
+                    <div>
+                      {(el.from.split(" ")[0] === el.to.split(" ")[0])
+                        ? `${el.field_label}: ${el.from.split(" ")[0]}`
+                        : `${el.field_label}: de ${el.from.split(" ")[0]} a ${el.to.split(" ")[0]
+                      }`}
+                    </div>
+                  </Badge>
+                ))}
+              </Stack>
+            )}
+            {Boolean(order.length) && (
+              <Stack direction="horizontal" gap={2} className="flex-wrap">
+                <Badge
+                  bg="secondary"
+                  role="button"
+                  className="d-flex gap-1"
+                  title="Quitar orden"
+                  onClick={resetSort}
+                >
+                  <DynaIcon name="FaCircleXmark" className="pr-4" />
+                  Orden:
                   <div className="text-wrap">
-                    {filterInfoProveedores.orders.map((el) => el.field_label).join(", ")}
+                    {order.map((el) => el.field_label).join(", ")}
                   </div>
-              </Badge>
-            </Stack>
+                </Badge>
+              </Stack>
+            )}
           </div>
         </Col>
       </Row>
-    </div>
+    </Container>
   )
 }

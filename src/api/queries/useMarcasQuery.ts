@@ -1,23 +1,33 @@
 const apiURL = import.meta.env.VITE_API_URL;
-import { useCallback, useEffect, useRef, useState } from "react"
+import { useEffect, useRef } from "react"
 import { useNavigate } from "react-router-dom";
 import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import useSessionStore from "../../app/store/useSessionStore"
 import { FetchOptions, FilterQueryResp, Marca, MarcaItem } from "../../app/types";
-import { filterParamsInit } from "../../app/utils/constants";
 import { fnFetch } from "../fnFetch";
+import useMarcasStore from "../../app/store/useMarcasStore";
+import { useDebounce } from "react-use";
+import { toast } from "react-toastify";
 
-type TypeAction = "filter_full" | "mutate_marca"
+type TypeAction = "filter_full" | "mutate_marca" | 'mutate_state_marca'
 
 // ****** FILTRAR ******
 export interface MarcasFilQryRes extends FilterQueryResp {
   filas: MarcaItem[];
 }
+
 export const useFilterMarcasQuery = () => {
-  const [filterParamsMarcas, setFilterParamsMarcas] = useState(filterParamsInit)
   const token = useSessionStore(state => state.tknSession)
+  // const isFirstRender = useRef(true);
   const queryClient = useQueryClient()
-  
+  const {
+    marcaFilterForm,
+    marcaFilterParam,
+    setMarcaFilterParam,
+    setMarcaFilterParamBetween,
+    setMarcaFilterInfo
+  } = useMarcasStore()
+
   const {
     data,
     isError,
@@ -32,7 +42,7 @@ export const useFilterMarcasQuery = () => {
       const options: FetchOptions = {
         method: "POST",
         url: `${apiURL}marcas/filter_marcas?page=${page}`,
-        body: JSON.stringify(filterParamsMarcas),
+        body: JSON.stringify(marcaFilterParam),
         authorization: "Bearer " + token,
         signal
       }
@@ -46,21 +56,44 @@ export const useFilterMarcasQuery = () => {
     staleTime: 1000 * 60 * 5 
   })
 
-  const resetear = useCallback(()=>{
-    queryClient.resetQueries({ queryKey: ['marcas'], exact: true });
-    setFilterParamsMarcas(filterParamsInit)
-  },[])
-  
+  // const resetear = ()=>{
+  //   queryClient.resetQueries({ queryKey: ['marcas'], exact: true });
+  // }
+
+  useDebounce(() => {
+    if (
+        marcaFilterForm.search.toLowerCase().trim() ==
+        marcaFilterParam.search.toLowerCase().trim()
+    ) return;
+    setMarcaFilterParam()
+  }, 500, [marcaFilterForm.search]);
 
   useEffect(() => {
-    return () => {
-      resetear()
-    }
-  },[])
-  
+    setMarcaFilterParam()
+  }, [marcaFilterForm.order, marcaFilterForm.equal])
+
   useEffect(() => {
+    setMarcaFilterParamBetween()
+  }, [marcaFilterForm.between])
+
+  useEffect(() => {
+    // if (isFirstRender.current) {
+    //   isFirstRender.current = false;
+    //   return; // Evita ejecutar en el primer render
+    // }
     queryClient.invalidateQueries({queryKey:["marcas"]})
-  }, [filterParamsMarcas])
+  }, [marcaFilterParam])
+
+  useEffect(()=>{
+    if(!data) return
+    if(data?.pages[0].error || isError){
+      toast.error("Error al obtener registros")
+      return
+    }
+    if(!isFetching){
+      setMarcaFilterInfo()
+    }
+  },[data, isError, isFetching])
 
   return {
     data,
@@ -69,7 +102,6 @@ export const useFilterMarcasQuery = () => {
     isFetching, 
     hasNextPage, 
     fetchNextPage,
-    setFilterParamsMarcas,
   }
 }
 
@@ -120,7 +152,16 @@ export const useMutationMarcasQuery = () => {
     }
     mutate(options)
   }
-
+  const setStateMarca = (data: {estado: number, id: number}) => {
+    typeActionRef.current = "mutate_state_marca"
+    const options: FetchOptions = {
+      method: "PUT",
+      url: apiURL + "marcas/set_state_marca",
+      body: JSON.stringify(data),
+      authorization: "Bearer " + token,
+    }
+    mutate(options)
+  }
   const deleteMarca = (id: number) => {
     typeActionRef.current = "mutate_marca"
     const options: FetchOptions = {
@@ -146,6 +187,7 @@ export const useMutationMarcasQuery = () => {
     getMarca,
     createMarca,
     updateMarca,
+    setStateMarca,
     deleteMarca,
     typeAction: typeActionRef.current,
   }

@@ -1,4 +1,4 @@
-import "../../../assets/css/mainHeader.css";
+import "../../../assets/css/header-layout.css";
 import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
@@ -28,7 +28,7 @@ function HeaderLayout () {
   const handleLogout = (e:React.MouseEvent) => {
     e.preventDefault();
     resetSessionStore()
-    navigate("/auth")
+    navigate("/signin")
   };
 
   const handleMisDatos = (e:React.MouseEvent) => {
@@ -64,7 +64,7 @@ function HeaderLayout () {
           </Nav>
           <Nav>
             <NavDropdown
-              className="dropdown-header"
+              className={`dropdown-header ${!userSession ? 'd-none' : ''}`}
               align='end'
               title={
                 <div className="d-flex align-items-center gap-2">
@@ -72,7 +72,6 @@ function HeaderLayout () {
                   <span>{userSession?.username}</span>
                 </div>
               }
-              // style={{zIndex:"1035"}}
             >
               <NavDropdown.Item href="#" onClick={handleMisDatos} className="d-flex align-items-center gap-2">
                 <FaUserEdit /> <span>Mi perfil</span>

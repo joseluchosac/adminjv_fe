@@ -1,11 +1,13 @@
 const apiURL = import.meta.env.VITE_API_URL;
 import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import useSessionStore from "../../app/store/useSessionStore"
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useRef } from "react"
 import { useNavigate } from "react-router-dom";
 import { FetchOptions, FilterQueryResp, Proveedor, ProveedorItem, QueryResp } from "../../app/types";
-import { filterParamsInit } from "../../app/utils/constants";
 import { fnFetch } from "../fnFetch";
+import useProveedoresStore from "../../app/store/useProveedoresStore";
+import { useDebounce } from "react-use";
+import { toast } from "react-toastify";
 
 type TypeAction = "mutate_proveedor" | "consultar_nro_doc"
 
@@ -13,10 +15,18 @@ type TypeAction = "mutate_proveedor" | "consultar_nro_doc"
 export interface ProveedoresFilQryRes extends FilterQueryResp {
   filas: ProveedorItem[];
 }
+
 export const useFilterProveedoresQuery = () => {
-  const [filterParamsProveedores, setFilterParamsProveedores] = useState(filterParamsInit)
   const token = useSessionStore(state => state.tknSession)
+  // const isFirstRender = useRef(true);
   const queryClient = useQueryClient()
+  const {
+    proveedorFilterForm,
+    proveedorFilterParam,
+    setProveedorFilterParam,
+    setProveedorFilterParamBetween,
+    setProveedorFilterInfo
+  } = useProveedoresStore()
 
   const {
     data,
@@ -32,7 +42,7 @@ export const useFilterProveedoresQuery = () => {
       const options: FetchOptions = {
         method: "POST",
         url: `${apiURL}proveedores/filter_proveedores?page=${page}`,
-        body: JSON.stringify(filterParamsProveedores),
+        body: JSON.stringify(proveedorFilterParam),
         authorization: "Bearer " + token,
         signal
       }
@@ -46,20 +56,44 @@ export const useFilterProveedoresQuery = () => {
     staleTime: 1000 * 60 * 5 
   })
 
-  const resetear = ()=>{
-    queryClient.resetQueries({ queryKey: ['proveedores'], exact: true });
-    setFilterParamsProveedores(filterParamsInit)
-  }
+  // const resetear = ()=>{
+  //   queryClient.resetQueries({ queryKey: ['proveedores'], exact: true });
+  // }
+
+  useDebounce(() => {
+    if (
+        proveedorFilterForm.search.toLowerCase().trim() ==
+        proveedorFilterParam.search.toLowerCase().trim()
+    ) return;
+    setProveedorFilterParam()
+  }, 500, [proveedorFilterForm.search]);
 
   useEffect(() => {
-    return () => {
-      resetear()
-    }
-  },[])
-  
+    setProveedorFilterParam()
+  }, [proveedorFilterForm.order, proveedorFilterForm.equal])
+
   useEffect(() => {
+    setProveedorFilterParamBetween()
+  }, [proveedorFilterForm.between])
+
+  useEffect(() => {
+    // if (isFirstRender.current) {
+    //   isFirstRender.current = false;
+    //   return; // Evita ejecutar en el primer render
+    // }
     queryClient.invalidateQueries({queryKey:["proveedores"]})
-  }, [filterParamsProveedores])
+  }, [proveedorFilterParam])
+
+  useEffect(()=>{
+    if(!data) return
+    if(data?.pages[0].error || isError){
+      toast.error("Error al obtener registros")
+      return
+    }
+    if(!isFetching){
+      setProveedorFilterInfo()
+    }
+  },[data, isError, isFetching])
 
   return {
     data,
@@ -68,7 +102,6 @@ export const useFilterProveedoresQuery = () => {
     isFetching, 
     hasNextPage, 
     fetchNextPage,
-    setFilterParamsProveedores,
   }
 }
 

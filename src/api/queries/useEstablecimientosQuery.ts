@@ -45,14 +45,6 @@ export const useMutationEstablecimientosQuery = () => {
     }
   })
 
-  const getEstablecimientosOptions = () => {
-    const options: FetchOptions = {
-      method: "POST",
-      url: apiURL + "establecimientos/get_establecimientos_options",
-    }
-    mutate(options)
-  }
-
   const getEstablecimiento = (id: number) => {
     const options: FetchOptions = {
       method: "POST",
@@ -107,7 +99,6 @@ export const useMutationEstablecimientosQuery = () => {
     data, 
     isPending, 
     isError,
-    getEstablecimientosOptions,
     getEstablecimiento,
     createEstablecimiento,
     updateEstablecimiento,

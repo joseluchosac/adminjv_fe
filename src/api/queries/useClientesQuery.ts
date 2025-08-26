@@ -6,6 +6,8 @@ import { useNavigate } from "react-router-dom";
 import { Cliente, ClienteItem, FetchOptions, FilterQueryResp, QueryResp } from "../../app/types";
 import useClientesStore from "../../app/store/useClientesStore";
 import { fnFetch } from "../fnFetch";
+import { toast } from "react-toastify";
+import { useDebounce } from "react-use";
 
 type TypeAction = "mutate_cliente" | "consultar_nro_doc"
 
@@ -13,7 +15,97 @@ type TypeAction = "mutate_cliente" | "consultar_nro_doc"
 export interface ClientesFilQryRes extends FilterQueryResp {
   filas: ClienteItem[];
 }
+
 export const useFilterClientesQuery = () => {
+  const token = useSessionStore(state => state.tknSession)
+  // const isFirstRender = useRef(true);
+  const queryClient = useQueryClient()
+  const {
+    clienteFilterForm,
+    clienteFilterParam,
+    setClienteFilterParam,
+    setClienteFilterParamBetween,
+    setClienteFilterInfo
+  } = useClientesStore()
+
+  const {
+    data,
+    isError,
+    isLoading,
+    isFetching,
+    hasNextPage,
+    fetchNextPage,
+  } = useInfiniteQuery<ClientesFilQryRes, Error>({
+    queryKey: ['clientes'],
+    queryFn: ({pageParam = 1, signal}) => {
+      const page = pageParam as number
+      const options: FetchOptions = {
+        method: "POST",
+        url: `${apiURL}clientes/filter_clientes?page=${page}`,
+        body: JSON.stringify(clienteFilterParam),
+        authorization: "Bearer " + token,
+        signal
+      }
+      return fnFetch(options)
+    },
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) => {
+      return lastPage.next != 0 ? lastPage.next : undefined
+    },
+    getPreviousPageParam: (lastPage) => lastPage.previous ?? undefined,
+    staleTime: 1000 * 60 * 5 
+  })
+
+  // const resetear = ()=>{
+  //   queryClient.resetQueries({ queryKey: ['clientes'], exact: true });
+  // }
+
+  useDebounce(() => {
+    if (
+        clienteFilterForm.search.toLowerCase().trim() ==
+        clienteFilterParam.search.toLowerCase().trim()
+    ) return;
+    setClienteFilterParam()
+  }, 500, [clienteFilterForm.search]);
+
+  useEffect(() => {
+    setClienteFilterParam()
+  }, [clienteFilterForm.order, clienteFilterForm.equal])
+
+  useEffect(() => {
+    setClienteFilterParamBetween()
+  }, [clienteFilterForm.between])
+
+  useEffect(() => {
+    // if (isFirstRender.current) {
+    //   isFirstRender.current = false;
+    //   return; // Evita ejecutar en el primer render
+    // }
+    queryClient.invalidateQueries({queryKey:["clientes"]})
+  }, [clienteFilterParam])
+
+  useEffect(()=>{
+    if(!data) return
+    if(data?.pages[0].error || isError){
+      toast.error("Error al obtener registros")
+      return
+    }
+    if(!isFetching){
+      setClienteFilterInfo()
+    }
+  },[data, isError, isFetching])
+
+  return {
+    data,
+    isError, 
+    isLoading, 
+    isFetching, 
+    hasNextPage, 
+    fetchNextPage,
+  }
+}
+
+/* export const useFilterClientesQuery = () => {
   const filterParamsClientes = useClientesStore(state => state.filterParamsClientes)
   const filterParamsClientesForm = useClientesStore(state => state.filterParamsClientesForm)
   const setFilterParamsClientes = useClientesStore(state => state.setFilterParamsClientes)
@@ -70,7 +162,8 @@ export const useFilterClientesQuery = () => {
     hasNextPage, 
     fetchNextPage,
   }
-}
+} */
+
 
 // ****** MUTATION ******
 export const useMutationClientesQuery = <T>() => {

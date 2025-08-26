@@ -1,4 +1,4 @@
-import { FetchOptions } from "../types"
+import { FetchOptions } from "../app/types"
 
 export const fnFetch = async({
   method = "GET",

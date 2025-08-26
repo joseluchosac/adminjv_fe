@@ -7,23 +7,13 @@ import { useForm } from "react-hook-form";
 import { LdsBar, LdsEllipsisCenter } from "../../app/components/Loaders";
 import useLayoutStore from "../../app/store/useLayoutStore";
 import { useMutationMarcasQuery } from "../../api/queries/useMarcasQuery";
-import { Marca, QueryResp } from "../../app/types";
-import { useMarcas } from "./context/MarcasContext";
-
-interface MarcaQryRes extends QueryResp {
-  content: Marca | null;
-}
-type GetMarcaQuery = {
-  data: MarcaQryRes | null ;
-  isPending: boolean;
-  isError: boolean;
-  getMarca: (id: number) => void
-}
+import { Marca } from "../../app/types";
+import useMarcasStore from "../../app/store/useMarcasStore";
 
 const marcaFormInit = {id: 0, nombre: "", estado: 1,}
 
 export default function MarcaForm() {
-  const {showMarcaForm, setShowMarcaForm, currentMarcaId} = useMarcas()
+  const {showMarcaForm, setShowMarcaForm, currentMarcaId} = useMarcasStore()
   const darkMode = useLayoutStore(state => state.layout.darkMode)
 
   const {
@@ -31,7 +21,7 @@ export default function MarcaForm() {
     isPending: isPendingMarca,
     isError: isErrorMarca,
     getMarca,
-  }: GetMarcaQuery = useMutationMarcasQuery()
+  }: any = useMutationMarcasQuery()
 
   const {
     data: mutation,
@@ -84,16 +74,16 @@ export default function MarcaForm() {
     console.log(marca)
     if(marca.error){
       toast(marca.msg, {type: marca.msgType})
-      setShowMarcaForm(false);
+      setShowMarcaForm({showMarcaForm: false, currentMarcaId: 0});
     }else{
-      if(marca.content) reset(marca?.content)
+      if(marca) reset(marca)
     }
   }, [marca])
   
   useEffect(() => {
     if(!mutation) return
     if(typeAction==="mutate_marca"){
-      if(!mutation.error) setShowMarcaForm(false);
+      if(!mutation.error) setShowMarcaForm({showMarcaForm: false, currentMarcaId: 0});
       toast(mutation.msg, {type: mutation.msgType})
     }
   }, [mutation])
@@ -101,7 +91,7 @@ export default function MarcaForm() {
   useEffect(() => {
     if(!isErrorMarca) return
     toast.error("Error al obtener datos")
-    setShowMarcaForm(false)
+    setShowMarcaForm({showMarcaForm: false, currentMarcaId: 0})
   }, [isErrorMarca])
 
   useEffect(() => {
@@ -112,7 +102,12 @@ export default function MarcaForm() {
 
   return (
     <div>
-      <Modal show={showMarcaForm} onHide={()=>setShowMarcaForm(false)} backdrop="static" size="md" >
+      <Modal 
+        size="md"
+        backdrop="static"
+        show={showMarcaForm} 
+        onHide={()=>setShowMarcaForm({showMarcaForm: false, currentMarcaId: 0})} 
+      >
         <Modal.Header closeButton className="py-2">
           <Modal.Title>{currentMarcaId ? "Editar marca" : "Nueva marca"}</Modal.Title>
         </Modal.Header>
@@ -145,7 +140,7 @@ export default function MarcaForm() {
               <Button
                 variant="seccondary"
                 type="button"
-                onClick={()=>setShowMarcaForm(false)}
+                onClick={()=>setShowMarcaForm({showMarcaForm: false, currentMarcaId: 0})}
               >Cerrar</Button>
               <Button 
                 variant="primary" 

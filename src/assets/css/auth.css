@@ -20,3 +20,14 @@
 .register-card {
   background-color: var(--color-fondo2);
 }
+
+.auth-container {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.signup-card, .signin-card {
+  width: 350px;
+  background-color: var(--color-fondo2);
+}

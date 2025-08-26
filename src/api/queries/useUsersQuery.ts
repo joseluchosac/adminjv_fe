@@ -6,13 +6,13 @@ import useSessionStore from "../../app/store/useSessionStore"
 import { 
   FilterQueryResp,
   FetchOptions,
-  LoginForm, 
   QueryResp, 
   UserItem, 
   UserSession, 
-  UserFormType,
-  RegisterFormType,
   ProfileFormType,
+  SignInFormSchema,
+  UserFormSchema,
+  SignUpFormSchema,
 } from "../../app/types"
 import { useUsers } from "../../pages/users/context/UsersContext";
 import { useDebounce } from "react-use";
@@ -33,10 +33,11 @@ type TypeAction =
 | "send_code_restoration"
 | "restore_password"
 
-interface UserSessionqryRes extends QueryResp {content: UserSession}
 export const useUserSessionQuery = () => {
   const tknSession = useSessionStore(state => state.tknSession)
-  const {data, isFetching} = useQuery<UserSessionqryRes>({
+  const queryClient = useQueryClient()
+
+  const {data, isFetching, refetch} = useQuery<UserSession>({
     queryKey: ['user_session'],
     queryFn: () => {
       const options: FetchOptions = {
@@ -49,8 +50,16 @@ export const useUserSessionQuery = () => {
     staleTime: 1000 * 60 * 60 * 24
   })
 
+  useEffect(()=>{
+    if(!tknSession) {
+      queryClient.setQueryData(['user_session'], ()=>{return null})
+    }else(
+      refetch()
+    )
+  },[tknSession])
+
   return {
-    userSession: data?.content,
+    userSession: data,
     isFetching
   }
 }
@@ -140,7 +149,7 @@ export const useFilterUsersQuery = () => {
 
 
   return {
-    data,
+    data: data?.pages[0].error ? undefined : data,
     isError, 
     isLoading, 
     isFetching, 
@@ -235,7 +244,7 @@ export const useMutationUsersQuery = <T>() => {
     mutate(options)
   }
 
-  const createUser = (user: UserFormType) => {
+  const createUser = (user: UserFormSchema) => {
     typeActionRef.current = "mutate_create_user"
     const options: FetchOptions = {
       method: "POST",
@@ -246,7 +255,7 @@ export const useMutationUsersQuery = <T>() => {
     mutate(options)
   }
 
-  const updateUser = (user: UserFormType) => {
+  const updateUser = (user: UserFormSchema) => {
     typeActionRef.current = "mutate_update_user"
     const options: FetchOptions = {
       method: "PUT",
@@ -299,7 +308,7 @@ export const useMutationUsersQuery = <T>() => {
     mutate(options)
   }
 
-  const signUp = (registro: RegisterFormType) => { // registrarse
+  const signUp = (registro: SignUpFormSchema) => { // registrarse
     typeActionRef.current = "sign_up"
     const options: FetchOptions = {
       method: "POST",
@@ -309,7 +318,7 @@ export const useMutationUsersQuery = <T>() => {
     mutate(options)
   }
 
-  const signIn = (param: LoginForm) => { // iniciar sesion
+  const signIn = (param: SignInFormSchema) => { // iniciar sesion
     typeActionRef.current = "login"
     const options: FetchOptions = {
       method: "POST",

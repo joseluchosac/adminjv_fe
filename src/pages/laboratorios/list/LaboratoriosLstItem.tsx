@@ -1,47 +1,38 @@
-import { format, isValid, parseISO } from "date-fns";
+import { LaboratorioItem} from "../../../app/types";
 import { FaEdit, FaToggleOff, FaToggleOn, FaTrash } from "react-icons/fa";
+import { useMutationLaboratoriosQuery } from "../../../api/queries/useLaboratoriosQuery";
 import Swal from "sweetalert2";
+import useLayoutStore from "../../../app/store/useLayoutStore";
 import { useEffect } from "react";
 import { toast } from "react-toastify";
-import { QueryResp, UserItem } from "../../../app/types";
-import { useUsers } from "../context/UsersContext";
-import useLayoutStore from "../../../app/store/useLayoutStore";
-import { useMutationUsersQuery } from "../../../api/queries/useUsersQuery";
+import useLaboratoriosStore from "../../../app/store/useLaboratoriosStore";
 
 interface Props {
-  user: UserItem ;
+  laboratorio: LaboratorioItem ;
 }
-interface UserMutQryRes extends QueryResp {content: UserItem}
 
-function UsersLstItem({ user }: Props) {
-  const { dispatchUsers, stateUsers: {camposUser} } = useUsers()
+function LaboratoriosListItem({ laboratorio }: Props) {
   const darkMode = useLayoutStore(state => state.layout.darkMode)
+  const camposLaboratorio = useLaboratoriosStore(state => state.camposLaboratorio)
+  const setShowLaboratorioForm = useLaboratoriosStore(state=>state.setShowLaboratorioForm)
 
   const {
     data: mutation,
     isPending: isPendingMutation,
-    setStateUser,
-    deleteUser, 
-  } = useMutationUsersQuery<UserMutQryRes>()
-
-  const validDate = (date:string | undefined, formato = "dd/MM/yyyy") => {
-    if(!date) return ''
-    return isValid(parseISO(date)) ? format(date, formato) : ''
-  }
+    deleteLaboratorio,
+    setStateLaboratorio,
+  } = useMutationLaboratoriosQuery()
 
   const handleToEdit = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
     e.preventDefault()
-    dispatchUsers({
-      type: 'SET_SHOW_USER_FORM',
-      payload: {showUserForm: true, currentUserId: user.id},
-    });
+    setShowLaboratorioForm({showLaboratorioForm: true, currentLaboratorioId: laboratorio.id})
   }
-
+  
   const handleDelete = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
     e.preventDefault()
     Swal.fire({
       icon: 'question',
-      text: `¿Desea eliminar al usuario ${user.username}?`,
+      text: `¿Desea eliminar al laboratorio ${laboratorio.nombre}?`,
       showCancelButton: true,
       confirmButtonText: "Sí",
       cancelButtonText: 'Cancelar',
@@ -50,26 +41,25 @@ function UsersLstItem({ user }: Props) {
       }
     }).then((result) => {
       if (result.isConfirmed) {
-        deleteUser(user.id)
+        deleteLaboratorio(laboratorio.id)
       }
     });
   }
 
   const toggleEstado = () => {
-    setStateUser({estado: user.estado ? 0 : 1, id: user.id})
+    setStateLaboratorio({estado: laboratorio.estado ? 0 : 1, id: laboratorio.id})
   }
-
 
   useEffect(() => {
     if(!mutation) return
     toast(mutation.msg, { type: mutation.msgType})
   }, [mutation])
-
+  
   return (
     <tr className="text-nowrap">
-      {camposUser.filter(el=>el.show).map(el => {
-        switch (el.field_name){
-          case "acciones": {
+      {camposLaboratorio.filter(el=>el.show).map((el) => {
+        switch (el.field_name) {
+          case "acciones":{
             return (
               <td key={el.field_name}>
                 <div className="d-flex gap-2 justify-content-start position-relative">
@@ -80,7 +70,7 @@ function UsersLstItem({ user }: Props) {
                   <a onClick={handleDelete} href="#" title="Eliminar">
                     <FaTrash className="text-danger"/>
                   </a>
-                  {user.estado == 0
+                  {laboratorio.estado == 0
                     ? <div role="button" onClick={toggleEstado} title="Habilitar" data-estado="0">
                         <FaToggleOff className="text-muted" size={"1.3rem"} />
                       </div>
@@ -92,14 +82,11 @@ function UsersLstItem({ user }: Props) {
               </td>
             )
           }
-          case "created_at":
-          case "updated_at": {
-            return <td key={el.field_name}>{validDate(user[el.field_name ], 'dd/MM/yyyy')}</td>
-          }
-          default: {
+ 
+          default:{
             return (
-              <td key={el.field_name} className={`${user.estado == 0 ? 'text-body-tertiary' : ''}`}>
-                {user[el.field_name as keyof UserItem]}
+              <td key={el.field_name} className={`${laboratorio.estado == 0 ? 'text-body-tertiary' : ''}`}>
+                  {laboratorio[el.field_name as keyof LaboratorioItem]}
               </td>
             )
           }
@@ -109,4 +96,4 @@ function UsersLstItem({ user }: Props) {
   );
 }
 
-export default UsersLstItem;
+export default LaboratoriosListItem;

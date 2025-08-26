@@ -34,7 +34,6 @@ function ConfirmPass({show, setShow, onSuccess}: ConfirmPassProps) {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     checkPassword(password)
-    // onSuccess()
   }
 
   useEffect(() => {

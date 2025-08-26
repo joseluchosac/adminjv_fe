@@ -1,24 +1,19 @@
-import { useEffect, useRef, useState } from "react";
-import { Card, Container, Table } from "react-bootstrap";
-import { toast } from "react-toastify";
-import DynaIcon from "../../../app/components/DynaComponents";
-import { LdsBar, LdsEllipsisCenter } from "../../../app/components/Loaders";
-import { useProveedores } from "../context/ProveedoresContext";
+import { useRef } from "react";
+import { Card, Table } from "react-bootstrap";
 import { useFilterProveedoresQuery } from "../../../api/queries/useProveedoresQuery";
-import { camposProveedorInit } from "../../../app/utils/constants";
+import useProveedoresStore from "../../../app/store/useProveedoresStore";
+import { LdsBar, LdsEllipsisCenter } from "../../../app/components/Loaders";
+import DynaIcon from "../../../app/components/DynaComponents";
+import ProveedoresListItem from "./ProveedoresLstItem";
 import ProveedoresHead from "./ProveedoresHead";
-import ProveedoresTblRow from "./ProveedoresTblRow";
+import { ProveedoresFilter } from "./ProveedoresFilter";
 
 export default function ProveedoresLst() {
-  const [ camposProveedor, setCamposProveedor ] = useState(camposProveedorInit)
   const tableRef = useRef<HTMLDivElement | null>(null)
   const ldsEllipsisRef = useRef<HTMLDivElement | null>(null)
-  const {
-    setFilterInfoProveedores,
-    filterParamsProveedoresForm,
-    setFilterParamsProveedoresForm,
-  } = useProveedores()
-
+  const camposProveedor = useProveedoresStore(state => state.camposProveedor)
+  const setProveedorFilterFormSortTable = useProveedoresStore(state => state.setProveedorFilterFormSortTable)
+  
   const {
     data,
     fetchNextPage,
@@ -26,109 +21,70 @@ export default function ProveedoresLst() {
     isFetching,
     isError,
     hasNextPage,
-    setFilterParamsProveedores
-  } = useFilterProveedoresQuery();
-
+  } = useFilterProveedoresQuery()
+  
   const sort = (field_name:string, field_label: string, ctrlKey: boolean) => {
-    const orderIdx = filterParamsProveedoresForm.orders.findIndex(el => el.field_name === field_name)
-    if(ctrlKey){
-      if(orderIdx === -1){
-        const newOrder = {field_name, order_dir: "ASC", field_label}
-        setFilterParamsProveedoresForm({...filterParamsProveedoresForm, orders: [...filterParamsProveedoresForm.orders, newOrder]})
-      }else{
-        let newOrders = structuredClone(filterParamsProveedoresForm.orders)
-        if(newOrders[orderIdx].order_dir == "ASC"){
-          newOrders[orderIdx] = {field_name, order_dir: "DESC", field_label}
-          setFilterParamsProveedoresForm({...filterParamsProveedoresForm, orders: newOrders})
-        }else{
-          newOrders = newOrders.filter(el=>el.field_name !== field_name)
-          setFilterParamsProveedoresForm({...filterParamsProveedoresForm, orders: newOrders})
-        }
-      }
-    }else{
-      if(orderIdx === -1){
-        const newOrder = {field_name, order_dir: "ASC", field_label}
-        setFilterParamsProveedoresForm({...filterParamsProveedoresForm, orders: [newOrder]})
-      }else{
-        let newOrders = structuredClone(filterParamsProveedoresForm.orders)
-        if(newOrders[orderIdx].order_dir == "ASC"){
-          const newOrder = {field_name, order_dir: "DESC", field_label}
-          setFilterParamsProveedoresForm({...filterParamsProveedoresForm, orders: [newOrder]})
-        }else{
-          setFilterParamsProveedoresForm({...filterParamsProveedoresForm, orders: []})
-        }
-      }
-    }
+    setProveedorFilterFormSortTable({field_name, field_label, ctrlKey})
   };
 
-  useEffect(() => {
-    setFilterParamsProveedores(filterParamsProveedoresForm)
-  }, [filterParamsProveedoresForm])
-  
-  useEffect(()=>{
-    if(data?.pages[0].error || isError){
-      toast.error("Error al obtener registros")
-      return
-    }
-    if(!isFetching){
-      const {search, equals, between, orders} = filterParamsProveedoresForm
-      setFilterInfoProveedores({search, equals, between, orders})
-      const newCamposProveedores = camposProveedor.map(el=>{
-        const order = orders.find(order => order.field_name === el.field_name)
-        return order ? {...el, order_dir: order?.order_dir} : {...el, order_dir: ""}
-      })
-      setCamposProveedor(newCamposProveedores)
-    }
-  },[data, isError, isFetching])
+  const info = () => {
+    let mostrando  = data?.pages.reduce((acum, curval)=>{
+      return acum + curval.filas.length
+    },0)
+    const total = data?.pages[0]?.num_regs || 0
+    return total ? `${mostrando} de ${total} reg` : ' '
+  }
+
+  const handleNextPage = () => {fetchNextPage()};
+
 
   return (
-    <Container className="position-relative">
+    <div className="position-relative">
       {isFetching && <LdsBar />}
-      <ProveedoresHead />
-      <Card className="overflow-hidden mx-auto" >
+      <ProveedoresHead info={info()}/>
+      <ProveedoresFilter isFetching={isFetching} />
+      <Card className="overflow-hidden">
         <div className="position-relative">
           <div className="table-responsive" style={{ height: "73vh" }} ref={tableRef}>
-            {data && 
-              <Table striped hover className="mb-1">
-                <thead className="sticky-top">
-                  <tr className="text-nowrap">
-                    {camposProveedor && camposProveedor.map((el) => {
-                      return ( el.show && (
-                        <th
-                          key={el.field_name}
-                          onClick={(e)=>{
-                            if(!el.orderable) return
-                            sort(el.field_name, el.field_label, e.ctrlKey)
-                          }}
-                          role={el.orderable ? "button" : "columnheader"}
-                        >
-                          <div className="d-flex gap-1">
-                            <div>{el.field_label}</div>
-                            <div>
-                              {el.order_dir == "ASC" 
-                                ? (<DynaIcon className="text-warning" name="FaArrowDownAZ" />) 
-                                : el.order_dir == "DESC"
-                                  ? (<DynaIcon className="text-warning" name="FaArrowDownZA" />)
-                                  : ("")
-                              }
-                            </div>
+            <Table striped hover className="mb-1">
+              <thead className="sticky-top">
+                <tr className="text-nowrap">
+                  {camposProveedor && camposProveedor.filter(el=>el.show).map((el) => {
+                    return (
+                      <th
+                        key={el.field_name}
+                        onClick={(e) => {
+                          if(!el.orderable) return
+                          sort(el.field_name, el.field_label, e.ctrlKey)
+                        }}
+                        role={el.orderable ? "button" : "columnheader"}
+                      >
+                        <div className="d-flex gap-1">
+                          <div>{el.field_label}</div>
+                          <div>
+                            {el.order_dir == "ASC" 
+                              ? (<DynaIcon className="text-warning" name="FaArrowDownAZ" />) 
+                              : el.order_dir == "DESC"
+                                ? (<DynaIcon className="text-warning" name="FaArrowDownZA" />)
+                                : ("")
+                            }
                           </div>
-                        </th>
-                      ));
-                    })}
-                  </tr>
-                </thead>
-                <tbody>
-                  {data && data?.pages.flatMap(el => el.filas).map((proveedor) => (
-                    <ProveedoresTblRow key={proveedor.id} proveedor={proveedor} camposProveedor={camposProveedor}/>
-                  ))}
-                </tbody>
-              </Table>
-            }
+                        </div>
+                      </th>
+                    );
+                  })}
+                </tr>
+              </thead>
+              <tbody>
+                {data && data?.pages.flatMap(el => el.filas).map((proveedor) => (
+                  <ProveedoresListItem key={proveedor.id} proveedor={proveedor}/>
+                ))}
+              </tbody>
+            </Table>
             <div className="position-relative">
               {hasNextPage &&
                 <div className="m-3">
-                  <button onClick={()=>fetchNextPage()} className="btn btn-success">Cargar mas registros</button>
+                  <button onClick={handleNextPage} className="btn btn-success">Cargar mas registros</button>
                 </div>
               }
               {(data?.pages[0].num_regs === 0) && <div>No hay registros para mostrar</div>}
@@ -138,6 +94,6 @@ export default function ProveedoresLst() {
           {isError && <div className="text-danger">Error de conexion</div>}
         </div>
       </Card>
-    </Container>
+    </div>
   )
 }

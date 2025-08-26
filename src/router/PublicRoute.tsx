@@ -1,3 +1,4 @@
+import "../assets/css/auth.css"
 import { Navigate, Outlet } from "react-router-dom";
 import useSessionStore from "../app/store/useSessionStore";
 

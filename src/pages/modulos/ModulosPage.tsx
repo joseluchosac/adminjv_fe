@@ -11,11 +11,12 @@ import DynaIcon from "../../app/components/DynaComponents"
 import IconsModal from "../../app/components/IconsModal"
 import { LdsBar } from "../../app/components/Loaders"
 import { moduloFormInit } from "../../app/utils/constants"
+import { useQueryClient } from "@tanstack/react-query"
 
 const ModulosPage:React.FC = () => {
   const [showIconsModal, setShowIconsModal] = useState(false);
   const darkMode = useLayoutStore(state => state.layout.darkMode)
-
+  const queryClient = useQueryClient()
   const {
     data: mutation,
     isPending: isPendingMutation,
@@ -35,13 +36,6 @@ const ModulosPage:React.FC = () => {
     actualizarPadres,
     getModulos
   } = useModulos()
-
-
-  const {
-    data: modulosSession,
-    getModulosSession
-  } = useMutateModulosQuery()
-
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const {name, value} = e.currentTarget
@@ -123,16 +117,9 @@ const ModulosPage:React.FC = () => {
     if(mutation?.msgType == "success"){
       setModuloForm(moduloFormInit)
     }
-    getModulosSession()
     getModulos()
+    queryClient.invalidateQueries({queryKey: ['modulos_session']})
   }, [mutation])
-
-  useEffect(() => {
-    if(!modulosSession) return
-    if(modulosSession.content){
-    }
-  }, [modulosSession])
-
 
   return (
     <Container style={{maxWidth: "991.98px"}}>

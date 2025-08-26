@@ -1,4 +1,4 @@
-import "../../../assets/css/mainSidebar.css";
+import "../../../assets/css/sidebar-layout.css";
 import { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from 'react-router-dom';
 import { getModulosTree } from '../../utils/funciones';
@@ -7,9 +7,11 @@ import useLayoutStore from '../../store/useLayoutStore';
 import DynaIcon from '../DynaComponents';
 import useSessionStore from '../../store/useSessionStore';
 import { EmpresaInfo, Modulo } from '../../types';
-import { useModulosSessionQuery } from '../../../api/queries/useModulosQuery';
+import { isModulosSessionRes, useModulosSessionQuery } from '../../../api/queries/useModulosQuery';
 import SidebarNavItems from "./SidebarNavItems";
 import { useQueryClient } from "@tanstack/react-query";
+
+
 
 const SidebarLayout:React.FC = () => {
   const [modulosSesionTree, setModulosSesionTree] = useState<any>(null)
@@ -21,7 +23,7 @@ const SidebarLayout:React.FC = () => {
   const setModuloActual = useSessionStore(state => state.setModuloActual)
   const queryClient = useQueryClient()
   const empresa = queryClient.getQueryData(["empresa_info"]) as EmpresaInfo
-  const {modulosSession} = useModulosSessionQuery()
+  const {data: modulosSession} = useModulosSessionQuery()
 
   const handleSidebarMini = (e:React.MouseEvent) => {
     e.preventDefault();
@@ -45,7 +47,9 @@ const SidebarLayout:React.FC = () => {
 
   const activarItem = () => {
     const nombreModulo = location.pathname.split("/").filter(Boolean).pop();
-    const moduloActual = modulosSession?.find((el: Modulo) => el.nombre === nombreModulo)
+    const moduloActual = modulosSession && isModulosSessionRes(modulosSession) // call type guards
+      ? modulosSession.find((el: Modulo) => el.nombre === nombreModulo)
+      : null
 
     const navLinks = navSidebarRef.current?.querySelectorAll('.nav-link')
     navLinks?.forEach(el=>{
@@ -58,9 +62,9 @@ const SidebarLayout:React.FC = () => {
     if(navlinkParent) {
       navlinkParent?.children[0].classList.add('active-parent')
     }
-    if(moduloActual){
-      setModuloActual(moduloActual)
-    }
+    
+    setModuloActual(moduloActual || null)
+
     document.body.classList.remove("sidebar-show-responsive");
     document.title = moduloActual?.descripcion
     ? `${moduloActual?.descripcion} - ${empresa.nombre_comercial}`
@@ -69,7 +73,11 @@ const SidebarLayout:React.FC = () => {
 
   useEffect(() => {
     if(!modulosSession) return
-    setModulosSesionTree(getModulosTree(modulosSession))
+    if(("error" in modulosSession) && modulosSession.error){
+      console.log("Error al obtener modulos session")
+    }else{
+      setModulosSesionTree(getModulosTree(modulosSession as Modulo[]))
+    }
   }, [modulosSession])
 
   useEffect(() => {
@@ -95,15 +103,15 @@ const SidebarLayout:React.FC = () => {
     }
   },[layout])
 
-  useEffect(() => {
-    const nombreModulo = location.pathname.split("/").filter(Boolean).pop();
+  // useEffect(() => {
+    // const nombreModulo = location.pathname.split("/").filter(Boolean).pop();
     // if(!nombreModulo) navigate("/home")
-    if(!modulosSession) return
-    const idx = modulosSession.findIndex((el: Modulo) => el.nombre === nombreModulo)
-    if(idx === -1){
+    // if(!modulosSession) return
+    // const idx = modulosSession.findIndex((el: Modulo) => el.nombre === nombreModulo)
+    // if(idx === -1){
       // navigate("/home")
-    }
-  }, [navigate, modulosSession])
+    // }
+  // }, [navigate, modulosSession])
 
   return (
     <>

@@ -10,11 +10,11 @@ import {
   subMonths,
   subWeeks,
 } from "date-fns";
-import { CampoTable } from "../../../app/types";
+import { CampoTable, Rol } from "../../../app/types";
 import { useProductos } from "../context/ProductosContext";
 import { filterParamsInit } from "../../../app/utils/constants";
 import { LdsBar } from "../../../app/components/Loaders";
-import { useCajasQuery } from "../../../api/queries/useCatalogosQuery";
+import { isCajasRes, useCajasQuery } from "../../../api/queries/useCatalogosQuery";
 import { useRolesQuery } from "../../../api/queries/useRolesQuery";
 
 
@@ -221,7 +221,7 @@ const ProductosLstFilterMdl: React.FC<Props> = ({isFetching, camposProducto}) =>
                   onChange={handleChangeEqual}
                 >
                   <option value="">Todos</option>
-                  {roles?.map((el) => (
+                  {(roles as Rol[])?.map((el) => (
                     <option key={el.id} value={el.id}>
                       {el.rol}
                     </option>
@@ -237,7 +237,7 @@ const ProductosLstFilterMdl: React.FC<Props> = ({isFetching, camposProducto}) =>
                   onChange={handleChangeEqual}
                 >
                   <option value="">Todos</option>
-                  {cajas?.map((el) => (
+                  {cajas && isCajasRes(cajas) && cajas?.map((el) => (
                     <option key={el.id} value={el.id}>
                       {el.descripcion}
                     </option>

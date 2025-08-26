@@ -3,15 +3,18 @@ import { useMutation, useQuery } from "@tanstack/react-query"
 import useSessionStore from "../../app/store/useSessionStore"
 import { useEffect, useRef } from "react"
 import { useNavigate } from "react-router-dom"
-import { Caja, Categoria, FetchOptions, FormaPago, Impuesto, MotivoNota, TipoComprobante, TipoDocumento, TipoMoneda, TipoMovimiento, TipoMovimientoCaja, TipoOperacion, UnidadMedida } from "../../app/types"
+import { Caja, Categoria, FetchOptions, FormaPago, Impuesto, MotivoNota, QueryResp, TipoComprobante, TipoDocumento, TipoMoneda, TipoMovimiento, TipoMovimientoCaja, TipoOperacion, UnidadMedida } from "../../app/types"
 import { fnFetch } from "../fnFetch"
 
 
 // ****** CAJAS ******
-type DataCajas = {content: Caja[]}
+export type CajasRes = Caja[] | QueryResp
+export function isCajasRes(response: CajasRes): response is Caja[] {
+  return ('error' in response || (response as QueryResp).error == true);
+}
 export const useCajasQuery = () => {
   const tknSession = useSessionStore(state => state.tknSession)
-  const {data, isFetching} = useQuery<DataCajas>({
+  const {data, isFetching} = useQuery<CajasRes>({
     queryKey: ['cajas'],
     queryFn: () => {
       const options: FetchOptions = {
@@ -24,7 +27,7 @@ export const useCajasQuery = () => {
   })
 
   return {
-    cajas: data?.content,
+    cajas: data,
     isFetching
   }
 }

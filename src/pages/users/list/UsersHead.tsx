@@ -9,15 +9,15 @@ import {
   Row,
   Stack,
 } from "react-bootstrap";
-import { FaFileExcel, FaFilePdf, FaFilter } from "react-icons/fa";
-import { LdsBar } from "../../../app/components/Loaders";
+import { FaFilter} from "react-icons/fa";
+import { BsFiletypePdf, BsFiletypeXlsx } from "react-icons/bs";
 import DynaIcon from "../../../app/components/DynaComponents";
 import { objToUriBase64 } from "../../../app/utils/funciones";
 import { useUsers } from "../context/UsersContext";
 
-type Props = { isFetching: boolean, info:string };
+type Props = { info:string };
 
-export default function UsersHead({ isFetching, info }: Props) {
+export default function UsersHead({ info }: Props) {
   const {
     stateUsers:{
       userFilterInfo: { equal, between, order },
@@ -69,7 +69,7 @@ export default function UsersHead({ isFetching, info }: Props) {
 
   return (
     <Container className="mb-2 pt-2 position-relative">
-      {isFetching && <LdsBar />}
+      {/* {isFetching && <LdsBar />} */}
       <Row className="align-items-center mb-2">
         <Col sm className="text-center text-sm-start">
           <h5>Lista de Usuarios</h5>
@@ -101,22 +101,18 @@ export default function UsersHead({ isFetching, info }: Props) {
         <Col className="text-center flex-sm-grow-0">
           <div className="d-flex justify-content-center align-items-center gap-3">
             <div className="d-flex">
-              <div
-                role="button"
-                className="d-flex align-items-center px-2 boton-icon"
-                title="Generar archivo xls"
+              <Button variant="outline-success" className="border-0"
+                title="Generar archivo excel"
                 onClick={handleTraerTodo}
               >
-                <FaFileExcel className="fs-5 text-success" />
-              </div>
-              <div
-                role="button"
-                className="d-flex align-items-center px-2 boton-icon"
+                <BsFiletypeXlsx className="fs-5" />
+              </Button>
+              <Button variant="outline-danger" className="border-0"
                 title="Generar archivo pdf"
                 onClick={handleTraerTodo}
               >
-                <FaFilePdf className="fs-5 text-danger" />
-              </div>
+                <BsFiletypePdf className="fs-5" />
+              </Button>
             </div>
             <Button onClick={handleNuevo} variant="primary">
               Nuevo

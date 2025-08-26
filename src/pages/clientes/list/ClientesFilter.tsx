@@ -1,86 +1,69 @@
 import { useMemo, useRef } from 'react';
 import { Card, Col, Form, Row } from 'react-bootstrap';
 import Offcanvas from 'react-bootstrap/Offcanvas';
-import { useUsers } from '../context/UsersContext';
-import { CommonPeriod, EqualItem, Rol } from '../../../app/types';
-import { useRolesQuery } from '../../../api/queries/useRolesQuery';
-import { useCajasQuery } from '../../../api/queries/useCatalogosQuery';
+import { CommonPeriod, EqualItem } from '../../../app/types';
+import { useTiposDocumentoQuery } from '../../../api/queries/useCatalogosQuery';
 import { commonPeriods } from '../../../app/utils/constants';
 import { LdsBar } from '../../../app/components/Loaders';
+import useClientesStore from '../../../app/store/useClientesStore';
 
 type Props = {isFetching: boolean;}
 
-export function UsersFilter({isFetching}: Props) {
-  const {roles} = useRolesQuery()
-  const {cajas} = useCajasQuery()
-  
+export function ClientesFilter({isFetching}: Props) {
+  const clienteFilterForm = useClientesStore(state => state.clienteFilterForm)
+  const showClientesFilter = useClientesStore(state => state.showClientesFilter)
+  const camposCliente = useClientesStore(state => state.camposCliente)
+  const setClienteFilterFormSort = useClientesStore(state => state.setClienteFilterFormSort)
+  const setClienteFilterFormEqual = useClientesStore(state => state.setClienteFilterFormEqual)
+  const setClienteFilterFormBetweenField = useClientesStore(state => state.setClienteFilterFormBetweenField)
+  const setClienteFilterFormBetweenPeriod = useClientesStore(state => state.setClienteFilterFormBetweenPeriod)
+  const setClienteFilterFormBetweenDate = useClientesStore(state => state.setClienteFilterFormBetweenDate)
+  const setShowClienteFilter = useClientesStore(state => state.setShowClienteFilter)
+  const {tiposDocumento} = useTiposDocumentoQuery()
   const orderRef = useRef<HTMLSelectElement | null>(null)
   const orderDirRef = useRef<HTMLSelectElement | null>(null)
   
-  const {
-    stateUsers: { showUsersFilter, userFilterForm, camposUser },
-    dispatchUsers
-  } = useUsers()
+
 
   const sort = () => {
     const field_name = orderRef.current?.value || ""
     const field_label = orderRef.current?.options[orderRef.current?.selectedIndex].textContent || ""
     const order_dir = orderDirRef.current?.value as "ASC" | "DESC"
-    dispatchUsers({
-      type: 'SET_USER_FILTER_FORM_SORT',
-      payload: {field_name, field_label, order_dir}
-    });
+    setClienteFilterFormSort({field_name, field_label, order_dir})
   }
 
   const equals = useMemo(() => {
     const equalsInit = {
-      rol: userFilterForm.equal.find(el => el.field_name === "rol")?.field_value || "",
-      caja: userFilterForm.equal.find(el => el.field_name === "caja")?.field_value || "",
-      estado: userFilterForm.equal.find(el => el.field_name === "estado")?.field_value || ""
+      tipo_documento: clienteFilterForm.equal.find(el => el.field_name === "tipo_documento")?.field_value || "",
     }
     return equalsInit
-  }, [userFilterForm.equal]);
+  }, [clienteFilterForm.equal]);
 
   const filterEqual = ({field_name, field_value, field_label}: EqualItem) => {
-    dispatchUsers({
-      type: 'SET_USER_FILTER_FORM_EQUAL',
-      payload: { field_name, field_value, field_label }
-    });
+    setClienteFilterFormEqual({ field_name, field_value, field_label })
   }
 
   const handleFilterBetweenField = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const field_name = e.currentTarget.value;
     const field_label = e.currentTarget.options[e.currentTarget.selectedIndex].textContent || ""
-    dispatchUsers({
-      type: 'SET_USER_FILTER_FORM_BETWEEN_FIELD',
-      payload: { field_name, field_label }
-    });
+    setClienteFilterFormBetweenField({ field_name, field_label })
   };
 
   const filterBetweenPeriod = (periodKey: CommonPeriod["key"]) => {
-    dispatchUsers({
-      type: 'SET_USER_FILTER_FORM_BETWEEN_PERIOD',
-      payload: { periodKey }
-    });
+    setClienteFilterFormBetweenPeriod({ periodKey })
   }
 
   const handleFilterBetweenDate = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.currentTarget;
-    dispatchUsers({
-      type: 'SET_USER_FILTER_FORM_BETWEEN_DATE',
-      payload: { name, value }
-    });
+    setClienteFilterFormBetweenDate({ name, value })
   };
 
   const handleOnHide = () => {
-    dispatchUsers({
-      type: "SET_SHOW_USER_FILTER",
-      payload: false
-    })
+    setShowClienteFilter(false)
   }
 
   return (
-    <Offcanvas show={showUsersFilter} placement='end' onHide={handleOnHide}>
+    <Offcanvas show={showClientesFilter} placement='end' onHide={handleOnHide}>
       <Offcanvas.Header closeButton>
         <Offcanvas.Title>Filtros de usuarios</Offcanvas.Title>
       </Offcanvas.Header>
@@ -98,11 +81,11 @@ export function UsersFilter({isFetching}: Props) {
                   ref={orderRef}
                   id="f_order"
                   name="order"
-                  value={userFilterForm.order.length ? userFilterForm.order[0].field_name : ""}
+                  value={clienteFilterForm.order.length ? clienteFilterForm.order[0].field_name : ""}
                   onChange={()=> sort()}
                 >
                   <option value="">Ninguno</option>
-                  {camposUser && camposUser.filter(el=>el.orderable).map(el=>{
+                  {camposCliente && camposCliente.filter(el=>el.orderable).map(el=>{
                     return <option key={el.field_name} value={el.field_name}>{el.field_label}</option>
                   })}
                 </Form.Select>
@@ -111,10 +94,10 @@ export function UsersFilter({isFetching}: Props) {
                 <Form.Label htmlFor="f_order_dir">Dir</Form.Label>
                 <Form.Select
                   ref={orderDirRef}
-                  disabled={!Boolean(userFilterForm.order.length)}
+                  disabled={!Boolean(clienteFilterForm.order.length)}
                   id="f_order_dir"
                   name="order_dir"
-                  value={userFilterForm.order.length ? userFilterForm.order[0].order_dir : "ASC"}
+                  value={clienteFilterForm.order.length ? clienteFilterForm.order[0].order_dir : "ASC"}
                   onChange={()=> sort()}
                 >
                   <option value="ASC">Ascendente</option>
@@ -129,69 +112,25 @@ export function UsersFilter({isFetching}: Props) {
           <Card.Body>
             <Form>
               <Form.Group as={Row} className="mb-3">
-                <Form.Label column xs="3" htmlFor="f_rol">Rol</Form.Label>
+                <Form.Label column xs="4" htmlFor="f_tipo_documento">Tipo Doc.</Form.Label>
                 <Col>
                   <Form.Select
-                    id="f_rol"
-                    value={equals.rol as string}
+                    id="f_tipo_documento"
+                    value={equals.tipo_documento as string}
                     onChange={(e)=>{
                       filterEqual({
-                        field_name:'rol',
+                        field_name:'tipo_documento',
                         field_value: e.target.value,
-                        field_label: "Rol"
+                        field_label: "T Documento"
                       })
                     }}
                   >
                     <option value="">Todos</option>
-                    {(roles as Rol[])?.map((el) => (
-                      <option key={el.id} value={el.rol}>
-                        {el.rol}
-                      </option>
-                    ))}
-                  </Form.Select>
-                </Col>
-              </Form.Group>
-              <Form.Group as={Row} className="mb-3">
-                <Form.Label column xs="3" htmlFor="f_caja">Caja</Form.Label>
-                <Col>
-                  <Form.Select
-                    id="f_caja"
-                    value={equals.caja as string}
-                    onChange={(e)=>{
-                      filterEqual({
-                        field_name:'caja',
-                        field_value: e.target.value,
-                        field_label: "Caja"
-                      })
-                    }}
-                  >
-                    <option value="">Todos</option>
-                    {cajas?.map((el) => (
+                    {tiposDocumento?.map((el) => (
                       <option key={el.id} value={el.descripcion}>
                         {el.descripcion}
                       </option>
                     ))}
-                  </Form.Select>
-                </Col>
-              </Form.Group>
-              <Form.Group as={Row} className="mb-3">
-                <Form.Label column xs="3" htmlFor="f_estado">Estado</Form.Label>
-                <Col>
-                  <Form.Select
-                    id="f_estado"
-                    name="estado"
-                    value={equals.estado as string}
-                    onChange={(e)=>{
-                      filterEqual({
-                        field_name:'estado',
-                        field_value: e.target.value,
-                        field_label: "Estado"
-                      })
-                    }}
-                  >
-                    <option value="">Todos</option>
-                    <option value="1">Habilidato</option>
-                    <option value="0">Deshabilitado</option>
                   </Form.Select>
                 </Col>
               </Form.Group>
@@ -207,7 +146,7 @@ export function UsersFilter({isFetching}: Props) {
                 <Form.Select
                   id="f_entre"
                   name="field_name"
-                  value={userFilterForm.between[0]?.field_name || ""}
+                  value={clienteFilterForm.between[0]?.field_name || ""}
                   onChange={handleFilterBetweenField}
                 >
                   <option value="">Ninguno</option>
@@ -220,8 +159,8 @@ export function UsersFilter({isFetching}: Props) {
                 <Form.Select
                   id="periodos"
                   name="periodos"
-                  disabled={!Boolean(userFilterForm.between[0]?.field_name)}
-                  value={userFilterForm.between[0]?.betweenName || ""}
+                  disabled={!Boolean(clienteFilterForm.between[0]?.field_name)}
+                  value={clienteFilterForm.between[0]?.betweenName || ""}
                   onChange={(e) => {
                     filterBetweenPeriod(e.target.value as CommonPeriod["key"])                    
                   }}
@@ -239,11 +178,11 @@ export function UsersFilter({isFetching}: Props) {
                   Del
                 </Form.Label>
                 <Form.Control
-                  disabled={!Boolean(userFilterForm.between[0]?.field_name) || Boolean(userFilterForm.between[0]?.betweenName)}
+                  disabled={!Boolean(clienteFilterForm.between[0]?.field_name) || Boolean(clienteFilterForm.between[0]?.betweenName)}
                   type="date"
                   name="from"
                   id="from"
-                  value={userFilterForm.between[0]?.from.split(" ")[0] || ""}
+                  value={clienteFilterForm.between[0]?.from.split(" ")[0] || ""}
                   onChange={handleFilterBetweenDate}
                 />
               </Col>
@@ -252,11 +191,11 @@ export function UsersFilter({isFetching}: Props) {
                   Al
                 </Form.Label>
                 <Form.Control
-                  disabled={!Boolean(userFilterForm.between[0]?.field_name) || Boolean(userFilterForm.between[0]?.betweenName)}
+                  disabled={!Boolean(clienteFilterForm.between[0]?.field_name) || Boolean(clienteFilterForm.between[0]?.betweenName)}
                   type="date"
                   name="to"
                   id="to"
-                  value={userFilterForm.between[0]?.to.split(" ")[0] || ""}
+                  value={clienteFilterForm.between[0]?.to.split(" ")[0] || ""}
                   onChange={handleFilterBetweenDate}
                 />
               </Col>

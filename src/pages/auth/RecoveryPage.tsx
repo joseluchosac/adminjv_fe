@@ -1,26 +1,27 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Alert, Button, Card, Form, InputGroup } from "react-bootstrap"
 import { LdsBar } from "../../app/components/Loaders"
 import DynaIcon from "../../app/components/DynaComponents"
-import { FormsAuth, LoginForm, QueryResp } from "../../app/types";
+import { QueryResp, RecoveryFormSchema } from "../../app/types";
 import { useMutationUsersQuery } from "../../api/queries/useUsersQuery";
 import { toast } from "react-toastify";
+import { useForm } from "react-hook-form";
+import { recoveryFormSchema } from "../../app/types/schemas";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Link } from "react-router-dom";
 
-type RecoveryPasswordProps = {
-  loginForm: LoginForm;
-  email: string;
-  handleShowForm: (e:React.MouseEvent<HTMLAnchorElement, MouseEvent>) => void;
-  formsAuth: FormsAuth;
-}
+const RecoveryPage: React.FC = () => {
+  const recovPlain = sessionStorage.getItem("recov") || ""
+  const recov = JSON.parse(recovPlain) as {username: string, email: string}
+  const {
+    register,
+    formState: { errors },
+    handleSubmit,
+    getValues,
+  } = useForm<RecoveryFormSchema>({
+    resolver: zodResolver(recoveryFormSchema),
+  })
 
-const RecoveryPassword: React.FC<RecoveryPasswordProps> = ({
-  loginForm,
-  email,
-  handleShowForm,
-  formsAuth,
-}) => {
-
-  const [restoreForm, setRestoreForm] = useState({code:"", new_password:"", new_confirm_password:""})
   const {
     data: dataRestore,
     isPending: isPendingRestore,
@@ -33,18 +34,14 @@ const RecoveryPassword: React.FC<RecoveryPasswordProps> = ({
     sendCodeRestoration
   } = useMutationUsersQuery<QueryResp>()
 
-  const handleChangeRestoreForm = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setRestoreForm({ ...restoreForm, [e.target.name]: e.target.value });
-  };
-
   const handleSendCodeRestoration = () => {
-    const params = {email, username: loginForm.username}
-    sendCodeRestoration(params)
+    const params = {email: recov.email, username: recov.username}
+    // sendCodeRestoration(params) // Trabajando en ello
   }
 
   const handleRestorePassword = (e: React.FormEvent) => {
-    e.preventDefault();
-    restorePassword(restoreForm)
+    // e.preventDefault();
+    // restorePassword(restoreForm)
   };
 
   useEffect(() => {
@@ -70,21 +67,20 @@ const RecoveryPassword: React.FC<RecoveryPasswordProps> = ({
       }
       <div className="text-center mb-3">
         <h4>Crear nueva contraseña</h4>
+        <p className="text-center mb-2">{recov.username}</p>
       </div>
       <div className="mb-3">
           <div className="text-center mb-2">
             <Button size="sm" onClick={handleSendCodeRestoration}>Enviar código al email</Button>
           </div>
-          <p className="text-center mb-2">{email}</p>
+          <p className="text-center mb-2">{recov.email}</p>
       </div>
       <Form className="form-login" onSubmit={handleRestorePassword}>
         <InputGroup className="mb-3">
           <Form.Control
             placeholder="Código de 6 dígitos"
             type="text"
-            name="code"
-            value={restoreForm.code}
-            onChange={handleChangeRestoreForm}
+            {...register("recovery_code")}
           />
           <InputGroup.Text id="basic-addon2"><DynaIcon name="LuRectangleEllipsis" /></InputGroup.Text>
         </InputGroup>
@@ -92,9 +88,7 @@ const RecoveryPassword: React.FC<RecoveryPasswordProps> = ({
           <Form.Control
             placeholder="Nueva contraseña"
             type="password"
-            name="new_password"
-            value={restoreForm.new_password}
-            onChange={handleChangeRestoreForm}
+            {...register("new_password")}
           />
           <InputGroup.Text id="basic-addon2"><DynaIcon name="FaLock" /></InputGroup.Text>
         </InputGroup>
@@ -102,24 +96,22 @@ const RecoveryPassword: React.FC<RecoveryPasswordProps> = ({
           <Form.Control
             placeholder="Repetir nueva contraseña"
             type="password"
-            name="new_confirm_password"
-            value={restoreForm.new_confirm_password}
-            onChange={handleChangeRestoreForm}
+            {...register("confirm_new_password")}
           />
           <InputGroup.Text id="basic-addon2"><DynaIcon name="FaLock" /></InputGroup.Text>
         </InputGroup>
         <div className="d-flex justify-content-end mb-3">
           <Button variant="primary" type="submit">
-            Guardar los cambios
+            Crear
           </Button>
         </div>
       </Form>
       <div>
-        <a href="#" onClick={handleShowForm} data-form={formsAuth.formOfLogin}>Login</a>
+        <Link to="/signin">Iniciar sesión</Link>
       </div>
     </Card.Body>
   </Card>
   )
 }
 
-export default RecoveryPassword
+export default RecoveryPage

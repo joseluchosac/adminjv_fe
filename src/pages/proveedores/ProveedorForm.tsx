@@ -35,14 +35,22 @@ import useSessionStore from "../../app/store/useSessionStore";
 import { useTiposDocumentoQuery } from "../../api/queries/useCatalogosQuery";
 import { fnFetch } from "../../api/fnFetch";
 
-interface NroDocumentoQryRes extends QueryResp {
-  content: NroDocumento;
+type NroDocumentoRes = NroDocumento | QueryResp
+export function isErrNroDocumentoRes(response: NroDocumentoRes): response is QueryResp {
+  return ('error' in response || (response as QueryResp).error == true);
 }
-interface ProveedorQryRes extends QueryResp {
-  content: Proveedor;
+
+type ProveedorRes = Proveedor | QueryResp
+export function isErrProveedorRes(response: ProveedorRes): response is QueryResp {
+  return ('error' in response || (response as QueryResp).error == true);
 }
+
+type MutationRes = QueryResp & {
+  proveedor?: Proveedor
+};
+
 type Props = {
-  onMutation?: (proveedor: Proveedor)=>void;
+  onMutation?: (proveedor: Proveedor | undefined)=>void;
 }
 
 export default function ProveedorForm({onMutation}:Props) {
@@ -57,25 +65,25 @@ export default function ProveedorForm({onMutation}:Props) {
   const {tiposDocumento} = useTiposDocumentoQuery()
 
   const {
-    data: proveedor,
+    data: proveedorRes,
     isPending: isPendingProveedor,
     isError: isErrorProveedor,
     getProveedor,
-  } = useMutationProveedoresQuery<ProveedorQryRes>();
+  } = useMutationProveedoresQuery<ProveedorRes>();
 
   const {
-    data: mutation,
+    data: mutationRes,
     isPending: isPendingMutation,
     createProveedor,
     updateProveedor,
-  } = useMutationProveedoresQuery<ProveedorQryRes>();
+  } = useMutationProveedoresQuery<MutationRes>();
 
   const {
-    data: nroDocumento,
+    data: nroDocumentoRes,
     isPending: isPendingNroDocumento,
     consultarNroDocumento,
     reset: resetNroDocumento,
-  } = useMutationProveedoresQuery<NroDocumentoQryRes>();
+  } = useMutationProveedoresQuery<NroDocumentoRes>();
 
   const {
     register,
@@ -148,13 +156,13 @@ export default function ProveedorForm({onMutation}:Props) {
 
   const resetForm = () => {
     reset(proveedorFormInit);
-    if(nroDocumento){
+    if(nroDocumentoRes){
       resetNroDocumento();
     }
   };
 
   const handleClose = () => {
-    setShowProveedorForm(false);
+    setShowProveedorForm({showProveedorForm: false, currentProveedorId: 0});
   };
 
   useEffect(() => {
@@ -168,49 +176,47 @@ export default function ProveedorForm({onMutation}:Props) {
   }, [showProveedorForm]);
 
   useEffect(() => {
-    if (!nroDocumento) return;
-    if (!nroDocumento.error) {
-      setValue("id", nroDocumento.content.id);
-      setValue("nombre_razon_social", nroDocumento.content.nombre_razon_social);
-      setValue("direccion", nroDocumento.content.direccion);
-      setValue("ubigeo_inei", nroDocumento.content.ubigeo);
-      setValue("dis_prov_dep", nroDocumento.content.dis_prov_dep);
-      setValue("email", nroDocumento.content.email);
-      setValue("telefono", nroDocumento.content.telefono);
+    if (!nroDocumentoRes) return;
+    if (isErrNroDocumentoRes(nroDocumentoRes)){
+      toast(nroDocumentoRes.msg, { type: nroDocumentoRes.msgType });
+    }else{
+      setValue("id", nroDocumentoRes.id);
+      setValue("nombre_razon_social", nroDocumentoRes.nombre_razon_social);
+      setValue("direccion", nroDocumentoRes.direccion);
+      setValue("ubigeo_inei", nroDocumentoRes.ubigeo);
+      setValue("dis_prov_dep", nroDocumentoRes.dis_prov_dep);
+      setValue("email", nroDocumentoRes.email);
+      setValue("telefono", nroDocumentoRes.telefono);
       setValue("api", 1, { shouldDirty: true });
-    } else {
-      toast(nroDocumento.msg, { type: nroDocumento.msgType });
     }
-  }, [nroDocumento]);
+  }, [nroDocumentoRes]);
 
   useEffect(() => {
-    if (!proveedor) return;
-    if (proveedor.error) {
-      toast.error("Error al obtener los datos");
-      setShowProveedorForm(false);
-    } else {
-      if (proveedor.content) {
-        reset(proveedor.content);
-      }
+    if (!proveedorRes) return;
+    if(isErrProveedorRes(proveedorRes)){
+      toast.error("Error al obtener los datos del proveedor");
+      setShowProveedorForm({showProveedorForm: false, currentProveedorId: 0});
+    }else{
+      reset(proveedorRes);
     }
-  }, [proveedor]);
+  }, [proveedorRes]);
 
   useEffect(() => {
     if (!isErrorProveedor) return;
     toast.error("Error de conexion");
-    setShowProveedorForm(false);
+    setShowProveedorForm({showProveedorForm: false, currentProveedorId: 0});
   }, [isErrorProveedor]);
 
   useEffect(() => {  
-    if (!mutation) return;
-    if(mutation?.msgType === 'success'){
+    if (!mutationRes) return;
+    if(mutationRes?.msgType === 'success'){
       if(onMutation){
-        onMutation(mutation.content)
+        onMutation(mutationRes?.proveedor)
       }
-      setShowProveedorForm(false)
+      setShowProveedorForm({showProveedorForm: false, currentProveedorId: 0})
     }
-    toast(mutation.msg, { type: mutation.msgType });
-  }, [mutation]);
+    toast(mutationRes.msg, { type: mutationRes.msgType });
+  }, [mutationRes]);
 
   return (
     <div>
@@ -243,7 +249,7 @@ export default function ProveedorForm({onMutation}:Props) {
                     },
                   })}
                   disabled={
-                    nroDocumento?.content?.nombre_razon_social ||
+                    (nroDocumentoRes as NroDocumento)?.nombre_razon_social ||
                     currentProveedorId
                       ? true
                       : false
@@ -267,15 +273,15 @@ export default function ProveedorForm({onMutation}:Props) {
                   className="d-flex justify-content-between"
                 >
                   <div>Nro Doc</div>
-                  {nroDocumento?.content && (
+                  {nroDocumentoRes && (
                     <Badge
                       bg={
-                        nroDocumento?.content.estado_sunat == "ACTIVO"
+                        (nroDocumentoRes as NroDocumento)?.estado_sunat == "ACTIVO"
                           ? "success"
                           : "warning"
                       }
                     >
-                      {nroDocumento?.content.estado_sunat}
+                      {(nroDocumentoRes as NroDocumento)?.estado_sunat}
                     </Badge>
                   )}
                 </Form.Label>
@@ -294,7 +300,7 @@ export default function ProveedorForm({onMutation}:Props) {
                       },
                     })}
                     disabled={
-                      nroDocumento?.content?.nombre_razon_social ||
+                      (nroDocumentoRes as NroDocumento)?.nombre_razon_social ||
                       currentProveedorId
                         ? true
                         : false
@@ -332,7 +338,7 @@ export default function ProveedorForm({onMutation}:Props) {
                     },
                   })}
                   disabled={
-                    nroDocumento?.content?.nombre_razon_social ? true : false
+                    (nroDocumentoRes as NroDocumento)?.nombre_razon_social ? true : false
                   }
                 />
                 {errors.nombre_razon_social && (
@@ -347,15 +353,15 @@ export default function ProveedorForm({onMutation}:Props) {
                   className="d-flex justify-content-between"
                 >
                   <div>Dirección</div>
-                  {nroDocumento?.content && (
+                  {nroDocumentoRes && (
                     <Badge
                       bg={
-                        nroDocumento?.content?.condicion_sunat == "HABIDO"
+                        (nroDocumentoRes as NroDocumento)?.condicion_sunat == "HABIDO"
                           ? "success"
                           : "warning"
                       }
                     >
-                      {nroDocumento?.content?.condicion_sunat}
+                      {(nroDocumentoRes as NroDocumento)?.condicion_sunat}
                     </Badge>
                   )}
                 </Form.Label>
@@ -376,7 +382,7 @@ export default function ProveedorForm({onMutation}:Props) {
                       }
                     },
                   })}
-                  disabled={nroDocumento?.content?.direccion ? true : false}
+                  disabled={(nroDocumentoRes as NroDocumento)?.direccion ? true : false}
                 />
                 {errors.direccion && (
                   <div className="invalid-feedback d-block">
@@ -404,6 +410,7 @@ export default function ProveedorForm({onMutation}:Props) {
                         // defaultOptions
                         styles={darkMode ? selectDark : undefined}
                         isClearable
+                        isDisabled={(nroDocumentoRes as NroDocumento)?.ubigeo ? true : false}
                         value={{
                           value: getValues().ubigeo_inei,
                           label: getValues().dis_prov_dep,

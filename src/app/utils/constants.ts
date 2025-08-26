@@ -60,12 +60,6 @@ export const moduloFormInit = {
   orden: 0,
 }
 
-//--> ROLES
-// *****************************************************
-export const rolFormInit = {
-  id: 0,
-  rol: "",
-}
 // ✅✅NUEVA ESTRUCTURA FILTER PARAMS✅✅
 export const filterParamInit: FilterParam = {
   offset: 25,
@@ -188,7 +182,6 @@ export const camposUserInit: CampoTable[] = [
   {show: true, orderable: true, order_dir:"", field_name: "created_at", field_label:"F creación",},
   {show: true, orderable: true, order_dir:"", field_name: "updated_at", field_label:"F actualización",},
 ]
-
 export const camposMarcaInit: CampoTable[] = [
   {show: true, orderable: false, order_dir:"", field_name: "acciones", field_label:"Acciones",},
   {show: false, orderable: true, order_dir:"", field_name: "id", field_label:"Id",},
@@ -199,7 +192,7 @@ export const camposLaboratorioInit: CampoTable[] = [
   {show: true, orderable: false, order_dir:"", field_name: "acciones", field_label:"Acciones",},
   {show: false, orderable: true, order_dir:"", field_name: "id", field_label:"Id",},
   {show: true, orderable: true, order_dir:"", field_name: "nombre", field_label:"Nombre",},
-  {show: true, orderable: true, order_dir:"", field_name: "estado", field_label:"Estado",},
+  {show: false, orderable: true, order_dir:"", field_name: "estado", field_label:"Estado",},
 ]
 export const camposProductoInit: CampoTable[] = [
   {show: true, orderable: false, order_dir:"", field_name: "acciones", field_label:"Acciones",},
@@ -225,7 +218,7 @@ export const camposClienteInit: CampoTable[] = [
   {show: true, orderable: true, order_dir: "", field_name: "telefono", field_label:"Teléf.",},
 ]
 export const camposProveedorInit: CampoTable[] = [
-  {show: true, orderable: true, order_dir:"", field_name: "acciones", field_label:"",},
+  {show: true, orderable: false, order_dir:"", field_name: "acciones", field_label:"",},
   {show: false, orderable: true, order_dir:"", field_name: "id", field_label:"Id",},
   {show: true, orderable: true, order_dir:"", field_name: "nro_documento", field_label:"Nro Doc",},
   {show: true, orderable: true, order_dir:"", field_name: "nombre_razon_social", field_label:"Razon Social",},

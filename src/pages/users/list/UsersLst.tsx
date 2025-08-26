@@ -3,10 +3,10 @@ import { Card, Table } from "react-bootstrap";
 import { useFilterUsersQuery } from "../../../api/queries/useUsersQuery";
 import DynaIcon from "../../../app/components/DynaComponents";
 import { UserItem } from "../../../app/types";
-import { LdsEllipsisCenter } from "../../../app/components/Loaders";
+import { LdsBar, LdsEllipsisCenter } from "../../../app/components/Loaders";
 import UsersHead from "./UsersHead";
-import UsersFilter from "./UsersFilter";
 import UsersLstItem from "./UsersLstItem";
+import { UsersFilter } from "./UsersFilter";
 
 
 export default function UsersLst() {
@@ -42,13 +42,16 @@ export default function UsersLst() {
   }
 
   const handleNextPage = () => {fetchNextPage()};
-
+  if(!data && !isFetching){
+    return <div>Error al obtener lista</div>
+  }
   return (
-    <>
-      <UsersHead isFetching={isFetching} info={info()}/>
+    <div className="position-relative">
+      {isFetching && <LdsBar />}
+      <UsersHead info={info()}/>
+      <UsersFilter isFetching={isFetching} />
       <Card className="overflow-hidden">
         <div className="position-relative">
-          <LdsEllipsisCenter innerRef={ldsEllipsisRef} className={`position-absolute ${isFetching ? '' : 'd-none'}`} />
           <div className="table-responsive" style={{ height: "73vh" }} ref={tableRef}>
             <Table striped hover className="mb-1">
               <thead className="sticky-top">
@@ -98,7 +101,6 @@ export default function UsersLst() {
           {isError && <div className="text-danger">Error de conexion</div>}
         </div>
       </Card>
-      <UsersFilter isFetching={isFetching}  />
-    </>
+    </div>
   )
 }
