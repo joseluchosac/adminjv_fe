@@ -1,11 +1,18 @@
 import { z } from "zod";
 import {
-  profileFormSchema,
-  recoveryFormSchema,
-  signInFormSchema,
-  signUpFormSchema,
-  userFormSchema,
-} from "./schemas";
+  RecoveryFormSchema,
+  SignInFormSchema,
+  SignUpFormSchema,
+} from "../schemas/auth-schema";
+import {
+  ProfileSchema,
+  ProfileFormSchema,
+  UserFormSchema,
+  UserItemSchema,
+  UserSessionSchema,
+} from "../schemas/users-schema";
+import { CajaSchema, FormaPagoSchema, ImpuestoSchema, MotivoNotaSchema, TipoComprobanteSchema, TipoDocumentoSchema, TipoEstablecimientoSchema, TipoMonedaSchema, TipoMovimientoCajaSchema, TipoMovimientoSchema, TipoOperacionSchema, UnidadMedidaSchema } from "../schemas/catalogos-schema";
+import { CategoriaSchema } from "../schemas/categorias-schema";
 
 // ✅ TIPO PARA EL EVENTO ON CHANGE DE UN ELEMENTO DE FORMULARIO
 export declare type FormControlElement =
@@ -52,89 +59,7 @@ export type CampoTable = {
   order_dir: string;
   show: boolean;
 };
-// ✅ TIPO PARA EL MODULO AUTH
-// export type FormsAuth = {
-//   formOfLogin: string;
-//   formOfForgot: string;
-// };
-// export type LoginForm = {
-//   username: string;
-//   password: string;
-//   establecimiento_id: string;
-// };
-export type RestoreForm = {
-  code: string;
-  new_password: string;
-  new_confirm_password: string;
-};
-// ✅ TIPOS PARA USUARIO
-export type User = {
-  id: number;
-  nombres: string;
-  apellidos: string;
-  username: string;
-  email: string;
-  rol_id: number;
-  rol: string;
-  caja_id: number;
-  caja: string;
-  estado: number;
-  created_at: string;
-  updated_at: string;
-  password: string;
-  confirm_password: string;
-};
-// tipos para el formulario de usuario
-export type UserFormSchema = z.infer<typeof userFormSchema>;
-// tipos para los items de lista de usuarios
-export type UserItem = {
-  id: number;
-  nombres: string;
-  apellidos: string;
-  username: string;
-  email: string;
-  rol: string;
-  caja: string;
-  estado: number;
-  created_at: string;
-  updated_at: string;
-};
-// export type RegisterFormSchema = z.infer<typeof registerFormSchema>;
 
-// Depreacarted, use UserFormType instead
-// export type UserForm = {
-//   id: number;
-//   nombres: string;
-//   apellidos: string;
-//   username: string;
-//   email: string;
-//   rol_id: number;
-//   caja_id: number;
-//   password: string;
-//   confirm_password: string;
-// }
-
-export type UserSession = Omit<
-  User,
-  | "password"
-  | "confirm_password"
-  | "rol"
-  | "caja"
-  | "estado"
-  | "created_at"
-  | "updated_at"
->;
-export type ProfileFormType = z.infer<typeof profileFormSchema>;
-
-export type Profile = {
-  id: number;
-  nombres: string;
-  apellidos: string;
-  username: string;
-  email: string;
-  rol: string;
-  caja: string;
-};
 
 // ✅ TIPOS PARA LA TABLA MODULOS
 export interface Modulo {
@@ -152,6 +77,22 @@ export interface Padre {
   id: number;
   descripcion: string;
 }
+// ✅ TIPOS PARA USUARIOS
+export type UserItem = z.infer<typeof UserItemSchema>;
+// export type User = z.infer<typeof userSchema>;
+export type UserForm = z.infer<typeof UserFormSchema>;
+export type UserSession = z.infer<typeof UserSessionSchema>;
+export type ProfileForm = z.infer<typeof ProfileFormSchema>;
+export type Profile = z.infer<typeof ProfileSchema>;
+export type SignInForm = z.infer<typeof SignInFormSchema>;
+export type SignUpForm = z.infer<typeof SignUpFormSchema>;
+export type RecoveryForm = z.infer<typeof RecoveryFormSchema>;
+export type RestoreForm = {
+  code: string;
+  new_password: string;
+  new_confirm_password: string;
+};
+
 
 // ✅ TIPOS PARA LA TABLA CONFIGURACIONES
 export type Empresa = {
@@ -189,8 +130,8 @@ export interface EmpresaInfo {
   telefono: string;
   email: string;
   urlLogo: string;
-  establecimientosOpc:  EstablecimientoOpc[];
-};
+  establecimientosOpc: EstablecimientoOpc[];
+}
 
 // ✅✅✅ TIPOS PARA LOS PARAMETROS DE FILTROS GENERALES NUEVO ✅✅✅
 export interface FilterParam {
@@ -383,7 +324,7 @@ export interface UbigeoItem {
   dis_prov_dep: string;
 }
 
-// ✅ TIPOS PARA MOVIMIENTO
+
 export type Movimiento = {
   id: number;
   establecimiento_id: number;
@@ -452,89 +393,25 @@ export type NroDocumento = {
   email: string;
   telefono: string;
 };
-export type Caja = {
-  id: number;
-  establecimiento_id: number;
-  descripcion: string;
-  estado: number;
-};
-export type FormaPago = {
-  id: number;
-  descripcion: string;
-  estado: number;
-};
-export type Impuesto = {
-  id: number;
-  afectacion_igv_cod: string;
-  afectacion_igv_desc: string;
-  letra_tributo: string;
-  codigo_tributo: string;
-  nombre_tributo: string;
-  tipo_tributo: string;
-  porcentaje: number;
-  importe: number;
-  pred: number;
-  estado: number;
-};
-export type MotivoNota = {
-  codigo: string;
-  descripcion: string;
-  estado: number;
-  id: number;
-  tipo: string;
-  tipo_comprobante_cod: string;
-};
+export type Caja = z.infer<typeof CajaSchema>;
+export type FormaPago = z.infer<typeof FormaPagoSchema>;
+export type Impuesto = z.infer<typeof ImpuestoSchema>;
+export type MotivoNota = z.infer<typeof MotivoNotaSchema>;
 export type Rol = {
   id: number;
   rol: string;
   estado?: number;
 };
-export type TipoComprobante = {
-  id: number;
-  codigo: string;
-  descripcion: string;
-  serie_pre: string;
-  descripcion_doc: string;
-  estado: number;
-};
-export type TipoDocumento = {
-  id: number;
-  codigo: string;
-  descripcion: string;
-  descripcion_abv: string;
-  estado: number;
-};
-export type TipoMoneda = {
-  id: number;
-  codigo: string;
-  descripcion: string;
-  simbolo: string;
-  pred: number;
-  estado: number;
-};
-export type TipoMovimientoCaja = {
-  id: number;
-  descripcion: string;
-  estado: number;
-};
-export type TipoMovimiento = {
-  id: number;
-  tipo: string;
-  concepto: string;
-  origen: string;
-  estado: number;
-};
-export type TipoOperacion = {
-  codigo: string;
-  descripcion: string;
-  estado: number;
-};
-export type UnidadMedida = {
-  codigo: string;
-  descripcion: string;
-  descripcion_abv: string;
-  estado: number;
-};
+export type TipoComprobante = z.infer<typeof TipoComprobanteSchema>;
+export type TipoDocumento = z.infer<typeof TipoDocumentoSchema>;
+export type TipoMoneda = z.infer<typeof TipoMonedaSchema>;
+export type TipoMovimientoCaja = z.infer<typeof TipoMovimientoCajaSchema>;
+export type TipoMovimiento = z.infer<typeof TipoMovimientoSchema>;
+export type TipoOperacion = z.infer<typeof TipoOperacionSchema>;
+export type TipoEstablecimiento = z.infer<typeof TipoEstablecimientoSchema>;
+
+export type UnidadMedida = z.infer<typeof UnidadMedidaSchema>;
+
 export type Provincia = {
   provincia: string;
 };
@@ -556,13 +433,11 @@ export type Establecimiento = {
   estado: number;
 };
 
-export type Categoria = {
-  id: number;
-  descripcion: string;
-  padre_id: number;
-  orden: number;
-  children?: any;
+export type Categoria = z.infer<typeof CategoriaSchema>
+export type CategoriaTree = Categoria & {
+  children: CategoriaTree[];
 };
+
 export type CategoriaOpc = {
   id: number;
   descripcion: string;
@@ -586,9 +461,4 @@ export type CommonPeriod = {
 // objeto cuya clave es K y valor V
 // Datos de validaciones de formulario obtenidos desde el back-end
 // de la forma:  { username:["El usuario no puede tener espacios"], ... }
-export type ContentValidate = Record<string, string[]>
-
-
-export type SignInFormSchema = z.infer<typeof signInFormSchema>
-export type SignUpFormSchema = z.infer<typeof signUpFormSchema>
-export type RecoveryFormSchema = z.infer<typeof recoveryFormSchema>
+export type ContentValidate = Record<string, string[]>;

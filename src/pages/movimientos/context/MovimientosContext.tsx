@@ -9,7 +9,7 @@ type Modo = {
 }
 
 export interface MovimientosContextType {
-  userMovimientoForm: UseFormReturn<Movimientoform, any, undefined>;
+  userMovimientoForm: UseFormReturn<Movimientoform, any>;
   modo: Modo;
   setModo: React.Dispatch<React.SetStateAction<Modo>>;
   showMovimientosFilterMdl: boolean;
@@ -41,7 +41,7 @@ export const MovimientosProvider: React.FC<{ children: React.ReactNode }> = ({ c
   const [showMovimientosFilterMdl, setShowMovimientosFilterMdl] = useState(false);
   const [filterParamsMovimientosForm, setFilterParamsMovimientosForm] = useState(filterParamsInit);
 
-  const userMovimientoForm = useForm<Movimientoform>({defaultValues: movimientoFormInit})
+  const userMovimientoForm = useForm({defaultValues: movimientoFormInit})
 
   return (
     <MovimientosContext.Provider value={{ 

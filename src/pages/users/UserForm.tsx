@@ -6,20 +6,18 @@ import { toast } from "react-toastify";
 import Swal from "sweetalert2" ;
 import { useUsers } from "./context/UsersContext";
 import {zodResolver} from "@hookform/resolvers/zod";
-import { ApiGenericResp, ContentValidate, QueryResp, Rol, UserFormSchema } from "../../app/types";
+import { ContentValidate, QueryResp, Rol, UserForm } from "../../app/types";
 import useLayoutStore from "../../app/store/useLayoutStore";
 import { useRolesQuery } from "../../api/queries/useRolesQuery";
 import { useCajasQuery } from "../../api/queries/useCatalogosQuery";
 import { userFormInit } from "../../app/utils/constants";
 import { useMutationUsersQuery } from "../../api/queries/useUsersQuery";
 import { LdsBar, LdsEllipsisCenter } from "../../app/components/Loaders";
-import { userFormSchema } from "../../app/types/schemas";
+import { UserFormSchema } from "../../app/schemas/users-schema";
 
 interface MutateUser extends QueryResp {
-  content: UserFormSchema | ContentValidate | null;
+  content: UserForm | ContentValidate | null;
 }
-
-type GetUser = UserFormSchema | ApiGenericResp
 
 export default function Userform(){
   const {
@@ -30,16 +28,15 @@ export default function Userform(){
   const darkMode = useLayoutStore(state => state.layout.darkMode)
   const {roles} = useRolesQuery()  
   const {cajas} = useCajasQuery()
-
   const {
     register, 
     formState: {errors, isDirty}, 
     handleSubmit,
     setError,
     reset,
-  } = useForm<UserFormSchema>({
+  } = useForm<UserForm>({
     defaultValues: userFormInit,
-    resolver: zodResolver(userFormSchema),
+    resolver: zodResolver(UserFormSchema),
   })
   
   const {
@@ -47,7 +44,7 @@ export default function Userform(){
     isPending: isPendingUser,
     isError: isErrorUser,
     getUser
-  }= useMutationUsersQuery<GetUser>()
+  }= useMutationUsersQuery()
 
   const {
     data: mutation,
@@ -56,7 +53,7 @@ export default function Userform(){
     updateUser, 
   } = useMutationUsersQuery<MutateUser>()
   
-  const submit = (data: UserFormSchema) => {
+  const submit = (data: UserForm) => {
     Swal.fire({
       icon: 'question',
       text: data.id
@@ -97,12 +94,14 @@ export default function Userform(){
 
   useEffect(() => {
     if(!user) return
-    if("error" in user && user.error){
-      toast(user.msg || "Hubo un error al obtener los datos", {type: user.msgType})
+    const result = UserFormSchema.safeParse(user)
+    if(result.success){
+      reset(user)
+    }else{
+      const {msg, msgType} = user as QueryResp
+      toast(msg || "Hubo un error al obtener los datos", {type: msgType})
       closeForm();
-      return
     }
-    reset(user as UserFormSchema)
   }, [user])
 
   useEffect(() => {
@@ -114,9 +113,9 @@ export default function Userform(){
   useEffect(() => {
     if(!mutation) return
     if(mutation.error) {
-      if(mutation?.errorType === "validation" && mutation.content){
+      if(mutation?.errorType === "validation" && mutation.content){ // Validate from back-end
          Object.entries(mutation.content as ContentValidate).forEach(([field, messages]) => {
-          const f = field as keyof UserFormSchema;
+          const f = field as keyof UserForm;
           setError(f, { type: 'server', message: messages.join(', ') });
         });
       }else{
@@ -223,7 +222,7 @@ export default function Userform(){
                 {...register('caja_id',{valueAsNumber:true})}
               >
                 <option value="0">-- Seleccione</option>
-                {cajas && cajas.map((el) => 
+                {cajas.map((el) => 
                   <option key={el.id} value={el.id}>{el.descripcion}</option>
                 )}
               </Form.Select>

@@ -14,7 +14,7 @@ import { CampoTable, Rol } from "../../../app/types";
 import { useProductos } from "../context/ProductosContext";
 import { filterParamsInit } from "../../../app/utils/constants";
 import { LdsBar } from "../../../app/components/Loaders";
-import { isCajasRes, useCajasQuery } from "../../../api/queries/useCatalogosQuery";
+import { useCajasQuery } from "../../../api/queries/useCatalogosQuery";
 import { useRolesQuery } from "../../../api/queries/useRolesQuery";
 
 
@@ -40,7 +40,7 @@ const ProductosLstFilterMdl: React.FC<Props> = ({isFetching, camposProducto}) =>
 
   const {roles} = useRolesQuery()
   const {cajas} = useCajasQuery()
-  
+
   const handleChangeOrder = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const field_name = e.target.value
     const field_label = e.currentTarget.options[e.currentTarget.selectedIndex].textContent || ""
@@ -237,7 +237,7 @@ const ProductosLstFilterMdl: React.FC<Props> = ({isFetching, camposProducto}) =>
                   onChange={handleChangeEqual}
                 >
                   <option value="">Todos</option>
-                  {cajas && isCajasRes(cajas) && cajas?.map((el) => (
+                  {cajas.map((el) => (
                     <option key={el.id} value={el.id}>
                       {el.descripcion}
                     </option>

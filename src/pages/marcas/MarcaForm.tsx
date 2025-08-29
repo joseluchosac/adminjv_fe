@@ -7,21 +7,30 @@ import { useForm } from "react-hook-form";
 import { LdsBar, LdsEllipsisCenter } from "../../app/components/Loaders";
 import useLayoutStore from "../../app/store/useLayoutStore";
 import { useMutationMarcasQuery } from "../../api/queries/useMarcasQuery";
-import { Marca } from "../../app/types";
+import { Marca, MarcaItem, QueryResp } from "../../app/types";
 import useMarcasStore from "../../app/store/useMarcasStore";
 
 const marcaFormInit = {id: 0, nombre: "", estado: 1,}
+
+type MarcaRes = MarcaItem | QueryResp
+export function isErrMarcaRes(response: MarcaRes): response is QueryResp {
+  return ('error' in response || (response as QueryResp).error == true);
+}
+
+type MutationRes = QueryResp & {
+  marca?: MarcaItem
+};
 
 export default function MarcaForm() {
   const {showMarcaForm, setShowMarcaForm, currentMarcaId} = useMarcasStore()
   const darkMode = useLayoutStore(state => state.layout.darkMode)
 
   const {
-    data: marca,
+    data: marcaRes,
     isPending: isPendingMarca,
     isError: isErrorMarca,
     getMarca,
-  }: any = useMutationMarcasQuery()
+  }= useMutationMarcasQuery<MarcaRes>()
 
   const {
     data: mutation,
@@ -29,8 +38,7 @@ export default function MarcaForm() {
     isError: isErrorMutation,
     createMarca, 
     updateMarca,
-    typeAction,
-  } = useMutationMarcasQuery()
+  } = useMutationMarcasQuery<MutationRes>()
 
   const {
     register, 
@@ -70,22 +78,19 @@ export default function MarcaForm() {
   }, [showMarcaForm])
 
   useEffect(() => {
-    if(!marca) return
-    console.log(marca)
-    if(marca.error){
-      toast(marca.msg, {type: marca.msgType})
+    if(!marcaRes) return
+    if(isErrMarcaRes(marcaRes)){
+      toast.error("Error al obtener la marca");
       setShowMarcaForm({showMarcaForm: false, currentMarcaId: 0});
     }else{
-      if(marca) reset(marca)
+      reset(marcaRes)
     }
-  }, [marca])
+  }, [marcaRes])
   
   useEffect(() => {
     if(!mutation) return
-    if(typeAction==="mutate_marca"){
-      if(!mutation.error) setShowMarcaForm({showMarcaForm: false, currentMarcaId: 0});
-      toast(mutation.msg, {type: mutation.msgType})
-    }
+    if(!mutation.error) setShowMarcaForm({showMarcaForm: false, currentMarcaId: 0});
+    toast(mutation.msg, {type: mutation.msgType})
   }, [mutation])
 
   useEffect(() => {
@@ -113,7 +118,7 @@ export default function MarcaForm() {
         </Modal.Header>
         <Modal.Body>
           <Form onSubmit={handleSubmit(submit)} id="marca_form">
-            {(isPendingMutation && typeAction==="mutate_marca") && <LdsBar />}
+            {isPendingMutation && <LdsBar />}
             <Row>
               <Form.Group as={Col} md={12} className="mb-3">
                 <Form.Label htmlFor="nombre">Marca</Form.Label>
@@ -145,9 +150,9 @@ export default function MarcaForm() {
               <Button 
                 variant="primary" 
                 type="submit"
-                disabled={(isPendingMutation && typeAction==="mutate_marca") ? true : isDirty ? false : true}
+                disabled={isPendingMutation ? true : isDirty ? false : true}
               >
-                {(isPendingMutation && typeAction==="mutate_marca") &&
+                {isPendingMutation &&
                   <Spinner
                     as="span"
                     animation="border"

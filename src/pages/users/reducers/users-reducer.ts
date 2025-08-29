@@ -1,6 +1,6 @@
 import { BetweenItem, CampoTable, CommonPeriod, EqualItem, FilterParam, OrderItem } from "../../../app/types";
 import { betweenItemInit, camposUserInit } from "../../../app/utils/constants";
-import { getDateRangePeriod } from "../../../app/utils/funciones";
+import { deepEqualUnordered, getDateRangePeriod } from "../../../app/utils/funciones";
 
 const userFilterParamInit: FilterParam = {
   offset: 50,
@@ -184,8 +184,11 @@ export const usersReducer = (
       return { ...state, userFilterForm: { ...state.userFilterForm, between: [{...cloneBetweenItem, from, to}] } }
     }
     
-    case 'SET_USER_FILTER_PARAM': 
-      { return { ...state, userFilterParam: {...state.userFilterForm} } };
+    case 'SET_USER_FILTER_PARAM': { 
+      const sonIguales = deepEqualUnordered(state.userFilterParam, state.userFilterForm)
+      if(sonIguales) return state
+      return { ...state, userFilterParam: {...state.userFilterForm} } 
+    };
     case 'SET_USER_FILTER_PARAM_BETWEEN': {
       if(
         state.userFilterForm.between[0]?.field_name && 
@@ -198,11 +201,16 @@ export const usersReducer = (
         // const to = state.userFilterForm.between[0]?.to + " 23:59:59"
         const newUserFilterParam = { 
           ...state.userFilterParam, 
-          between: [{...state.userFilterForm.between[0], from, to}] }
+          between: [{...state.userFilterForm.between[0], from, to}] 
+        }
+        const sonIguales = deepEqualUnordered(state.userFilterParam, newUserFilterParam)
+        if(sonIguales) return state
         return { ...state, userFilterParam: newUserFilterParam }
       }else{
         if(state.userFilterParam.between.length){ // Solo resetea si between tiene contenido
           const newUserFilterParam = { ...state.userFilterParam, between: [] }
+          const sonIguales = deepEqualUnordered(state.userFilterParam, newUserFilterParam)
+          if(sonIguales) return state
           return { ...state, userFilterParam: newUserFilterParam }
         }
       }

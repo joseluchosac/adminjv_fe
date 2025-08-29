@@ -4,11 +4,11 @@ import { toast } from "react-toastify";
 import Swal from "sweetalert2";
 import useLayoutStore from "../../app/store/useLayoutStore";
 import { useMutationUsersQuery } from "../../api/queries/useUsersQuery";
-import {ApiGenericResp, type Profile, ProfileFormType, QueryResp } from "../../app/types";
+import {ApiGenericResp, type Profile, ProfileForm, QueryResp } from "../../app/types";
 import { useForm } from "react-hook-form";
-import { profileFormSchema } from "../../app/types/schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { LdsEllipsisCenter } from "../../app/components/Loaders";
+import { ProfileFormSchema } from "../../app/schemas/users-schema";
 
 interface MutatateProfile extends ApiGenericResp {
   content: Profile
@@ -23,8 +23,8 @@ export default function ProfilePage() {
       handleSubmit,
       reset,
       getValues,
-    } = useForm<ProfileFormType>({
-      resolver: zodResolver(profileFormSchema),
+    } = useForm<ProfileForm>({
+      resolver: zodResolver(ProfileFormSchema),
     })
 
     const {

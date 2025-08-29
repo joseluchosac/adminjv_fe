@@ -235,7 +235,7 @@ const MovimientosLstFilterMdl: React.FC<Props> = ({isFetching, camposMovimiento}
                   onChange={handleChangeEqual}
                 >
                   <option value="">Todos</option>
-                  {tiposMovimiento && [...new Set(tiposMovimiento.map(el=>el.tipo))].map((el) => (
+                  {[...new Set(tiposMovimiento.map(el=>el.tipo))].map((el) => (
                     <option key={el} value={el}>{el}</option>
                   ))}
                 </Form.Select>

@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { Button, Card, Col, Container, Form, Row, Spinner } from "react-bootstrap";
 import Swal from "sweetalert2";
 import { toast } from "react-toastify";
@@ -40,17 +40,20 @@ export default function Movimientoform(){
     createMovimiento, 
   } = useMutationMovimientosQuery()
   // devuelve un arreglo de tipos de movimiento
-  const tiposOpc = ():string[] => {
+  const tiposOpc = useMemo(():string[]=> {
+    if(!tiposMovimiento.length) return []
     const tipos = tiposMovimiento?.filter(el => el.origen==="interno").map(el=>el.tipo)
     return tipos ? [...new Set(tipos)] : []
-  }
-  const conceptosOpc = ():string[] => {
+  }, [tiposMovimiento])
+
+  const conceptosOpc = useMemo(():string[] => {
+    if(!tiposMovimiento.length) return []
     const concep = tiposMovimiento?.filter(el => el.origen==="interno" && el.tipo === getValues().tipo)
     .map(el=>el.concepto)
     return concep ? concep : []
-  }
+  }, [tiposMovimiento])
 
-  const submit = (data: Movimientoform) => {
+  const onSubmit = (data: Movimientoform) => {
     if(data.establecimiento_id == data.destino_id){
       toast.warning("Elija otro destino")
       return
@@ -117,7 +120,7 @@ export default function Movimientoform(){
 
   return (
     <Container className={`${modo.vista === "list" ? "d-none" : ""}`}>
-      <Form onSubmit={handleSubmit(submit)} id="form_movimientos">
+      <Form onSubmit={handleSubmit(onSubmit)} id="form_movimientos">
         <div className="my-2 d-md-flex justify-content-between">
           <div className="text-center"><h5>Nuevo Movimiento</h5></div>
           <div className="d-md-flex text-center">
@@ -181,7 +184,7 @@ export default function Movimientoform(){
                       })}
                     >
                       <option value=""></option>
-                      {tiposOpc().map((el, idx) => 
+                      {tiposOpc.map((el, idx) => 
                         <option key={idx} value={el}>{el.toUpperCase()}</option>
                       )}
                     </Form.Select>
@@ -198,7 +201,7 @@ export default function Movimientoform(){
                       })}
                     >
                       <option value=""></option>
-                      {conceptosOpc().map((el, idx) => 
+                      {conceptosOpc.map((el, idx) => 
                         <option key={idx} value={el}>{el.toUpperCase()}</option>
                       )}
                     </Form.Select>

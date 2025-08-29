@@ -67,15 +67,21 @@ export function generateTree<T extends ArregloBase>(arreglo: T[]): ArregloJerarq
   return tree;
 }
 // ✅ FUNCION PARA APLANAR UN ARBOL DE UN ARREGLO JERARQUIZADO
-interface ArregloJerarquizado {
+export interface ArregloJerarquizado {
   id: number;
   descripcion: string;
   padre_id: number;
   children?: ArregloJerarquizado[];
-  [key: string]: any; // Propiedades adicionales
+  orden: number;
+  nivel: number;
+  //[key: string]: any; // Propiedades adicionales
 }
 
-export function flattenTree(tree: ArregloJerarquizado[], padreId: number = 0, nivel: number = 0): ArregloJerarquizado[] {
+export function flattenTree(
+  tree: ArregloJerarquizado[], 
+  padreId: number = 0, 
+  nivel: number = 0
+): ArregloJerarquizado[] {
   let resultado: ArregloJerarquizado[] = [];
   tree.forEach(nodo => {
     // Extraer children y crear copia del nodo sin la propiedad children

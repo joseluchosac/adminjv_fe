@@ -1,10 +1,38 @@
 const apiURL = import.meta.env.VITE_API_URL;
-import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import useSessionStore from "../../app/store/useSessionStore"
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { Categoria, FetchOptions } from "../../app/types";
+import { CategoriaTree, FetchOptions } from "../../app/types";
 import { fnFetch } from "../fnFetch";
+import { CategoriasResponseSchema } from "../../app/schemas/categorias-schema";
+
+
+// ****** CATEGORIAS Y CATEGORIAS TREE ******
+export const useCategoriasQuery = () => {
+  const tknSession = useSessionStore((state) => state.tknSession);
+  const { data, isFetching } = useQuery({
+    queryKey: ["categorias"],
+    queryFn: () => {
+      const options: FetchOptions = {
+        url: apiURL + "catalogos/get_categorias",
+        authorization: "Bearer " + tknSession,
+      };
+      return fnFetch(options);
+    },
+    staleTime: 1000 * 60 * 60 * 24,
+  });
+ 
+  const categorias = useMemo(() => {
+    const result = CategoriasResponseSchema.safeParse(data);
+    return result.success ? result.data : {list: [], tree: []};
+  }, [data]);
+
+  return {
+    categorias,
+    isFetching,
+  };
+};
 
 // ****** MUTATION ******
 export const useMutateCategoriasQuery = () => {
@@ -20,7 +48,7 @@ export const useMutateCategoriasQuery = () => {
     }
   })
 
-  const sortCategorias = (orderedItems: Categoria[]) => {
+  const sortCategorias = (orderedItems: CategoriaTree[]) => {
     const options: FetchOptions = {
       method: "PUT",
       url: apiURL + "categorias/sort_categorias",
@@ -30,7 +58,7 @@ export const useMutateCategoriasQuery = () => {
     mutate(options)
   }
 
-  const createCategoria = (categoria:  Categoria) => {
+  const createCategoria = (categoria:  CategoriaTree) => {
     const options: FetchOptions = {
       method: "POST",
       url: apiURL + "categorias/create_categoria",
@@ -40,7 +68,7 @@ export const useMutateCategoriasQuery = () => {
     mutate(options)
   }
 
-  const updateCategoria = (categoria: Categoria) => {
+  const updateCategoria = (categoria: CategoriaTree) => {
     const options: FetchOptions = {
       method: "PUT",
       url: apiURL + "categorias/update_categoria",

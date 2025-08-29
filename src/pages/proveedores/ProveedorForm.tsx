@@ -255,7 +255,7 @@ export default function ProveedorForm({onMutation}:Props) {
                       : false
                   }
                 >
-                  {tiposDocumento?.map((el) => (
+                  {tiposDocumento.map((el) => (
                     <option key={el.id} value={el.codigo}>
                       {el.descripcion}
                     </option>

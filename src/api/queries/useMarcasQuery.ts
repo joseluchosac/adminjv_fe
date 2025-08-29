@@ -3,13 +3,17 @@ import { useEffect, useRef } from "react"
 import { useNavigate } from "react-router-dom";
 import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import useSessionStore from "../../app/store/useSessionStore"
-import { FetchOptions, FilterQueryResp, Marca, MarcaItem } from "../../app/types";
+import { FetchOptions, FilterQueryResp, Marca, MarcaItem, QueryResp } from "../../app/types";
 import { fnFetch } from "../fnFetch";
 import useMarcasStore from "../../app/store/useMarcasStore";
 import { useDebounce } from "react-use";
 import { toast } from "react-toastify";
 
-type TypeAction = "filter_full" | "mutate_marca" | 'mutate_state_marca'
+type TypeAction = 
+"mutate_create_marca" 
+| 'mutate_update_marca'
+| 'mutate_delete_marca'
+| 'mutate_state_marca'
 
 // ****** FILTRAR ******
 export interface MarcasFilQryRes extends FilterQueryResp {
@@ -106,17 +110,17 @@ export const useFilterMarcasQuery = () => {
 }
 
 // ****** MUTATION ******
-export const useMutationMarcasQuery = () => {
+export const useMutationMarcasQuery = <T>() => {
   const resetSessionStore = useSessionStore(state => state.resetSessionStore)
   const navigate = useNavigate()
   const token = useSessionStore(state => state.tknSession)
   const queryClient = useQueryClient()
   const typeActionRef = useRef<TypeAction | "">("")
 
-  const {data, isPending, isError, mutate, } = useMutation({
+  const {data, isPending, isError, mutate, } = useMutation<T, Error, FetchOptions, unknown>({
     mutationFn: fnFetch,
     onSuccess: (resp) => {
-      if(resp.msgType !== 'success') return
+      if((resp as QueryResp).msgType !== 'success') return
       queryClient.invalidateQueries({queryKey:["marcas"]}) // Recarga la tabla marcas
     }
   })
@@ -132,7 +136,7 @@ export const useMutationMarcasQuery = () => {
   }
 
   const createMarca = (marca: Marca) => {
-    typeActionRef.current = "mutate_marca"
+    typeActionRef.current = "mutate_create_marca"
     const options: FetchOptions = {
       method: "POST",
       url: apiURL + "marcas/create_marca",
@@ -143,7 +147,7 @@ export const useMutationMarcasQuery = () => {
   }
 
   const updateMarca = (marca: Marca) => {
-    typeActionRef.current = "mutate_marca"
+    typeActionRef.current = "mutate_update_marca"
     const options: FetchOptions = {
       method: "PUT",
       url: apiURL + "marcas/update_marca",
@@ -163,7 +167,7 @@ export const useMutationMarcasQuery = () => {
     mutate(options)
   }
   const deleteMarca = (id: number) => {
-    typeActionRef.current = "mutate_marca"
+    typeActionRef.current = "mutate_delete_marca"
     const options: FetchOptions = {
       method: "DELETE",
       url: apiURL + "marcas/delete_marca",
@@ -174,7 +178,8 @@ export const useMutationMarcasQuery = () => {
   }
 
   useEffect(()=>{
-    if(data?.errorType === "errorToken"){
+    if(!data) return
+    if((data as QueryResp).errorType === "errorToken"){
       resetSessionStore()
       navigate("/auth")
     }

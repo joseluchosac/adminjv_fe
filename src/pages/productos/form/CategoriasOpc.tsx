@@ -2,12 +2,10 @@ import { useEffect, useState } from "react"
 import { useProductos } from "../context/ProductosContext"
 import { FaCheckSquare, FaRegSquare } from "react-icons/fa"
 import { UseFormGetValues, UseFormSetValue } from "react-hook-form"
-import { type CategoriaOpc, ProductoQryRes, Producto } from "../../../app/types"
+import { type CategoriaOpc, ProductoQryRes, Producto, CategoriaTree } from "../../../app/types"
 import { Button, Card, Col, Collapse, Form, Row } from "react-bootstrap"
-import { useMutateCategoriasQuery } from "../../../api/queries/useCategoriasQuery"
+import { useCategoriasQuery, useMutateCategoriasQuery } from "../../../api/queries/useCategoriasQuery"
 import { useQueryClient } from "@tanstack/react-query"
-import { flattenTree } from "../../../app/utils/funciones"
-import { useCategoriasTreeQuery } from "../../../api/queries/useCatalogosQuery"
 
 type Props = {
   setValue: UseFormSetValue<Producto>;
@@ -15,23 +13,26 @@ type Props = {
   producto: ProductoQryRes | undefined
 }
 
-const nCategoriaInit = {
+const nCategoriaInit: CategoriaTree = {
   id: 0,
   descripcion:"",
   padre_id: 0,
-  orden: 0
+  orden: 0,
+  nivel: 0,
+  children: []
 }
 
 export default function CategoriaOpc({setValue, getValues, producto}:Props) {
   const [showNewCategoria, setShowNewCategoria] = useState(false);
-  const [nCategoria, setNCategoria] = useState(nCategoriaInit)
+  const [nCategoria, setNCategoria] = useState<CategoriaTree>(nCategoriaInit)
   const {
     categoriasOpc,
     setCategoriasOpc,
     modo,
   } = useProductos()
   const queryClient = useQueryClient()
-  const {categoriasTree} = useCategoriasTreeQuery()
+  // const {categoriasTree} = useCategoriasTreeQuery()
+  const {categorias} = useCategoriasQuery()
 
   const seleccionarOpcion = (id: number) => {
     const nuevasCategoriasOpc = categoriasOpc?.map(el=>{
@@ -51,9 +52,8 @@ export default function CategoriaOpc({setValue, getValues, producto}:Props) {
   }
 
   const resetCategoriasOpc = ()=>{
-    if(!categoriasTree) return
-    const categorias = flattenTree(categoriasTree)
-    const resultado: CategoriaOpc[] = categorias.map(el=>{
+    if(!categorias.list.length) return
+    const resultado: CategoriaOpc[] = categorias.list.map(el=>{
       const {id,descripcion, nivel} = el
       return {id, descripcion, nivel, checked: false}
     })
@@ -70,7 +70,7 @@ export default function CategoriaOpc({setValue, getValues, producto}:Props) {
 
   useEffect(()=>{
     resetCategoriasOpc()
-  }, [categoriasTree])
+  }, [categorias])
 
   useEffect(()=>{
     if(!producto) return
@@ -149,7 +149,7 @@ export default function CategoriaOpc({setValue, getValues, producto}:Props) {
                   <Form.Select
                     id="padre" size="sm"
                     onChange={e=>setNCategoria({...nCategoria, padre_id: parseInt(e.target.value)})}
-                    value={nCategoria.padre_id}
+                    value={nCategoria.padre_id || ""}
                   >
                     <option value={0}> Sin padre</option>
                     {categoriasOpc?.map((el) => 

@@ -13,10 +13,9 @@ type Props = {isFetching: boolean;}
 export function UsersFilter({isFetching}: Props) {
   const {roles} = useRolesQuery()
   const {cajas} = useCajasQuery()
-  
   const orderRef = useRef<HTMLSelectElement | null>(null)
   const orderDirRef = useRef<HTMLSelectElement | null>(null)
-  
+
   const {
     stateUsers: { showUsersFilter, userFilterForm, camposUser },
     dispatchUsers
@@ -166,7 +165,7 @@ export function UsersFilter({isFetching}: Props) {
                     }}
                   >
                     <option value="">Todos</option>
-                    {cajas?.map((el) => (
+                    {cajas.map((el) => (
                       <option key={el.id} value={el.descripcion}>
                         {el.descripcion}
                       </option>

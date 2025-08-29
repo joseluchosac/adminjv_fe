@@ -6,22 +6,28 @@ import { toast } from "react-toastify";
 import { useForm } from "react-hook-form";
 import { LdsBar, LdsEllipsisCenter } from "../../app/components/Loaders";
 import useLayoutStore from "../../app/store/useLayoutStore";
-import { useMutationLaboratoriosQuery } from "../../api/queries/useLaboratoriosQuery";
-import { Laboratorio } from "../../app/types";
+import { MutationLaboratorioRes, useMutationLaboratoriosQuery } from "../../api/queries/useLaboratoriosQuery";
+import { Laboratorio, LaboratorioItem, QueryResp } from "../../app/types";
 import useLaboratoriosStore from "../../app/store/useLaboratoriosStore";
 
 const laboratorioFormInit = {id: 0, nombre: "", estado: 1,}
+
+type LaboratorioRes = LaboratorioItem | QueryResp
+export function isErrLaboratorioRes(response: LaboratorioRes): response is QueryResp {
+  return ('error' in response || (response as QueryResp).error == true);
+}
+
 
 export default function LaboratorioForm() {
   const {showLaboratorioForm, setShowLaboratorioForm, currentLaboratorioId} = useLaboratoriosStore()
   const darkMode = useLayoutStore(state => state.layout.darkMode)
 
   const {
-    data: laboratorio,
+    data: laboratorioRes,
     isPending: isPendingLaboratorio,
     isError: isErrorLaboratorio,
     getLaboratorio,
-  }: any = useMutationLaboratoriosQuery()
+  } = useMutationLaboratoriosQuery<LaboratorioRes>()
 
   const {
     data: mutation,
@@ -29,8 +35,7 @@ export default function LaboratorioForm() {
     isError: isErrorMutation,
     createLaboratorio, 
     updateLaboratorio,
-    typeAction,
-  } = useMutationLaboratoriosQuery()
+  } = useMutationLaboratoriosQuery<MutationLaboratorioRes>()
 
   const {
     register, 
@@ -70,22 +75,19 @@ export default function LaboratorioForm() {
   }, [showLaboratorioForm])
 
   useEffect(() => {
-    if(!laboratorio) return
-    console.log(laboratorio)
-    if(laboratorio.error){
-      toast(laboratorio.msg, {type: laboratorio.msgType})
+    if(!laboratorioRes) return
+    if(isErrLaboratorioRes(laboratorioRes)){
+      toast.error("Error al obtener la laboratorio");
       setShowLaboratorioForm({showLaboratorioForm: false, currentLaboratorioId: 0});
     }else{
-      if(laboratorio) reset(laboratorio)
+      reset(laboratorioRes)
     }
-  }, [laboratorio])
+  }, [laboratorioRes])
   
   useEffect(() => {
     if(!mutation) return
-    if(typeAction==="mutate_laboratorio"){
-      if(!mutation.error) setShowLaboratorioForm({showLaboratorioForm: false, currentLaboratorioId: 0});
-      toast(mutation.msg, {type: mutation.msgType})
-    }
+    if(!mutation.error) setShowLaboratorioForm({showLaboratorioForm: false, currentLaboratorioId: 0});
+    toast(mutation.msg, {type: mutation.msgType})
   }, [mutation])
 
   useEffect(() => {
@@ -113,7 +115,7 @@ export default function LaboratorioForm() {
         </Modal.Header>
         <Modal.Body>
           <Form onSubmit={handleSubmit(submit)} id="laboratorio_form">
-            {(isPendingMutation && typeAction==="mutate_laboratorio") && <LdsBar />}
+            {isPendingMutation && <LdsBar />}
             <Row>
               <Form.Group as={Col} md={12} className="mb-3">
                 <Form.Label htmlFor="nombre">Laboratorio</Form.Label>
@@ -145,9 +147,9 @@ export default function LaboratorioForm() {
               <Button 
                 variant="primary" 
                 type="submit"
-                disabled={(isPendingMutation && typeAction==="mutate_laboratorio") ? true : isDirty ? false : true}
+                disabled={isPendingMutation ? true : isDirty ? false : true}
               >
-                {(isPendingMutation && typeAction==="mutate_laboratorio") &&
+                {isPendingMutation &&
                   <Spinner
                     as="span"
                     animation="border"

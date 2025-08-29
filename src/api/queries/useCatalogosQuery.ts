@@ -1,358 +1,404 @@
-const apiURL = import.meta.env.VITE_API_URL
-import { useMutation, useQuery } from "@tanstack/react-query"
-import useSessionStore from "../../app/store/useSessionStore"
-import { useEffect, useRef } from "react"
-import { useNavigate } from "react-router-dom"
-import { Caja, Categoria, FetchOptions, FormaPago, Impuesto, MotivoNota, QueryResp, TipoComprobante, TipoDocumento, TipoMoneda, TipoMovimiento, TipoMovimientoCaja, TipoOperacion, UnidadMedida } from "../../app/types"
-import { fnFetch } from "../fnFetch"
-
+const apiURL = import.meta.env.VITE_API_URL;
+import { useMutation, useQuery } from "@tanstack/react-query";
+import useSessionStore from "../../app/store/useSessionStore";
+import { useEffect, useMemo, useRef } from "react";
+import { useNavigate } from "react-router-dom";
+import {
+  FetchOptions,
+  TipoComprobante,
+} from "../../app/types";
+import { fnFetch } from "../fnFetch";
+import {
+  CajasSchema,
+  FormasPagoSchema,
+  ImpuestosSchema,
+  MotivosNotaSchema,
+  TiposComprobanteSchema,
+  TiposDocumentoSchema,
+  TiposEstablecimientoSchema,
+  TiposMonedaSchema,
+  TiposMovimientoCajaSchema,
+  TiposMovimientoSchema,
+  TiposOperacionSchema,
+  UnidadesMedidaSchema,
+} from "../../app/schemas/catalogos-schema";
 
 // ****** CAJAS ******
-export type CajasRes = Caja[] | QueryResp
-export function isCajasRes(response: CajasRes): response is Caja[] {
-  return ('error' in response || (response as QueryResp).error == true);
-}
 export const useCajasQuery = () => {
-  const tknSession = useSessionStore(state => state.tknSession)
-  const {data, isFetching} = useQuery<CajasRes>({
-    queryKey: ['cajas'],
+  const tknSession = useSessionStore((state) => state.tknSession);
+  const { data, isFetching } = useQuery({
+    queryKey: ["cajas"],
     queryFn: () => {
       const options: FetchOptions = {
         url: apiURL + "catalogos/get_cajas",
-        authorization: "Bearer " + tknSession
-      }
-      return fnFetch(options)
+        authorization: "Bearer " + tknSession,
+      };
+      return fnFetch(options);
     },
-    staleTime: 1000 * 60 * 60 * 24
-  })
+    staleTime: 1000 * 60 * 60 * 24,
+  });
+
+  const cajas = useMemo(() => {
+    const result = CajasSchema.safeParse(data);
+    return result.success ? result.data : [];
+  }, [data]);
 
   return {
-    cajas: data,
-    isFetching
-  }
-}
-// ****** CATEGORIAS TREE ******
-type DataCategoriasTree = {content: Categoria[]}
-export const useCategoriasTreeQuery = () => {
-  const tknSession = useSessionStore(state => state.tknSession)
-  const {data, isFetching} = useQuery<DataCategoriasTree>({
-    queryKey: ['categorias_tree'],
-    queryFn: () => {
-      const options: FetchOptions = {
-        url: apiURL + "catalogos/get_categorias_tree",
-        authorization: "Bearer " + tknSession
-      }
-      return fnFetch(options)
-    },
-    staleTime: 1000 * 60 * 60 * 24
-  })
+    cajas,
+    isFetching,
+  };
+};
 
-  return {
-    categoriasTree: data?.content,
-    isFetching
-  }
-}
-
-// ****** UNIDADES MEDIDA ******
-type DataUnidadesMedida = {content: UnidadMedida[]}
-export const useUnidadesMedidaQuery = () => {
-  const tknSession = useSessionStore(state => state.tknSession)
-  const {data, isFetching} = useQuery<DataUnidadesMedida>({
-    queryKey: ['unidades_medida'],
-    queryFn: () => {
-      const options: FetchOptions = {
-        url: apiURL + "catalogos/get_unidades_medida",
-        authorization: "Bearer " + tknSession
-      }
-      return fnFetch(options)
-    },
-    staleTime: 1000 * 60 * 60 * 24
-  })
-
-  return {
-    unidadesMedida: data?.content,
-    isFetching
-  }
-}
-
-// ****** IMPUESTOS ******
-type DataImpuestosMedida = {content: Impuesto[]}
-export const useImpuestosQuery = () => {
-  const tknSession = useSessionStore(state => state.tknSession)
-  const {data, isFetching} = useQuery<DataImpuestosMedida>({
-    queryKey: ['impuestos'],
-    queryFn: () => {
-      const options: FetchOptions = {
-        url: apiURL + "catalogos/get_impuestos",
-        authorization: "Bearer " + tknSession
-      }
-      return fnFetch(options)
-    },
-    staleTime: 1000 * 60 * 60 * 24
-  })
-
-  return {
-    impuestos: data?.content,
-    isFetching
-  }
-}
-
-// ****** MOTIVOS NOTA ******
-type DataMotivosNotaMedida = {content: MotivoNota[]}
-export const useMotivosNotaQuery = () => {
-  const tknSession = useSessionStore(state => state.tknSession)
-  const {data, isFetching} = useQuery<DataMotivosNotaMedida>({
-    queryKey: ['motivos_nota'],
-    queryFn: () => {
-      const options: FetchOptions = {
-        url: apiURL + "catalogos/get_motivos_nota",
-        authorization: "Bearer " + tknSession
-      }
-      return fnFetch(options)
-    },
-    staleTime: 1000 * 60 * 60 * 24
-  })
-
-  return {
-    motivosNota: data?.content,
-    isFetching
-  }
-}
-// ****** TIPOS DOCUMENTO ******
-type DataTiposDocumento = {content: TipoDocumento[]}
-export const useTiposDocumentoQuery = () => {
-  const tknSession = useSessionStore(state => state.tknSession)
-  const {data, isFetching} = useQuery<DataTiposDocumento>({
-    queryKey: ['tipos_documento'],
-    queryFn: () => {
-      const options: FetchOptions = {
-        url: apiURL + "catalogos/get_tipos_documento",
-        authorization: "Bearer " + tknSession
-      }
-      return fnFetch(options)
-    },
-    staleTime: 1000 * 60 * 60 * 24
-  })
-
-  return {
-    tiposDocumento: data?.content,
-    isFetching
-  }
-}
-// ****** TIPOS COMPROBANTE ******
-type DataTiposComprobante = {content: TipoComprobante[]}
-export const useTiposComprobanteQuery = () => {
-  const tknSession = useSessionStore(state => state.tknSession)
-  const {data, isFetching} = useQuery<DataTiposComprobante>({
-    queryKey: ['tipos_comprobante'],
-    queryFn: () => {
-      const options: FetchOptions = {
-        url: apiURL + "catalogos/get_tipos_comprobante",
-        authorization: "Bearer " + tknSession
-      }
-      return fnFetch(options)
-    },
-    staleTime: 1000 * 60 * 60 * 24
-  })
-
-  return {
-    tiposComprobante: data?.content,
-    isFetching
-  }
-}
-// ****** TIPOS MOVIMIENTO CAJA ******
-type DataTiposMovimientoCaja = {content: TipoMovimientoCaja[]}
-export const useTiposMovimientoCajaQuery = () => {
-  const tknSession = useSessionStore(state => state.tknSession)
-  const {data, isFetching} = useQuery<DataTiposMovimientoCaja>({
-    queryKey: ['tipos_movimiento_caja'],
-    queryFn: () => {
-      const options: FetchOptions = {
-        url: apiURL + "catalogos/get_tipos_movimiento_caja",
-        authorization: "Bearer " + tknSession
-      }
-      return fnFetch(options)
-    },
-    staleTime: 1000 * 60 * 60 * 24
-  })
-
-  return {
-    tiposMovimientoCaja: data?.content,
-    isFetching
-  }
-}
-// ****** TIPOS MOVIMIENTO ******
-type DataTiposMovimiento = {content: TipoMovimiento[]}
-export const useTiposMovimientoQuery = () => {
-  const tknSession = useSessionStore(state => state.tknSession)
-  const {data, isFetching} = useQuery<DataTiposMovimiento>({
-    queryKey: ['tipos_movimiento'],
-    queryFn: () => {
-      const options: FetchOptions = {
-        url: apiURL + "catalogos/get_tipos_movimiento",
-        authorization: "Bearer " + tknSession
-      }
-      return fnFetch(options)
-    },
-    staleTime: 1000 * 60 * 60 * 24
-  })
-
-  return {
-    tiposMovimiento: data?.content,
-    isFetching
-  }
-}
-// ****** TIPOS OPERACION ******
-type DataTiposOperacion = {content: TipoOperacion[]}
-export const useTiposOperacionQuery = () => {
-  const tknSession = useSessionStore(state => state.tknSession)
-  const {data, isFetching} = useQuery<DataTiposOperacion>({
-    queryKey: ['tipos_operacion'],
-    queryFn: () => {
-      const options: FetchOptions = {
-        url: apiURL + "catalogos/get_tipos_operacion",
-        authorization: "Bearer " + tknSession
-      }
-      return fnFetch(options)
-    },
-    staleTime: 1000 * 60 * 60 * 24
-  })
-
-  return {
-    tiposOperacion: data?.content,
-    isFetching
-  }
-}
-// ****** TIPOS MONEDA ******
-type DataTiposMoneda = {content: TipoMoneda[]}
-export const useTiposMonedaQuery = () => {
-  const tknSession = useSessionStore(state => state.tknSession)
-  const {data, isFetching} = useQuery<DataTiposMoneda>({
-    queryKey: ['tipos_moneda'],
-    queryFn: () => {
-      const options: FetchOptions = {
-        url: apiURL + "catalogos/get_tipos_moneda",
-        authorization: "Bearer " + tknSession
-      }
-      return fnFetch(options)
-    },
-    staleTime: 1000 * 60 * 60 * 24
-  })
-
-  return {
-    tiposMoneda: data?.content,
-    isFetching
-  }
-}
-// ****** TIPOS ESTABLECIMIENTO ******
-type DataTiposEstablecimiento = {content: string[]}
-export const useTiposEstablecimientoQuery = () => {
-  const tknSession = useSessionStore(state => state.tknSession)
-  const {data, isFetching} = useQuery<DataTiposEstablecimiento>({
-    queryKey: ['tipos_establecimiento'],
-    queryFn: () => {
-      const options: FetchOptions = {
-        url: apiURL + "catalogos/get_tipos_establecimiento",
-        authorization: "Bearer " + tknSession
-      }
-      return fnFetch(options)
-    },
-    staleTime: 1000 * 60 * 60 * 24
-  })
-
-  return {
-    tiposEstablecimiento: data?.content,
-    isFetching
-  }
-}
 // ****** FORMAS PAGO ******
-type DataFormasPago = {content: FormaPago[]}
 export const useFormasPagoQuery = () => {
-  const tknSession = useSessionStore(state => state.tknSession)
-  const {data, isFetching} = useQuery<DataFormasPago>({
-    queryKey: ['formas_pago'],
+  const tknSession = useSessionStore((state) => state.tknSession);
+  const { data, isFetching } = useQuery({
+    queryKey: ["formas_pago"],
     queryFn: () => {
       const options: FetchOptions = {
         url: apiURL + "catalogos/get_formas_pago",
-        authorization: "Bearer " + tknSession
-      }
-      return fnFetch(options)
+        authorization: "Bearer " + tknSession,
+      };
+      return fnFetch(options);
     },
-    staleTime: 1000 * 60 * 60 * 24
-  })
+    staleTime: 1000 * 60 * 60 * 24,
+  });
+
+  const formasPago = useMemo(() => {
+    const result = FormasPagoSchema.safeParse(data);
+    return result.success ? result.data : [];
+  }, [data]);
 
   return {
-    formasPago: data?.content,
-    isFetching
-  }
-}
+    formasPago,
+    isFetching,
+  };
+};
+
+// ****** IMPUESTOS ******
+export const useImpuestosQuery = () => {
+  const tknSession = useSessionStore((state) => state.tknSession);
+  const { data, isFetching } = useQuery({
+    queryKey: ["impuestos"],
+    queryFn: () => {
+      const options: FetchOptions = {
+        url: apiURL + "catalogos/get_impuestos",
+        authorization: "Bearer " + tknSession,
+      };
+      return fnFetch(options);
+    },
+    staleTime: 1000 * 60 * 60 * 24,
+  });
+
+  const impuestos = useMemo(() => {
+    const result = ImpuestosSchema.safeParse(data);
+    return result.success ? result.data : [];
+  }, [data]);
+
+  return {
+    impuestos,
+    isFetching,
+  };
+};
+
+// ****** MOTIVOS NOTA ******
+export const useMotivosNotaQuery = () => {
+  const tknSession = useSessionStore((state) => state.tknSession);
+  const { data, isFetching } = useQuery({
+    queryKey: ["motivos_nota"],
+    queryFn: () => {
+      const options: FetchOptions = {
+        url: apiURL + "catalogos/get_motivos_nota",
+        authorization: "Bearer " + tknSession,
+      };
+      return fnFetch(options);
+    },
+    staleTime: 1000 * 60 * 60 * 24,
+  });
+
+  const motivosNota = useMemo(() => {
+    const result = MotivosNotaSchema.safeParse(data);
+    return result.success ? result.data : [];
+  }, [data]);
+
+  return {
+    motivosNota,
+    isFetching,
+  };
+};
+
+// ****** TIPOS DOCUMENTO ******
+export const useTiposDocumentoQuery = () => {
+  const tknSession = useSessionStore((state) => state.tknSession);
+  const { data, isFetching } = useQuery({
+    queryKey: ["tipos_documento"],
+    queryFn: () => {
+      const options: FetchOptions = {
+        url: apiURL + "catalogos/get_tipos_documento",
+        authorization: "Bearer " + tknSession,
+      };
+      return fnFetch(options);
+    },
+    staleTime: 1000 * 60 * 60 * 24,
+  });
+
+  const tiposDocumento = useMemo(() => {
+    const result = TiposDocumentoSchema.safeParse(data);
+    return result.success ? result.data : [];
+  }, [data]);
+
+  return {
+    tiposDocumento,
+    isFetching,
+  };
+};
+
+// ****** TIPOS COMPROBANTE ******
+export const useTiposComprobanteQuery = () => {
+  const tknSession = useSessionStore((state) => state.tknSession);
+  const { data, isFetching } = useQuery({
+    queryKey: ["tipos_comprobante"],
+    queryFn: () => {
+      const options: FetchOptions = {
+        url: apiURL + "catalogos/get_tipos_comprobante",
+        authorization: "Bearer " + tknSession,
+      };
+      return fnFetch(options);
+    },
+    staleTime: 1000 * 60 * 60 * 24,
+  });
+
+  const tiposComprobante = useMemo(() => {
+    const result = TiposComprobanteSchema.safeParse(data);
+    return result.success ? result.data : [];
+  }, [data]);
+
+  return {
+    tiposComprobante,
+    isFetching,
+  };
+};
+
+// ****** TIPOS MOVIMIENTO CAJA ******
+export const useTiposMovimientoCajaQuery = () => {
+  const tknSession = useSessionStore((state) => state.tknSession);
+  const { data, isFetching } = useQuery({
+    queryKey: ["tipos_movimiento_caja"],
+    queryFn: () => {
+      const options: FetchOptions = {
+        url: apiURL + "catalogos/get_tipos_movimiento_caja",
+        authorization: "Bearer " + tknSession,
+      };
+      return fnFetch(options);
+    },
+    staleTime: 1000 * 60 * 60 * 24,
+  });
+
+  const tiposMovimientoCaja = useMemo(() => {
+    const result = TiposMovimientoCajaSchema.safeParse(data);
+    return result.success ? result.data : [];
+  }, [data]);
+
+  return {
+    tiposMovimientoCaja,
+    isFetching,
+  };
+};
+
+// ****** TIPOS MOVIMIENTO ******
+export const useTiposMovimientoQuery = () => {
+  const tknSession = useSessionStore((state) => state.tknSession);
+  const { data, isFetching } = useQuery({
+    queryKey: ["tipos_movimiento"],
+    queryFn: () => {
+      const options: FetchOptions = {
+        url: apiURL + "catalogos/get_tipos_movimiento",
+        authorization: "Bearer " + tknSession,
+      };
+      return fnFetch(options);
+    },
+    staleTime: 1000 * 60 * 60 * 24,
+  });
+
+  const tiposMovimiento = useMemo(() => {
+    const result = TiposMovimientoSchema.safeParse(data);
+    return result.success ? result.data : [];
+  }, [data]);
+
+  return {
+    tiposMovimiento,
+    isFetching,
+  };
+};
+
+// ****** TIPOS OPERACION ******
+export const useTiposOperacionQuery = () => {
+  const tknSession = useSessionStore((state) => state.tknSession);
+  const { data, isFetching } = useQuery({
+    queryKey: ["tipos_operacion"],
+    queryFn: () => {
+      const options: FetchOptions = {
+        url: apiURL + "catalogos/get_tipos_operacion",
+        authorization: "Bearer " + tknSession,
+      };
+      return fnFetch(options);
+    },
+    staleTime: 1000 * 60 * 60 * 24,
+  });
+
+  const tiposOperacion = useMemo(() => {
+    const result = TiposOperacionSchema.safeParse(data);
+    return result.success ? result.data : [];
+  }, [data]);
+
+  return {
+    tiposOperacion,
+    isFetching,
+  };
+};
+
+// ****** TIPOS MONEDA ******
+export const useTiposMonedaQuery = () => {
+  const tknSession = useSessionStore((state) => state.tknSession);
+  const { data, isFetching } = useQuery({
+    queryKey: ["tipos_moneda"],
+    queryFn: () => {
+      const options: FetchOptions = {
+        url: apiURL + "catalogos/get_tipos_moneda",
+        authorization: "Bearer " + tknSession,
+      };
+      return fnFetch(options);
+    },
+    staleTime: 1000 * 60 * 60 * 24,
+  });
+
+  const tiposMoneda = useMemo(() => {
+    const result = TiposMonedaSchema.safeParse(data);
+    return result.success ? result.data : [];
+  }, [data]);
+
+  return {
+    tiposMoneda,
+    isFetching,
+  };
+};
+
+// ****** TIPOS ESTABLECIMIENTO ******
+export const useTiposEstablecimientoQuery = () => {
+  const tknSession = useSessionStore((state) => state.tknSession);
+  const { data, isFetching } = useQuery({
+    queryKey: ["tipos_establecimiento"],
+    queryFn: () => {
+      const options: FetchOptions = {
+        url: apiURL + "catalogos/get_tipos_establecimiento",
+        authorization: "Bearer " + tknSession,
+      };
+      return fnFetch(options);
+    },
+    staleTime: 1000 * 60 * 60 * 24,
+  });
+
+  const tiposEstablecimiento = useMemo(() => {
+    const result = TiposEstablecimientoSchema.safeParse(data);
+    return result.success ? result.data : [];
+  }, [data]);
+
+  return {
+    tiposEstablecimiento,
+    isFetching,
+  };
+};
+
+// ****** UNIDADES MEDIDA ******
+export const useUnidadesMedidaQuery = () => {
+  const tknSession = useSessionStore((state) => state.tknSession);
+  const { data, isFetching } = useQuery({
+    queryKey: ["unidades_medida"],
+    queryFn: () => {
+      const options: FetchOptions = {
+        url: apiURL + "catalogos/get_unidades_medida",
+        authorization: "Bearer " + tknSession,
+      };
+      return fnFetch(options);
+    },
+    staleTime: 1000 * 60 * 60 * 24,
+  });
+
+  const unidadesMedida = useMemo(() => {
+    const result = UnidadesMedidaSchema.safeParse(data);
+    return result.success ? result.data : [];
+  }, [data]);
+
+  return {
+    unidadesMedida,
+    isFetching,
+  };
+};
 
 
 // ****** MUTATION CATALOGOS ******
 export const useMutationCatalogosQuery = () => {
-  const fnName = useRef("")
-  const resetSessionStore = useSessionStore(state => state.resetSessionStore)
-  const navigate = useNavigate()
-  const token = useSessionStore(state => state.tknSession)
+  const fnName = useRef("");
+  const resetSessionStore = useSessionStore((state) => state.resetSessionStore);
+  const navigate = useNavigate();
+  const token = useSessionStore((state) => state.tknSession);
 
-  const {data, isPending, isError, mutate, } = useMutation({
-    mutationKey: ['mutation_catalogos'],
+  const { data, isPending, isError, mutate } = useMutation({
+    mutationKey: ["mutation_catalogos"],
     mutationFn: fnFetch,
     onSuccess: (resp) => {
-      if(resp.msgType !== 'success') return
+      if (resp.msgType !== "success") return;
       // queryClient.invalidateQueries({queryKey:["catalogos"]})
-    }
-  })
+    },
+  });
 
   const createTipoComprobante = (param: TipoComprobante) => {
-    fnName.current = createTipoComprobante.name
+    fnName.current = createTipoComprobante.name;
     const options: FetchOptions = {
       method: "POST",
       url: apiURL + "catalogos/create_tipo_comprobante",
       body: JSON.stringify(param),
       authorization: "Bearer " + token,
-    }
-    mutate(options)
-  }
-  
+    };
+    mutate(options);
+  };
+
   const updateTipoComprobante = (param: TipoComprobante) => {
-    fnName.current = updateTipoComprobante.name
+    fnName.current = updateTipoComprobante.name;
     const options: FetchOptions = {
       method: "PUT",
       url: apiURL + "catalogos/update_tipo_comprobante",
       body: JSON.stringify(param),
       authorization: "Bearer " + token,
-    }
-    mutate(options)
-  }
+    };
+    mutate(options);
+  };
 
   const deleteTipoComprobante = (id: number) => {
-    fnName.current = deleteTipoComprobante.name
+    fnName.current = deleteTipoComprobante.name;
     const options: FetchOptions = {
       method: "DELETE",
       url: apiURL + "catalogos/delete_tipo_comprobante",
-      body: JSON.stringify({id}),
+      body: JSON.stringify({ id }),
       authorization: "Bearer " + token,
-    }
-    mutate(options)
-  }
+    };
+    mutate(options);
+  };
 
-  useEffect(()=>{
-    if(!data) return
-    if(data?.errorType === "errorToken"){
-      resetSessionStore()
-      navigate("/auth")
+  useEffect(() => {
+    if (!data) return;
+    if (data?.errorType === "errorToken") {
+      resetSessionStore();
+      navigate("/auth");
     }
-  },[data])
-  
+  }, [data]);
+
   return {
-    data, 
-    isPending, 
+    data,
+    isPending,
     isError,
     createTipoComprobante,
     updateTipoComprobante,
     deleteTipoComprobante,
-  }
-}
-
-
+  };
+};

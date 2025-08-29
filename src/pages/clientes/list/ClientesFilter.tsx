@@ -126,7 +126,7 @@ export function ClientesFilter({isFetching}: Props) {
                     }}
                   >
                     <option value="">Todos</option>
-                    {tiposDocumento?.map((el) => (
+                    {tiposDocumento.map((el) => (
                       <option key={el.id} value={el.descripcion}>
                         {el.descripcion}
                       </option>

@@ -2,30 +2,27 @@ import { useEffect, useState } from "react"
 import Swal from "sweetalert2"
 import { toast } from "react-toastify"
 import { Button, Card, Col, Container, Form, Row } from "react-bootstrap"
-import { useMutateCategoriasQuery } from "../../api/queries/useCategoriasQuery"
-import { flattenTree } from "../../app/utils/funciones"
+import { useCategoriasQuery, useMutateCategoriasQuery } from "../../api/queries/useCategoriasQuery"
 import CategoriasTree from "./CategoriasTree"
 import { LdsBar } from "../../app/components/Loaders"
 import useLayoutStore from "../../app/store/useLayoutStore"
-import { Categoria, Padre } from "../../app/types"
-import { useCategoriasTreeQuery } from "../../api/queries/useCatalogosQuery"
+import { CategoriaTree } from "../../app/types"
 import { useQueryClient } from "@tanstack/react-query"
 
-export const categoriaFormInit = {
+export const categoriaFormInit: CategoriaTree = {
   id: 0,
-  nombre: "",
   descripcion: "",
   padre_id: 0,
+  nivel: 0,
   orden: 0,
-  estado: 1
+  children: []
 }
 
 export default function CategoriasPage() {
-  const [categoriaForm, setCategoriaForm] = useState<Categoria>(categoriaFormInit)
-  const [padres, setPadres] = useState<Padre[] | null>(null)
+  const [categoriaForm, setCategoriaForm] = useState<CategoriaTree>(categoriaFormInit)
   const darkMode = useLayoutStore(state => state.layout.darkMode)
   const queryClient = useQueryClient()
-  const {categoriasTree} = useCategoriasTreeQuery()
+  const {categorias} = useCategoriasQuery()
 
   const {
     data: mutation, 
@@ -36,21 +33,21 @@ export default function CategoriasPage() {
     deleteCategoria, 
   } = useMutateCategoriasQuery()
 
-  const actualizarPadres = (id: number) => {
-    if(!categoriasTree) return
-    let nuevosPadres = flattenTree(categoriasTree)
-      .filter((el: any)=> el.id != id)
-      .map((el: any) => {
-        const {id, descripcion, nivel} = el
-        return {id, descripcion, nivel}
-      }
-    )
-    setPadres(nuevosPadres)
-  }
+  // const actualizarPadres = (id: number) => {
+  //   if(!categoriasTree || isErrCategoriasTreeRes(categoriasTree)) return
+  //   let nuevosPadres = flattenTree(categoriasTree)
+  //     .filter((el: any)=> el.id != id)
+  //     .map((el: any) => {
+  //       const {id, descripcion, nivel} = el
+  //       return {id, descripcion, nivel}
+  //     }
+  //   )
+  //   setPadres(nuevosPadres)
+  // }
 
-  const toEdit = (categoria: Categoria) => {
+  const toEdit = (categoria: CategoriaTree) => {
     setCategoriaForm(categoria)
-    actualizarPadres(categoria.id)
+    // actualizarPadres(categoria.id)
   }
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -86,16 +83,17 @@ export default function CategoriasPage() {
 
   const handleResetForm = () => {
     setCategoriaForm(categoriaFormInit)
-    actualizarPadres(0)
+    // actualizarPadres(0)
   }
 
   const handleDelete = () => {
+    if(!categorias.tree.length) return
     const {id} = categoriaForm
     if(!id){
       toast.warning("Seleccione una categoría de la lista!")
       return
     }
-    const item = categoriasTree?.find((el: any) => el.id === id)
+    const item = categorias.tree.find((el: any) => el.id === id)
     if(item?.children.length){
       toast.warning("No se puede eliminar categorías que tienen hijos")
       return
@@ -135,10 +133,10 @@ export default function CategoriasPage() {
   }, [mutation])
     
 
-  useEffect(()=>{
-    if(!categoriasTree) return
-    actualizarPadres(0)
-  }, [categoriasTree])
+  // useEffect(()=>{
+  //   if(!categoriasTree) return
+  //   actualizarPadres(0)
+  // }, [categoriasTree])
 
   return (
     <Container>
@@ -151,9 +149,9 @@ export default function CategoriasPage() {
               <Row>
                 <Col>
                   <div className="mb-2"><small>Arrastre los items para ordenar.</small></div>
-                  {categoriasTree && categoriasTree && 
+                  {categorias.tree.length && 
                     <CategoriasTree 
-                      categoriasTree={categoriasTree} 
+                      categoriasTree={categorias.tree} 
                       toEdit={toEdit}
                       sortCategorias={sortCategorias}
                     />
@@ -189,11 +187,11 @@ export default function CategoriasPage() {
                       <Form.Label>Padre</Form.Label>
                       <Form.Select 
                         name="padre_id"
-                        value={categoriaForm.padre_id}
+                        value={categoriaForm.padre_id || ""}
                         onChange={handleChangeSelect}
                       >
                         <option value={0}> </option>
-                        {padres && padres.map((el: Padre) => 
+                        {categorias.list.map((el) => 
                           <option key={el.id} value={el.id}
                           >
                             {el.descripcion}

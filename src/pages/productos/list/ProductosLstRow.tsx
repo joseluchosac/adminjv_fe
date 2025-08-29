@@ -1,4 +1,4 @@
-import { format, isValid, parseISO } from "date-fns";
+// import { format, isValid, parseISO } from "date-fns";
 import { CampoTable, Producto, ProductoItem, QueryResp } from "../../../app/types";
 import { useProductos } from "../context/ProductosContext";
 import { FaEdit, FaToggleOff, FaToggleOn, FaTrash } from "react-icons/fa";
@@ -18,7 +18,7 @@ interface ProductoMutQryRes extends QueryResp {
   content: Producto | null
 }
 function ProductosLstRow({ producto, camposProducto }: ProductosLstRowProps) {
-  const {setModo} = useProductos()
+  const { setModo } = useProductos()
   const darkMode = useLayoutStore(state => state.layout.darkMode)
   const curEstab = useSessionStore(state => state.curEstab)
 
@@ -28,11 +28,6 @@ function ProductosLstRow({ producto, camposProducto }: ProductosLstRowProps) {
     updateEstado,
     deleteProducto, 
   } = useMutationProductosQuery<ProductoMutQryRes>()
-
-  const validDate = (date:string | undefined, formato = "dd/MM/yyyy") => {
-    if(!date) return ''
-    return isValid(parseISO(date)) ? format(date, formato) : ''
-  }
 
   const handleToEdit = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
     e.preventDefault()

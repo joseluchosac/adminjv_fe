@@ -1,4 +1,4 @@
-import { LaboratorioItem} from "../../../app/types";
+import { LaboratorioItem, QueryResp} from "../../../app/types";
 import { FaEdit, FaToggleOff, FaToggleOn, FaTrash } from "react-icons/fa";
 import { useMutationLaboratoriosQuery } from "../../../api/queries/useLaboratoriosQuery";
 import Swal from "sweetalert2";
@@ -10,7 +10,9 @@ import useLaboratoriosStore from "../../../app/store/useLaboratoriosStore";
 interface Props {
   laboratorio: LaboratorioItem ;
 }
-
+type MutationRes = QueryResp & {
+  laboratorio?: LaboratorioItem
+};
 function LaboratoriosListItem({ laboratorio }: Props) {
   const darkMode = useLayoutStore(state => state.layout.darkMode)
   const camposLaboratorio = useLaboratoriosStore(state => state.camposLaboratorio)
@@ -21,7 +23,7 @@ function LaboratoriosListItem({ laboratorio }: Props) {
     isPending: isPendingMutation,
     deleteLaboratorio,
     setStateLaboratorio,
-  } = useMutationLaboratoriosQuery()
+  } = useMutationLaboratoriosQuery<MutationRes>()
 
   const handleToEdit = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
     e.preventDefault()

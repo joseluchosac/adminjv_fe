@@ -4,8 +4,8 @@ import { FaStore } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import { MdMail } from "react-icons/md";
 import { useForm } from "react-hook-form";
-import { EmpresaInfo, QueryResp, SignUpFormSchema } from "../../app/types";
-import { signUpFormSchema } from "../../app/types/schemas";
+import { EmpresaInfo, QueryResp, SignUpForm } from "../../app/types";
+import { SignUpFormSchema } from "../../app/schemas/auth-schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import useSessionStore from "../../app/store/useSessionStore";
 import { useQueryClient } from "@tanstack/react-query";
@@ -28,8 +28,8 @@ export default function SignUpPage() {
     register,
     formState: { errors },
     handleSubmit,
-  } = useForm<SignUpFormSchema>({
-    resolver: zodResolver(signUpFormSchema),
+  } = useForm<SignUpForm>({
+    resolver: zodResolver(SignUpFormSchema),
     defaultValues: {
       username: "", 
       email: "", 
@@ -45,7 +45,7 @@ export default function SignUpPage() {
     signUp, 
   } = useMutationUsersQuery<SignUpQryRes>()
 
-  const onSubmit = (data: SignUpFormSchema) => {
+  const onSubmit = (data: SignUpForm) => {
     if(data.establecimiento_id != curEstab){
       setCurEstab(Number(data.establecimiento_id));
     }

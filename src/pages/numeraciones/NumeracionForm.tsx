@@ -116,7 +116,7 @@ export default function NumeracionForm() {
 
   useEffect(() => {
     setValue('serie', `${getValues().serie_pre}${getValues().serie_suf}`)
-    if(!tiposComprobante) return
+    if(!tiposComprobante.length) return
     const tipo_comprobante = tiposComprobante?.find(el => el.serie_pre === getValues().serie_pre)
     setValue('descripcion_doc', tipo_comprobante ? tipo_comprobante.descripcion_doc : "")
   }, [watch("serie_pre"), watch("serie_suf")])
@@ -136,7 +136,7 @@ export default function NumeracionForm() {
                 id="serie_pre"
                 {...register('serie_pre',{required: "Ingrese el tipo de comprobante"})}
               >
-                {tiposComprobante && tiposComprobante.map((el) => 
+                {tiposComprobante.map((el) => 
                   <option key={el.id} value={el.serie_pre}>{el.descripcion_doc}</option>
                 )}
               </Form.Select>

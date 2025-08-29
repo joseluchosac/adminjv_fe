@@ -35,6 +35,7 @@ export default function TiposComprobante() {
 
   const handleToEdit = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
     e.preventDefault()
+    if(!tiposComprobante.length) return
     const {id} = e.currentTarget.dataset
     const toEdit = tiposComprobante?.find(el=>el.id === Number(id))
     if(toEdit) setForm(toEdit)
@@ -42,6 +43,7 @@ export default function TiposComprobante() {
 
   const handleToggleEstado = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
     e.preventDefault()
+    if(!tiposComprobante.length) return
     const id = e.currentTarget.dataset.id
     const new_tipo_comprobante = tiposComprobante?.find(el => el.id === Number(id)) as TipoComprobante
     new_tipo_comprobante.estado = (new_tipo_comprobante?.estado === 1) ? 0 : 1
@@ -50,6 +52,7 @@ export default function TiposComprobante() {
 
   const handleDelete = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
     e.preventDefault()
+    if(!tiposComprobante.length) return
     const id = e.currentTarget.dataset.id
     const tipo_comprobante = tiposComprobante?.find(el => el.id === Number(id))
     Swal.fire({
@@ -170,8 +173,7 @@ export default function TiposComprobante() {
                   </tr>
                 </thead>
                 <tbody>
-                  {
-                    tiposComprobante?.map(el => {
+                  {tiposComprobante.map(el => {
                       return (
                         <tr key={el.id}>
                           <td>{el.codigo}</td>

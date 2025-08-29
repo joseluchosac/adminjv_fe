@@ -9,10 +9,10 @@ import {
   QueryResp, 
   UserItem, 
   UserSession, 
-  ProfileFormType,
-  SignInFormSchema,
-  UserFormSchema,
-  SignUpFormSchema,
+  ProfileForm,
+  SignInForm,
+  UserForm,
+  SignUpForm,
 } from "../../app/types"
 import { useUsers } from "../../pages/users/context/UsersContext";
 import { useDebounce } from "react-use";
@@ -244,7 +244,7 @@ export const useMutationUsersQuery = <T>() => {
     mutate(options)
   }
 
-  const createUser = (user: UserFormSchema) => {
+  const createUser = (user: UserForm) => {
     typeActionRef.current = "mutate_create_user"
     const options: FetchOptions = {
       method: "POST",
@@ -255,7 +255,7 @@ export const useMutationUsersQuery = <T>() => {
     mutate(options)
   }
 
-  const updateUser = (user: UserFormSchema) => {
+  const updateUser = (user: UserForm) => {
     typeActionRef.current = "mutate_update_user"
     const options: FetchOptions = {
       method: "PUT",
@@ -297,7 +297,7 @@ export const useMutationUsersQuery = <T>() => {
     mutate(options)
   }
 
-  const updateProfile = (user: ProfileFormType) => {
+  const updateProfile = (user: ProfileForm) => {
     typeActionRef.current = "mutate_profile"
     const options: FetchOptions = {
       method: "PUT",
@@ -308,7 +308,7 @@ export const useMutationUsersQuery = <T>() => {
     mutate(options)
   }
 
-  const signUp = (registro: SignUpFormSchema) => { // registrarse
+  const signUp = (registro: SignUpForm) => { // registrarse
     typeActionRef.current = "sign_up"
     const options: FetchOptions = {
       method: "POST",
@@ -318,7 +318,7 @@ export const useMutationUsersQuery = <T>() => {
     mutate(options)
   }
 
-  const signIn = (param: SignInFormSchema) => { // iniciar sesion
+  const signIn = (param: SignInForm) => { // iniciar sesion
     typeActionRef.current = "login"
     const options: FetchOptions = {
       method: "POST",

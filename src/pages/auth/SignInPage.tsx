@@ -4,12 +4,12 @@ import { FaStore } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { EmpresaInfo, QueryResp, SignInFormSchema } from "../../app/types";
+import { EmpresaInfo, QueryResp, SignInForm } from "../../app/types";
 import { useEffect } from "react";
 import useSessionStore from "../../app/store/useSessionStore";
 import { useMutationUsersQuery } from "../../api/queries/useUsersQuery";
 import { toast } from "react-toastify";
-import { signInFormSchema } from "../../app/types/schemas";
+import { SignInFormSchema } from "../../app/schemas/auth-schema";
 import { LdsBar } from "../../app/components/Loaders";
 import { useQueryClient } from "@tanstack/react-query";
 
@@ -31,8 +31,8 @@ export default function SignInPage() {
     formState: { errors },
     handleSubmit,
     getValues,
-  } = useForm<SignInFormSchema>({
-    resolver: zodResolver(signInFormSchema),
+  } = useForm<SignInForm>({
+    resolver: zodResolver(SignInFormSchema),
     defaultValues: { username: "", password: "", establecimiento_id: curEstab }
   })
 
@@ -48,7 +48,7 @@ export default function SignInPage() {
     getEmailByUsername,
   } = useMutationUsersQuery<DataEmailQryRes>();
 
-  const onSubmit = (data: SignInFormSchema) => {
+  const onSubmit = (data: SignInForm) => {
     signIn(data)
     setCurEstab(Number(data.establecimiento_id));
   }

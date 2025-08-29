@@ -2,11 +2,11 @@ import { useEffect } from "react";
 import { Alert, Button, Card, Form, InputGroup } from "react-bootstrap"
 import { LdsBar } from "../../app/components/Loaders"
 import DynaIcon from "../../app/components/DynaComponents"
-import { QueryResp, RecoveryFormSchema } from "../../app/types";
+import { QueryResp, RecoveryForm } from "../../app/types";
 import { useMutationUsersQuery } from "../../api/queries/useUsersQuery";
 import { toast } from "react-toastify";
 import { useForm } from "react-hook-form";
-import { recoveryFormSchema } from "../../app/types/schemas";
+import { RecoveryFormSchema } from "../../app/schemas/auth-schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Link } from "react-router-dom";
 
@@ -15,32 +15,32 @@ const RecoveryPage: React.FC = () => {
   const recov = JSON.parse(recovPlain) as {username: string, email: string}
   const {
     register,
-    formState: { errors },
-    handleSubmit,
-    getValues,
-  } = useForm<RecoveryFormSchema>({
-    resolver: zodResolver(recoveryFormSchema),
+    // formState: { errors },
+    // handleSubmit,
+    // getValues,
+  } = useForm<RecoveryForm>({
+    resolver: zodResolver(RecoveryFormSchema),
   })
 
   const {
     data: dataRestore,
     isPending: isPendingRestore,
-    restorePassword
+    // restorePassword
   } = useMutationUsersQuery<QueryResp>()
 
   const {
     data: dataSendCode,
     isPending: isPendingSendCode,
-    sendCodeRestoration
+    // sendCodeRestoration
   } = useMutationUsersQuery<QueryResp>()
 
   const handleSendCodeRestoration = () => {
-    const params = {email: recov.email, username: recov.username}
+    // const params = {email: recov.email, username: recov.username}
     // sendCodeRestoration(params) // Trabajando en ello
   }
 
   const handleRestorePassword = (e: React.FormEvent) => {
-    // e.preventDefault();
+    e.preventDefault();
     // restorePassword(restoreForm)
   };
 

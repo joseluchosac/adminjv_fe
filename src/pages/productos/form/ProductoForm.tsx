@@ -126,6 +126,7 @@ export default function Productoform(){
   }, [producto])
   
   useEffect(()=>{
+    if(!impuestos.length) return
     let igv = impuestos?.find(el=>el.id === watch('impuesto_id_igv'))?.porcentaje
     igv = igv ? igv : 0
     const valorVenta = watch('precio_venta')/(1 + igv/100)
@@ -264,7 +265,7 @@ export default function Productoform(){
                               id="tipo_moneda_cod"
                               {...register('tipo_moneda_cod')}
                             >
-                              {tiposMoneda?.map((el) => 
+                              {tiposMoneda.map((el) => 
                                 <option key={el.codigo} value={el.codigo}>{el.descripcion}</option>
                               )}
                             </Form.Select>
@@ -275,7 +276,7 @@ export default function Productoform(){
                               id="impuesto_id_igv"
                               {...register('impuesto_id_igv', {valueAsNumber:true})}
                             >
-                              {impuestos?.filter(el=>el.afectacion_igv_desc != "ICBPER").map((el) => 
+                              {impuestos.filter(el=>el.afectacion_igv_desc != "ICBPER").map((el) => 
                                 <option key={el.id} value={el.id}>{`${el.afectacion_igv_desc} (${el.porcentaje}%)`}</option>
                               )}
                             </Form.Select>
@@ -287,7 +288,7 @@ export default function Productoform(){
                               {...register('impuesto_id_icbper', {valueAsNumber:true})}
                             >
                                 <option value={0}></option>
-                              {impuestos?.filter(el=>el.afectacion_igv_desc === "ICBPER").map((el) => 
+                              {impuestos.filter(el=>el.afectacion_igv_desc === "ICBPER").map((el) => 
                                 <option key={el.id} value={el.id}>
                                   {`${el.afectacion_igv_desc} (${el.importe})`}
                                 </option>

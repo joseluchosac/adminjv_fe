@@ -1,12 +1,12 @@
 import { useEffect, useRef } from "react";
 import DynaIcon from "../../app/components/DynaComponents";
 import Sortable from "sortablejs";
-import { Categoria } from "../../app/types";
+import { CategoriaTree } from "../../app/types";
 
 type Props = {
-  categoriasTree: Categoria[];
-  toEdit: (categoria: Categoria) => void;
-  sortCategorias: (orderedItems: Categoria[]) => void;
+  categoriasTree: CategoriaTree[];
+  toEdit: (categoria: CategoriaTree) => void;
+  sortCategorias: (orderedItems: CategoriaTree[]) => void;
 }
 
 export default function CategoriasTree({categoriasTree,  toEdit, sortCategorias}: Props) {

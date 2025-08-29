@@ -1,17 +1,18 @@
 const apiURL = import.meta.env.VITE_API_URL;
 import { useEffect, useRef } from "react"
 import { useNavigate } from "react-router-dom";
-import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query"
+import { InfiniteData, useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import useSessionStore from "../../app/store/useSessionStore"
-import { FetchOptions, FilterQueryResp, Laboratorio, LaboratorioItem } from "../../app/types";
+import { FetchOptions, FilterQueryResp, Laboratorio, LaboratorioItem, QueryResp } from "../../app/types";
 import { fnFetch } from "../fnFetch";
 import { toast } from "react-toastify";
 import { useDebounce } from "react-use";
 import useLaboratoriosStore from "../../app/store/useLaboratoriosStore";
 
 type TypeAction = 
-  "filter_full"
-  | "mutate_laboratorio"
+  "mutate_create_laboratorio"
+  | "mutate_update_laboratorio"
+  | "mutate_delete_laboratorio"
   | 'mutate_state_laboratorio'
 
 // ****** FILTRAR  ******
@@ -109,17 +110,75 @@ export const useFilterLaboratoriosQuery = () => {
 }
 
 // ****** MUTATION ******
-export const useMutationLaboratoriosQuery = () => {
+export type MutationLaboratorioRes = QueryResp & {
+  laboratorio?: LaboratorioItem
+};
+export const useMutationLaboratoriosQuery = <T>() => {
   const resetSessionStore = useSessionStore(state => state.resetSessionStore)
   const navigate = useNavigate()
   const token = useSessionStore(state => state.tknSession)
   const queryClient = useQueryClient()
   const typeActionRef = useRef<TypeAction | "">("")
 
-  const {data, isPending, isError, mutate, } = useMutation({
+  const {data, isPending, isError, mutate, } = useMutation<T, Error, FetchOptions, unknown>({
     mutationFn: fnFetch,
     onSuccess: (resp) => {
-      if(resp.msgType !== 'success') return
+      const r = resp as MutationLaboratorioRes
+      if(r.msgType !== 'success') return
+      if(typeActionRef.current === "mutate_create_laboratorio") {
+        const createdLaboratorio = r.laboratorio as LaboratorioItem
+        queryClient.setQueryData(["laboratorios"], (oldData: InfiniteData<LaboratoriosFilQryRes, unknown> | undefined) => {
+          const pages = structuredClone(oldData?.pages)
+          if((pages?.length || 0) < 4){ // hacer refetch si se cumple esta condicion
+            queryClient.invalidateQueries({queryKey:["laboratorios"]})
+            return oldData
+          }
+          if(pages && pages.length > 0){
+            pages[0].filas.unshift(createdLaboratorio as LaboratorioItem) // Agrega el nuevo registro al inicio de la primera página
+            pages[0].num_regs = pages[0].num_regs + 1
+          }
+          return {...oldData, pages, }
+        })
+      }else if(typeActionRef.current === "mutate_update_laboratorio" || typeActionRef.current === "mutate_state_laboratorio") {
+        const updatedLaboratorio = r.laboratorio as LaboratorioItem
+        queryClient.setQueryData(["laboratorios"], (oldData: InfiniteData<LaboratoriosFilQryRes, unknown> | undefined) => {
+          const pages = structuredClone(oldData?.pages)
+          if((pages?.length || 0) < 4){
+            queryClient.invalidateQueries({queryKey:["laboratorios"]})
+            return oldData
+          }
+          for(let idxPage in pages){
+            const idxFila = pages[parseInt(idxPage)].filas.findIndex((el: LaboratorioItem)=>el.id === updatedLaboratorio.id)
+            if(idxFila !== -1){
+              pages[parseInt(idxPage)].filas[idxFila] = updatedLaboratorio // Actualiza el registro en la lista
+              break
+            }
+          }
+          return {...oldData, pages}
+        })
+      }else if(typeActionRef.current === "mutate_delete_laboratorio") {
+        const deletedLaboratorioId = r.content as LaboratorioItem["id"]
+        queryClient.setQueryData(["laboratorios"], (oldData: InfiniteData<LaboratoriosFilQryRes, unknown> | undefined) => {
+          let pages = structuredClone(oldData?.pages)
+          if((pages?.length || 0) < 4){
+            queryClient.invalidateQueries({queryKey:["laboratorios"]})
+            return oldData
+          }
+          for(let idxPage in pages){
+            const idxFila = pages[parseInt(idxPage)].filas.findIndex((el: LaboratorioItem)=>el.id === deletedLaboratorioId)
+            if(idxFila !== -1){
+              let filasFiltradas = pages[parseInt(idxPage)].filas.filter(el => el.id !== deletedLaboratorioId) // Elimina el usuario de la fila
+              pages[parseInt(idxPage)].filas = filasFiltradas
+              pages[0].num_regs = pages[0].num_regs - 1
+              break
+            }
+          }
+          return {...oldData, pages}
+        })
+      } 
+
+
+
       queryClient.invalidateQueries({queryKey:["laboratorios"]}) // Recarga la tabla laboratorios
     }
   })
@@ -135,7 +194,7 @@ export const useMutationLaboratoriosQuery = () => {
   }
 
   const createLaboratorio = (laboratorio: Laboratorio) => {
-    typeActionRef.current = "mutate_laboratorio"
+    typeActionRef.current = "mutate_create_laboratorio"
     const options: FetchOptions = {
       method: "POST",
       url: apiURL + "laboratorios/create_laboratorio",
@@ -146,7 +205,7 @@ export const useMutationLaboratoriosQuery = () => {
   }
 
   const updateLaboratorio = (laboratorio: Laboratorio) => {
-    typeActionRef.current = "mutate_laboratorio"
+    typeActionRef.current = "mutate_update_laboratorio"
     const options: FetchOptions = {
       method: "PUT",
       url: apiURL + "laboratorios/update_laboratorio",
@@ -166,7 +225,7 @@ export const useMutationLaboratoriosQuery = () => {
     mutate(options)
   }
   const deleteLaboratorio = (id: number) => {
-    typeActionRef.current = "mutate_laboratorio"
+    typeActionRef.current = "mutate_delete_laboratorio"
     const options: FetchOptions = {
       method: "DELETE",
       url: apiURL + "laboratorios/delete_laboratorio",
@@ -177,7 +236,7 @@ export const useMutationLaboratoriosQuery = () => {
   }
 
   useEffect(()=>{
-    if(data?.errorType === "errorToken"){
+    if((data as QueryResp)?.errorType === "errorToken"){
       resetSessionStore()
       navigate("/auth")
     }

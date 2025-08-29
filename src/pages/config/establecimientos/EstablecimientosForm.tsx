@@ -184,7 +184,7 @@ export default function EstablecimientoForm() {
                     required:"Ingrese el código",
                   })}
                 >
-                  {tiposEstablecimiento?.map(el=><option key={el}>{el}</option>)}
+                  {tiposEstablecimiento.map(el=><option key={el}>{el}</option>)}
                 </Form.Select>
                 {errors.tipo && 
                   <div className="invalid-feedback d-block">{errors.tipo.message}</div>
