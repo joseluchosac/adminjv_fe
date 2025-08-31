@@ -1,4 +1,4 @@
-import { ClienteItem, QueryResp} from "../../../app/types";
+import { ClienteItem, ApiResp} from "../../../app/types";
 import { FaEdit, FaToggleOff, FaToggleOn, FaTrash } from "react-icons/fa";
 import { useMutationClientesQuery } from "../../../api/queries/useClientesQuery";
 import Swal from "sweetalert2";
@@ -12,7 +12,7 @@ interface Props {
 }
 
 
-interface ClienteMutQryRes extends QueryResp {content: ClienteItem}
+interface ClienteMutQryRes extends ApiResp {content: ClienteItem}
 
 function ClientesListItem({ cliente }: Props) {
   const darkMode = useLayoutStore(state => state.layout.darkMode)

@@ -4,96 +4,87 @@ import { toast } from "react-toastify";
 import Swal from "sweetalert2";
 import useLayoutStore from "../../app/store/useLayoutStore";
 import { useMutationUsersQuery } from "../../api/queries/useUsersQuery";
-import {ApiGenericResp, type Profile, ProfileForm, QueryResp } from "../../app/types";
+import { ApiResp, GetProfileResp, type Profile, ProfileForm } from "../../app/types";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { LdsEllipsisCenter } from "../../app/components/Loaders";
 import { ProfileFormSchema } from "../../app/schemas/users-schema";
 
-interface MutatateProfile extends ApiGenericResp {
-  content: Profile
-}
-type GetProfile = Profile | ApiGenericResp
-
 export default function ProfilePage() {
-    const darkMode = useLayoutStore(state => state.layout.darkMode)
-    const {
-      register,
-      formState: { errors },
-      handleSubmit,
-      reset,
-      getValues,
-    } = useForm<ProfileForm>({
-      resolver: zodResolver(ProfileFormSchema),
-    })
+  const darkMode = useLayoutStore(state => state.layout.darkMode)
+  const {
+    register,
+    formState: { errors },
+    handleSubmit,
+    reset,
+    getValues,
+  } = useForm<ProfileForm>({
+    resolver: zodResolver(ProfileFormSchema),
+  })
 
-    const {
-      data: profile,
-      isPending: isPendingProfile,
-      getProfile
-    } = useMutationUsersQuery<GetProfile>()
+  const {
+    data: getProfileResp,
+    isPending: isPendingProfile,
+    getProfile
+  } = useMutationUsersQuery<GetProfileResp>()
 
-    const {
-      data: respCheckPassword,
-      checkPassword
-    } = useMutationUsersQuery<QueryResp>()
+  const {
+    data: checkPasswordResp,
+    checkPassword
+  } = useMutationUsersQuery<ApiResp>()
 
-    const {
-      data: mutation,
-      isPending: isPendingMutation,
-      updateProfile
-    } = useMutationUsersQuery<MutatateProfile>()
-    
+  const {
+    data: updateProfileResp,
+    isPending: isPendingMutation,
+    updateProfile
+  } = useMutationUsersQuery<ApiResp>()
   
-  
-    // const actualizar = () => {
-    //   queryClient.invalidateQueries({queryKey:["check_auth"]})
-    // }
-  
-    const onSubmit = () => {
-      Swal.fire({
-        text: "Ingrese su contraseña para guardar los cambios",
-        input: "password",
-        inputAttributes: {
-          autocapitalize: "off"
-        },
-        showCancelButton: true,
-        confirmButtonText: "Confirmar",
-        cancelButtonText: "Cancelar",
-        customClass: { 
-          popup: darkMode ? 'swal-dark' : ''
-        },
-      }).then((result) => {
-        checkPassword(result.value)
-      });
+  const onSubmit = () => {
+    Swal.fire({
+      text: "Ingrese su contraseña para guardar los cambios",
+      input: "password",
+      inputAttributes: {
+        autocapitalize: "off"
+      },
+      showCancelButton: true,
+      confirmButtonText: "Confirmar",
+      cancelButtonText: "Cancelar",
+      customClass: { 
+        popup: darkMode ? 'swal-dark' : ''
+      },
+    }).then((result) => {
+      checkPassword(result.value)
+    });
+  }
+
+  useEffect(() => {
+    getProfile()
+  }, [])
+
+  useEffect(() => {
+    if(!getProfileResp) return
+    if("error" in getProfileResp && getProfileResp.error){
+      toast(getProfileResp.msg || "Hubo un error al obtener los datos", {type: getProfileResp.msgType})
+      return
     }
+    reset(getProfileResp as Profile)
+  }, [getProfileResp])
+
+  useEffect(() => {
+    if(!checkPasswordResp) return
+    if(checkPasswordResp.error){
+      toast.error(checkPasswordResp.msg)
+    }else{
+      updateProfile(getValues())
+    }
+  }, [checkPasswordResp])
+
+  useEffect(() => {
+    if(!updateProfileResp) return
+    toast(updateProfileResp.msg, {type: updateProfileResp.msgType})
+  }, [updateProfileResp])
+
   
-    useEffect(() => {
-      getProfile()
-    }, [])
-  
-    useEffect(() => {
-      if(!profile) return
-      if("error" in profile && profile.error){
-        toast(profile.msg || "Hubo un error al obtener los datos", {type: profile.msgType})
-        return
-      }
-      reset(profile as Profile)
-    }, [profile])
-  
-    useEffect(() => {
-      if(!respCheckPassword) return
-      if(respCheckPassword.error){
-        toast.error(respCheckPassword.msg)
-      }else{
-        updateProfile(getValues())
-      }
-    }, [respCheckPassword])
-  
-    useEffect(() => {
-      if(!mutation) return
-      toast(mutation.msg, {type: mutation.msgType})
-    }, [mutation])
   return (
     <Container>
       <Card>

@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react"
 import { useNavigate } from "react-router-dom";
 import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import useSessionStore from "../../app/store/useSessionStore"
-import { FetchOptions, Producto, QueryResp, FilterQueryResp, ProductoItem } from "../../app/types"
+import { FetchOptions, Producto, ApiResp, FilterQueryResp, ProductoItem } from "../../app/types"
 import { filterParamsInit } from "../../app/utils/constants";
 import { fnFetch } from "../fnFetch";
 
@@ -89,7 +89,7 @@ export const useMutationProductosQuery = <T>() => {
   const {data, isPending, isError, mutate, } = useMutation<T, Error, FetchOptions, unknown>({
     mutationFn: fnFetch,
     onSuccess: (resp) => {
-      const r = resp as QueryResp
+      const r = resp as ApiResp
       if(r.msgType !== 'success') return
       queryClient.invalidateQueries({queryKey:["productos"]})
     }
@@ -162,7 +162,7 @@ export const useMutationProductosQuery = <T>() => {
   }
 
   useEffect(()=>{
-    const r = data as QueryResp
+    const r = data as ApiResp
     if(r?.errorType === "errorToken"){
       resetSessionStore()
       navigate("/auth")

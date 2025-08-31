@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import { Button, Card, Col, Container, Form, Row, Table } from "react-bootstrap"
-import { Modulo, QueryResp, Rol } from "../../app/types"
+import { Modulo, ApiResp, Rol } from "../../app/types"
 import ModulosRolTree from "./ModulosRolTree"
 import { getModulosTree } from "../../app/utils/funciones"
 import { useMutateModulosQuery } from "../../api/queries/useModulosQuery"
@@ -12,7 +12,7 @@ import { toast } from "react-toastify"
 import { useMutateRolesQuery, useRolesQuery } from "../../api/queries/useRolesQuery"
 import { useQueryClient } from "@tanstack/react-query"
 
-interface MutateRol extends QueryResp {
+interface MutateRol extends ApiResp {
   rol?: Rol
 }
 const rolFormInit = {id: 0, rol: ""}

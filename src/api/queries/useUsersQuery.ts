@@ -6,7 +6,7 @@ import useSessionStore from "../../app/store/useSessionStore"
 import { 
   FilterQueryResp,
   FetchOptions,
-  QueryResp, 
+  ApiResp, 
   UserItem, 
   UserSession, 
   ProfileForm,
@@ -19,19 +19,17 @@ import { useDebounce } from "react-use";
 import { toast } from "react-toastify";
 import { fnFetch } from "../fnFetch";
 
-type TypeAction = 
-"mutate_user" 
-| "mutate_create_user" 
-| "mutate_update_user" 
-| "mutate_delete_user" 
-| "mutate_state_user" 
-| "mutate_profile" 
-| "sign_up"
-| "login"
-| "check_auth"
-| "check_password"
-| "send_code_restoration"
-| "restore_password"
+type TypeAction = "CREATE_USER" 
+| "UPDATE_USER" 
+| "DELETE_USER" 
+| "SET_STATE_USER" 
+| "UPDATE_PROFILE" 
+| "SIGN_UP"
+| "LOGIN"
+| "CHECK_AUTH"
+| "CHECK_PASSWORD"
+| "SEND_CODE_RESTORATION"
+| "RESTORE_PASSWORD"
 
 export const useUserSessionQuery = () => {
   const tknSession = useSessionStore(state => state.tknSession)
@@ -175,12 +173,12 @@ export const useMutationUsersQuery = <T>() => {
     //   // console.log("onMutate", datoMutate)
     // },
     onSuccess: (resp) => {
-      const r = resp as QueryResp
+      const r = resp as ApiResp
       if(r?.msgType !== 'success') return
       // 2: Haciendo refetch de la lista
       // queryClient.invalidateQueries({queryKey:["users"]})
       // 3: Manual: Actualiza los registros despues de un success
-      if(typeActionRef.current === "mutate_create_user") {
+      if(typeActionRef.current === "CREATE_USER") {
         const createdUser = r.content as UserItem
         queryClient.setQueryData(["users"], (oldData: InfiniteData<UsersFilQryRes, unknown> | undefined) => {
           const pages = structuredClone(oldData?.pages)
@@ -194,7 +192,7 @@ export const useMutationUsersQuery = <T>() => {
           }
           return {...oldData, pages, }
         })
-      }else if(typeActionRef.current === "mutate_update_user" || typeActionRef.current === "mutate_state_user") {
+      }else if(typeActionRef.current === "UPDATE_USER" || typeActionRef.current === "SET_STATE_USER") {
         const updatedUser = r.content as UserItem
         queryClient.setQueryData(["users"], (oldData: InfiniteData<UsersFilQryRes, unknown> | undefined) => {
           const pages = structuredClone(oldData?.pages)
@@ -211,7 +209,7 @@ export const useMutationUsersQuery = <T>() => {
           }
           return {...oldData, pages}
         })
-      }else if(typeActionRef.current === "mutate_delete_user") {
+      }else if(typeActionRef.current === "DELETE_USER") {
         const deletedUserId = r.content as UserItem["id"]
         queryClient.setQueryData(["users"], (oldData: InfiniteData<UsersFilQryRes, unknown> | undefined) => {
           let pages = structuredClone(oldData?.pages)
@@ -245,7 +243,7 @@ export const useMutationUsersQuery = <T>() => {
   }
 
   const createUser = (user: UserForm) => {
-    typeActionRef.current = "mutate_create_user"
+    typeActionRef.current = "CREATE_USER"
     const options: FetchOptions = {
       method: "POST",
       url: apiURL + "users/create_user",
@@ -256,7 +254,7 @@ export const useMutationUsersQuery = <T>() => {
   }
 
   const updateUser = (user: UserForm) => {
-    typeActionRef.current = "mutate_update_user"
+    typeActionRef.current = "UPDATE_USER"
     const options: FetchOptions = {
       method: "PUT",
       url: apiURL + "users/update_user",
@@ -267,7 +265,7 @@ export const useMutationUsersQuery = <T>() => {
   }
 
   const setStateUser = (data: {estado: number, id: number}) => {
-    typeActionRef.current = "mutate_state_user"
+    typeActionRef.current = "SET_STATE_USER"
     const options: FetchOptions = {
       method: "PUT",
       url: apiURL + "users/set_state_user",
@@ -278,7 +276,7 @@ export const useMutationUsersQuery = <T>() => {
   }
 
   const deleteUser = (id: number) => {
-    typeActionRef.current = "mutate_delete_user"
+    typeActionRef.current = "DELETE_USER"
     const options: FetchOptions = {
       method: "DELETE",
       url: apiURL + "users/delete_user",
@@ -298,7 +296,7 @@ export const useMutationUsersQuery = <T>() => {
   }
 
   const updateProfile = (user: ProfileForm) => {
-    typeActionRef.current = "mutate_profile"
+    typeActionRef.current = "UPDATE_PROFILE"
     const options: FetchOptions = {
       method: "PUT",
       url: apiURL + "users/update_profile",
@@ -309,7 +307,7 @@ export const useMutationUsersQuery = <T>() => {
   }
 
   const signUp = (registro: SignUpForm) => { // registrarse
-    typeActionRef.current = "sign_up"
+    typeActionRef.current = "SIGN_UP"
     const options: FetchOptions = {
       method: "POST",
       url: apiURL + "users/sign_up",
@@ -319,7 +317,7 @@ export const useMutationUsersQuery = <T>() => {
   }
 
   const signIn = (param: SignInForm) => { // iniciar sesion
-    typeActionRef.current = "login"
+    typeActionRef.current = "LOGIN"
     const options: FetchOptions = {
       method: "POST",
       url: apiURL + "users/sign_in",
@@ -329,7 +327,7 @@ export const useMutationUsersQuery = <T>() => {
   }
 
   const checkAuth = () => { // Verificar autenticacion
-    typeActionRef.current = "check_auth"
+    typeActionRef.current = "CHECK_AUTH"
     const options: FetchOptions = {
       method: "POST",
       url: apiURL + "users/check_auth",
@@ -339,7 +337,7 @@ export const useMutationUsersQuery = <T>() => {
   }
 
   const checkPassword = (password: string) => { // En modal confirmacion con password
-    typeActionRef.current = "check_password"
+    typeActionRef.current = "CHECK_PASSWORD"
     const options: FetchOptions = {
       method: "POST",
       url: apiURL + "users/check_password",
@@ -359,7 +357,7 @@ export const useMutationUsersQuery = <T>() => {
   }
 
   const sendCodeRestoration = (param: {email: string, username: string}) => {
-    typeActionRef.current = "send_code_restoration"
+    typeActionRef.current = "SEND_CODE_RESTORATION"
     const options: FetchOptions = {
       method: "POST",
       url: apiURL + "users/send_code_restoration",
@@ -369,7 +367,7 @@ export const useMutationUsersQuery = <T>() => {
   }
   
   const restorePassword = (param: any) => {
-    typeActionRef.current = "restore_password"
+    typeActionRef.current = "RESTORE_PASSWORD"
     const options: FetchOptions = {
       method: "POST",
       url: apiURL + "users/restore_password",
@@ -379,7 +377,7 @@ export const useMutationUsersQuery = <T>() => {
   }
 
   useEffect(()=>{
-    const r = data as QueryResp
+    const r = data as ApiResp
     if(r?.errorType === "errorToken"){
       resetSessionStore()
       navigate("/auth")

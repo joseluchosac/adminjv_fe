@@ -3,26 +3,26 @@ import { FaEdit, FaToggleOff, FaToggleOn, FaTrash } from "react-icons/fa";
 import Swal from "sweetalert2";
 import { useEffect } from "react";
 import { toast } from "react-toastify";
-import { QueryResp, UserItem } from "../../../app/types";
+import { UserItem } from "../../../app/types";
 import { useUsers } from "../context/UsersContext";
 import useLayoutStore from "../../../app/store/useLayoutStore";
 import { useMutationUsersQuery } from "../../../api/queries/useUsersQuery";
+import { MutationUserResp } from "../../../app/schemas/users-schema";
 
 interface Props {
   user: UserItem ;
 }
-interface UserMutQryRes extends QueryResp {content: UserItem}
 
 function UsersLstItem({ user }: Props) {
   const { dispatchUsers, stateUsers: {camposUser} } = useUsers()
   const darkMode = useLayoutStore(state => state.layout.darkMode)
 
   const {
-    data: mutation,
+    data: mutationResp,
     isPending: isPendingMutation,
     setStateUser,
     deleteUser, 
-  } = useMutationUsersQuery<UserMutQryRes>()
+  } = useMutationUsersQuery<MutationUserResp>()
 
   const validDate = (date:string | undefined, formato = "dd/MM/yyyy") => {
     if(!date) return ''
@@ -61,9 +61,9 @@ function UsersLstItem({ user }: Props) {
 
 
   useEffect(() => {
-    if(!mutation) return
-    toast(mutation.msg, { type: mutation.msgType})
-  }, [mutation])
+    if(!mutationResp) return
+    toast(mutationResp.msg, {type: mutationResp.msgType})
+  }, [mutationResp])
 
   return (
     <tr className="text-nowrap">

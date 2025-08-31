@@ -2,7 +2,9 @@ import { z } from "zod";
 import {
   RecoveryFormSchema,
   SignInFormSchema,
+  SignInRespSchema,
   SignUpFormSchema,
+  SignUpRespSchema,
 } from "../schemas/auth-schema";
 import {
   ProfileSchema,
@@ -10,9 +12,14 @@ import {
   UserFormSchema,
   UserItemSchema,
   UserSessionSchema,
+  GetUserRespSchema,
+  GetProfileRespSchema,
+  MutationUserRespSchema,
+  CheckAuthRespSchema,
 } from "../schemas/users-schema";
 import { CajaSchema, FormaPagoSchema, ImpuestoSchema, MotivoNotaSchema, TipoComprobanteSchema, TipoDocumentoSchema, TipoEstablecimientoSchema, TipoMonedaSchema, TipoMovimientoCajaSchema, TipoMovimientoSchema, TipoOperacionSchema, UnidadMedidaSchema } from "../schemas/catalogos-schema";
 import { CategoriaSchema } from "../schemas/categorias-schema";
+import { ApiRespSchema, ErrorValidateSchema } from "../schemas/generics-schema";
 
 // ✅ TIPO PARA EL EVENTO ON CHANGE DE UN ELEMENTO DE FORMULARIO
 export declare type FormControlElement =
@@ -20,23 +27,28 @@ export declare type FormControlElement =
   | HTMLSelectElement
   | HTMLTextAreaElement;
 
+export type ApiResp = z.infer<typeof ApiRespSchema>
+
 // ✅ TIPOS PARA LAS RESPUESTAS GENERICAS DE LA API
-export interface ApiGenericResp {
-  content?: any; // Puede ser cualquier tipo de contenido
-  error: boolean;
-  msg: string;
-  msgType: "default" | "error" | "info" | "success" | "warning";
-  errorType: string | null;
-}
-// Evaluar deprecamiento
+// export interface ApiGenericResp {
+//   content?: any; // Puede ser cualquier tipo de contenido
+//   error: boolean;
+//   msg: string;
+//   msgType: "default" | "error" | "info" | "success" | "warning";
+//   errorType: string | null;
+// }
+
 // ✅ TIPOS PARA LAS RESPUESTAS DE LA API (el content se le agrega despues)
-export interface QueryResp {
-  content?: any; // Puede ser cualquier tipo de contenido
-  error?: boolean;
-  msg?: string;
-  msgType?: "default" | "error" | "info" | "success" | "warning";
-  errorType?: string | null;
-}
+// export interface QueryResp {
+//   content?: any; // Puede ser cualquier tipo de contenido
+//   error?: boolean;
+//   msg?: string;
+//   msgType?: "default" | "error" | "info" | "success" | "warning";
+//   errorType?: string | null;
+// }
+
+export type ErrorValidate = z.infer<typeof ErrorValidateSchema> // Validacion de formularios
+
 // ✅ TIPO PARA LA RESPUESTA DE UNA PETICION DE FILTROS
 export type FilterQueryResp = {
   // filas: any;
@@ -79,19 +91,24 @@ export interface Padre {
 }
 // ✅ TIPOS PARA USUARIOS
 export type UserItem = z.infer<typeof UserItemSchema>;
-// export type User = z.infer<typeof userSchema>;
 export type UserForm = z.infer<typeof UserFormSchema>;
 export type UserSession = z.infer<typeof UserSessionSchema>;
 export type ProfileForm = z.infer<typeof ProfileFormSchema>;
 export type Profile = z.infer<typeof ProfileSchema>;
+export type RecoveryForm = z.infer<typeof RecoveryFormSchema>;
+// export type RestoreForm = {
+//   code: string;
+//   new_password: string;
+//   new_confirm_password: string;
+// };
+export type GetUserResp = z.infer<typeof GetUserRespSchema>
+export type GetProfileResp = z.infer<typeof GetProfileRespSchema>
+export type MutationUserResp = z.infer<typeof MutationUserRespSchema>
+export type CheckAuthResp = z.infer<typeof CheckAuthRespSchema>
 export type SignInForm = z.infer<typeof SignInFormSchema>;
 export type SignUpForm = z.infer<typeof SignUpFormSchema>;
-export type RecoveryForm = z.infer<typeof RecoveryFormSchema>;
-export type RestoreForm = {
-  code: string;
-  new_password: string;
-  new_confirm_password: string;
-};
+export type SignInResp = z.infer<typeof SignInRespSchema>
+export type SignUpResp = z.infer<typeof SignUpRespSchema>
 
 
 // ✅ TIPOS PARA LA TABLA CONFIGURACIONES
@@ -241,7 +258,7 @@ export type ProductoItem = {
   estado: number;
 };
 type stocksItem = { e: string; s: string };
-export interface ProductoQryRes extends QueryResp {
+export interface ProductoQryRes extends ApiResp {
   content: Producto;
 }
 
@@ -380,7 +397,7 @@ export type Numeracion = {
   correlativo: number;
   estado: number;
 };
-export type NroDocumento = {
+export type DocumentData = {
   id: number;
   nombre_razon_social: string;
   nro_documento: string;
@@ -393,6 +410,7 @@ export type NroDocumento = {
   email: string;
   telefono: string;
 };
+export type QueryDocumentResp = DocumentData | ApiResp;
 export type Caja = z.infer<typeof CajaSchema>;
 export type FormaPago = z.infer<typeof FormaPagoSchema>;
 export type Impuesto = z.infer<typeof ImpuestoSchema>;
@@ -460,5 +478,10 @@ export type CommonPeriod = {
 // ContentValidate: es un tipo generico de la forma Record<K,V> representa un tipo de
 // objeto cuya clave es K y valor V
 // Datos de validaciones de formulario obtenidos desde el back-end
-// de la forma:  { username:["El usuario no puede tener espacios"], ... }
+// de la forma: 
+// {
+//   username:["El usuario no puede tener espacios"], 
+//   email: ["email no valido"], ... 
+// }
+// Deprecar
 export type ContentValidate = Record<string, string[]>;

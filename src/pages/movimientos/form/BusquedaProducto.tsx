@@ -3,9 +3,9 @@ import { useMutationProductosQuery } from "../../../api/queries/useProductosQuer
 import { useEffect, useRef } from "react"
 import { toast } from "react-toastify"
 import { useMovimientos } from "../hooks/useMovimientos"
-import { Producto, QueryResp, type MovimientoFormDetalle } from "../../../app/types"
+import { Producto, ApiResp, type MovimientoFormDetalle } from "../../../app/types"
 
-interface ProductoQryRes extends QueryResp {
+interface ProductoQryRes extends ApiResp {
   content: Producto;
 }
 export default function BusquedaProducto() {

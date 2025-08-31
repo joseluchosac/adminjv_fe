@@ -9,7 +9,7 @@ import {
   Row,
   Spinner,
 } from "react-bootstrap";
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import Swal from "sweetalert2";
 import { toast } from "react-toastify";
 import { Controller, useForm } from "react-hook-form";
@@ -17,13 +17,13 @@ import { FaSearch } from "react-icons/fa";
 import SelectAsync from "react-select/async";
 import {
   clienteFormInit,
-  filterParamsInit,
+  filterParamInit,
   selectDark,
 } from "../../app/utils/constants";
 import {
   Cliente,
-  NroDocumento,
-  QueryResp,
+  QueryDocumentResp,
+  ApiResp,
   UbigeoItem,
 } from "../../app/types";
 import useClientesStore from "../../app/store/useClientesStore";
@@ -35,17 +35,12 @@ import useSessionStore from "../../app/store/useSessionStore";
 import { useTiposDocumentoQuery } from "../../api/queries/useCatalogosQuery";
 import { fnFetch } from "../../api/fnFetch";
 
-type NroDocumentoRes = NroDocumento | QueryResp
-export function isErrNroDocumentoRes(response: NroDocumentoRes): response is QueryResp {
-  return ('error' in response || (response as QueryResp).error == true);
+type ClienteRes = Cliente | ApiResp
+export function isErrClienteRes(response: ClienteRes): response is ApiResp {
+  return ('error' in response || (response as ApiResp).error == true);
 }
 
-type ClienteRes = Cliente | QueryResp
-export function isErrClienteRes(response: ClienteRes): response is QueryResp {
-  return ('error' in response || (response as QueryResp).error == true);
-}
-
-type MutationRes = QueryResp & {
+type MutationRes = ApiResp & {
   cliente?: Cliente
 };
 
@@ -63,7 +58,6 @@ export default function ClienteForm({onMutation}:Props) {
   const {tiposDocumento} = useTiposDocumentoQuery()
   const abortUbigeos = useRef<AbortController | null>(null);
   const token = useSessionStore((state) => state.tknSession);
-
   const {
     data: clienteRes,
     isPending: isPendingCliente,
@@ -79,11 +73,11 @@ export default function ClienteForm({onMutation}:Props) {
   } = useMutationClientesQuery<MutationRes>();
 
   const {
-    data: nroDocumentoRes,
-    isPending: isPendingNroDocumento,
-    consultarNroDocumento,
-    reset: resetNroDocumento,
-  } = useMutationClientesQuery<NroDocumentoRes>();
+    data: queryDocumentResp,
+    isPending: isPendingQueryDocument,
+    reset: resetQueryDocument,
+    queryDocument,
+  } = useMutationClientesQuery<QueryDocumentResp>();
 
   const {
     register,
@@ -97,10 +91,16 @@ export default function ClienteForm({onMutation}:Props) {
     watch,
   } = useForm<Cliente>({ defaultValues: clienteFormInit });
 
+  const docum = useMemo(() => {
+    if(queryDocumentResp && "nro_documento" in queryDocumentResp){
+      return queryDocumentResp
+    }
+  },[queryDocumentResp])
+
   const loadUbigeosOptions = debounce((search: string, callback: any) => {
     abortUbigeos.current?.abort(); // ✅ Cancela la petición anterior
     abortUbigeos.current = new AbortController();
-    const filtered = { ...filterParamsInit, search };
+    const filtered = { ...filterParamInit, search };
     fnFetch({
       method: "POST",
       url: `${apiURL}ubigeos/filter_ubigeos?page=1`,
@@ -117,10 +117,10 @@ export default function ClienteForm({onMutation}:Props) {
     });
   }, 500);
 
-  const handleConsultarNroDocumento = () => {
+  const handleQueryDocument = () => {
     const { tipo_documento_cod, nro_documento, api } = getValues();
     if (tipo_documento_cod == "1" || tipo_documento_cod == "6") {
-      consultarNroDocumento({ tipo_documento_cod, nro_documento, api });
+      queryDocument({ tipo_documento_cod, nro_documento, api });
     } else {
       toast("No se puede consultar este número de documento", {
         type: "warning",
@@ -154,8 +154,8 @@ export default function ClienteForm({onMutation}:Props) {
 
   const resetForm = () => {
     reset(clienteFormInit);
-    if(nroDocumentoRes){
-      resetNroDocumento();
+    if(queryDocumentResp){
+      resetQueryDocument();
     }
   };
 
@@ -174,20 +174,20 @@ export default function ClienteForm({onMutation}:Props) {
   }, [showClienteForm]);
 
   useEffect(() => {
-    if (!nroDocumentoRes) return;
-    if (isErrNroDocumentoRes(nroDocumentoRes)){
-      toast(nroDocumentoRes.msg, { type: nroDocumentoRes.msgType });
-    }else{
-      setValue("id", nroDocumentoRes.id || 0);
-      setValue("nombre_razon_social", nroDocumentoRes.nombre_razon_social || "");
-      setValue("direccion", nroDocumentoRes.direccion || "");
-      setValue("ubigeo_inei", nroDocumentoRes.ubigeo || "");
-      setValue("dis_prov_dep", nroDocumentoRes.dis_prov_dep || "");
-      setValue("email", nroDocumentoRes.email || "");
-      setValue("telefono", nroDocumentoRes.telefono || "");
+    if (!queryDocumentResp) return;
+    if("error" in queryDocumentResp && queryDocumentResp.error){
+      toast(queryDocumentResp.msg, { type: queryDocumentResp.msgType });
+    }else if("nro_documento" in queryDocumentResp){
+      setValue("id", queryDocumentResp.id || 0);
+      setValue("nombre_razon_social", queryDocumentResp.nombre_razon_social || "");
+      setValue("direccion", queryDocumentResp.direccion || "");
+      setValue("ubigeo_inei", queryDocumentResp.ubigeo || "");
+      setValue("dis_prov_dep", queryDocumentResp.dis_prov_dep || "");
+      setValue("email", queryDocumentResp.email || "");
+      setValue("telefono", queryDocumentResp.telefono || "");
       setValue("api", 1, { shouldDirty: true });
     }
-  }, [nroDocumentoRes]);
+  }, [queryDocumentResp]);
 
   useEffect(() => {
     if (!clienteRes) return;
@@ -232,7 +232,7 @@ export default function ClienteForm({onMutation}:Props) {
         <Modal.Body>
           <Form onSubmit={handleSubmit(submit)} id="form_cliente">
             {isPendingMutation && <LdsBar />}
-            {isPendingNroDocumento && <LdsBar />}
+            {isPendingQueryDocument && <LdsBar />}
             <Row>
               <Form.Group as={Col} md={4} className="mb-3">
                 <Form.Label htmlFor="tipo_documento_cod">Tipo</Form.Label>
@@ -247,7 +247,7 @@ export default function ClienteForm({onMutation}:Props) {
                     },
                   })}
                   disabled={
-                    (nroDocumentoRes as NroDocumento)?.nombre_razon_social ||
+                    docum?.nombre_razon_social ||
                     currentClienteId
                       ? true
                       : false
@@ -271,15 +271,15 @@ export default function ClienteForm({onMutation}:Props) {
                   className="d-flex justify-content-between"
                 >
                   <div>Nro Doc</div>
-                  {(nroDocumentoRes as NroDocumento) && (
+                  {docum && (
                     <Badge
                       bg={
-                        (nroDocumentoRes as NroDocumento)?.estado_sunat == "ACTIVO"
+                        docum?.estado_sunat == "ACTIVO"
                           ? "success"
                           : "warning"
                       }
                     >
-                      {(nroDocumentoRes as NroDocumento)?.estado_sunat}
+                      {docum?.estado_sunat}
                     </Badge>
                   )}
                 </Form.Label>
@@ -298,14 +298,14 @@ export default function ClienteForm({onMutation}:Props) {
                       },
                     })}
                     disabled={
-                      (nroDocumentoRes as NroDocumento)?.nombre_razon_social ||
+                      docum?.nombre_razon_social ||
                       currentClienteId
                         ? true
                         : false
                     }
                   />
                   <Button
-                    onClick={handleConsultarNroDocumento}
+                    onClick={handleQueryDocument}
                     variant="outline-secondary"
                     title="Consultar nro. de documento"
                   >
@@ -336,7 +336,7 @@ export default function ClienteForm({onMutation}:Props) {
                     },
                   })}
                   disabled={
-                    (nroDocumentoRes as NroDocumento)?.nombre_razon_social ? true : false
+                    docum?.nombre_razon_social ? true : false
                   }
                 />
                 {errors.nombre_razon_social && (
@@ -351,15 +351,15 @@ export default function ClienteForm({onMutation}:Props) {
                   className="d-flex justify-content-between"
                 >
                   <div>Dirección</div>
-                  {(nroDocumentoRes as NroDocumento) && (
+                  {docum && (
                     <Badge
                       bg={
-                        (nroDocumentoRes as NroDocumento)?.condicion_sunat == "HABIDO"
+                        docum.condicion_sunat == "HABIDO"
                           ? "success"
                           : "warning"
                       }
                     >
-                      {(nroDocumentoRes as NroDocumento)?.condicion_sunat}
+                      {docum.condicion_sunat}
                     </Badge>
                   )}
                 </Form.Label>
@@ -380,7 +380,7 @@ export default function ClienteForm({onMutation}:Props) {
                       }
                     },
                   })}
-                  disabled={(nroDocumentoRes as NroDocumento)?.direccion ? true : false}
+                  disabled={docum?.direccion ? true : false}
                 />
                 {errors.direccion && (
                   <div className="invalid-feedback d-block">
@@ -408,7 +408,7 @@ export default function ClienteForm({onMutation}:Props) {
                         // defaultOptions
                         styles={darkMode ? selectDark : undefined}
                         isClearable
-                        isDisabled={(nroDocumentoRes as NroDocumento)?.ubigeo ? true : false}
+                        isDisabled={docum?.ubigeo ? true : false}
                         value={{
                           value: getValues().ubigeo_inei,
                           label: getValues().dis_prov_dep,

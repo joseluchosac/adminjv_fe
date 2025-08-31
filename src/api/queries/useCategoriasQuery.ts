@@ -15,7 +15,8 @@ export const useCategoriasQuery = () => {
     queryKey: ["categorias"],
     queryFn: () => {
       const options: FetchOptions = {
-        url: apiURL + "catalogos/get_categorias",
+        method: "POST",
+        url: apiURL + "categorias/get_categorias_pack",
         authorization: "Bearer " + tknSession,
       };
       return fnFetch(options);

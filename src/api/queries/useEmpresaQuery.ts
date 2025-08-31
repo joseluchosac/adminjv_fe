@@ -3,7 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import useSessionStore from "../../app/store/useSessionStore"
 import { useEffect, useRef } from "react"
 import { useNavigate } from "react-router-dom";
-import { ApiGenericResp, Empresa, EmpresaInfo, FetchOptions, QueryResp } from "../../app/types";
+import { ApiResp, Empresa, EmpresaInfo, FetchOptions} from "../../app/types";
 import { fnFetch } from "../fnFetch";
 
 type TypeAction = "mutate_empresa"
@@ -36,7 +36,7 @@ export const useEmpresaQuery = () => {
   }
 }
 
-type EmpresaInfoResp = EmpresaInfo | ApiGenericResp
+type EmpresaInfoResp = EmpresaInfo | ApiResp
 export const useEmpresaInfoQuery = () => {
   const {data, isFetching} = useQuery<EmpresaInfoResp>({
     queryKey: ['empresa_info'],
@@ -67,7 +67,7 @@ export const useMutationEmpresaQuery = <T>() => {
     mutationKey: ['mut_empresa'],
     mutationFn: fnFetch,
     onSuccess: (resp) => {
-      const r = resp as QueryResp
+      const r = resp as ApiResp
       if(r?.msgType !== 'success') return
       queryClient.invalidateQueries({queryKey:["empresa"]}) // Recarga la tabla proveedores
     }
@@ -85,7 +85,7 @@ export const useMutationEmpresaQuery = <T>() => {
   }
 
   useEffect(()=>{
-    const d = data as QueryResp
+    const d = data as ApiResp
     if(d?.errorType === "errorToken"){
       resetSessionStore()
       navigate("/auth")

@@ -4,7 +4,7 @@ import { FaStore } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { EmpresaInfo, QueryResp, SignInForm } from "../../app/types";
+import { EmpresaInfo, ApiResp, SignInForm, SignInResp } from "../../app/types";
 import { useEffect } from "react";
 import useSessionStore from "../../app/store/useSessionStore";
 import { useMutationUsersQuery } from "../../api/queries/useUsersQuery";
@@ -13,10 +13,7 @@ import { SignInFormSchema } from "../../app/schemas/auth-schema";
 import { LdsBar } from "../../app/components/Loaders";
 import { useQueryClient } from "@tanstack/react-query";
 
-interface SignInQryRes extends QueryResp {
-  token?: string;
-}
-interface DataEmailQryRes extends QueryResp {
+interface DataEmailQryRes extends ApiResp {
   email?: string;
 }
 
@@ -37,10 +34,10 @@ export default function SignInPage() {
   })
 
   const {
-    data: dataSignIn,
+    data: signInResp,
     isPending: isPendingSignIn,
     signIn,
-  } = useMutationUsersQuery<SignInQryRes>();
+  } = useMutationUsersQuery<SignInResp>();
 
   const {
     data: dataEmail,
@@ -60,13 +57,13 @@ export default function SignInPage() {
   }
 
   useEffect(() => {
-    if(!dataSignIn) return
-    if(dataSignIn.error){
-      toast(dataSignIn.msg, {type: dataSignIn.msgType})
-    }else{
-      setTknSession(dataSignIn.token || "");
+    if(!signInResp) return
+    if('token' in signInResp){
+      setTknSession(signInResp.token as string || "");
+    }else if("error" in signInResp && signInResp.error){
+      toast(signInResp.msg || "Hubo un error al obtener los datos", {type: signInResp.msgType})
     }
-  }, [dataSignIn]);
+  }, [signInResp]);
 
   useEffect(()=>{
     if(!dataEmail) return

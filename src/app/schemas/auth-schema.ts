@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { ApiRespSchema } from "./generics-schema";
 
 export const SignInFormSchema = z.object({
   username: z.string().min(1, "Usuario es requerido").max(50, "Se permite máximo 50 caracteres"),
@@ -27,5 +28,7 @@ export const RecoveryFormSchema = z.object({
   path: ["confirm_new_password"]
 });
 
+export const SignInRespSchema = z.union([z.object({token: z.string()}), ApiRespSchema]) 
+export const SignUpRespSchema = z.union([z.object({token: z.string()}), ApiRespSchema])
 
 

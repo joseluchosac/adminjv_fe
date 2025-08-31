@@ -3,13 +3,13 @@ import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-q
 import useSessionStore from "../../app/store/useSessionStore"
 import { useEffect, useRef } from "react"
 import { useNavigate } from "react-router-dom";
-import { Cliente, ClienteItem, FetchOptions, FilterQueryResp, QueryResp } from "../../app/types";
+import { Cliente, ClienteItem, FetchOptions, FilterQueryResp, ApiResp } from "../../app/types";
 import useClientesStore from "../../app/store/useClientesStore";
 import { fnFetch } from "../fnFetch";
 import { toast } from "react-toastify";
 import { useDebounce } from "react-use";
 
-type TypeAction = "mutate_cliente" | "consultar_nro_doc"
+type TypeAction = "mutate_cliente" | "query_document"
 
 // ****** FILTRAR ******
 export interface ClientesFilQryRes extends FilterQueryResp {
@@ -18,7 +18,6 @@ export interface ClientesFilQryRes extends FilterQueryResp {
 
 export const useFilterClientesQuery = () => {
   const token = useSessionStore(state => state.tknSession)
-  // const isFirstRender = useRef(true);
   const queryClient = useQueryClient()
   const {
     clienteFilterForm,
@@ -105,66 +104,6 @@ export const useFilterClientesQuery = () => {
   }
 }
 
-/* export const useFilterClientesQuery = () => {
-  const filterParamsClientes = useClientesStore(state => state.filterParamsClientes)
-  const filterParamsClientesForm = useClientesStore(state => state.filterParamsClientesForm)
-  const setFilterParamsClientes = useClientesStore(state => state.setFilterParamsClientes)
-  const isMounted = useRef(false);
-
-  const token = useSessionStore(state => state.tknSession)
-
-  const {
-    data,
-    isError,
-    isLoading,
-    isFetching,
-    hasNextPage,
-    fetchNextPage,
-    refetch
-  } = useInfiniteQuery<ClientesFilQryRes, Error>({
-    queryKey: ['clientes'],
-    queryFn: ({pageParam = 1, signal}) => {
-      const page = pageParam as number
-      const options: FetchOptions = {
-        method: "POST",
-        url: `${apiURL}clientes/filter_clientes?page=${page}`,
-        body: JSON.stringify(filterParamsClientes),
-        authorization: "Bearer " + token,
-        signal
-      }
-      return fnFetch(options)
-    },
-    initialPageParam: 1,
-    getNextPageParam: (lastPage) => {
-      return lastPage.next != 0 ? lastPage.next : undefined
-    },
-    getPreviousPageParam: (lastPage) => lastPage.previous ?? undefined,
-    staleTime: 1000 * 60 * 5 
-  })
-  
-  useEffect(() => {
-    setFilterParamsClientes({...filterParamsClientesForm})
-  }, [filterParamsClientesForm])
-
-  useEffect(() => {
-    if(isMounted.current){
-      refetch() // Se ejecuta solo al cambiar estado, no al montar
-    }else{
-      isMounted.current = true
-    }
-  }, [filterParamsClientes])
-
-  return {
-    data,
-    isError, 
-    isLoading, 
-    isFetching, 
-    hasNextPage, 
-    fetchNextPage,
-  }
-} */
-
-
 // ****** MUTATION ******
 export const useMutationClientesQuery = <T>() => {
   const resetSessionStore = useSessionStore(state => state.resetSessionStore)
@@ -173,12 +112,11 @@ export const useMutationClientesQuery = <T>() => {
   const queryClient = useQueryClient()
   const typeActionRef = useRef<TypeAction | "">("")
 
-// ****** MUTATION ******
   const {data, isPending, isError, mutate, reset} = useMutation<T, Error, FetchOptions, unknown>({
     mutationKey:["clientes_mut"],
     mutationFn: fnFetch,
     onSuccess: (resp) => {
-      const r = resp as QueryResp
+      const r = resp as ApiResp
       if(r?.msgType !== 'success') return
       queryClient.invalidateQueries({queryKey:["clientes"]}) // Recarga la tabla clientes
     }
@@ -238,11 +176,11 @@ export const useMutationClientesQuery = <T>() => {
     mutate(options)
   }
 
-  const consultarNroDocumento = (param: any) => {
-    typeActionRef.current = "consultar_nro_doc"
+  const queryDocument = (param: any) => {
+    typeActionRef.current = "query_document"
     const options: FetchOptions = {
       method: "POST",
-      url: apiURL + "clientes/consultar_nro_documento",
+      url: apiURL + "clientes/query_document",
       body: JSON.stringify(param),
       authorization: "Bearer " + token,
     }
@@ -250,7 +188,7 @@ export const useMutationClientesQuery = <T>() => {
   }
 
   useEffect(()=>{
-    const r = data as QueryResp
+    const r = data as ApiResp
     if(r?.errorType === "errorToken"){
       resetSessionStore()
       navigate("/auth")
@@ -266,7 +204,7 @@ export const useMutationClientesQuery = <T>() => {
     updateCliente,
     setStateCliente,
     deleteCliente,
-    consultarNroDocumento,
+    queryDocument,
     typeAction: typeActionRef.current,
     reset
   }

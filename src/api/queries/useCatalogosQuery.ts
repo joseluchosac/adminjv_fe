@@ -141,7 +141,6 @@ export const useTiposDocumentoQuery = () => {
     },
     staleTime: 1000 * 60 * 60 * 24,
   });
-
   const tiposDocumento = useMemo(() => {
     const result = TiposDocumentoSchema.safeParse(data);
     return result.success ? result.data : [];

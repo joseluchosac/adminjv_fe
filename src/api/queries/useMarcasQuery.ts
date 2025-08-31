@@ -3,7 +3,7 @@ import { useEffect, useRef } from "react"
 import { useNavigate } from "react-router-dom";
 import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import useSessionStore from "../../app/store/useSessionStore"
-import { FetchOptions, FilterQueryResp, Marca, MarcaItem, QueryResp } from "../../app/types";
+import { FetchOptions, FilterQueryResp, Marca, MarcaItem, ApiResp } from "../../app/types";
 import { fnFetch } from "../fnFetch";
 import useMarcasStore from "../../app/store/useMarcasStore";
 import { useDebounce } from "react-use";
@@ -120,7 +120,7 @@ export const useMutationMarcasQuery = <T>() => {
   const {data, isPending, isError, mutate, } = useMutation<T, Error, FetchOptions, unknown>({
     mutationFn: fnFetch,
     onSuccess: (resp) => {
-      if((resp as QueryResp).msgType !== 'success') return
+      if((resp as ApiResp).msgType !== 'success') return
       queryClient.invalidateQueries({queryKey:["marcas"]}) // Recarga la tabla marcas
     }
   })
@@ -179,7 +179,7 @@ export const useMutationMarcasQuery = <T>() => {
 
   useEffect(()=>{
     if(!data) return
-    if((data as QueryResp).errorType === "errorToken"){
+    if((data as ApiResp).errorType === "errorToken"){
       resetSessionStore()
       navigate("/auth")
     }

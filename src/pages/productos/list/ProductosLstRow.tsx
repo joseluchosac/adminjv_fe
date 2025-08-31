@@ -1,5 +1,5 @@
 // import { format, isValid, parseISO } from "date-fns";
-import { CampoTable, Producto, ProductoItem, QueryResp } from "../../../app/types";
+import { CampoTable, Producto, ProductoItem, ApiResp } from "../../../app/types";
 import { useProductos } from "../context/ProductosContext";
 import { FaEdit, FaToggleOff, FaToggleOn, FaTrash } from "react-icons/fa";
 import Swal from "sweetalert2";
@@ -14,7 +14,7 @@ interface ProductosLstRowProps {
   camposProducto: CampoTable[]
 }
 
-interface ProductoMutQryRes extends QueryResp {
+interface ProductoMutQryRes extends ApiResp {
   content: Producto | null
 }
 function ProductosLstRow({ producto, camposProducto }: ProductosLstRowProps) {

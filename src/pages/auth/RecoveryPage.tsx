@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { Alert, Button, Card, Form, InputGroup } from "react-bootstrap"
 import { LdsBar } from "../../app/components/Loaders"
 import DynaIcon from "../../app/components/DynaComponents"
-import { QueryResp, RecoveryForm } from "../../app/types";
+import { ApiResp, RecoveryForm } from "../../app/types";
 import { useMutationUsersQuery } from "../../api/queries/useUsersQuery";
 import { toast } from "react-toastify";
 import { useForm } from "react-hook-form";
@@ -23,16 +23,16 @@ const RecoveryPage: React.FC = () => {
   })
 
   const {
-    data: dataRestore,
+    data: restorePasswordResp,
     isPending: isPendingRestore,
     // restorePassword
-  } = useMutationUsersQuery<QueryResp>()
+  } = useMutationUsersQuery<ApiResp>()
 
   const {
-    data: dataSendCode,
+    data: sendCodeRestorationResp,
     isPending: isPendingSendCode,
     // sendCodeRestoration
-  } = useMutationUsersQuery<QueryResp>()
+  } = useMutationUsersQuery<ApiResp>()
 
   const handleSendCodeRestoration = () => {
     // const params = {email: recov.email, username: recov.username}
@@ -45,14 +45,14 @@ const RecoveryPage: React.FC = () => {
   };
 
   useEffect(() => {
-    if(!dataSendCode) return
-    toast(dataSendCode.msg, {type: dataSendCode.msgType})
-  }, [dataSendCode])
+    if(!sendCodeRestorationResp) return
+    toast(sendCodeRestorationResp.msg, {type: sendCodeRestorationResp.msgType})
+  }, [sendCodeRestorationResp])
 
   useEffect(() => {
-    if(!dataRestore) return
-    toast(dataRestore.msg, {type: dataRestore.msgType})
-  }, [dataRestore])
+    if(!restorePasswordResp) return
+    toast(restorePasswordResp.msg, {type: restorePasswordResp.msgType})
+  }, [restorePasswordResp])
 
   return (
     <Card className="forgot-card mx-auto">
@@ -60,9 +60,9 @@ const RecoveryPage: React.FC = () => {
       { isPendingSendCode && <LdsBar />}
       { isPendingRestore && <LdsBar />}
       {
-        dataSendCode?.msg && !isPendingSendCode && 
+        sendCodeRestorationResp?.msg && !isPendingSendCode && 
         <Alert variant="success" className="p-2 text-wrap text-center">
-          {dataSendCode?.msg}
+          {sendCodeRestorationResp?.msg}
         </Alert>
       }
       <div className="text-center mb-3">

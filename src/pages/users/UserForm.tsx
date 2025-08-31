@@ -6,7 +6,7 @@ import { toast } from "react-toastify";
 import Swal from "sweetalert2" ;
 import { useUsers } from "./context/UsersContext";
 import {zodResolver} from "@hookform/resolvers/zod";
-import { ContentValidate, QueryResp, Rol, UserForm } from "../../app/types";
+import { ErrorValidate, GetUserResp, MutationUserResp, UserForm } from "../../app/types";
 import useLayoutStore from "../../app/store/useLayoutStore";
 import { useRolesQuery } from "../../api/queries/useRolesQuery";
 import { useCajasQuery } from "../../api/queries/useCatalogosQuery";
@@ -14,10 +14,6 @@ import { userFormInit } from "../../app/utils/constants";
 import { useMutationUsersQuery } from "../../api/queries/useUsersQuery";
 import { LdsBar, LdsEllipsisCenter } from "../../app/components/Loaders";
 import { UserFormSchema } from "../../app/schemas/users-schema";
-
-interface MutateUser extends QueryResp {
-  content: UserForm | ContentValidate | null;
-}
 
 export default function Userform(){
   const {
@@ -28,6 +24,7 @@ export default function Userform(){
   const darkMode = useLayoutStore(state => state.layout.darkMode)
   const {roles} = useRolesQuery()  
   const {cajas} = useCajasQuery()
+
   const {
     register, 
     formState: {errors, isDirty}, 
@@ -40,18 +37,18 @@ export default function Userform(){
   })
   
   const {
-    data: user,
+    data: getUserResp,
     isPending: isPendingUser,
     isError: isErrorUser,
     getUser
-  }= useMutationUsersQuery()
+  }= useMutationUsersQuery<GetUserResp>()
 
   const {
-    data: mutation,
+    data: mutationResp,
     isPending: isPendingMutation,
     createUser, 
     updateUser, 
-  } = useMutationUsersQuery<MutateUser>()
+  } = useMutationUsersQuery<MutationUserResp>()
   
   const submit = (data: UserForm) => {
     Swal.fire({
@@ -93,16 +90,13 @@ export default function Userform(){
   }, [showUserForm])
 
   useEffect(() => {
-    if(!user) return
-    const result = UserFormSchema.safeParse(user)
-    if(result.success){
-      reset(user)
-    }else{
-      const {msg, msgType} = user as QueryResp
-      toast(msg || "Hubo un error al obtener los datos", {type: msgType})
-      closeForm();
+    if(!getUserResp) return
+    if("error" in getUserResp && getUserResp.error){
+      toast(getUserResp.msg || "Hubo un error al obtener los datos", {type: getUserResp.msgType})
+      return
     }
-  }, [user])
+    reset(getUserResp as UserForm)
+  }, [getUserResp])
 
   useEffect(() => {
     if(!isErrorUser) return
@@ -111,21 +105,19 @@ export default function Userform(){
   }, [isErrorUser])
 
   useEffect(() => {
-    if(!mutation) return
-    if(mutation.error) {
-      if(mutation?.errorType === "validation" && mutation.content){ // Validate from back-end
-         Object.entries(mutation.content as ContentValidate).forEach(([field, messages]) => {
+    if(!mutationResp) return
+    if(mutationResp.error){
+      if(mutationResp.errorType === "validation"){
+        Object.entries(mutationResp.content as ErrorValidate).forEach(([field, messages]) => {
           const f = field as keyof UserForm;
           setError(f, { type: 'server', message: messages.join(', ') });
         });
-      }else{
-        toast(mutation.msg, {type: mutation.msgType})
       }
     }else{
-      toast(mutation.msg, {type: mutation.msgType})
+      toast(mutationResp.msg, {type: mutationResp.msgType})
       closeForm();
-    };
-  }, [mutation])
+    }
+  }, [mutationResp])
 
 
   return (
@@ -209,7 +201,7 @@ export default function Userform(){
                 {...register('rol_id',{valueAsNumber:true})}
               >
                 <option value="0">-- Seleccione</option>
-                {(roles as Rol[])?.map((el) => 
+                {roles.map((el) => 
                   <option key={el.id} value={el.id}>{el.rol}</option>
                 )}
               </Form.Select>

@@ -3,13 +3,13 @@ import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-q
 import useSessionStore from "../../app/store/useSessionStore"
 import { useEffect, useRef } from "react"
 import { useNavigate } from "react-router-dom";
-import { FetchOptions, FilterQueryResp, Proveedor, ProveedorItem, QueryResp } from "../../app/types";
+import { FetchOptions, FilterQueryResp, Proveedor, ProveedorItem, ApiResp } from "../../app/types";
 import { fnFetch } from "../fnFetch";
 import useProveedoresStore from "../../app/store/useProveedoresStore";
 import { useDebounce } from "react-use";
 import { toast } from "react-toastify";
 
-type TypeAction = "mutate_proveedor" | "consultar_nro_doc"
+type TypeAction = "mutate_proveedor" | "query_document"
 
 // ****** FILTRAR ******
 export interface ProveedoresFilQryRes extends FilterQueryResp {
@@ -116,7 +116,7 @@ export const useMutationProveedoresQuery = <T>() => {
   const {data, isPending, isError, mutate, reset } = useMutation<T, Error, FetchOptions, unknown>({
     mutationFn: fnFetch,
     onSuccess: (resp) => {
-      const r = resp as QueryResp
+      const r = resp as ApiResp
       if(r?.msgType !== 'success') return
       queryClient.invalidateQueries({queryKey:["proveedores"]}) // Recarga la tabla proveedores
     }
@@ -176,11 +176,11 @@ export const useMutationProveedoresQuery = <T>() => {
     mutate(options)
   }
 
-  const consultarNroDocumento = (param: any) => {
-    typeActionRef.current = "consultar_nro_doc"
+  const queryDocument = (param: any) => {
+    typeActionRef.current = "query_document"
     const options: FetchOptions = {
       method: "POST",
-      url: apiURL + "proveedores/consultar_nro_documento",
+      url: apiURL + "proveedores/query_document",
       body: JSON.stringify(param),
       authorization: "Bearer " + token,
     }
@@ -188,7 +188,7 @@ export const useMutationProveedoresQuery = <T>() => {
   }
 
   useEffect(()=>{
-    const d = data as QueryResp
+    const d = data as ApiResp
     if(d?.errorType === "errorToken"){
       resetSessionStore()
       navigate("/auth")
@@ -204,7 +204,7 @@ export const useMutationProveedoresQuery = <T>() => {
     updateProveedor,
     setStateProveedor,
     deleteProveedor,
-    consultarNroDocumento,
+    queryDocument,
     typeAction: typeActionRef.current,
     reset
   }

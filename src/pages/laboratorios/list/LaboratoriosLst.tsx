@@ -9,11 +9,6 @@ import useLaboratoriosStore from "../../../app/store/useLaboratoriosStore";
 import { LaboratoriosFilter } from "./LaboratoriosFilter";
 
 export default function LaboratoriosLst() {
-  const tableRef = useRef<HTMLDivElement | null>(null)
-  const ldsEllipsisRef = useRef<HTMLDivElement | null>(null)
-  const camposLaboratorio = useLaboratoriosStore(state => state.camposLaboratorio)
-  const setLaboratorioFilterFormSortTable = useLaboratoriosStore(state => state.setLaboratorioFilterFormSortTable)
-  
   const {
     data,
     fetchNextPage,
@@ -23,6 +18,12 @@ export default function LaboratoriosLst() {
     hasNextPage,
   } = useFilterLaboratoriosQuery()
   
+  const camposLaboratorio = useLaboratoriosStore(state => state.camposLaboratorio)
+  const setLaboratorioFilterFormSortTable = useLaboratoriosStore(state => state.setLaboratorioFilterFormSortTable)
+  
+  const tableRef = useRef<HTMLDivElement | null>(null)
+  const ldsEllipsisRef = useRef<HTMLDivElement | null>(null)
+
   const sort = (field_name:string, field_label: string, ctrlKey: boolean) => {
     setLaboratorioFilterFormSortTable({field_name, field_label, ctrlKey})
   };

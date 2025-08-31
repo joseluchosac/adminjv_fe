@@ -7,17 +7,17 @@ import { useForm } from "react-hook-form";
 import { LdsBar, LdsEllipsisCenter } from "../../app/components/Loaders";
 import useLayoutStore from "../../app/store/useLayoutStore";
 import { useMutationMarcasQuery } from "../../api/queries/useMarcasQuery";
-import { Marca, MarcaItem, QueryResp } from "../../app/types";
+import { Marca, MarcaItem, ApiResp } from "../../app/types";
 import useMarcasStore from "../../app/store/useMarcasStore";
 
 const marcaFormInit = {id: 0, nombre: "", estado: 1,}
 
-type MarcaRes = MarcaItem | QueryResp
-export function isErrMarcaRes(response: MarcaRes): response is QueryResp {
-  return ('error' in response || (response as QueryResp).error == true);
+type MarcaRes = MarcaItem | ApiResp
+export function isErrMarcaRes(response: MarcaRes): response is ApiResp {
+  return ('error' in response || (response as ApiResp).error == true);
 }
 
-type MutationRes = QueryResp & {
+type MutationRes = ApiResp & {
   marca?: MarcaItem
 };
 

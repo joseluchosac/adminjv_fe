@@ -4,7 +4,7 @@ import { FaStore } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import { MdMail } from "react-icons/md";
 import { useForm } from "react-hook-form";
-import { EmpresaInfo, QueryResp, SignUpForm } from "../../app/types";
+import { EmpresaInfo, SignUpForm, SignUpResp } from "../../app/types";
 import { SignUpFormSchema } from "../../app/schemas/auth-schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import useSessionStore from "../../app/store/useSessionStore";
@@ -13,10 +13,6 @@ import { useMutationUsersQuery } from "../../api/queries/useUsersQuery";
 import { LdsBar } from "../../app/components/Loaders";
 import { useEffect } from "react";
 import { toast } from "react-toastify";
-
-interface SignUpQryRes extends QueryResp {
-  token?: string
-}
 
 export default function SignUpPage() {
   const { setTknSession, curEstab, setCurEstab } = useSessionStore();
@@ -40,10 +36,10 @@ export default function SignUpPage() {
   })
 
   const {
-    data: dataSignUp,
+    data: signUpResp,
     isPending: isPendingSignUp,
     signUp, 
-  } = useMutationUsersQuery<SignUpQryRes>()
+  } = useMutationUsersQuery<SignUpResp>()
 
   const onSubmit = (data: SignUpForm) => {
     if(data.establecimiento_id != curEstab){
@@ -53,13 +49,13 @@ export default function SignUpPage() {
   }
 
   useEffect(() => {
-    if(!dataSignUp) return
-    if(dataSignUp.error){
-      toast(dataSignUp.msg, {type: dataSignUp.msgType})
-    }else{
-      setTknSession(dataSignUp.token || "")
+    if(!signUpResp) return
+    if('token' in signUpResp){
+      setTknSession(signUpResp.token as string || "");
+    }else if("error" in signUpResp && signUpResp.error){
+      toast(signUpResp.msg || "Hubo un error al obtener los datos", {type: signUpResp.msgType})
     }
-  }, [dataSignUp])
+  }, [signUpResp])
 
   return (
     <div className="auth-container">

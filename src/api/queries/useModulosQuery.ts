@@ -1,19 +1,19 @@
 const apiURL = import.meta.env.VITE_API_URL;
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import useSessionStore from "../../app/store/useSessionStore"
-import { FetchOptions, Modulo, QueryResp } from "../../app/types"
+import { FetchOptions, Modulo, ApiResp } from "../../app/types"
 import { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { fnFetch } from "../fnFetch";
 
 type TypeAction = "mutate_modulo" | "mutate_modulos"
 
-export type ModulosSessionQryRes = Modulo[] | QueryResp
-// export function isErrModulosSession(response: ModulosSessionQryRes): response is QueryResp {
-//   return (response as QueryResp).error !== undefined;
+export type ModulosSessionQryRes = Modulo[] | ApiResp
+// export function isErrModulosSession(response: ModulosSessionQryRes): response is ApiResp {
+//   return (response as ApiResp).error !== undefined;
 // }
 export function isModulosSessionRes(response: ModulosSessionQryRes): response is Modulo[] {
-  return ('error' in response || (response as QueryResp).error == true);
+  return ('error' in response || (response as ApiResp).error == true);
 }
 
 export const useModulosSessionQuery = () => {

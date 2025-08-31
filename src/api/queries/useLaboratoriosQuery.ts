@@ -3,7 +3,7 @@ import { useEffect, useRef } from "react"
 import { useNavigate } from "react-router-dom";
 import { InfiniteData, useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import useSessionStore from "../../app/store/useSessionStore"
-import { FetchOptions, FilterQueryResp, Laboratorio, LaboratorioItem, QueryResp } from "../../app/types";
+import { FetchOptions, FilterQueryResp, Laboratorio, LaboratorioItem, ApiResp } from "../../app/types";
 import { fnFetch } from "../fnFetch";
 import { toast } from "react-toastify";
 import { useDebounce } from "react-use";
@@ -21,9 +21,6 @@ export interface LaboratoriosFilQryRes extends FilterQueryResp {
 }
 
 export const useFilterLaboratoriosQuery = () => {
-  const token = useSessionStore(state => state.tknSession)
-  // const isFirstRender = useRef(true);
-  const queryClient = useQueryClient()
   const {
     laboratorioFilterForm,
     laboratorioFilterParam,
@@ -31,6 +28,10 @@ export const useFilterLaboratoriosQuery = () => {
     setLaboratorioFilterParamBetween,
     setLaboratorioFilterInfo
   } = useLaboratoriosStore()
+  const token = useSessionStore(state => state.tknSession)
+  // const isFirstRender = useRef(true);
+  const queryClient = useQueryClient()
+
 
   const {
     data,
@@ -64,6 +65,7 @@ export const useFilterLaboratoriosQuery = () => {
   //   queryClient.resetQueries({ queryKey: ['laboratorios'], exact: true });
   // }
 
+
   useDebounce(() => {
     if (
         laboratorioFilterForm.search.toLowerCase().trim() ==
@@ -71,6 +73,16 @@ export const useFilterLaboratoriosQuery = () => {
     ) return;
     setLaboratorioFilterParam()
   }, 500, [laboratorioFilterForm.search]);
+
+  useEffect(() => {
+    // if (isFirstRender.current) {
+    //   isFirstRender.current = false;
+    //   return; // Evita ejecutar en el primer render
+    // }
+    return () => {
+      // resetear()
+    }
+  }, [])
 
   useEffect(() => {
     setLaboratorioFilterParam()
@@ -81,10 +93,6 @@ export const useFilterLaboratoriosQuery = () => {
   }, [laboratorioFilterForm.between])
 
   useEffect(() => {
-    // if (isFirstRender.current) {
-    //   isFirstRender.current = false;
-    //   return; // Evita ejecutar en el primer render
-    // }
     queryClient.invalidateQueries({queryKey:["laboratorios"]})
   }, [laboratorioFilterParam])
 
@@ -110,7 +118,7 @@ export const useFilterLaboratoriosQuery = () => {
 }
 
 // ****** MUTATION ******
-export type MutationLaboratorioRes = QueryResp & {
+export type MutationLaboratorioRes = ApiResp & {
   laboratorio?: LaboratorioItem
 };
 export const useMutationLaboratoriosQuery = <T>() => {
@@ -214,6 +222,7 @@ export const useMutationLaboratoriosQuery = <T>() => {
     }
     mutate(options)
   }
+
   const setStateLaboratorio = (data: {estado: number, id: number}) => {
     typeActionRef.current = "mutate_state_laboratorio"
     const options: FetchOptions = {
@@ -224,6 +233,7 @@ export const useMutationLaboratoriosQuery = <T>() => {
     }
     mutate(options)
   }
+  
   const deleteLaboratorio = (id: number) => {
     typeActionRef.current = "mutate_delete_laboratorio"
     const options: FetchOptions = {
@@ -236,7 +246,7 @@ export const useMutationLaboratoriosQuery = <T>() => {
   }
 
   useEffect(()=>{
-    if((data as QueryResp)?.errorType === "errorToken"){
+    if((data as ApiResp)?.errorType === "errorToken"){
       resetSessionStore()
       navigate("/auth")
     }

@@ -46,7 +46,7 @@ export const TipoDocumentoSchema = z.object({
   id: z.number(),
   codigo: z.string(),
   descripcion: z.string(),
-  descripcion_abv: z.string(),
+  descripcion_ext: z.string(),
   estado: z.number(),
 })
 export const TiposDocumentoSchema = z.array(TipoDocumentoSchema)

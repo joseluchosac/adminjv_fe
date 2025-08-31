@@ -7,14 +7,14 @@ import { useForm } from "react-hook-form";
 import { LdsBar, LdsEllipsisCenter } from "../../app/components/Loaders";
 import useLayoutStore from "../../app/store/useLayoutStore";
 import { MutationLaboratorioRes, useMutationLaboratoriosQuery } from "../../api/queries/useLaboratoriosQuery";
-import { Laboratorio, LaboratorioItem, QueryResp } from "../../app/types";
+import { Laboratorio, LaboratorioItem, ApiResp } from "../../app/types";
 import useLaboratoriosStore from "../../app/store/useLaboratoriosStore";
 
 const laboratorioFormInit = {id: 0, nombre: "", estado: 1,}
 
-type LaboratorioRes = LaboratorioItem | QueryResp
-export function isErrLaboratorioRes(response: LaboratorioRes): response is QueryResp {
-  return ('error' in response || (response as QueryResp).error == true);
+type LaboratorioRes = LaboratorioItem | ApiResp
+export function isErrLaboratorioRes(response: LaboratorioRes): response is ApiResp {
+  return ('error' in response || (response as ApiResp).error == true);
 }
 
 

@@ -9,7 +9,7 @@ import {
   Row,
   Spinner,
 } from "react-bootstrap";
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import Swal from "sweetalert2";
 import { toast } from "react-toastify";
 import { Controller, useForm } from "react-hook-form";
@@ -17,14 +17,14 @@ import { FaSearch } from "react-icons/fa";
 import SelectAsync from "react-select/async";
 import {
   proveedorFormInit,
-  filterParamsInit,
   selectDark,
+  filterParamInit,
 } from "../../app/utils/constants";
 import {
   Proveedor,
-  NroDocumento,
-  QueryResp,
+  ApiResp,
   UbigeoItem,
+  QueryDocumentResp,
 } from "../../app/types";
 import useProveedoresStore from "../../app/store/useProveedoresStore";
 import useLayoutStore from "../../app/store/useLayoutStore";
@@ -35,17 +35,12 @@ import useSessionStore from "../../app/store/useSessionStore";
 import { useTiposDocumentoQuery } from "../../api/queries/useCatalogosQuery";
 import { fnFetch } from "../../api/fnFetch";
 
-type NroDocumentoRes = NroDocumento | QueryResp
-export function isErrNroDocumentoRes(response: NroDocumentoRes): response is QueryResp {
-  return ('error' in response || (response as QueryResp).error == true);
+type ProveedorRes = Proveedor | ApiResp
+export function isErrProveedorRes(response: ProveedorRes): response is ApiResp {
+  return ('error' in response || (response as ApiResp).error == true);
 }
 
-type ProveedorRes = Proveedor | QueryResp
-export function isErrProveedorRes(response: ProveedorRes): response is QueryResp {
-  return ('error' in response || (response as QueryResp).error == true);
-}
-
-type MutationRes = QueryResp & {
+type MutationRes = ApiResp & {
   proveedor?: Proveedor
 };
 
@@ -79,11 +74,11 @@ export default function ProveedorForm({onMutation}:Props) {
   } = useMutationProveedoresQuery<MutationRes>();
 
   const {
-    data: nroDocumentoRes,
-    isPending: isPendingNroDocumento,
-    consultarNroDocumento,
-    reset: resetNroDocumento,
-  } = useMutationProveedoresQuery<NroDocumentoRes>();
+    data: queryDocumentResp,
+    isPending: isPendingQueryDocument,
+    reset: resetQueryDocument,
+    queryDocument,
+  } = useMutationProveedoresQuery<QueryDocumentResp>();
 
   const {
     register,
@@ -97,10 +92,16 @@ export default function ProveedorForm({onMutation}:Props) {
     watch,
   } = useForm<Proveedor>({ defaultValues: proveedorFormInit });
 
+  const docum = useMemo(() => {
+    if(queryDocumentResp && "nro_documento" in queryDocumentResp){
+      return queryDocumentResp
+    }
+  },[queryDocumentResp])
+
   const loadUbigeosOptions = debounce((search: string, callback: any) => {
     abortUbigeos.current?.abort(); // ✅ Cancela la petición anterior
     abortUbigeos.current = new AbortController();
-    const filtered = { ...filterParamsInit, search };
+    const filtered = { ...filterParamInit, search };
     fnFetch({
       method: "POST",
       url: `${apiURL}ubigeos/filter_ubigeos?page=1`,
@@ -117,10 +118,10 @@ export default function ProveedorForm({onMutation}:Props) {
     });
   }, 500);
 
-  const handleConsultarNroDocumento = () => {
+  const handleQueryDocument = () => {
     const { tipo_documento_cod, nro_documento, api } = getValues();
     if (tipo_documento_cod == "1" || tipo_documento_cod == "6") {
-      consultarNroDocumento({ tipo_documento_cod, nro_documento, api });
+      queryDocument({ tipo_documento_cod, nro_documento, api });
     } else {
       toast("No se puede consultar este número de documento", {
         type: "warning",
@@ -156,8 +157,8 @@ export default function ProveedorForm({onMutation}:Props) {
 
   const resetForm = () => {
     reset(proveedorFormInit);
-    if(nroDocumentoRes){
-      resetNroDocumento();
+    if(queryDocumentResp){
+      resetQueryDocument();
     }
   };
 
@@ -176,20 +177,20 @@ export default function ProveedorForm({onMutation}:Props) {
   }, [showProveedorForm]);
 
   useEffect(() => {
-    if (!nroDocumentoRes) return;
-    if (isErrNroDocumentoRes(nroDocumentoRes)){
-      toast(nroDocumentoRes.msg, { type: nroDocumentoRes.msgType });
-    }else{
-      setValue("id", nroDocumentoRes.id);
-      setValue("nombre_razon_social", nroDocumentoRes.nombre_razon_social);
-      setValue("direccion", nroDocumentoRes.direccion);
-      setValue("ubigeo_inei", nroDocumentoRes.ubigeo);
-      setValue("dis_prov_dep", nroDocumentoRes.dis_prov_dep);
-      setValue("email", nroDocumentoRes.email);
-      setValue("telefono", nroDocumentoRes.telefono);
+    if (!queryDocumentResp) return;
+    if ("error" in queryDocumentResp && queryDocumentResp.error){
+      toast(queryDocumentResp.msg, { type: queryDocumentResp.msgType });
+    }else if("nro_documento" in queryDocumentResp){
+      setValue("id", queryDocumentResp.id);
+      setValue("nombre_razon_social", queryDocumentResp.nombre_razon_social);
+      setValue("direccion", queryDocumentResp.direccion);
+      setValue("ubigeo_inei", queryDocumentResp.ubigeo);
+      setValue("dis_prov_dep", queryDocumentResp.dis_prov_dep);
+      setValue("email", queryDocumentResp.email);
+      setValue("telefono", queryDocumentResp.telefono);
       setValue("api", 1, { shouldDirty: true });
     }
-  }, [nroDocumentoRes]);
+  }, [queryDocumentResp]);
 
   useEffect(() => {
     if (!proveedorRes) return;
@@ -234,7 +235,7 @@ export default function ProveedorForm({onMutation}:Props) {
         <Modal.Body>
           <Form onSubmit={handleSubmit(submit)} id="form_proveedor">
             {isPendingMutation && <LdsBar />}
-            {isPendingNroDocumento && <LdsBar />}
+            {isPendingQueryDocument && <LdsBar />}
             <Row>
               <Form.Group as={Col} md={4} className="mb-3">
                 <Form.Label htmlFor="tipo_documento_cod">Tipo</Form.Label>
@@ -249,7 +250,7 @@ export default function ProveedorForm({onMutation}:Props) {
                     },
                   })}
                   disabled={
-                    (nroDocumentoRes as NroDocumento)?.nombre_razon_social ||
+                    docum?.nombre_razon_social ||
                     currentProveedorId
                       ? true
                       : false
@@ -273,15 +274,15 @@ export default function ProveedorForm({onMutation}:Props) {
                   className="d-flex justify-content-between"
                 >
                   <div>Nro Doc</div>
-                  {nroDocumentoRes && (
+                  {docum && (
                     <Badge
                       bg={
-                        (nroDocumentoRes as NroDocumento)?.estado_sunat == "ACTIVO"
+                        docum?.estado_sunat == "ACTIVO"
                           ? "success"
                           : "warning"
                       }
                     >
-                      {(nroDocumentoRes as NroDocumento)?.estado_sunat}
+                      {docum?.estado_sunat}
                     </Badge>
                   )}
                 </Form.Label>
@@ -300,14 +301,14 @@ export default function ProveedorForm({onMutation}:Props) {
                       },
                     })}
                     disabled={
-                      (nroDocumentoRes as NroDocumento)?.nombre_razon_social ||
+                      docum?.nombre_razon_social ||
                       currentProveedorId
                         ? true
                         : false
                     }
                   />
                   <Button
-                    onClick={handleConsultarNroDocumento}
+                    onClick={handleQueryDocument}
                     variant="outline-secondary"
                     title="Consultar nro. de documento"
                   >
@@ -338,7 +339,7 @@ export default function ProveedorForm({onMutation}:Props) {
                     },
                   })}
                   disabled={
-                    (nroDocumentoRes as NroDocumento)?.nombre_razon_social ? true : false
+                    docum?.nombre_razon_social ? true : false
                   }
                 />
                 {errors.nombre_razon_social && (
@@ -353,15 +354,15 @@ export default function ProveedorForm({onMutation}:Props) {
                   className="d-flex justify-content-between"
                 >
                   <div>Dirección</div>
-                  {nroDocumentoRes && (
+                  {docum && (
                     <Badge
                       bg={
-                        (nroDocumentoRes as NroDocumento)?.condicion_sunat == "HABIDO"
+                        docum?.condicion_sunat == "HABIDO"
                           ? "success"
                           : "warning"
                       }
                     >
-                      {(nroDocumentoRes as NroDocumento)?.condicion_sunat}
+                      {docum?.condicion_sunat}
                     </Badge>
                   )}
                 </Form.Label>
@@ -382,7 +383,7 @@ export default function ProveedorForm({onMutation}:Props) {
                       }
                     },
                   })}
-                  disabled={(nroDocumentoRes as NroDocumento)?.direccion ? true : false}
+                  disabled={docum?.direccion ? true : false}
                 />
                 {errors.direccion && (
                   <div className="invalid-feedback d-block">
@@ -410,7 +411,7 @@ export default function ProveedorForm({onMutation}:Props) {
                         // defaultOptions
                         styles={darkMode ? selectDark : undefined}
                         isClearable
-                        isDisabled={(nroDocumentoRes as NroDocumento)?.ubigeo ? true : false}
+                        isDisabled={docum?.ubigeo ? true : false}
                         value={{
                           value: getValues().ubigeo_inei,
                           label: getValues().dis_prov_dep,

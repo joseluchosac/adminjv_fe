@@ -6,19 +6,19 @@ import Swal from "sweetalert2";
 import { toast } from "react-toastify";
 import { Controller, useForm } from "react-hook-form";
 import { useEstablecimientos } from "./context/EstablecimientosContext";
-import { Establecimiento, QueryResp, UbigeoItem } from "../../../app/types";
+import { Establecimiento, ApiResp, UbigeoItem } from "../../../app/types";
 import useLayoutStore from "../../../app/store/useLayoutStore";
 import { useMutationEstablecimientosQuery } from "../../../api/queries/useEstablecimientosQuery";
 import { LdsBar, LdsEllipsisCenter } from "../../../app/components/Loaders";
 import SelectAsync from "react-select/async"
 import { debounce } from "../../../app/utils/funciones";
-import { filterParamsInit, selectDark } from "../../../app/utils/constants";
+import { filterParamInit, selectDark } from "../../../app/utils/constants";
 import useSessionStore from "../../../app/store/useSessionStore";
 import { useQueryClient } from "@tanstack/react-query";
 import { useTiposEstablecimientoQuery } from "../../../api/queries/useCatalogosQuery";
 import { fnFetch } from "../../../api/fnFetch";
 
-interface EstablecimientoQryRes extends QueryResp {
+interface EstablecimientoQryRes extends ApiResp {
   content: Establecimiento | null;
 }
 type GetEstablecimientoQuery = {
@@ -80,7 +80,7 @@ export default function EstablecimientoForm() {
   const loadUbigeosOptions =  debounce((search: string, callback: any) => {
     abortUbigeos.current?.abort(); // ✅ Cancela la petición anterior
     abortUbigeos.current = new AbortController();
-    const filtered = {...filterParamsInit, search}
+    const filtered = {...filterParamInit, search}
     fnFetch({
       method: "POST",
       url: `${apiURL}ubigeos/filter_ubigeos?page=1`,

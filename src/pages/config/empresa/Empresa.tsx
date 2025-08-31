@@ -8,11 +8,11 @@ import { MdHideImage, MdImage } from "react-icons/md"
 import { FaUndo } from "react-icons/fa"
 import { useQueryClient } from "@tanstack/react-query"
 import useSessionStore from "../../../app/store/useSessionStore"
-import { QueryResp, UbigeoItem, type Empresa } from "../../../app/types"
+import { ApiResp, UbigeoItem, type Empresa } from "../../../app/types"
 import { LdsEllipsisCenter } from "../../../app/components/Loaders"
 import { ConfirmPass } from "../../../app/components/ConfirmsMdl"
 import { debounce } from "../../../app/utils/funciones"
-import { filterParamsInit, selectDark } from "../../../app/utils/constants"
+import { filterParamInit, selectDark } from "../../../app/utils/constants"
 import useLayoutStore from "../../../app/store/useLayoutStore";
 import { useEmpresaQuery, useMutationEmpresaQuery } from "../../../api/queries/useEmpresaQuery";
 import { fnFetch } from "../../../api/fnFetch";
@@ -30,7 +30,7 @@ export default function Empresa() {
     data: mutation,
     isPending: isPendingMutation, 
     updateEmpresa 
-  } = useMutationEmpresaQuery<QueryResp>()
+  } = useMutationEmpresaQuery<ApiResp>()
 
   const {
     register, 
@@ -46,7 +46,7 @@ export default function Empresa() {
   const loadUbigeosOptions = debounce((search: string, callback: any) => {
     abortUbigeos.current?.abort(); // ✅ Cancela la petición anterior
     abortUbigeos.current = new AbortController();
-    const filtered = { ...filterParamsInit, search };
+    const filtered = { ...filterParamInit, search };
     fnFetch({
       method: "POST",
       url: `${apiURL}ubigeos/filter_ubigeos?page=1`,

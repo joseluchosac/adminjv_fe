@@ -1,4 +1,4 @@
-import { ProveedorItem, QueryResp} from "../../../app/types";
+import { ProveedorItem, ApiResp} from "../../../app/types";
 import { FaEdit, FaToggleOff, FaToggleOn, FaTrash } from "react-icons/fa";
 import { useMutationProveedoresQuery } from "../../../api/queries/useProveedoresQuery";
 import Swal from "sweetalert2";
@@ -11,7 +11,7 @@ interface Props {
   proveedor: ProveedorItem ;
 }
 
-interface ProveedorMutQryRes extends QueryResp {content: ProveedorItem}
+interface ProveedorMutQryRes extends ApiResp {content: ProveedorItem}
 
 function ProveedoresListItem({ proveedor }: Props) {
   const darkMode = useLayoutStore(state => state.layout.darkMode)
