@@ -6,15 +6,9 @@ import { useNavigate } from "react-router-dom";
 import { FetchOptions } from "../../app/types";
 import { fnFetch } from "../fnFetch";
 
-type TypeAction = 
-  "mutate_empresa"
-  | "mutate_apis_nro_doc"
-  | "mutate_cpe_fact"
-  | "mutate_cpe_guia"
-  | "mutate_usuario_sol_sec"
-  | "mutate_email_config"
-  | "mutate_establecimiento"
-  | "check_this_term"
+type TypeAction = "UPDATE_CPE_FACT"
+  | "UPDATE_CPE_GUIA"
+  | "UPDATE_USUARIO_SOL_SEC"
 
 // ****** MUTATION ******
 export const useMutationConfigQuery = () => {
@@ -32,17 +26,6 @@ export const useMutationConfigQuery = () => {
     }
   })
 
-  const updateEmpresa = (formData: FormData) => {
-    typeActionRef.current = "mutate_empresa"
-    const options: FetchOptions = {
-      method: "POST",
-      url: apiURL + "config/update_empresa",
-      body: formData,
-      authorization: "Bearer " + token,
-    }
-    mutate(options)
-  }
-
   const getApisNroDoc = () => {
     const options: FetchOptions = {
       method: "POST",
@@ -53,7 +36,6 @@ export const useMutationConfigQuery = () => {
   }
 
   const updateApisNroDoc = (form: any) => {
-    typeActionRef.current = "mutate_apis_nro_doc"
     const options: FetchOptions = {
       method: "POST",
       url: apiURL + "config/update_apis_nro_doc",
@@ -73,7 +55,7 @@ export const useMutationConfigQuery = () => {
   }
 
   const updateCpeFact = (form: any) => {
-    typeActionRef.current = "mutate_cpe_fact"
+    typeActionRef.current = "UPDATE_CPE_FACT"
     const options: FetchOptions = {
       method: "POST",
       url: apiURL + "config/update_cpe_fact",
@@ -93,7 +75,7 @@ export const useMutationConfigQuery = () => {
   }
   
   const updateCpeGuia = (form: any) => {
-    typeActionRef.current = "mutate_cpe_guia"
+    typeActionRef.current = "UPDATE_CPE_GUIA"
     const options: FetchOptions = {
       method: "POST",
       url: apiURL + "config/update_cpe_guia",
@@ -113,7 +95,7 @@ export const useMutationConfigQuery = () => {
   }
   
   const updateUsuarioSolSec = (form: any) => {
-    typeActionRef.current = "mutate_usuario_sol_sec"
+    typeActionRef.current = "UPDATE_USUARIO_SOL_SEC"
     const options: FetchOptions = {
       method: "POST",
       url: apiURL + "config/update_usuario_sol_sec",
@@ -133,7 +115,6 @@ export const useMutationConfigQuery = () => {
   }
   
   const updateEmailConfig = (form: any) => {
-    typeActionRef.current = "mutate_email_config"
     const options: FetchOptions = {
       method: "POST",
       url: apiURL + "config/update_email_config",
@@ -155,7 +136,6 @@ export const useMutationConfigQuery = () => {
     data, 
     isPending, 
     isError,
-    updateEmpresa,
     getApisNroDoc,
     updateApisNroDoc,
     getCpeFact,

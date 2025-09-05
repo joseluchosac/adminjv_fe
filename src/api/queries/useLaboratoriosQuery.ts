@@ -3,24 +3,18 @@ import { useEffect, useRef } from "react"
 import { useNavigate } from "react-router-dom";
 import { InfiniteData, useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import useSessionStore from "../../app/store/useSessionStore"
-import { FetchOptions, FilterQueryResp, Laboratorio, LaboratorioItem, ApiResp } from "../../app/types";
+import { FetchOptions, Laboratorio, LaboratorioItem, ApiResp, LaboratoriosFilQryRes } from "../../app/types";
 import { fnFetch } from "../fnFetch";
 import { toast } from "react-toastify";
 import { useDebounce } from "react-use";
 import useLaboratoriosStore from "../../app/store/useLaboratoriosStore";
 
-type TypeAction = 
-  "mutate_create_laboratorio"
-  | "mutate_update_laboratorio"
-  | "mutate_delete_laboratorio"
-  | 'mutate_state_laboratorio'
+type TypeAction = "CREATE_LABORATORIO"
+  | "UPDATE_LABORATORIO"
+  | "DELETE_LABORATORIO"
 
 // ****** FILTRAR  ******
-export interface LaboratoriosFilQryRes extends FilterQueryResp {
-  filas: LaboratorioItem[];
-}
-
-export const useFilterLaboratoriosQuery = () => {
+export const useLaboratoriosFilterQuery = () => {
   const {
     laboratorioFilterForm,
     laboratorioFilterParam,
@@ -61,9 +55,9 @@ export const useFilterLaboratoriosQuery = () => {
     staleTime: 1000 * 60 * 5 
   })
 
-  // const resetear = ()=>{
-  //   queryClient.resetQueries({ queryKey: ['laboratorios'], exact: true });
-  // }
+  const resetear = ()=>{
+    queryClient.resetQueries({ queryKey: ['laboratorios'], exact: true });
+  }
 
 
   useDebounce(() => {
@@ -80,7 +74,7 @@ export const useFilterLaboratoriosQuery = () => {
     //   return; // Evita ejecutar en el primer render
     // }
     return () => {
-      // resetear()
+      resetear()
     }
   }, [])
 
@@ -133,7 +127,7 @@ export const useMutationLaboratoriosQuery = <T>() => {
     onSuccess: (resp) => {
       const r = resp as MutationLaboratorioRes
       if(r.msgType !== 'success') return
-      if(typeActionRef.current === "mutate_create_laboratorio") {
+      if(typeActionRef.current === "CREATE_LABORATORIO") {
         const createdLaboratorio = r.laboratorio as LaboratorioItem
         queryClient.setQueryData(["laboratorios"], (oldData: InfiniteData<LaboratoriosFilQryRes, unknown> | undefined) => {
           const pages = structuredClone(oldData?.pages)
@@ -147,7 +141,7 @@ export const useMutationLaboratoriosQuery = <T>() => {
           }
           return {...oldData, pages, }
         })
-      }else if(typeActionRef.current === "mutate_update_laboratorio" || typeActionRef.current === "mutate_state_laboratorio") {
+      }else if(typeActionRef.current === "UPDATE_LABORATORIO") {
         const updatedLaboratorio = r.laboratorio as LaboratorioItem
         queryClient.setQueryData(["laboratorios"], (oldData: InfiniteData<LaboratoriosFilQryRes, unknown> | undefined) => {
           const pages = structuredClone(oldData?.pages)
@@ -164,7 +158,7 @@ export const useMutationLaboratoriosQuery = <T>() => {
           }
           return {...oldData, pages}
         })
-      }else if(typeActionRef.current === "mutate_delete_laboratorio") {
+      }else if(typeActionRef.current === "DELETE_LABORATORIO") {
         const deletedLaboratorioId = r.content as LaboratorioItem["id"]
         queryClient.setQueryData(["laboratorios"], (oldData: InfiniteData<LaboratoriosFilQryRes, unknown> | undefined) => {
           let pages = structuredClone(oldData?.pages)
@@ -202,7 +196,7 @@ export const useMutationLaboratoriosQuery = <T>() => {
   }
 
   const createLaboratorio = (laboratorio: Laboratorio) => {
-    typeActionRef.current = "mutate_create_laboratorio"
+    typeActionRef.current = "CREATE_LABORATORIO"
     const options: FetchOptions = {
       method: "POST",
       url: apiURL + "laboratorios/create_laboratorio",
@@ -213,7 +207,7 @@ export const useMutationLaboratoriosQuery = <T>() => {
   }
 
   const updateLaboratorio = (laboratorio: Laboratorio) => {
-    typeActionRef.current = "mutate_update_laboratorio"
+    typeActionRef.current = "UPDATE_LABORATORIO"
     const options: FetchOptions = {
       method: "PUT",
       url: apiURL + "laboratorios/update_laboratorio",
@@ -224,7 +218,7 @@ export const useMutationLaboratoriosQuery = <T>() => {
   }
 
   const setStateLaboratorio = (data: {estado: number, id: number}) => {
-    typeActionRef.current = "mutate_state_laboratorio"
+    typeActionRef.current = "UPDATE_LABORATORIO"
     const options: FetchOptions = {
       method: "PUT",
       url: apiURL + "laboratorios/set_state_laboratorio",
@@ -235,7 +229,7 @@ export const useMutationLaboratoriosQuery = <T>() => {
   }
   
   const deleteLaboratorio = (id: number) => {
-    typeActionRef.current = "mutate_delete_laboratorio"
+    typeActionRef.current = "DELETE_LABORATORIO"
     const options: FetchOptions = {
       method: "DELETE",
       url: apiURL + "laboratorios/delete_laboratorio",

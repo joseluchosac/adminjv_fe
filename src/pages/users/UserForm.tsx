@@ -16,26 +16,15 @@ import { LdsBar, LdsEllipsisCenter } from "../../app/components/Loaders";
 import { UserFormSchema } from "../../app/schemas/users-schema";
 
 export default function Userform(){
-  const {
-    stateUsers: { showUserForm, currentUserId },
-    dispatchUsers
-  } = useUsers()
-
   const darkMode = useLayoutStore(state => state.layout.darkMode)
   const {roles} = useRolesQuery()  
   const {cajas} = useCajasQuery()
 
   const {
-    register, 
-    formState: {errors, isDirty}, 
-    handleSubmit,
-    setError,
-    reset,
-  } = useForm<UserForm>({
-    defaultValues: userFormInit,
-    resolver: zodResolver(UserFormSchema),
-  })
-  
+    stateUsers: { showUserForm, currentUserId },
+    dispatchUsers
+  } = useUsers()
+
   const {
     data: getUserResp,
     isPending: isPendingUser,
@@ -49,7 +38,18 @@ export default function Userform(){
     createUser, 
     updateUser, 
   } = useMutationUsersQuery<MutationUserResp>()
-  
+
+  const {
+    register, 
+    formState: {errors, isDirty}, 
+    handleSubmit,
+    setError,
+    reset,
+  } = useForm<UserForm>({
+    defaultValues: userFormInit,
+    resolver: zodResolver(UserFormSchema),
+  })
+
   const submit = (data: UserForm) => {
     Swal.fire({
       icon: 'question',

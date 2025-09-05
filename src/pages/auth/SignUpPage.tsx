@@ -5,7 +5,6 @@ import { Link } from "react-router-dom";
 import { MdMail } from "react-icons/md";
 import { useForm } from "react-hook-form";
 import { EmpresaInfo, SignUpForm, SignUpResp } from "../../app/types";
-import { SignUpFormSchema } from "../../app/schemas/auth-schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import useSessionStore from "../../app/store/useSessionStore";
 import { useQueryClient } from "@tanstack/react-query";
@@ -13,6 +12,7 @@ import { useMutationUsersQuery } from "../../api/queries/useUsersQuery";
 import { LdsBar } from "../../app/components/Loaders";
 import { useEffect } from "react";
 import { toast } from "react-toastify";
+import { SignUpFormSchema } from "../../app/schemas/users-schema";
 
 export default function SignUpPage() {
   const { setTknSession, curEstab, setCurEstab } = useSessionStore();

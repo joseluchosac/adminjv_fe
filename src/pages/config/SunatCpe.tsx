@@ -125,7 +125,7 @@ export default function SunatCpe() {
         <Accordion.Item eventKey="0">
           <Accordion.Header>MODO FACTURACIÓN / WEBSERVICE SUNAT</Accordion.Header>
           <Accordion.Body className="position-relative">
-            {(isPendingCpeFact || isPendingMutation && typeAction==="mutate_cpe_fact") && <LdsBar />}
+            {(isPendingCpeFact || isPendingMutation && typeAction==="UPDATE_CPE_FACT") && <LdsBar />}
             <Form className='mx-4' onSubmit={handleSubmit} data-form="cpeFactForm">
               <Form.Group as={Row} className="mb-3">
                 <Form.Label column sm="2">Desarrollo</Form.Label>
@@ -169,7 +169,7 @@ export default function SunatCpe() {
         <Accordion.Item eventKey="1">
           <Accordion.Header>MODO GUÍA DE REMISIÓN / API SUNAT</Accordion.Header>
           <Accordion.Body className="position-relative">
-            {(isPendingCpeGuia || isPendingMutation && typeAction==="mutate_cpe_guia") && <LdsBar />}
+            {(isPendingCpeGuia || isPendingMutation && typeAction==="UPDATE_CPE_GUIA") && <LdsBar />}
             <Form className='mx-4' onSubmit={handleSubmit} data-form="cpeGuiaForm">
               <Form.Group as={Row} className="mb-3">
                 <Form.Label column sm="3">Client Id desarrollo</Form.Label>
@@ -272,7 +272,7 @@ export default function SunatCpe() {
         <Accordion.Item eventKey="2">
           <Accordion.Header>USUARIO SOL SECUNDARIO</Accordion.Header>
           <Accordion.Body className="position-relative">
-            {(isPendingUsuarioSolSec || isPendingMutation && typeAction==="mutate_usuario_sol_sec") && <LdsBar />}
+            {(isPendingUsuarioSolSec || isPendingMutation && typeAction==="UPDATE_USUARIO_SOL_SEC") && <LdsBar />}
             <Form className='mx-4' onSubmit={handleSubmit} data-form="usuarioSolSecForm">
               <Form.Group as={Row} className="mb-3">
                 <Form.Label column sm="3">Usuario SOL</Form.Label>

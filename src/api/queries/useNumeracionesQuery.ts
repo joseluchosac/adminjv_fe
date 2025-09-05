@@ -1,19 +1,17 @@
 const apiURL = import.meta.env.VITE_API_URL;
-import { useEffect, useRef } from "react"
+import { useEffect } from "react"
 import { useNavigate } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query"
 import useSessionStore from "../../app/store/useSessionStore"
 import { FetchOptions, Numeracion } from "../../app/types";
 import { fnFetch } from "../fnFetch";
 
-type TypeAction = "filter_full" | "mutate_numeracion" | "delete_numeracion"
 
 // ****** MUTATION ******
 export const useMutationNumeracionesQuery = () => {
   const resetSessionStore = useSessionStore(state => state.resetSessionStore)
   const navigate = useNavigate()
   const token = useSessionStore(state => state.tknSession)
-  const typeActionRef = useRef<TypeAction | "">("")
 
   const {data, isPending, isError, mutate, } = useMutation({
     mutationFn: fnFetch,
@@ -42,7 +40,6 @@ export const useMutationNumeracionesQuery = () => {
   }
 
   const createNumeracion = (numeracion: Numeracion) => {
-    typeActionRef.current = "mutate_numeracion"
     const options: FetchOptions = {
       method: "POST",
       url: apiURL + "numeraciones/create_numeracion",
@@ -53,7 +50,6 @@ export const useMutationNumeracionesQuery = () => {
   }
 
   const updateNumeracion = (numeracion: Numeracion) => {
-    typeActionRef.current = "mutate_numeracion"
     const options: FetchOptions = {
       method: "PUT",
       url: apiURL + "numeraciones/update_numeracion",
@@ -63,7 +59,6 @@ export const useMutationNumeracionesQuery = () => {
     mutate(options)
   }
   const deleteNumeracion = (id: number) => {
-    typeActionRef.current = "delete_numeracion"
     const options: FetchOptions = {
       method: "DELETE",
       url: apiURL + "numeraciones/delete_numeracion",
@@ -89,6 +84,5 @@ export const useMutationNumeracionesQuery = () => {
     createNumeracion,
     updateNumeracion,
     deleteNumeracion,
-    typeAction: typeActionRef.current,
   }
 }

@@ -3,7 +3,7 @@ import { Card, Table } from "react-bootstrap";
 import { toast } from "react-toastify";
 import { camposProductoInit } from "../../../app/utils/constants";
 import { useProductos } from "../context/ProductosContext";
-import { useFilterProductosQuery } from "../../../api/queries/useProductosQuery";
+import { useProductosFilterQuery } from "../../../api/queries/useProductosQuery";
 import DynaIcon from "../../../app/components/DynaComponents";
 import ProductosLstRow from "./ProductosLstRow";
 import { LdsEllipsisCenter } from "../../../app/components/Loaders";
@@ -29,7 +29,7 @@ const ProductosLst: React.FC = () => {
     hasNextPage,
     fetchNextPage,
     setFilterParamsProductos,
-  } = useFilterProductosQuery();
+  } = useProductosFilterQuery();
   
   const tableRef = useRef<HTMLDivElement | null>(null)
   const ldsEllipsisRef = useRef<HTMLDivElement | null>(null)

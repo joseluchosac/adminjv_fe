@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { ApiRespSchema, ErrorValidateSchema } from "./generics-schema";
 
 export const UserSchema = z.object({
   id: z.number(),
@@ -16,19 +15,6 @@ export const UserSchema = z.object({
   updated_at: z.string(),
 })
 
-export const UserItemSchema = UserSchema.omit({
-  rol_id: true, caja_id: true
-})
-
-export const UserSessionSchema = UserSchema.omit({
-  rol: true, caja: true, estado: true, created_at: true, updated_at: true
-})
-
-export const ProfileSchema = UserSchema.omit({
-  rol_id: true, caja_id: true, estado: true, created_at: true, updated_at: true
-})
-
-// 💡 FORMS
 export const UserFormSchema = z.object({
   id: z.number().int().optional(),
   nombres: z.string().min(2, "Minimo 2 caracteres").max(20, "Máximo 20 caracteres"),
@@ -77,19 +63,55 @@ export const ProfileFormSchema = z.object({
   path: ["confirm_new_password"]
 });
 
-// 💡 API RESPONSES
-export const GetUserRespSchema = z.union([UserSchema, ApiRespSchema]) 
-export const GetProfileRespSchema = z.union([ProfileSchema, ApiRespSchema]) 
+export const SignInFormSchema = z.object({
+  username: z.string().min(1, "Usuario es requerido").max(50, "Se permite máximo 50 caracteres"),
+  password: z.string().min(1, "Contraseña es requerida").max(50, "Se permite máximo 50 caracteres"),
+  establecimiento_id: z.number().int().min(1, "Elija un establecimiento")
+});
 
-export const MutationUserRespSchema = ApiRespSchema.extend({
-  content: z.union([UserItemSchema, ErrorValidateSchema])
-})
+export const SignUpFormSchema = z.object({
+  username: z.string().min(2, "Minimo 2 caracteres").max(15, "Máximo 15 caracteres"),
+  email: z.email("Formato del email no válido")
+    .optional().or(z.literal('')),
+  password: z.string().min(6, "La contraseña debe tener al menos 6 caracteres"),
+  confirm_password: z.string(),
+  establecimiento_id: z.number().int().min(1, "Elija un establecimiento")
+}).refine(data => data.password === data.confirm_password, {
+  message: "Las contraseñas no coinciden",
+  path: ["confirm_password"]
+});
 
-export const CheckAuthRespSchema = ApiRespSchema.extend({
-  profile: ProfileSchema
-})
+export const RecoveryFormSchema = z.object({
+  recovery_code: z.string().length(6, "Debe ingresar 6 caracteres"),
+  new_password: z.string().min(6, "La contraseña debe tener al menos 6 caracteres"),
+  confirm_new_password: z.string(),
+}).refine(data => data.new_password === data.confirm_new_password, {
+  message: "Las contraseñas no coinciden",
+  path: ["confirm_new_password"]
+});
 
-export const AuthUserRespSchema = ApiRespSchema.extend({
-  token: z.string()
-})
 
+
+// 💡 DEPRECADOS
+// export const GetUserRespSchema = z.union([UserSchema, ApiRespSchema]) 
+// export const GetProfileRespSchema = z.union([ProfileSchema, ApiRespSchema]) 
+
+// export const MutationUserRespSchema = ApiRespSchema.extend({
+//   content: z.union([UserItemSchema, ErrorValidateSchema])
+// })
+
+// export const CheckAuthRespSchema = ApiRespSchema.extend({
+//   profile: ProfileSchema
+// })
+
+// export const UserItemSchema = UserSchema.omit({
+//   rol_id: true, caja_id: true
+// })
+
+// export const UserSessionSchema = UserSchema.omit({
+//   rol: true, caja: true, estado: true, created_at: true, updated_at: true
+// })
+
+// export const ProfileSchema = UserSchema.omit({
+//   rol_id: true, caja_id: true, estado: true, created_at: true, updated_at: true
+// })

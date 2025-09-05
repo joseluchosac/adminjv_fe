@@ -6,7 +6,7 @@ import useSessionStore from "../../app/store/useSessionStore"
 import { Establecimiento, FetchOptions } from "../../app/types";
 import { fnFetch } from "../fnFetch";
 
-type TypeAction = "filter_full" | "mutate_establecimiento" | "delete_establecimiento"
+type TypeAction = ""
 // ****** ESTABLECIMIENTOS ******
 type DataEstablecimientos = {content: Establecimiento[]}
 export const useEstablecimientosQuery = () => {
@@ -56,7 +56,6 @@ export const useMutationEstablecimientosQuery = () => {
   }
 
   const createEstablecimiento = (establecimiento: Establecimiento) => {
-    typeActionRef.current = "mutate_establecimiento"
     const options: FetchOptions = {
       method: "POST",
       url: apiURL + "establecimientos/create_establecimiento",
@@ -67,7 +66,6 @@ export const useMutationEstablecimientosQuery = () => {
   }
 
   const updateEstablecimiento = (establecimiento: Establecimiento) => {
-    typeActionRef.current = "mutate_establecimiento"
     const options: FetchOptions = {
       method: "PUT",
       url: apiURL + "establecimientos/update_establecimiento",
@@ -78,7 +76,6 @@ export const useMutationEstablecimientosQuery = () => {
   }
 
   const deleteEstablecimiento = (id: number) => {
-    typeActionRef.current = "delete_establecimiento"
     const options: FetchOptions = {
       method: "DELETE",
       url: apiURL + "establecimientos/delete_establecimiento",

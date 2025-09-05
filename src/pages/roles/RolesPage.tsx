@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import { Button, Card, Col, Container, Form, Row, Table } from "react-bootstrap"
-import { Modulo, ApiResp, Rol } from "../../app/types"
+import { Modulo, ApiResp, Rol, ModuloRol } from "../../app/types"
 import ModulosRolTree from "./ModulosRolTree"
 import { getModulosTree } from "../../app/utils/funciones"
 import { useMutateModulosQuery } from "../../api/queries/useModulosQuery"
@@ -10,19 +10,14 @@ import Swal from "sweetalert2"
 import useLayoutStore from "../../app/store/useLayoutStore"
 import { toast } from "react-toastify"
 import { useMutateRolesQuery, useRolesQuery } from "../../api/queries/useRolesQuery"
-import { useQueryClient } from "@tanstack/react-query"
 
-interface MutateRol extends ApiResp {
-  rol?: Rol
-}
 const rolFormInit = {id: 0, rol: ""}
 
 const RolesPage: React.FC = () => {
   const [rolForm, setRolForm] = useState<Rol>(rolFormInit)
-  const [modulosRol, setModulosRol] = useState<Modulo[] | null>(null)
+  const [modulosRol, setModulosRol] = useState<ModuloRol[] | null>(null)
   const [itemsTree, setItemsTree] = useState<Modulo[] | null>(null)
   const darkMode = useLayoutStore(state => state.layout.darkMode)
-  const queryClient = useQueryClient()
 
   const {
     roles,
@@ -32,24 +27,24 @@ const RolesPage: React.FC = () => {
   } = useRolesQuery()
   
   const {
-    data: moduloRol,
-    isPending: isPendingModuloRol,
-    getModuloRol
-  } = useMutateModulosQuery()
+    data: getModulosRolResp,
+    isPending: isPendingModulosRol,
+    getModulosRol
+  } = useMutateModulosQuery<ModuloRol[] | ApiResp>()
 
   const {
     data: mutationModulosRoles, 
     isPending: isPendingMutationModulosRoles,
     updateModulosRoles,
-  } = useMutateModulosQuery()
+  } = useMutateModulosQuery<ApiResp>()
 
   const {
-    data: mutationRol,
+    data: mutationRolResp,
     isPending: isPendingMutationRol,
     createRol,
     updateRol,
     deleteRol,
-  } = useMutateRolesQuery<MutateRol>()
+  } = useMutateRolesQuery<ApiResp>()
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const {name, value} = e.currentTarget
@@ -74,17 +69,16 @@ const RolesPage: React.FC = () => {
       }
     }).then((result) => {
       if (result.isConfirmed) {
-        deleteRol({id: rol.id})
+        deleteRol(rol.id)
       }
     });
   }
 
   const rolToEdit = (id: number) => {
-    if(!roles) return
-    if(('error' in roles) && roles.error) return
-    const currentRol = (roles as Rol[])?.find((el) => el.id === id) as Rol
-    setRolForm(currentRol)
-    getModuloRol(id)
+    if(!roles.length) return
+    const currentRol = roles.find((el) => el.id === id)
+    setRolForm(currentRol!)
+    getModulosRol(id)
   }
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -115,15 +109,14 @@ const RolesPage: React.FC = () => {
     });
   }
 
-  const toggleAssign = (id: number) => {
+  const toggleAssign = (id: Modulo['id']) => {
+    if(id == 1 || id == 2) return toast.warning("No es posible cambiar estor módulos")
     if(!modulosRol) return
     const idx = modulosRol?.findIndex((el) => el.id === id)
     modulosRol[idx].assign = !modulosRol[idx].assign
     const newModulosRol = structuredClone(modulosRol)
     setModulosRol(newModulosRol)
-    const newModulosRolData = newModulosRol?.filter((el) => el.assign === true)
-      .map((el) => ({modulo_id: el.id}))
-    updateModulosRoles({rol_id: rolForm.id, modulos: newModulosRolData})
+    updateModulosRoles({modulo_id: id, rol_id: rolForm.id})
   }
 
   useEffect(() => {
@@ -141,22 +134,21 @@ const RolesPage: React.FC = () => {
   }, [mutationModulosRoles])
   
   useEffect(() => {
-    if(!mutationRol) return
-    toast(mutationRol.msg, {type: mutationRol.msgType})
-    if(mutationRol.rol){
-      queryClient.invalidateQueries({queryKey: ["roles"]})
+    if(!mutationRolResp) return
+    if(!mutationRolResp.error){
       resetForm()
     }
-  }, [mutationRol])
+    toast(mutationRolResp.msg, {type: mutationRolResp.msgType})
+  }, [mutationRolResp])
 
   useEffect(() => {
-    if(!moduloRol) return
-    if(moduloRol.content){
-      setModulosRol(moduloRol.content)
-    }else{
-      toast(moduloRol.msg, {type: moduloRol.msgType})
+    if(!getModulosRolResp) return
+    if("error" in getModulosRolResp && getModulosRolResp.error){
+      toast(getModulosRolResp.msg || "Hubo un error al obtener los datos", {type: getModulosRolResp.msgType})
+      return
     }
-  }, [moduloRol])
+    setModulosRol(getModulosRolResp as ModuloRol[])
+  }, [getModulosRolResp])
 
   if(isLoadingRoles){
     return (
@@ -166,7 +158,7 @@ const RolesPage: React.FC = () => {
     )
   }
 
-  if(!roles || isErrorRoles || ("error" in roles && roles.error)){
+  if(isErrorRoles){
     return <div>Error al obtener los roles</div>
   }
 
@@ -211,7 +203,7 @@ const RolesPage: React.FC = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {roles && !("error" in roles) && (roles as Rol[]).map((el) => (
+                  {roles.map((el) => (
                     <tr key={el.id}>
                       <td
                          className={(el.id == rolForm.id) ? "text-info" : ""}
@@ -241,9 +233,9 @@ const RolesPage: React.FC = () => {
         </Col>
         <Col>
           <Card>
-            <Card.Header>MÓDULOS {Boolean(rolForm.id) && `PARA:  ${rolForm.rol}`}</Card.Header>
+            <Card.Header>PERMISOS {Boolean(rolForm.id) && `PARA:  ${rolForm.rol}`}</Card.Header>
             <Card.Body className="position-relative">
-              {isPendingModuloRol && <LdsBar />}
+              {isPendingModulosRol && <LdsBar />}
               {isPendingMutationModulosRoles && <LdsBar />}
               {itemsTree ? 
                 <Row>

@@ -3,7 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import useSessionStore from "../../app/store/useSessionStore"
 import { useNavigate } from "react-router-dom";
 import { useEffect, useMemo } from "react";
-import { FetchOptions, ApiResp } from "../../app/types";
+import { FetchOptions, ApiResp, Rol } from "../../app/types";
 import { fnFetch } from "../fnFetch";
 import { RolesSchema } from "../../app/schemas/roles-schema";
 
@@ -52,7 +52,7 @@ export const useMutateRolesQuery = <T>() => {
     }
   })
 
-  const createRol = (param:any) => {
+  const createRol = (param: Rol) => {
     const options: FetchOptions = {
       method: "POST",
       url: apiURL + "roles/create_rol",
@@ -62,7 +62,7 @@ export const useMutateRolesQuery = <T>() => {
     mutate(options)
   }
 
-  const updateRol = (param:any) => {
+  const updateRol = (param: Rol) => {
     const options: FetchOptions = {
       method: "PUT",
       url: apiURL + "roles/update_rol",
@@ -72,11 +72,11 @@ export const useMutateRolesQuery = <T>() => {
     mutate(options)
   }
   
-  const deleteRol = (param: any) => {
+  const deleteRol = (id: Rol['id']) => {
     const options: FetchOptions = {
       method: "DELETE",
       url: apiURL + "roles/delete_rol",
-      body: JSON.stringify(param),
+      body: JSON.stringify({id}),
       authorization: "Bearer " + token,
     }
     mutate(options)

@@ -1,6 +1,6 @@
 import { useRef } from "react";
 import { Card, Table } from "react-bootstrap";
-import { useFilterClientesQuery } from "../../../api/queries/useClientesQuery";
+import { useClientesFilterQuery } from "../../../api/queries/useClientesQuery";
 import useClientesStore from "../../../app/store/useClientesStore";
 import { LdsBar, LdsEllipsisCenter } from "../../../app/components/Loaders";
 import DynaIcon from "../../../app/components/DynaComponents";
@@ -21,7 +21,7 @@ export default function ClientesLst() {
     isFetching,
     isError,
     hasNextPage,
-  } = useFilterClientesQuery()
+  } = useClientesFilterQuery()
   
   const sort = (field_name:string, field_label: string, ctrlKey: boolean) => {
     setClienteFilterFormSortTable({field_name, field_label, ctrlKey})

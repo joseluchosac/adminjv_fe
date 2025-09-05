@@ -1,5 +1,5 @@
 const apiURL = import.meta.env.VITE_API_URL;
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom";
 import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import useSessionStore from "../../app/store/useSessionStore"
@@ -7,15 +7,12 @@ import { FetchOptions, FilterQueryResp, Movimiento, Movimientoform, MovimientoIt
 import { filterParamsInit } from "../../app/utils/constants";
 import { fnFetch } from "../fnFetch";
 
-type TypeAction = 
-"filter_full" 
-| "mutate_movimiento" 
 
 // ****** FILTRAR ******
 export interface MovimientosFilQryRes extends FilterQueryResp {
   filas: MovimientoItem[];
 }
-export const useFilterMovimientosQuery = () => {
+export const useMovimientosFilterQuery = () => {
   const [filterParamsMovimientos, setFilterParamsMovimientos] = useState(filterParamsInit)
   const token = useSessionStore(state => state.tknSession)
   const queryClient = useQueryClient()
@@ -81,7 +78,6 @@ export const useMutationMovimientosQuery = () => {
   const navigate = useNavigate()
   const token = useSessionStore(state => state.tknSession)
   const queryClient = useQueryClient()
-  const typeActionRef = useRef<TypeAction | "">("")
 
   const {data, isPending, isError, mutate, } = useMutation({
     mutationFn: fnFetch,
@@ -93,7 +89,6 @@ export const useMutationMovimientosQuery = () => {
 
 
   const createMovimiento = (movimiento: Movimientoform) => {
-    typeActionRef.current = "mutate_movimiento"
     const options: FetchOptions = {
       method: "POST",
       url: apiURL + "movimientos/create_movimiento",
@@ -104,7 +99,6 @@ export const useMutationMovimientosQuery = () => {
   }
 
   const updateMovimiento = (movimiento: Movimiento) => {
-    typeActionRef.current = "mutate_movimiento"
     const options: FetchOptions = {
       method: "PUT",
       url: apiURL + "movimientos/update_movimiento",

@@ -2,11 +2,10 @@ const apiURL = import.meta.env.VITE_API_URL;
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import useSessionStore from "../../app/store/useSessionStore"
 import { FetchOptions, Modulo, ApiResp } from "../../app/types"
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { fnFetch } from "../fnFetch";
 
-type TypeAction = "mutate_modulo" | "mutate_modulos"
 
 export type ModulosSessionQryRes = Modulo[] | ApiResp
 // export function isErrModulosSession(response: ModulosSessionQryRes): response is ApiResp {
@@ -47,14 +46,13 @@ export const useModulosSessionQuery = () => {
 }
 
 // ****** MUTATION ******
-export const useMutateModulosQuery = () => {
+export const useMutateModulosQuery = <T>() => {
   const resetSessionStore = useSessionStore(state => state.resetSessionStore)
   const navigate = useNavigate()
   const token = useSessionStore(state => state.tknSession)
   const queryClient = useQueryClient()
-  const typeActionRef = useRef<TypeAction | "">("")
 
-  const {mutate, isPending, data} = useMutation({
+  const {mutate, isPending, data} = useMutation<T, Error, FetchOptions, unknown>({
     mutationKey: ['mutation_modulos'],
     mutationFn: fnFetch,
     onSuccess: () => {
@@ -71,10 +69,11 @@ export const useMutateModulosQuery = () => {
     mutate(options)
   }
 
-  const getModuloRol = (rol_id: number) => {
+  const getModulosRol = (rol_id: number) => {
+    // Obtiene todos los módulos indicando cuales estan asignados al rol_id
     const options: FetchOptions = {
       method: "POST",
-      url: apiURL + "modulos/get_modulo_rol",
+      url: apiURL + "modulos/get_modulos_rol",
       body: JSON.stringify({rol_id}),
       authorization: "Bearer " + token,
     }
@@ -92,7 +91,6 @@ export const useMutateModulosQuery = () => {
   }
 
   const updateModulo = (modulo: Modulo) => {
-    typeActionRef.current = "mutate_modulo"
     const options: FetchOptions = {
       method: "PUT",
       url: apiURL + "modulos/update_modulo",
@@ -103,7 +101,6 @@ export const useMutateModulosQuery = () => {
   }
 
   const createModulo = (modulo:  Modulo) => {
-    typeActionRef.current = "mutate_modulo"
     const options: FetchOptions = {
       method: "POST",
       url: apiURL + "modulos/create_modulo",
@@ -114,7 +111,6 @@ export const useMutateModulosQuery = () => {
   }
 
   const deleteModulo = (id: number) => {
-    typeActionRef.current = "mutate_modulo"
     const options: FetchOptions = {
       method: "DELETE",
       url: apiURL + "modulos/delete_modulo",
@@ -135,7 +131,8 @@ export const useMutateModulosQuery = () => {
   }
 
   useEffect(()=>{
-    if(data?.errorType === "errorToken"){
+    const r = data as ApiResp
+    if(r?.errorType === "errorToken"){
       resetSessionStore()
       navigate("/auth")
     }
@@ -149,7 +146,7 @@ export const useMutateModulosQuery = () => {
     deleteModulo, 
     sortModulos,
     getModulos,
-    getModuloRol,
+    getModulosRol,
     updateModulosRoles,
   }
 }

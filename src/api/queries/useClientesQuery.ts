@@ -3,20 +3,19 @@ import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-q
 import useSessionStore from "../../app/store/useSessionStore"
 import { useEffect, useRef } from "react"
 import { useNavigate } from "react-router-dom";
-import { Cliente, ClienteItem, FetchOptions, FilterQueryResp, ApiResp } from "../../app/types";
+import { Cliente, FetchOptions, ApiResp, ClientesFilQryRes } from "../../app/types";
 import useClientesStore from "../../app/store/useClientesStore";
 import { fnFetch } from "../fnFetch";
 import { toast } from "react-toastify";
 import { useDebounce } from "react-use";
 
-type TypeAction = "mutate_cliente" | "query_document"
+type TypeAction = "CREATE_CLIENTE" 
+| "UPDATE_CLIENTE"
+| "DELETE_CLIENTE"
+| "QUERY_DOCUMENT"
 
 // ****** FILTRAR ******
-export interface ClientesFilQryRes extends FilterQueryResp {
-  filas: ClienteItem[];
-}
-
-export const useFilterClientesQuery = () => {
+export const useClientesFilterQuery = () => {
   const token = useSessionStore(state => state.tknSession)
   const queryClient = useQueryClient()
   const {
@@ -133,7 +132,7 @@ export const useMutationClientesQuery = <T>() => {
   }
 
   const createCliente = (cliente: Cliente) => {
-    typeActionRef.current = "mutate_cliente"
+    typeActionRef.current = "CREATE_CLIENTE"
     const options: FetchOptions = {
       method: "POST",
       url: apiURL + "clientes/create_cliente",
@@ -144,7 +143,7 @@ export const useMutationClientesQuery = <T>() => {
   }
 
   const updateCliente = (cliente: Cliente) => {
-    typeActionRef.current = "mutate_cliente"
+    typeActionRef.current = "UPDATE_CLIENTE"
     const options: FetchOptions = {
       method: "PUT",
       url: apiURL + "clientes/update_cliente",
@@ -155,7 +154,7 @@ export const useMutationClientesQuery = <T>() => {
   }
 
   const setStateCliente = (estado: number) => {
-    typeActionRef.current = "mutate_cliente"
+    typeActionRef.current = "UPDATE_CLIENTE"
     const options: FetchOptions = {
       method: "POST",
       url: apiURL + "clientes/set_state_cliente",
@@ -166,7 +165,7 @@ export const useMutationClientesQuery = <T>() => {
   }
 
   const deleteCliente = (id: number) => {
-    typeActionRef.current = "mutate_cliente"
+    typeActionRef.current = "DELETE_CLIENTE"
     const options: FetchOptions = {
       method: "DELETE",
       url: apiURL + "clientes/delete_cliente",
@@ -177,7 +176,7 @@ export const useMutationClientesQuery = <T>() => {
   }
 
   const queryDocument = (param: any) => {
-    typeActionRef.current = "query_document"
+    typeActionRef.current = "QUERY_DOCUMENT"
     const options: FetchOptions = {
       method: "POST",
       url: apiURL + "clientes/query_document",

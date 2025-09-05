@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { ApiResp, Empresa, EmpresaInfo, FetchOptions} from "../../app/types";
 import { fnFetch } from "../fnFetch";
 
-type TypeAction = "mutate_empresa"
+type TypeAction = ""
 type DataEmpresa = {content: Empresa}
 
 export const useEmpresaQuery = () => {
@@ -74,7 +74,6 @@ export const useMutationEmpresaQuery = <T>() => {
   })
 
   const updateEmpresa = (formData: FormData) => {
-    typeActionRef.current = "mutate_empresa"
     const options: FetchOptions = {
       method: "POST",
       url: apiURL + "config/update_empresa",

@@ -3,7 +3,7 @@ import { Card, Table } from "react-bootstrap";
 import { toast } from "react-toastify";
 import { Movimiento } from "../../../app/types";
 import DynaIcon from "../../../app/components/DynaComponents";
-import { useFilterMovimientosQuery } from "../../../api/queries/useMovimientosQuery";
+import { useMovimientosFilterQuery } from "../../../api/queries/useMovimientosQuery";
 import { LdsEllipsisCenter } from "../../../app/components/Loaders";
 import MovimientosLstRow from "./MovimientosLstRow";
 import { useMovimientos } from "../hooks/useMovimientos";
@@ -29,7 +29,7 @@ const MovimientosLst: React.FC = () => {
     isError,
     hasNextPage,
     setFilterParamsMovimientos
-  } = useFilterMovimientosQuery();
+  } = useMovimientosFilterQuery();
   
   const tableRef = useRef<HTMLDivElement | null>(null)
   const ldsEllipsisRef = useRef<HTMLDivElement | null>(null)

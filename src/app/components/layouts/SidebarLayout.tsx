@@ -24,7 +24,7 @@ const SidebarLayout:React.FC = () => {
   const queryClient = useQueryClient()
   const empresa = queryClient.getQueryData(["empresa_info"]) as EmpresaInfo
   const {data: modulosSession} = useModulosSessionQuery()
-
+  
   const handleSidebarMini = (e:React.MouseEvent) => {
     e.preventDefault();
     document.body.classList.toggle("main-sidebar-mini");
@@ -103,15 +103,15 @@ const SidebarLayout:React.FC = () => {
     }
   },[layout])
 
-  // useEffect(() => {
-    // const nombreModulo = location.pathname.split("/").filter(Boolean).pop();
-    // if(!nombreModulo) navigate("/home")
-    // if(!modulosSession) return
-    // const idx = modulosSession.findIndex((el: Modulo) => el.nombre === nombreModulo)
-    // if(idx === -1){
-      // navigate("/home")
-    // }
-  // }, [navigate, modulosSession])
+  useEffect(() => { // evita ingresar a otros modulos
+    const nombreModulo = location.pathname.split("/").filter(Boolean).pop();
+    if(!nombreModulo) navigate("/home")
+    if(!modulosSession) return
+    const idx = (modulosSession as Modulo[]).findIndex((el: Modulo) => el.nombre === nombreModulo)
+    if(idx === -1){
+      navigate("/home")
+    }
+  }, [navigate, modulosSession])
 
   return (
     <>

@@ -2,7 +2,6 @@ import { useEffect, useState } from "react"
 import useLayoutStore from "../../app/store/useLayoutStore"
 import ModulosTree from "./ModulosTree"
 import { Button, Card, Col, Container, Form, Nav, Row } from "react-bootstrap"
-import { Padre } from "../../app/types"
 import { useMutateModulosQuery } from "../../api/queries/useModulosQuery"
 import { toast } from "react-toastify"
 import Swal from "sweetalert2"
@@ -174,7 +173,7 @@ const ModulosPage:React.FC = () => {
                         onChange={handleChangeSelect}
                       >
                         <option value="0"> - Sin padre -</option>
-                        {padres && padres.map((el: Padre) => 
+                        {padres && padres.map((el) => 
                           <option key={el.id} value={el.id}
                           >
                             {el.descripcion}

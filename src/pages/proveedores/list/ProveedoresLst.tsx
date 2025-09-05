@@ -1,6 +1,6 @@
 import { useRef } from "react";
 import { Card, Table } from "react-bootstrap";
-import { useFilterProveedoresQuery } from "../../../api/queries/useProveedoresQuery";
+import { useProveedoresFilterQuery } from "../../../api/queries/useProveedoresQuery";
 import useProveedoresStore from "../../../app/store/useProveedoresStore";
 import { LdsBar, LdsEllipsisCenter } from "../../../app/components/Loaders";
 import DynaIcon from "../../../app/components/DynaComponents";
@@ -21,7 +21,7 @@ export default function ProveedoresLst() {
     isFetching,
     isError,
     hasNextPage,
-  } = useFilterProveedoresQuery()
+  } = useProveedoresFilterQuery()
   
   const sort = (field_name:string, field_label: string, ctrlKey: boolean) => {
     setProveedorFilterFormSortTable({field_name, field_label, ctrlKey})

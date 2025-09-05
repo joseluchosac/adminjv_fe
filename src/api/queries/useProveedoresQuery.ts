@@ -3,20 +3,19 @@ import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-q
 import useSessionStore from "../../app/store/useSessionStore"
 import { useEffect, useRef } from "react"
 import { useNavigate } from "react-router-dom";
-import { FetchOptions, FilterQueryResp, Proveedor, ProveedorItem, ApiResp } from "../../app/types";
+import { FetchOptions, Proveedor, ApiResp, ProveedoresFilQryRes } from "../../app/types";
 import { fnFetch } from "../fnFetch";
 import useProveedoresStore from "../../app/store/useProveedoresStore";
 import { useDebounce } from "react-use";
 import { toast } from "react-toastify";
 
-type TypeAction = "mutate_proveedor" | "query_document"
+type TypeAction = "CREATE_PROVEEDOR" 
+| "UPDATE_PROVEEDOR"
+| "DELETE_PROVEEDOR"
+| "QUERY_DOCUMENT"
 
 // ****** FILTRAR ******
-export interface ProveedoresFilQryRes extends FilterQueryResp {
-  filas: ProveedorItem[];
-}
-
-export const useFilterProveedoresQuery = () => {
+export const useProveedoresFilterQuery = () => {
   const token = useSessionStore(state => state.tknSession)
   // const isFirstRender = useRef(true);
   const queryClient = useQueryClient()
@@ -133,7 +132,7 @@ export const useMutationProveedoresQuery = <T>() => {
   }
 
   const createProveedor = (proveedor: Proveedor) => {
-    typeActionRef.current = "mutate_proveedor"
+    typeActionRef.current = "CREATE_PROVEEDOR"
     const options: FetchOptions = {
       method: "POST",
       url: apiURL + "proveedores/create_proveedor",
@@ -144,7 +143,7 @@ export const useMutationProveedoresQuery = <T>() => {
   }
 
   const updateProveedor = (proveedor: Proveedor) => {
-    typeActionRef.current = "mutate_proveedor"
+    typeActionRef.current = "UPDATE_PROVEEDOR"
     const options: FetchOptions = {
       method: "PUT",
       url: apiURL + "proveedores/update_proveedor",
@@ -155,7 +154,7 @@ export const useMutationProveedoresQuery = <T>() => {
   }
 
   const setStateProveedor = (estado: number) => {
-    typeActionRef.current = "mutate_proveedor"
+    typeActionRef.current = "UPDATE_PROVEEDOR"
     const options: FetchOptions = {
       method: "PUT",
       url: apiURL + "proveedores/set_state_proveedor",
@@ -166,7 +165,7 @@ export const useMutationProveedoresQuery = <T>() => {
   }
 
   const deleteProveedor = (id: number) => {
-    typeActionRef.current = "mutate_proveedor"
+    typeActionRef.current = "DELETE_PROVEEDOR"
     const options: FetchOptions = {
       method: "DELETE",
       url: apiURL + "proveedores/delete_proveedor",
@@ -177,7 +176,7 @@ export const useMutationProveedoresQuery = <T>() => {
   }
 
   const queryDocument = (param: any) => {
-    typeActionRef.current = "query_document"
+    typeActionRef.current = "QUERY_DOCUMENT"
     const options: FetchOptions = {
       method: "POST",
       url: apiURL + "proveedores/query_document",

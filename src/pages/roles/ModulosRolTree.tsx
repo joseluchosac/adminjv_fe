@@ -12,7 +12,7 @@ const ModulosRolTree: React.FC<Props> = ({itemsTree, setItemsTree, toggleAssign}
 
   const listRef = useRef<HTMLUListElement>(null);
 
-  const toggleClick = (id: number) => {
+  const toggleClick = (id: Modulo['id']) => {
     toggleAssign(id)
   }
 

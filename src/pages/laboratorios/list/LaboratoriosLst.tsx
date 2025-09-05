@@ -1,6 +1,6 @@
 import { useRef } from "react";
 import { Card, Table } from "react-bootstrap";
-import { useFilterLaboratoriosQuery } from "../../../api/queries/useLaboratoriosQuery";
+import { useLaboratoriosFilterQuery } from "../../../api/queries/useLaboratoriosQuery";
 import { LdsBar, LdsEllipsisCenter } from "../../../app/components/Loaders";
 import DynaIcon from "../../../app/components/DynaComponents";
 import LaboratoriosListItem from "./LaboratoriosLstItem";
@@ -16,7 +16,7 @@ export default function LaboratoriosLst() {
     isFetching,
     isError,
     hasNextPage,
-  } = useFilterLaboratoriosQuery()
+  } = useLaboratoriosFilterQuery()
   
   const camposLaboratorio = useLaboratoriosStore(state => state.camposLaboratorio)
   const setLaboratorioFilterFormSortTable = useLaboratoriosStore(state => state.setLaboratorioFilterFormSortTable)

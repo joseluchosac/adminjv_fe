@@ -1,5 +1,5 @@
 const apiURL = import.meta.env.VITE_API_URL;
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom";
 import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import useSessionStore from "../../app/store/useSessionStore"
@@ -7,15 +7,12 @@ import { FetchOptions, Producto, ApiResp, FilterQueryResp, ProductoItem } from "
 import { filterParamsInit } from "../../app/utils/constants";
 import { fnFetch } from "../fnFetch";
 
-type TypeAction = 
-"filter_full" 
-| "mutate_producto" 
 
 // ****** FILTRAR ******
 interface ProductosFilQryRes extends FilterQueryResp {
   filas: ProductoItem[];
 }
-export const useFilterProductosQuery = () => {
+export const useProductosFilterQuery = () => {
   const [filterParamsProductos, setFilterParamsProductos] = useState(filterParamsInit)
   const token = useSessionStore(state => state.tknSession)
   const curEstab = useSessionStore(state => state.curEstab)
@@ -84,7 +81,6 @@ export const useMutationProductosQuery = <T>() => {
   const curModulo = useSessionStore(state => state.moduloActual?.nombre)
   const curEstab = useSessionStore(state => state.curEstab)
   const queryClient = useQueryClient()
-  const typeActionRef = useRef<TypeAction | "">("")
 
   const {data, isPending, isError, mutate, } = useMutation<T, Error, FetchOptions, unknown>({
     mutationFn: fnFetch,
@@ -117,7 +113,6 @@ export const useMutationProductosQuery = <T>() => {
   }
 
   const createProducto = (producto: Producto) => {
-    typeActionRef.current = "mutate_producto"
     const options: FetchOptions = {
       method: "POST",
       url: apiURL + "productos/create_producto",
@@ -128,7 +123,6 @@ export const useMutationProductosQuery = <T>() => {
   }
 
   const updateProducto = (producto: Producto) => {
-    typeActionRef.current = "mutate_producto"
     const options: FetchOptions = {
       method: "PUT",
       url: apiURL + "productos/update_producto",
@@ -139,7 +133,6 @@ export const useMutationProductosQuery = <T>() => {
   }
 
   const updateEstado = (estado: {id:number; estado:number}) => {
-    typeActionRef.current = "mutate_producto"
     const options: FetchOptions = {
       method: "PUT",
       url: apiURL + "productos/update_estado",
@@ -151,7 +144,6 @@ export const useMutationProductosQuery = <T>() => {
 
 
   const deleteProducto = (id: number) => {
-    typeActionRef.current = "mutate_producto"
     const options: FetchOptions = {
       method: "DELETE",
       url: apiURL + "productos/delete_producto",

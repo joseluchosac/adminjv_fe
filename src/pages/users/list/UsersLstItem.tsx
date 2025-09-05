@@ -3,11 +3,10 @@ import { FaEdit, FaToggleOff, FaToggleOn, FaTrash } from "react-icons/fa";
 import Swal from "sweetalert2";
 import { useEffect } from "react";
 import { toast } from "react-toastify";
-import { UserItem } from "../../../app/types";
+import { MutationUserResp, UserItem } from "../../../app/types";
 import { useUsers } from "../context/UsersContext";
 import useLayoutStore from "../../../app/store/useLayoutStore";
 import { useMutationUsersQuery } from "../../../api/queries/useUsersQuery";
-import { MutationUserResp } from "../../../app/schemas/users-schema";
 
 interface Props {
   user: UserItem ;

@@ -6,9 +6,9 @@ import { ApiResp, RecoveryForm } from "../../app/types";
 import { useMutationUsersQuery } from "../../api/queries/useUsersQuery";
 import { toast } from "react-toastify";
 import { useForm } from "react-hook-form";
-import { RecoveryFormSchema } from "../../app/schemas/auth-schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Link } from "react-router-dom";
+import { RecoveryFormSchema } from "../../app/schemas/users-schema";
 
 const RecoveryPage: React.FC = () => {
   const recovPlain = sessionStorage.getItem("recov") || ""

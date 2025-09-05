@@ -3,24 +3,18 @@ import { useEffect, useRef } from "react"
 import { useNavigate } from "react-router-dom";
 import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import useSessionStore from "../../app/store/useSessionStore"
-import { FetchOptions, FilterQueryResp, Marca, MarcaItem, ApiResp } from "../../app/types";
+import { FetchOptions, Marca, ApiResp, MarcasFilQryRes } from "../../app/types";
 import { fnFetch } from "../fnFetch";
 import useMarcasStore from "../../app/store/useMarcasStore";
 import { useDebounce } from "react-use";
 import { toast } from "react-toastify";
 
-type TypeAction = 
-"mutate_create_marca" 
-| 'mutate_update_marca'
-| 'mutate_delete_marca'
-| 'mutate_state_marca'
+type TypeAction = "CREATE_MARCA" 
+| 'UPDATE_MARCA'
+| 'DELETE_MARCA'
 
 // ****** FILTRAR ******
-export interface MarcasFilQryRes extends FilterQueryResp {
-  filas: MarcaItem[];
-}
-
-export const useFilterMarcasQuery = () => {
+export const useMarcasFilterQuery = () => {
   const token = useSessionStore(state => state.tknSession)
   // const isFirstRender = useRef(true);
   const queryClient = useQueryClient()
@@ -136,7 +130,7 @@ export const useMutationMarcasQuery = <T>() => {
   }
 
   const createMarca = (marca: Marca) => {
-    typeActionRef.current = "mutate_create_marca"
+    typeActionRef.current = "CREATE_MARCA"
     const options: FetchOptions = {
       method: "POST",
       url: apiURL + "marcas/create_marca",
@@ -147,7 +141,7 @@ export const useMutationMarcasQuery = <T>() => {
   }
 
   const updateMarca = (marca: Marca) => {
-    typeActionRef.current = "mutate_update_marca"
+    typeActionRef.current = "UPDATE_MARCA"
     const options: FetchOptions = {
       method: "PUT",
       url: apiURL + "marcas/update_marca",
@@ -157,7 +151,7 @@ export const useMutationMarcasQuery = <T>() => {
     mutate(options)
   }
   const setStateMarca = (data: {estado: number, id: number}) => {
-    typeActionRef.current = "mutate_state_marca"
+    typeActionRef.current = "UPDATE_MARCA"
     const options: FetchOptions = {
       method: "PUT",
       url: apiURL + "marcas/set_state_marca",
@@ -167,7 +161,7 @@ export const useMutationMarcasQuery = <T>() => {
     mutate(options)
   }
   const deleteMarca = (id: number) => {
-    typeActionRef.current = "mutate_delete_marca"
+    typeActionRef.current = "DELETE_MARCA"
     const options: FetchOptions = {
       method: "DELETE",
       url: apiURL + "marcas/delete_marca",

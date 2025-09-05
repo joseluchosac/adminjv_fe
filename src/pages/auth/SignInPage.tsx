@@ -9,9 +9,9 @@ import { useEffect } from "react";
 import useSessionStore from "../../app/store/useSessionStore";
 import { useMutationUsersQuery } from "../../api/queries/useUsersQuery";
 import { toast } from "react-toastify";
-import { SignInFormSchema } from "../../app/schemas/auth-schema";
 import { LdsBar } from "../../app/components/Loaders";
 import { useQueryClient } from "@tanstack/react-query";
+import { SignInFormSchema } from "../../app/schemas/users-schema";
 
 interface DataEmailQryRes extends ApiResp {
   email?: string;

@@ -4,7 +4,6 @@ import { useNavigate } from "react-router-dom";
 import { InfiniteData, useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import useSessionStore from "../../app/store/useSessionStore"
 import { 
-  FilterQueryResp,
   FetchOptions,
   ApiResp, 
   UserItem, 
@@ -13,6 +12,7 @@ import {
   SignInForm,
   UserForm,
   SignUpForm,
+  UsersFilQryRes,
 } from "../../app/types"
 import { useUsers } from "../../pages/users/context/UsersContext";
 import { useDebounce } from "react-use";
@@ -22,7 +22,6 @@ import { fnFetch } from "../fnFetch";
 type TypeAction = "CREATE_USER" 
 | "UPDATE_USER" 
 | "DELETE_USER" 
-| "SET_STATE_USER" 
 | "UPDATE_PROFILE" 
 | "SIGN_UP"
 | "LOGIN"
@@ -63,10 +62,7 @@ export const useUserSessionQuery = () => {
 }
 
 // ****** FILTRAR ******
-interface UsersFilQryRes extends FilterQueryResp {
-  filas: UserItem[];
-}
-export const useFilterUsersQuery = () => {
+export const useUsersFilterQuery = () => {
   const token = useSessionStore(state => state.tknSession)
   const queryClient = useQueryClient()
 
@@ -192,7 +188,7 @@ export const useMutationUsersQuery = <T>() => {
           }
           return {...oldData, pages, }
         })
-      }else if(typeActionRef.current === "UPDATE_USER" || typeActionRef.current === "SET_STATE_USER") {
+      }else if(typeActionRef.current === "UPDATE_USER") {
         const updatedUser = r.content as UserItem
         queryClient.setQueryData(["users"], (oldData: InfiniteData<UsersFilQryRes, unknown> | undefined) => {
           const pages = structuredClone(oldData?.pages)
@@ -265,7 +261,7 @@ export const useMutationUsersQuery = <T>() => {
   }
 
   const setStateUser = (data: {estado: number, id: number}) => {
-    typeActionRef.current = "SET_STATE_USER"
+    typeActionRef.current = "UPDATE_USER"
     const options: FetchOptions = {
       method: "PUT",
       url: apiURL + "users/set_state_user",

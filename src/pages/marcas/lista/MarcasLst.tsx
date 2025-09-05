@@ -1,6 +1,6 @@
 import { useRef } from "react";
 import { Card, Table } from "react-bootstrap";
-import { useFilterMarcasQuery } from "../../../api/queries/useMarcasQuery";
+import { useMarcasFilterQuery } from "../../../api/queries/useMarcasQuery";
 import { LdsBar, LdsEllipsisCenter } from "../../../app/components/Loaders";
 import DynaIcon from "../../../app/components/DynaComponents";
 import MarcasListItem from "./MarcasLstItem";
@@ -21,7 +21,7 @@ export default function MarcasLst() {
     isFetching,
     isError,
     hasNextPage,
-  } = useFilterMarcasQuery()
+  } = useMarcasFilterQuery()
   
   const sort = (field_name:string, field_label: string, ctrlKey: boolean) => {
     setMarcaFilterFormSortTable({field_name, field_label, ctrlKey})

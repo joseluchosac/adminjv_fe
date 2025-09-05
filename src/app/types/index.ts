@@ -1,25 +1,30 @@
 import { z } from "zod";
+
 import {
-  RecoveryFormSchema,
-  SignInFormSchema,
-  SignInRespSchema,
-  SignUpFormSchema,
-  SignUpRespSchema,
-} from "../schemas/auth-schema";
-import {
-  ProfileSchema,
   ProfileFormSchema,
   UserFormSchema,
-  UserItemSchema,
-  UserSessionSchema,
-  GetUserRespSchema,
-  GetProfileRespSchema,
-  MutationUserRespSchema,
-  CheckAuthRespSchema,
+  RecoveryFormSchema,
+  SignInFormSchema,
+  SignUpFormSchema,
+  UserSchema,
 } from "../schemas/users-schema";
-import { CajaSchema, FormaPagoSchema, ImpuestoSchema, MotivoNotaSchema, TipoComprobanteSchema, TipoDocumentoSchema, TipoEstablecimientoSchema, TipoMonedaSchema, TipoMovimientoCajaSchema, TipoMovimientoSchema, TipoOperacionSchema, UnidadMedidaSchema } from "../schemas/catalogos-schema";
+import { 
+  CajaSchema, 
+  FormaPagoSchema, 
+  ImpuestoSchema, 
+  MotivoNotaSchema, 
+  TipoComprobanteSchema, 
+  TipoDocumentoSchema, 
+  TipoEstablecimientoSchema, 
+  TipoMonedaSchema, 
+  TipoMovimientoCajaSchema, 
+  TipoMovimientoSchema, 
+  TipoOperacionSchema, 
+  UnidadMedidaSchema 
+} from "../schemas/catalogos-schema";
 import { CategoriaSchema } from "../schemas/categorias-schema";
 import { ApiRespSchema, ErrorValidateSchema } from "../schemas/generics-schema";
+import { ModuloSchema } from "../schemas/modulos-schema";
 
 // ✅ TIPO PARA EL EVENTO ON CHANGE DE UN ELEMENTO DE FORMULARIO
 export declare type FormControlElement =
@@ -27,25 +32,8 @@ export declare type FormControlElement =
   | HTMLSelectElement
   | HTMLTextAreaElement;
 
+// ✅ TIPO PARA LAS RESPUESTAS GENERICAS DE LA API
 export type ApiResp = z.infer<typeof ApiRespSchema>
-
-// ✅ TIPOS PARA LAS RESPUESTAS GENERICAS DE LA API
-// export interface ApiGenericResp {
-//   content?: any; // Puede ser cualquier tipo de contenido
-//   error: boolean;
-//   msg: string;
-//   msgType: "default" | "error" | "info" | "success" | "warning";
-//   errorType: string | null;
-// }
-
-// ✅ TIPOS PARA LAS RESPUESTAS DE LA API (el content se le agrega despues)
-// export interface QueryResp {
-//   content?: any; // Puede ser cualquier tipo de contenido
-//   error?: boolean;
-//   msg?: string;
-//   msgType?: "default" | "error" | "info" | "success" | "warning";
-//   errorType?: string | null;
-// }
 
 export type ErrorValidate = z.infer<typeof ErrorValidateSchema> // Validacion de formularios
 
@@ -71,84 +59,6 @@ export type CampoTable = {
   order_dir: string;
   show: boolean;
 };
-
-
-// ✅ TIPOS PARA LA TABLA MODULOS
-export interface Modulo {
-  id: number;
-  nombre: string;
-  descripcion: string;
-  padre_id: number;
-  icon_menu: string;
-  orden: number;
-  assign?: boolean;
-  children?: any;
-}
-
-export interface Padre {
-  id: number;
-  descripcion: string;
-}
-// ✅ TIPOS PARA USUARIOS
-export type UserItem = z.infer<typeof UserItemSchema>;
-export type UserForm = z.infer<typeof UserFormSchema>;
-export type UserSession = z.infer<typeof UserSessionSchema>;
-export type ProfileForm = z.infer<typeof ProfileFormSchema>;
-export type Profile = z.infer<typeof ProfileSchema>;
-export type RecoveryForm = z.infer<typeof RecoveryFormSchema>;
-// export type RestoreForm = {
-//   code: string;
-//   new_password: string;
-//   new_confirm_password: string;
-// };
-export type GetUserResp = z.infer<typeof GetUserRespSchema>
-export type GetProfileResp = z.infer<typeof GetProfileRespSchema>
-export type MutationUserResp = z.infer<typeof MutationUserRespSchema>
-export type CheckAuthResp = z.infer<typeof CheckAuthRespSchema>
-export type SignInForm = z.infer<typeof SignInFormSchema>;
-export type SignUpForm = z.infer<typeof SignUpFormSchema>;
-export type SignInResp = z.infer<typeof SignInRespSchema>
-export type SignUpResp = z.infer<typeof SignUpRespSchema>
-
-
-// ✅ TIPOS PARA LA TABLA CONFIGURACIONES
-export type Empresa = {
-  razon_social: string;
-  nombre_comercial: string;
-  ruc: string;
-  direccion: string;
-  ubigeo_inei: string;
-  dis_prov_dep: string;
-  telefono: string;
-  email: string;
-  simbolo_moneda: string;
-  logo: string;
-  certificado_digital: string;
-  clave_certificado: string;
-  usuario_sol: string;
-  clave_sol: string;
-  urlLogo: string;
-  urlNoImage: string;
-  fileLogo: any;
-  fileCertificado: any;
-};
-export type EstablecimientoOpc = {
-  id: number;
-  codigo: string;
-  descripcion: string;
-};
-export interface EmpresaInfo {
-  // Informacion de la empresa y establecimientos para opciones
-  razon_social: string;
-  nombre_comercial: string;
-  ruc: string;
-  direccion: string;
-  dis_prov_dep: string;
-  telefono: string;
-  email: string;
-  urlLogo: string;
-  establecimientosOpc: EstablecimientoOpc[];
-}
 
 // ✅✅✅ TIPOS PARA LOS PARAMETROS DE FILTROS GENERALES NUEVO ✅✅✅
 export interface FilterParam {
@@ -202,7 +112,8 @@ type FilterParamsOrder = {
   order_dir: string;
   field_label: string;
 };
-// ✅ TIPOS PARA LAS OPCIONES DEL FETCH
+
+// ✅ TIPOS PARA LAS OPCIONES DE PETICION FETCH
 export type FetchOptions = {
   method?: "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
   url: string;
@@ -217,6 +128,177 @@ export type FetchOptions = {
 // ✅ TIPO PARA MOSTRAR LA INFORMACION DEL FILTRO
 // Para deprecar
 export type FilterInfo = Omit<FilterParams, "offset">;
+
+
+export type DocumentData = {
+  id: number;
+  nombre_razon_social: string;
+  nro_documento: string;
+  tipo_documento_cod: string;
+  condicion_sunat: string;
+  estado_sunat: string;
+  direccion: string;
+  ubigeo: string;
+  dis_prov_dep: string;
+  email: string;
+  telefono: string;
+};
+export type QueryDocumentResp = DocumentData | ApiResp;
+export type CommonPeriod = { // Para filtrar por rango de fechas
+  key:
+    | "today"
+    | "thisWeek"
+    | "lastWeek"
+    | "thisMonth"
+    | "lastMonth"
+    | "thisYear"
+    | "lastYear";
+  text: string;
+};
+
+// ✅ TIPOS PARA LOS CATALOGOS
+// Ubigeos
+export interface UbigeoItem {
+  ubigeo_inei: string;
+  ubigeo_reniec: string;
+  dis_prov_dep: string;
+}
+export type Provincia = { provincia: string;};
+export type Distrito = {distrito: string; ubigeo_inei: string;};
+
+export type Caja = z.infer<typeof CajaSchema>;
+export type FormaPago = z.infer<typeof FormaPagoSchema>;
+export type Impuesto = z.infer<typeof ImpuestoSchema>;
+export type MotivoNota = z.infer<typeof MotivoNotaSchema>;
+export type TipoComprobante = z.infer<typeof TipoComprobanteSchema>;
+export type TipoDocumento = z.infer<typeof TipoDocumentoSchema>;
+export type TipoMoneda = z.infer<typeof TipoMonedaSchema>;
+export type TipoMovimientoCaja = z.infer<typeof TipoMovimientoCajaSchema>;
+export type TipoMovimiento = z.infer<typeof TipoMovimientoSchema>;
+export type TipoOperacion = z.infer<typeof TipoOperacionSchema>;
+export type TipoEstablecimiento = z.infer<typeof TipoEstablecimientoSchema>;
+export type UnidadMedida = z.infer<typeof UnidadMedidaSchema>;
+export type Establecimiento = {
+  id: number;
+  tipo: string;
+  codigo: string;
+  descripcion: string;
+  direccion: string;
+  ubigeo_inei: string;
+  dis_prov_dep: string;
+  telefono: string;
+  email: string;
+  campo_stock: string;
+  estado: number;
+};
+
+
+
+
+
+// ✅ TIPOS PARA LA TABLA MODULOS
+export type Modulo = z.infer<typeof ModuloSchema>
+// export type Modulo = {
+//   id: number;
+//   nombre: string;
+//   descripcion: string;
+//   padre_id: number;
+//   icon_menu: string;
+//   orden: number;
+//   assign?: boolean;
+//   children?: any;
+// }
+
+export interface Padre {
+  id: number;
+  descripcion: string;
+}
+
+// ✅ TIPOS PARA ROL
+export type Rol = {
+  id: number;
+  rol: string;
+  estado?: number;
+};
+
+// ✅ TIPOS PARA MODULO-ROL
+export type ModuloRol = {
+  id: number;
+  nombre: string;
+  descripcion: string;
+  icon_menu: string;
+  padre_id: number;
+  orden: number;
+  assign: boolean;
+};
+
+// ✅ TIPOS PARA USUARIOS Y AUTH
+export interface UsersFilQryRes extends FilterQueryResp { 
+  filas: UserItem[] 
+}
+export type User = z.infer<typeof UserSchema>
+export type UserItem = Omit<User, 'rol_id' | 'caja_id'>;
+export type UserForm = z.infer<typeof UserFormSchema>;
+export type UserSession = Omit<User, 'rol' | 'caja' | 'estado' | 'created_at' | 'updated_at'>;
+export type ProfileForm = z.infer<typeof ProfileFormSchema>;
+export type Profile = Omit<User, 'rol_id' | 'caja_id' | 'estado' | 'created_at' | 'updated_at'>;
+export type RecoveryForm = z.infer<typeof RecoveryFormSchema>;
+export type GetUserResp = User | ApiResp
+export type GetProfileResp = Profile | ApiResp
+export interface MutationUserResp extends ApiResp {
+  content: UserItem | ErrorValidate
+}
+export interface CheckAuthResp extends ApiResp {
+  profile: Profile
+}
+export type SignInForm = z.infer<typeof SignInFormSchema>;
+export type SignUpForm = z.infer<typeof SignUpFormSchema>;
+export type SignInResp = {token: string} | ApiResp
+export type SignUpResp = {token: string} | ApiResp
+
+
+// ✅ TIPOS PARA CONFIGURACIONES
+export type Empresa = {
+  razon_social: string;
+  nombre_comercial: string;
+  ruc: string;
+  direccion: string;
+  ubigeo_inei: string;
+  dis_prov_dep: string;
+  telefono: string;
+  email: string;
+  simbolo_moneda: string;
+  logo: string;
+  certificado_digital: string;
+  clave_certificado: string;
+  usuario_sol: string;
+  clave_sol: string;
+  urlLogo: string;
+  urlNoImage: string;
+  fileLogo: any;
+  fileCertificado: any;
+};
+
+export type EstablecimientoOpc = {
+  id: number;
+  codigo: string;
+  descripcion: string;
+};
+
+export interface EmpresaInfo {
+  // Informacion de la empresa y establecimientos para opciones
+  razon_social: string;
+  nombre_comercial: string;
+  ruc: string;
+  direccion: string;
+  dis_prov_dep: string;
+  telefono: string;
+  email: string;
+  urlLogo: string;
+  establecimientosOpc: EstablecimientoOpc[];
+}
+
+
 
 // ✅ TIPOS PARA PRODUCTO
 export interface Producto {
@@ -262,7 +344,10 @@ export interface ProductoQryRes extends ApiResp {
   content: Producto;
 }
 
-// ✅ TIPOS PARA TABLA LABORATORIOS
+// ✅ TIPOS PARA LABORATORIOS
+export interface LaboratoriosFilQryRes extends FilterQueryResp {
+  filas: LaboratorioItem[];
+}
 export interface Laboratorio {
   id: number;
   nombre: string;
@@ -274,7 +359,10 @@ export type LaboratorioItem = {
   estado: number;
 };
 
-// ✅TIPOS PARA TABLA MARCAS
+// ✅TIPOS PARA MARCAS
+export interface MarcasFilQryRes extends FilterQueryResp {
+  filas: MarcaItem[];
+}
 export interface Marca {
   id: number;
   nombre: string;
@@ -286,7 +374,10 @@ export type MarcaItem = {
   estado: number;
 };
 
-// ✅ TIPOS PARA CLIENTE
+// ✅ TIPOS PARA CLIENTES
+export interface ClientesFilQryRes extends FilterQueryResp {
+  filas: ClienteItem[];
+}
 export type Cliente = {
   id: number;
   tipo_documento_cod: string;
@@ -311,7 +402,10 @@ export type ClienteItem = {
   estado: number;
 };
 
-// ✅ TIPOS PARA PROVEEDOR
+// ✅ TIPOS PARA PROVEEDORES
+export interface ProveedoresFilQryRes extends FilterQueryResp {
+  filas: ProveedorItem[];
+}
 export type Proveedor = {
   id: number;
   tipo_documento_cod: string;
@@ -324,6 +418,7 @@ export type Proveedor = {
   telefono: string;
   api?: number;
 };
+
 export type ProveedorItem = {
   id: number;
   tipo_documento: string;
@@ -335,13 +430,9 @@ export type ProveedorItem = {
   telefono: string;
   estado: number;
 };
-export interface UbigeoItem {
-  ubigeo_inei: string;
-  ubigeo_reniec: string;
-  dis_prov_dep: string;
-}
 
 
+// ✅ TIPOS PARA MOVIMIENTOS
 export type Movimiento = {
   id: number;
   establecimiento_id: number;
@@ -387,6 +478,8 @@ export type MovimientoFormDetalle = {
   precio_costo: number;
   observacion: string;
 };
+
+// ✅ TIPOS PARA NUMERACION
 export type Numeracion = {
   id: number;
   establecimiento_id: number;
@@ -397,60 +490,11 @@ export type Numeracion = {
   correlativo: number;
   estado: number;
 };
-export type DocumentData = {
-  id: number;
-  nombre_razon_social: string;
-  nro_documento: string;
-  tipo_documento_cod: string;
-  condicion_sunat: string;
-  estado_sunat: string;
-  direccion: string;
-  ubigeo: string;
-  dis_prov_dep: string;
-  email: string;
-  telefono: string;
-};
-export type QueryDocumentResp = DocumentData | ApiResp;
-export type Caja = z.infer<typeof CajaSchema>;
-export type FormaPago = z.infer<typeof FormaPagoSchema>;
-export type Impuesto = z.infer<typeof ImpuestoSchema>;
-export type MotivoNota = z.infer<typeof MotivoNotaSchema>;
-export type Rol = {
-  id: number;
-  rol: string;
-  estado?: number;
-};
-export type TipoComprobante = z.infer<typeof TipoComprobanteSchema>;
-export type TipoDocumento = z.infer<typeof TipoDocumentoSchema>;
-export type TipoMoneda = z.infer<typeof TipoMonedaSchema>;
-export type TipoMovimientoCaja = z.infer<typeof TipoMovimientoCajaSchema>;
-export type TipoMovimiento = z.infer<typeof TipoMovimientoSchema>;
-export type TipoOperacion = z.infer<typeof TipoOperacionSchema>;
-export type TipoEstablecimiento = z.infer<typeof TipoEstablecimientoSchema>;
 
-export type UnidadMedida = z.infer<typeof UnidadMedidaSchema>;
 
-export type Provincia = {
-  provincia: string;
-};
-export type Distrito = {
-  distrito: string;
-  ubigeo_inei: string;
-};
-export type Establecimiento = {
-  id: number;
-  tipo: string;
-  codigo: string;
-  descripcion: string;
-  direccion: string;
-  ubigeo_inei: string;
-  dis_prov_dep: string;
-  telefono: string;
-  email: string;
-  campo_stock: string;
-  estado: number;
-};
 
+
+// ✅ TIPOS PARA CATEGORIAS
 export type Categoria = z.infer<typeof CategoriaSchema>
 export type CategoriaTree = Categoria & {
   children: CategoriaTree[];
@@ -462,26 +506,3 @@ export type CategoriaOpc = {
   nivel: number;
   checked: false;
 };
-
-export type CommonPeriod = {
-  key:
-    | "today"
-    | "thisWeek"
-    | "lastWeek"
-    | "thisMonth"
-    | "lastMonth"
-    | "thisYear"
-    | "lastYear";
-  text: string;
-};
-
-// ContentValidate: es un tipo generico de la forma Record<K,V> representa un tipo de
-// objeto cuya clave es K y valor V
-// Datos de validaciones de formulario obtenidos desde el back-end
-// de la forma: 
-// {
-//   username:["El usuario no puede tener espacios"], 
-//   email: ["email no valido"], ... 
-// }
-// Deprecar
-export type ContentValidate = Record<string, string[]>;

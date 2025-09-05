@@ -1,6 +1,6 @@
-import { useRef, } from "react";
+import { useMemo, useRef, } from "react";
 import { Card, Table } from "react-bootstrap";
-import { useFilterUsersQuery } from "../../../api/queries/useUsersQuery";
+import { useUsersFilterQuery } from "../../../api/queries/useUsersQuery";
 import DynaIcon from "../../../app/components/DynaComponents";
 import { UserItem } from "../../../app/types";
 import { LdsBar, LdsEllipsisCenter } from "../../../app/components/Loaders";
@@ -22,9 +22,15 @@ export default function UsersLst() {
     hasNextPage,
     dispatchUsers,
     camposUser
-  } = useFilterUsersQuery();
+  } = useUsersFilterQuery();
   
-
+  const info = useMemo(() => {
+    let mostrando  = data?.pages.reduce((acum, curVal)=>{
+      return acum + curVal.filas.length
+    },0)
+    const total = data?.pages[0]?.num_regs || 0
+    return total ? `${mostrando} de ${total} reg` : ' '
+  }, [data?.pages])
 
   const sort = (field_name:string, field_label: string, ctrlKey: boolean) => {
     dispatchUsers({
@@ -33,22 +39,14 @@ export default function UsersLst() {
     })
   };
 
-  const info = () => {
-    let mostrando  = data?.pages.reduce((acum, curval)=>{
-      return acum + curval.filas.length
-    },0)
-    const total = data?.pages[0]?.num_regs || 0
-    return total ? `${mostrando} de ${total} reg` : ' '
-  }
-
-  const handleNextPage = () => {fetchNextPage()};
   if(!data && !isFetching){
     return <div>Error al obtener lista</div>
   }
+
   return (
     <div className="position-relative">
       {isFetching && <LdsBar />}
-      <UsersHead info={info()}/>
+      <UsersHead info={info}/>
       <UsersFilter isFetching={isFetching} />
       <Card className="overflow-hidden">
         <div className="position-relative">
@@ -91,7 +89,10 @@ export default function UsersLst() {
             <div className="position-relative">
               {hasNextPage &&
                 <div className="m-3">
-                  <button onClick={handleNextPage} className="btn btn-success">Cargar mas registros</button>
+                  <button 
+                    onClick={() => fetchNextPage()} 
+                    className="btn btn-success"
+                  >Cargar mas registros</button>
                 </div>
               }
               {(data?.pages[0].num_regs === 0) && <div>No hay registros para mostrar</div>}
