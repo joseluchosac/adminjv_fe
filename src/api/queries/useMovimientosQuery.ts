@@ -1,29 +1,42 @@
 const apiURL = import.meta.env.VITE_API_URL;
-import { useEffect, useState } from "react"
+import { useEffect, useRef } from "react"
 import { useNavigate } from "react-router-dom";
-import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query"
+import { InfiniteData, useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import useSessionStore from "../../app/store/useSessionStore"
-import { FetchOptions, FilterQueryResp, Movimiento, Movimientoform, MovimientoItem } from "../../app/types"
-import { filterParamsInit } from "../../app/utils/constants";
+import { ApiResp, FetchOptions, FilterQueryResp, Movimiento, Movimientoform, MovimientoItem } from "../../app/types"
 import { fnFetch } from "../fnFetch";
+import useMovimientosStore from "../../app/store/useMovimientosStore";
+import { useDebounce } from "react-use";
+import { toast } from "react-toastify";
 
+type TypeAction = "CREATE_MOVIMIENTO"
+  | "UPDATE_MOVIMIENTO"
+  | "DELETE_MOVIMIENTO"
 
 // ****** FILTRAR ******
 export interface MovimientosFilQryRes extends FilterQueryResp {
   filas: MovimientoItem[];
 }
 export const useMovimientosFilterQuery = () => {
-  const [filterParamsMovimientos, setFilterParamsMovimientos] = useState(filterParamsInit)
+  const {
+    movimientoFilterForm,
+    movimientoFilterParam,
+    setMovimientoFilterParam,
+    setMovimientoFilterParamBetween,
+    setMovimientoFilterInfo
+  } = useMovimientosStore()
   const token = useSessionStore(state => state.tknSession)
+  // const isFirstRender = useRef(true);
   const queryClient = useQueryClient()
 
+
   const {
-    fetchNextPage,
     data,
     isError,
     isLoading,
     isFetching,
-    hasNextPage
+    hasNextPage,
+    fetchNextPage,
   } = useInfiniteQuery<MovimientosFilQryRes, Error>({
     queryKey: ['movimientos'],
     queryFn: ({pageParam = 1, signal}) => {
@@ -31,7 +44,7 @@ export const useMovimientosFilterQuery = () => {
       const options: FetchOptions = {
         method: "POST",
         url: `${apiURL}movimientos/filter_movimientos?page=${page}`,
-        body: JSON.stringify(filterParamsMovimientos),
+        body: JSON.stringify(movimientoFilterParam),
         authorization: "Bearer " + token,
         signal
       }
@@ -47,19 +60,49 @@ export const useMovimientosFilterQuery = () => {
 
   const resetear = ()=>{
     queryClient.resetQueries({ queryKey: ['movimientos'], exact: true });
-    setFilterParamsMovimientos(filterParamsInit)
-
   }
 
+
+  useDebounce(() => {
+    if (
+        movimientoFilterForm.search.toLowerCase().trim() ==
+        movimientoFilterParam.search.toLowerCase().trim()
+    ) return;
+    setMovimientoFilterParam()
+  }, 500, [movimientoFilterForm.search]);
+
   useEffect(() => {
+    // if (isFirstRender.current) {
+    //   isFirstRender.current = false;
+    //   return; // Evita ejecutar en el primer render
+    // }
     return () => {
       resetear()
     }
-  },[])
-  
+  }, [])
+
+  useEffect(() => {
+    setMovimientoFilterParam()
+  }, [movimientoFilterForm.order, movimientoFilterForm.equal])
+
+  useEffect(() => {
+    setMovimientoFilterParamBetween()
+  }, [movimientoFilterForm.between])
+
   useEffect(() => {
     queryClient.invalidateQueries({queryKey:["movimientos"]})
-  }, [filterParamsMovimientos])
+  }, [movimientoFilterParam])
+
+  useEffect(()=>{
+    if(!data) return
+    if(data?.pages[0].error || isError){
+      toast.error("Error al obtener registros")
+      return
+    }
+    if(!isFetching){
+      setMovimientoFilterInfo()
+    }
+  },[data, isError, isFetching])
 
   return {
     data,
@@ -68,22 +111,80 @@ export const useMovimientosFilterQuery = () => {
     isFetching, 
     hasNextPage, 
     fetchNextPage,
-    setFilterParamsMovimientos
   }
 }
 
 // ****** MUTATION ******
-export const useMutationMovimientosQuery = () => {
+export type MutationMovimientoRes = ApiResp & {
+  movimiento?: MovimientoItem
+};
+export const useMutationMovimientosQuery = <T>() => {
   const resetSessionStore = useSessionStore(state => state.resetSessionStore)
   const navigate = useNavigate()
   const token = useSessionStore(state => state.tknSession)
   const queryClient = useQueryClient()
+  const typeActionRef = useRef<TypeAction | "">("")
 
-  const {data, isPending, isError, mutate, } = useMutation({
+  const {data, isPending, isError, mutate, } = useMutation<T, Error, FetchOptions, unknown>({
     mutationFn: fnFetch,
     onSuccess: (resp) => {
-      if(resp.msgType !== 'success') return
-      queryClient.invalidateQueries({queryKey:["movimientos"]})
+      const r = resp as MutationMovimientoRes
+      if(r.msgType !== 'success') return
+      if(typeActionRef.current === "CREATE_MOVIMIENTO") {
+        const createdMovimiento = r.movimiento as MovimientoItem
+        queryClient.setQueryData(["movimientos"], (oldData: InfiniteData<MovimientosFilQryRes, unknown> | undefined) => {
+          const pages = structuredClone(oldData?.pages)
+          if((pages?.length || 0) < 4){ // hacer refetch si se cumple esta condicion
+            queryClient.invalidateQueries({queryKey:["movimientos"]})
+            return oldData
+          }
+          if(pages && pages.length > 0){
+            pages[0].filas.unshift(createdMovimiento as MovimientoItem) // Agrega el nuevo registro al inicio de la primera página
+            pages[0].num_regs = pages[0].num_regs + 1
+          }
+          return {...oldData, pages, }
+        })
+      }else if(typeActionRef.current === "UPDATE_MOVIMIENTO") {
+        const updatedMovimiento = r.movimiento as MovimientoItem
+        queryClient.setQueryData(["movimientos"], (oldData: InfiniteData<MovimientosFilQryRes, unknown> | undefined) => {
+          const pages = structuredClone(oldData?.pages)
+          if((pages?.length || 0) < 4){
+            queryClient.invalidateQueries({queryKey:["movimientos"]})
+            return oldData
+          }
+          for(let idxPage in pages){
+            const idxFila = pages[parseInt(idxPage)].filas.findIndex((el: MovimientoItem)=>el.id === updatedMovimiento.id)
+            if(idxFila !== -1){
+              pages[parseInt(idxPage)].filas[idxFila] = updatedMovimiento // Actualiza el registro en la lista
+              break
+            }
+          }
+          return {...oldData, pages}
+        })
+      }else if(typeActionRef.current === "DELETE_MOVIMIENTO") {
+        const deletedMovimientoId = r.content as MovimientoItem["id"]
+        queryClient.setQueryData(["movimientos"], (oldData: InfiniteData<MovimientosFilQryRes, unknown> | undefined) => {
+          let pages = structuredClone(oldData?.pages)
+          if((pages?.length || 0) < 4){
+            queryClient.invalidateQueries({queryKey:["movimientos"]})
+            return oldData
+          }
+          for(let idxPage in pages){
+            const idxFila = pages[parseInt(idxPage)].filas.findIndex((el: MovimientoItem)=>el.id === deletedMovimientoId)
+            if(idxFila !== -1){
+              let filasFiltradas = pages[parseInt(idxPage)].filas.filter(el => el.id !== deletedMovimientoId) // Elimina el usuario de la fila
+              pages[parseInt(idxPage)].filas = filasFiltradas
+              pages[0].num_regs = pages[0].num_regs - 1
+              break
+            }
+          }
+          return {...oldData, pages}
+        })
+      } 
+
+
+
+      queryClient.invalidateQueries({queryKey:["movimientos"]}) // Recarga la tabla
     }
   })
 
@@ -109,7 +210,7 @@ export const useMutationMovimientosQuery = () => {
   }
 
   useEffect(()=>{
-    if(data?.errorType === "errorToken"){
+    if((data as ApiResp)?.errorType === "errorToken"){
       resetSessionStore()
       navigate("/auth")
     }

@@ -5,14 +5,15 @@ import Swal from "sweetalert2";
 import { toast } from "react-toastify";
 import { LdsBar, LdsEllipsisCenter } from "../../../app/components/Loaders";
 import useLayoutStore from "../../../app/store/useLayoutStore";
-import { useMutationProductosQuery } from "../../../api/queries/useProductosQuery";
-import { useProductos } from "../context/ProductosContext";
+import { MutationProductoRes, useMutationProductosQuery } from "../../../api/queries/useProductosQuery";
+// import { useProductos } from "../context/ProductosContext";
 import { Producto, ProductoQryRes } from "../../../app/types";
 import CategoriasOpc from "./CategoriasOpc";
 import { LaboratorioSelect, MarcasSelect } from "./Selects";
 import { useMutationMarcasQuery } from "../../../api/queries/useMarcasQuery";
-import { useMutationLaboratoriosQuery } from "../../../api/queries/useLaboratoriosQuery";
+import { MutationLaboratorioRes, useMutationLaboratoriosQuery } from "../../../api/queries/useLaboratoriosQuery";
 import { useImpuestosQuery, useTiposMonedaQuery, useUnidadesMedidaQuery } from "../../../api/queries/useCatalogosQuery";
+import useProductosStore from "../../../app/store/useProductosStore";
 
 const productoFormInit = {
   id: 0,
@@ -45,13 +46,17 @@ const calcInit = {
 }
 
 export default function Productoform(){
+  const showProductoForm = useProductosStore(state => state.showProductoForm) // bool
+  const setShowProductoForm = useProductosStore(state => state.setShowProductoForm)
+  const currentProductoId = useProductosStore(state => state.currentProductoId) // number
+  const setCurrentProductoId = useProductosStore(state => state.setCurrentProductoId)
   const [showMarcaForm, setShowMarcaForm] = useState(false)  
   const [showLaboratorioForm, setShowLaboratorioForm] = useState(false)  
   const [calc, setCalc] = useState(calcInit)
   const [tab, setTab] = useState<string>("precios")
   const darkMode = useLayoutStore(state => state.layout.darkMode)
   const {tiposMoneda} = useTiposMonedaQuery()
-  const { modo, setModo } = useProductos()
+  // const { modo, setModo } = useProductos()
   const {unidadesMedida} = useUnidadesMedidaQuery()
   const {impuestos} = useImpuestosQuery()
   const {
@@ -107,12 +112,18 @@ export default function Productoform(){
   };
 
   useEffect(()=>{
-    if(modo.vista === "edit" && modo.productoId){
-      getProducto(modo.productoId)
+    if(showProductoForm){
+      if(currentProductoId){
+        getProducto(currentProductoId)
+      }else{
+        reset(productoFormInit)
+      }
     }else{
+      setCurrentProductoId(0)
       reset(productoFormInit)
     }
-  },[modo.vista])
+  },[showProductoForm])
+
 
   useEffect(() => {
     if(!producto) return
@@ -140,20 +151,21 @@ export default function Productoform(){
 
   useEffect(() => {
     if(!mutation) return
-    if(!mutation.error) setModo((prev)=>({...prev, vista:"list"}));
+    if(!mutation.error) setShowLaboratorioForm(false);
     toast(mutation.msg, {type: mutation.msgType})
   }, [mutation])
 
+  if(showProductoForm)
   return (
-    <Container className={`${modo.vista === "list" ? "d-none" : ""}`}>
+    <Container>
       <Form onSubmit={handleSubmit(submit)} id="form_productos">
         <div className="my-2 d-md-flex justify-content-between">
-          <div className="text-center"><h5>{modo.productoId ? "Editar producto" : "Nuevo prducto"}</h5></div>
+          <div className="text-center"><h5>{currentProductoId ? "Editar producto" : "Nuevo prducto"}</h5></div>
           <div className="d-md-flex text-center">
             <Button
               variant="seccondary"
               type="button"
-              onClick={()=>setModo((prev)=>({...prev, vista:"list"}))}
+              onClick={()=>setShowProductoForm(false)}
             >
               Cerrar
             </Button>
@@ -416,7 +428,7 @@ function MarcaForm({showMarcaForm, setShowMarcaForm, setValue}: MarcaFormProps){
     isPending: isPendingMutation,
     isError: isErrorMutation,
     createMarca, 
-  } = useMutationMarcasQuery()
+  } = useMutationMarcasQuery<MutationProductoRes>()
 
   const handleSubmit = (e:React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -499,7 +511,7 @@ function LaboratorioForm({showLaboratorioForm, setShowLaboratorioForm, setValue}
     isPending: isPendingMutation,
     isError: isErrorMutation,
     createLaboratorio, 
-  } = useMutationLaboratoriosQuery()
+  } = useMutationLaboratoriosQuery<MutationLaboratorioRes>()
 
   const handleSubmit = (e:React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()

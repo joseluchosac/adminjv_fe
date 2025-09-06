@@ -5,7 +5,7 @@ import { Control, Controller, UseFormClearErrors, UseFormGetValues, UseFormSetVa
 import SelectAsync from "react-select/async"
 import { debounce } from "../../../app/utils/funciones";
 import useSessionStore from "../../../app/store/useSessionStore";
-import { filterParamsInit, selectDark } from "../../../app/utils/constants";
+import { filterParamInit, selectDark } from "../../../app/utils/constants";
 import useLayoutStore from "../../../app/store/useLayoutStore";
 import { LaboratorioItem, MarcaItem, Producto } from "../../../app/types";
 import { FaPlus } from "react-icons/fa6";
@@ -40,7 +40,7 @@ export function MarcasSelect({
   const loadMarcasOptions =  debounce((search: string, callback: any) => {
     abortMarcas.current?.abort();
     abortMarcas.current = new AbortController();
-    const filtered = {...filterParamsInit, search}
+    const filtered = {...filterParamInit, search}
     fnFetch({
       method: "POST",
       url: `${apiURL}marcas/filter_marcas?page=1`,
@@ -102,7 +102,7 @@ export function LaboratorioSelect({
   const loadLaboratoriosOptions =  debounce((search: string, callback: any) => {
     abortLaboratorios.current?.abort(); // ✅ Cancela la petición anterior
     abortLaboratorios.current = new AbortController();
-    const filtered = {...filterParamsInit, search}
+    const filtered = {...filterParamInit, search}
 
     const abortController = new AbortController()
     return fnFetch({

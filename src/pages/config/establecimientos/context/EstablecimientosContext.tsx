@@ -1,11 +1,12 @@
 import { createContext, useContext, useState } from "react";
-import { FilterInfo } from "../../../../app/types";
+import { FilterParam } from "../../../../app/types";
 
-const filterEstablecimientosCurrentInit: FilterInfo = {
+const filterEstablecimientosCurrentInit: FilterParam = {
+  per_page: 50,
   search: "",
-  equals: [],
-  between: {field_name: "", field_label: "", range: ""},
-  orders: [], 
+  equal: [],
+  between: [],
+  order: [],
 }
 
 export interface EstablecimientosContextType {
@@ -13,8 +14,8 @@ export interface EstablecimientosContextType {
   setShowEstablecimientoForm: React.Dispatch<React.SetStateAction<boolean>>;
   currentEstablecimientoId: number;
   setCurrentEstablecimientoId: React.Dispatch<React.SetStateAction<number>>;
-  filterEstablecimientosCurrent: FilterInfo;
-  setFilterEstablecimientosCurrent: React.Dispatch<React.SetStateAction<FilterInfo>>;
+  filterEstablecimientosCurrent: FilterParam;
+  setFilterEstablecimientosCurrent: React.Dispatch<React.SetStateAction<FilterParam>>;
 }
 
 // Crear el contexto con un valor por defecto

@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react"
-import { useProductos } from "../context/ProductosContext"
+// import { useProductos } from "../context/ProductosContext"
 import { FaCheckSquare, FaRegSquare } from "react-icons/fa"
 import { UseFormGetValues, UseFormSetValue } from "react-hook-form"
 import { type CategoriaOpc, ProductoQryRes, Producto, CategoriaTree } from "../../../app/types"
 import { Button, Card, Col, Collapse, Form, Row } from "react-bootstrap"
 import { useCategoriasQuery, useMutateCategoriasQuery } from "../../../api/queries/useCategoriasQuery"
 import { useQueryClient } from "@tanstack/react-query"
+import useProductosStore from "../../../app/store/useProductosStore"
 
 type Props = {
   setValue: UseFormSetValue<Producto>;
@@ -25,11 +26,14 @@ const nCategoriaInit: CategoriaTree = {
 export default function CategoriaOpc({setValue, getValues, producto}:Props) {
   const [showNewCategoria, setShowNewCategoria] = useState(false);
   const [nCategoria, setNCategoria] = useState<CategoriaTree>(nCategoriaInit)
-  const {
-    categoriasOpc,
-    setCategoriasOpc,
-    modo,
-  } = useProductos()
+  const categoriasOpc = useProductosStore(state => state.categoriasOpc)
+  const setCategoriasOpc = useProductosStore(state => state.setCategoriasOpc)
+  const showProductoForm = useProductosStore(state => state.showProductoForm)
+  // const {
+  //   categoriasOpc,
+  //   setCategoriasOpc,
+  //   modo,
+  // } = useProductos()
   const queryClient = useQueryClient()
   // const {categoriasTree} = useCategoriasTreeQuery()
   const {categorias} = useCategoriasQuery()
@@ -61,12 +65,12 @@ export default function CategoriaOpc({setValue, getValues, producto}:Props) {
   }
 
   useEffect(()=>{
-    if(modo.vista === "list"){
+    if(!showProductoForm){
       if(categoriasOpc?.findIndex(el=>el.checked) != -1){
         resetCategoriasOpc()
       }
     }
-  },[modo.vista])
+  },[showProductoForm])
 
   useEffect(()=>{
     resetCategoriasOpc()

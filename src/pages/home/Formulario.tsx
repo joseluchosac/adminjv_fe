@@ -5,7 +5,7 @@ import { Controller, useForm } from "react-hook-form"
 import SelectAsync from "react-select/async"
 import Select from "react-select"
 import useLayoutStore from "../../app/store/useLayoutStore"
-import { filterParamsInit, selectDark } from "../../app/utils/constants"
+import { filterParamInit, selectDark } from "../../app/utils/constants"
 import useSessionStore from "../../app/store/useSessionStore"
 import { debounce } from "../../app/utils/funciones"
 import { LaboratorioItem } from "../../app/types";
@@ -78,7 +78,7 @@ function Formulario() {
   const loadMarcasOptions =  debounce((search: string, callback: any) => {
     abortMarcas.current?.abort(); // ✅ Cancela la petición anterior
     abortMarcas.current = new AbortController();
-    const filtered = {...filterParamsInit, search}
+    const filtered = {...filterParamInit, search}
     const abortController = new AbortController()
     fnFetch({
       method: "POST",
@@ -94,7 +94,7 @@ function Formulario() {
   const loadLaboratoriosOptions =  debounce((search: string, callback: any) => {
     abortLaboratorios.current?.abort(); // ✅ Cancela la petición anterior
     abortLaboratorios.current = new AbortController();
-    const filtered = {...filterParamsInit, search}
+    const filtered = {...filterParamInit, search}
 
     const abortController = new AbortController()
     fnFetch({

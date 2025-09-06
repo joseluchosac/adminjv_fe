@@ -4,7 +4,7 @@ import Swal from "sweetalert2";
 import { toast } from "react-toastify";
 import { LdsBar } from "../../../app/components/Loaders";
 import useLayoutStore from "../../../app/store/useLayoutStore";
-import { useMutationMovimientosQuery } from "../../../api/queries/useMovimientosQuery";
+import { MutationMovimientoRes, useMutationMovimientosQuery } from "../../../api/queries/useMovimientosQuery";
 import { type Movimientoform } from "../../../app/types";
 import { useMovimientos } from "../hooks/useMovimientos";
 import MovimientoFormDetalle from "./MovimientoFormDetalle";
@@ -14,16 +14,19 @@ import { movimientoFormInit } from "../context/MovimientosContext";
 import { cropText } from "../../../app/utils/funciones";
 import { useTiposMovimientoQuery } from "../../../api/queries/useCatalogosQuery";
 import { useEstablecimientosQuery } from "../../../api/queries/useEstablecimientosQuery";
+import useMovimientosStore from "../../../app/store/useMovimientosStore";
 
 export default function Movimientoform(){
   const darkMode = useLayoutStore(state => state.layout.darkMode)
   const {establecimientos} = useEstablecimientosQuery()
   const curEstab = useSessionStore(state => state.curEstab)
   const {tiposMovimiento} = useTiposMovimientoQuery()
+  const showMovimientoForm = useMovimientosStore(state => state.showMovimientoForm)
+  const setShowMovimientoForm = useMovimientosStore(state => state.setShowMovimientoForm)
+  const setCurrentMovimientoId = useMovimientosStore(state => state.setCurrentMovimientoId)
+  
   const { 
-    modo,
-    setModo,
-    userMovimientoForm:{
+    movimientoForm:{
       register,
       formState: {errors, isDirty},
       setValue,
@@ -38,7 +41,7 @@ export default function Movimientoform(){
     data: mutation,
     isPending: isPendingMutation,
     createMovimiento, 
-  } = useMutationMovimientosQuery()
+  } = useMutationMovimientosQuery<MutationMovimientoRes>()
   // devuelve un arreglo de tipos de movimiento
   const tiposOpc = useMemo(():string[]=> {
     if(!tiposMovimiento.length) return []
@@ -91,12 +94,12 @@ export default function Movimientoform(){
   };
 
   useEffect(()=>{
-    if(modo.vista === "edit" && curEstab){
+    if(showMovimientoForm && curEstab){
       setValue("establecimiento_id", curEstab)
     }else{
       reset(movimientoFormInit)
     }
-  },[modo.vista])
+  },[showMovimientoForm])
 
   useEffect(()=>{
     setValue("concepto","")
@@ -114,12 +117,14 @@ export default function Movimientoform(){
     if(!mutation) return
     toast(mutation.msg, {type: mutation.msgType})
     if(!mutation.error){
-      setModo((prev)=>({...prev, vista:"list"}));
+      setCurrentMovimientoId(0)
+      setShowMovimientoForm(false)
     }
   }, [mutation])
 
+  if(showMovimientoForm)
   return (
-    <Container className={`${modo.vista === "list" ? "d-none" : ""}`}>
+    <Container>
       <Form onSubmit={handleSubmit(onSubmit)} id="form_movimientos">
         <div className="my-2 d-md-flex justify-content-between">
           <div className="text-center"><h5>Nuevo Movimiento</h5></div>
@@ -127,7 +132,7 @@ export default function Movimientoform(){
             <Button
               variant="seccondary"
               type="button"
-              onClick={()=>setModo((prev)=>({...prev, vista:"list"}))}
+              onClick={()=>setShowMovimientoForm(false)}
             >
               Cerrar
             </Button>

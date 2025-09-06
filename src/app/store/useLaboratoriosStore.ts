@@ -4,7 +4,7 @@ import { betweenItemInit, camposLaboratorioInit } from "../utils/constants";
 import { deepEqualUnordered, getDateRangePeriod } from "../utils/funciones";
 
 const laboratorioFilterParamInit: FilterParam = {
-  offset: 50,
+  per_page: 50,
   search: "",
   equal: [],
   between: [],

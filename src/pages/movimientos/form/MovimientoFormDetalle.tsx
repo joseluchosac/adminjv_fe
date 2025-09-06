@@ -6,7 +6,7 @@ import { toast } from "react-toastify"
 
 export default function MovimientoFormDetalle() {
   const { 
-    userMovimientoForm:{
+    movimientoForm:{
       getValues,
       watch,
       setValue,

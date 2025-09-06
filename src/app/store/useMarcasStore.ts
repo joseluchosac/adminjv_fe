@@ -4,7 +4,7 @@ import { betweenItemInit, camposMarcaInit } from "../utils/constants";
 import { deepEqualUnordered, getDateRangePeriod } from "../utils/funciones";
 
 const marcaFilterParamInit: FilterParam = {
-  offset: 50,
+  per_page: 50,
   search: "",
   equal: [],
   between: [],

@@ -45,7 +45,7 @@ export type FilterQueryResp = {
   page: number;
   next: number;
   previous: number;
-  offset: number;
+  per_page: number;
   error?: boolean;
   msg?: string;
   msgTye?: string;
@@ -62,7 +62,7 @@ export type CampoTable = {
 
 // ✅✅✅ TIPOS PARA LOS PARAMETROS DE FILTROS GENERALES NUEVO ✅✅✅
 export interface FilterParam {
-  offset: number;
+  per_page: number;
   search: string;
   equal: EqualItem[];
   between: BetweenItem[];
@@ -87,32 +87,6 @@ export type OrderItem = {
   field_label: string;
 };
 
-// ✅ TIPOS PARA LOS PARAMETROS DE FILTROS GENERALES
-// Para deprecar
-export interface FilterParams {
-  offset: number;
-  search: string;
-  equals: FilterParamsEqual[];
-  between: FilterParamsBetween;
-  orders: FilterParamsOrder[];
-}
-type FilterParamsEqual = {
-  field_name: string; // rol_id
-  field_value: string; // 3
-  label_name: string; // rol
-  label_value: string; // vendedor
-};
-type FilterParamsBetween = {
-  field_name: string;
-  field_label: string;
-  range: string;
-};
-type FilterParamsOrder = {
-  field_name: string;
-  order_dir: string;
-  field_label: string;
-};
-
 // ✅ TIPOS PARA LAS OPCIONES DE PETICION FETCH
 export type FetchOptions = {
   method?: "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
@@ -124,11 +98,6 @@ export type FetchOptions = {
   authorization?: string;
   attachedData?: any;
 };
-
-// ✅ TIPO PARA MOSTRAR LA INFORMACION DEL FILTRO
-// Para deprecar
-export type FilterInfo = Omit<FilterParams, "offset">;
-
 
 export type DocumentData = {
   id: number;

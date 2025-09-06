@@ -1,4 +1,4 @@
-import { BetweenItem, CampoTable, Cliente, CommonPeriod, FilterInfo, FilterParam, FilterParams, Proveedor } from "../types";
+import { BetweenItem, CampoTable, Cliente, CommonPeriod, FilterParam, Proveedor } from "../types";
 
 //--> CLAVES PARA LOCAL STORAGE
 export const ls_layoutKey = "ls_layout"
@@ -62,7 +62,7 @@ export const moduloFormInit = {
 
 // ✅✅NUEVA ESTRUCTURA FILTER PARAMS✅✅
 export const filterParamInit: FilterParam = {
-  offset: 25,
+  per_page: 25,
   search: "",
   equal: [],
   between: [],
@@ -70,7 +70,7 @@ export const filterParamInit: FilterParam = {
 }
 
 /* const ejemploFilterParam = {
-  offset: 25,
+  per_page: 25,
   search: "joel",
   equal: [
     { fieldName: 'rol_id', fieldValue: [2,3] },
@@ -85,48 +85,7 @@ export const filterParamInit: FilterParam = {
     { fieldName: 'nombres', dir: 'DESC' }
   ]
 } */
-// Para deprecar
-export const filterParamsInit: FilterParams = {
-    offset: 25,
-    search: "",
-    equals: [],
-    between: {field_name: "", range: "", field_label: ""},
-    orders: [], 
-}
-///   ejemplo de uso
-/*
-  const filterParamsInit_: FilterParams = {
-    offset: 25,
-    search: "",
-    orders: [
-      {field_name: "nombres", order_dir: "ASC", field_label: "Nombres"}
-    ],
-    equals: [
-      {
-        field_name: "establecimiento_id", 
-        field_value: "1", 
-        label_name: "principal", 
-        label_value: "Establecimiento"
-      },
-    ],
-    between: {
-      field_name: "created_at", 
-      field_label:"Creado", 
-      range: "2024-12-18 00:00:00, 2024-12-19 23:59:59"
-    },
-  }
-*/
 
-
-
-//--> ROLES
-// *****************************************************
-export const filterInfoInit: FilterInfo = {
-  search:"",
-  equals: [],
-  between: {field_name: "", field_label: "", range: ""},
-  orders: [], 
-}
 
 //--> CLIENTES
 // *****************************************************

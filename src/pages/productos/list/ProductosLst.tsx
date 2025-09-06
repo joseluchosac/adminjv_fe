@@ -1,100 +1,51 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef } from "react";
 import { Card, Table } from "react-bootstrap";
-import { toast } from "react-toastify";
-import { camposProductoInit } from "../../../app/utils/constants";
-import { useProductos } from "../context/ProductosContext";
 import { useProductosFilterQuery } from "../../../api/queries/useProductosQuery";
+import { LdsBar, LdsEllipsisCenter } from "../../../app/components/Loaders";
 import DynaIcon from "../../../app/components/DynaComponents";
-import ProductosLstRow from "./ProductosLstRow";
-import { LdsEllipsisCenter } from "../../../app/components/Loaders";
+import ProductosListItem from "./ProductosLstItem";
 import ProductosHead from "./ProductosHead";
-import ProductosLstFilterMdl from "./ProductosLstFilterMdl";
+import useProductosStore from "../../../app/store/useProductosStore";
+import { ProductosFilter } from "./ProductosFilter";
 
-
-const ProductosLst: React.FC = () => {
-  const [camposProducto, setCamposProducto] = useState(camposProductoInit)
-  
-  const {
-    setFilterInfoProductos,
-    filterParamsProductosForm,
-    setFilterParamsProductosForm,
-    modo
-  } = useProductos()
-
+export default function ProductosLst() {
   const {
     data,
+    fetchNextPage,
     isLoading,
     isFetching,
     isError,
     hasNextPage,
-    fetchNextPage,
-    setFilterParamsProductos,
-  } = useProductosFilterQuery();
+  } = useProductosFilterQuery()
+  
+  const camposProducto = useProductosStore(state => state.camposProducto)
+  const showProductoForm = useProductosStore(state => state.showProductoForm)
+  const setProductoFilterFormSortTable = useProductosStore(state => state.setProductoFilterFormSortTable)
   
   const tableRef = useRef<HTMLDivElement | null>(null)
   const ldsEllipsisRef = useRef<HTMLDivElement | null>(null)
 
   const sort = (field_name:string, field_label: string, ctrlKey: boolean) => {
-    const orderIdx = filterParamsProductosForm.orders.findIndex(el => el.field_name === field_name)
-    if(ctrlKey){
-      if(orderIdx === -1){
-        const newOrder = {field_name, order_dir: "ASC", field_label}
-        setFilterParamsProductosForm({...filterParamsProductosForm, orders: [...filterParamsProductosForm.orders, newOrder]})
-      }else{
-        let newOrders = structuredClone(filterParamsProductosForm.orders)
-        if(newOrders[orderIdx].order_dir == "ASC"){
-          newOrders[orderIdx] = {field_name, order_dir: "DESC", field_label}
-          setFilterParamsProductosForm({...filterParamsProductosForm, orders: newOrders})
-        }else{
-          newOrders = newOrders.filter(el=>el.field_name !== field_name)
-          setFilterParamsProductosForm({...filterParamsProductosForm, orders: newOrders})
-        }
-      }
-    }else{
-      if(orderIdx === -1){
-        const newOrder = {field_name, order_dir: "ASC", field_label}
-        setFilterParamsProductosForm({...filterParamsProductosForm, orders: [newOrder]})
-      }else{
-        let newOrders = structuredClone(filterParamsProductosForm.orders)
-        if(newOrders[orderIdx].order_dir == "ASC"){
-          const newOrder = {field_name, order_dir: "DESC", field_label}
-          setFilterParamsProductosForm({...filterParamsProductosForm, orders: [newOrder]})
-        }else{
-          setFilterParamsProductosForm({...filterParamsProductosForm, orders: []})
-        }
-      }
-
-    }
-  };
-  const handleNextPage = () => {
-    fetchNextPage();
+    setProductoFilterFormSortTable({field_name, field_label, ctrlKey})
   };
 
-  useEffect(() => {
-    setFilterParamsProductos(filterParamsProductosForm)
-  }, [filterParamsProductosForm])
+  const info = () => {
+    let mostrando  = data?.pages.reduce((acum, curval)=>{
+      return acum + curval.filas.length
+    },0)
+    const total = data?.pages[0]?.num_regs || 0
+    return total ? `${mostrando} de ${total} reg` : ' '
+  }
 
-  useEffect(()=>{
-    if(data?.pages[0].error || isError){
-      toast.error("Error al obtener registros")
-      return
-    }
-    if(!isFetching){
-      const {search, equals, between, orders} = filterParamsProductosForm
-      setFilterInfoProductos({search, equals, between, orders})
-      const newCamposProductos = camposProducto.map(el=>{
-        const order = orders.find(order => order.field_name === el.field_name)
-        return order ? {...el, order_dir: order?.order_dir} : {...el, order_dir: ""}
-      })
-      setCamposProducto(newCamposProductos)
-    }
-  },[data, isError, isFetching])
+  const handleNextPage = () => {fetchNextPage()};
 
-
+  if(!showProductoForm)
   return (
-    <>
-      <ProductosHead isFetching={isFetching} />
-      <Card className={`overflow-hidden ${modo.vista === "edit" ? "d-none" : ""}`}>
+    <div className="position-relative">
+      {isFetching && <LdsBar />}
+      <ProductosHead info={info()}/>
+      <ProductosFilter isFetching={isFetching} />
+      <Card className="overflow-hidden">
         <div className="position-relative">
           <div className="table-responsive" style={{ height: "73vh" }} ref={tableRef}>
             <Table striped hover className="mb-1">
@@ -128,7 +79,7 @@ const ProductosLst: React.FC = () => {
               </thead>
               <tbody>
                 {data && data?.pages.flatMap(el => el.filas).map((producto) => (
-                  <ProductosLstRow key={producto.id} producto={producto} camposProducto={camposProducto}/>
+                  <ProductosListItem key={producto.id} producto={producto}/>
                 ))}
               </tbody>
             </Table>
@@ -145,9 +96,6 @@ const ProductosLst: React.FC = () => {
           {isError && <div className="text-danger">Error de conexion</div>}
         </div>
       </Card>
-      <ProductosLstFilterMdl isFetching={isFetching} camposProducto={camposProducto} />
-    </>
+    </div>
   )
 }
-
-export default ProductosLst

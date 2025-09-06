@@ -1,48 +1,48 @@
 import { Badge, Button, Col, Container, Form, InputGroup, Row, Stack } from "react-bootstrap";
 import { BsFiletypePdf, BsFiletypeXlsx } from "react-icons/bs";
 import DynaIcon from "../../../app/components/DynaComponents";
-import useProductosStore from "../../../app/store/useProductosStore";
+import useMovimientosStore from "../../../app/store/useMovimientosStore";
 import { FaFilter } from "react-icons/fa";
 
 type Props = { info:string };
 
-export default function ProductosHead({info}: Props) {
-  const {equal, between, order} = useProductosStore(state => state.productoFilterInfo)
-  const productoFilterForm = useProductosStore(state => state.productoFilterForm)
-  const setShowProductoFilter = useProductosStore(state => state.setShowProductoFilter)
-  const setProductoFilterForm = useProductosStore(state => state.setProductoFilterForm)
-  const setShowProductoForm = useProductosStore(state => state.setShowProductoForm)
-  const setProductoFilterFormResetEqualItem = useProductosStore(state => state.setProductoFilterFormResetEqualItem)
+export default function MovimientosHead({info}: Props) {
+  const {equal, between, order} = useMovimientosStore(state => state.movimientoFilterInfo)
+  const movimientoFilterForm = useMovimientosStore(state => state.movimientoFilterForm)
+  const setShowMovimientoFilter = useMovimientosStore(state => state.setShowMovimientoFilter)
+  const setMovimientoFilterForm = useMovimientosStore(state => state.setMovimientoFilterForm)
+  const setShowMovimientoForm = useMovimientosStore(state => state.setShowMovimientoForm)
+  const setMovimientoFilterFormResetEqualItem = useMovimientosStore(state => state.setMovimientoFilterFormResetEqualItem)
 
-  const handleSetShowProductosFilterMdl = (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
+  const handleSetShowMovimientosFilterMdl = (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
     e.preventDefault();
-    setShowProductoFilter(true)
+    setShowMovimientoFilter(true)
   };
 
   const resetBetweenItem = (field_name: string) => {
-    let { between } = productoFilterForm;
+    let { between } = movimientoFilterForm;
     between = between.filter((el) => el.field_name !== field_name);
-    setProductoFilterForm({ ...productoFilterForm, between: [...between] })
+    setMovimientoFilterForm({ ...movimientoFilterForm, between: [...between] })
   };
 
   const resetSort = () => {
-    setProductoFilterForm({ ...productoFilterForm, order: [] })
+    setMovimientoFilterForm({ ...movimientoFilterForm, order: [] })
   };
 
   const handleNuevo = () => {
-    setShowProductoForm(true)
+    setShowMovimientoForm(false)
   };
 
   const handleTraerTodo = () => {
-    // const param = objToUriBase64(productoFilterParam);
-    // window.open(apiDOCS + "pdf/?action=productos_report&p=" + param);
+    // const param = objToUriBase64(movimientoFilterParam);
+    // window.open(apiDOCS + "pdf/?action=movimientos_report&p=" + param);
   };
 
   return (
     <Container className="mb-2 pt-2 position-relative">
       <Row className="align-items-center mb-2">
         <Col sm className="text-center text-sm-start">
-          <h5>Lista de Productos</h5>
+          <h5>Lista de Movimientos</h5>
         </Col>
         <Col sm className="text-center text-sm-start mb-3 mb-sm-0">
           <InputGroup>
@@ -50,16 +50,16 @@ export default function ProductosHead({info}: Props) {
               name="search"
               type="search"
               placeholder="Buscar"
-              value={productoFilterForm.search}
+              value={movimientoFilterForm.search}
               onChange={(e) => {
-                setProductoFilterForm({ ...productoFilterForm, search: e.target.value })
+                setMovimientoFilterForm({ ...movimientoFilterForm, search: e.target.value })
               }}
             />
             <Button
               variant="outline-secondary" 
               className="px-2 py-1"
               title="Mostrar filtros"
-              onClick={handleSetShowProductosFilterMdl}
+              onClick={handleSetShowMovimientosFilterMdl}
             >
               <FaFilter />
             </Button>
@@ -99,7 +99,7 @@ export default function ProductosHead({info}: Props) {
                     bg="secondary"
                     role="button"
                     onClick={() => {
-                      setProductoFilterFormResetEqualItem({field_name: el.field_name})
+                      setMovimientoFilterFormResetEqualItem({field_name: el.field_name})
                     }}
                     className="d-flex gap-1"
                     key={idx}

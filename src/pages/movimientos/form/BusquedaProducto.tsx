@@ -12,7 +12,7 @@ export default function BusquedaProducto() {
   const formRef = useRef<HTMLFormElement | null>(null)
   const {
     agregarProducto,
-    userMovimientoForm: {
+    movimientoForm: {
       getValues
     }
   } = useMovimientos()

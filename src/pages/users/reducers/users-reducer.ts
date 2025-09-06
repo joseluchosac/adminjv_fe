@@ -3,7 +3,7 @@ import { betweenItemInit, camposUserInit } from "../../../app/utils/constants";
 import { deepEqualUnordered, getDateRangePeriod } from "../../../app/utils/funciones";
 
 const userFilterParamInit: FilterParam = {
-  offset: 50,
+  per_page: 50,
   search: '',
   equal: [],
   between: [],
@@ -85,7 +85,7 @@ export const usersReducer = (
     case 'SET_SHOW_USER_FILTER':
       {return { ...state, showUsersFilter: action.payload }};
     case 'SET_OFFSET':
-      {return { ...state, userFilterForm: {...state.userFilterForm, offset: action.payload} }};
+      {return { ...state, userFilterForm: {...state.userFilterForm, per_page: action.payload} }};
     case 'SET_USER_FILTER_FORM':
       {return { ...state, userFilterForm: action.payload }};
     case 'SET_USER_FILTER_FORM_SORT': {

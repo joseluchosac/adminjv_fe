@@ -115,6 +115,7 @@ export const useLaboratoriosFilterQuery = () => {
 export type MutationLaboratorioRes = ApiResp & {
   laboratorio?: LaboratorioItem
 };
+
 export const useMutationLaboratoriosQuery = <T>() => {
   const resetSessionStore = useSessionStore(state => state.resetSessionStore)
   const navigate = useNavigate()
@@ -181,7 +182,7 @@ export const useMutationLaboratoriosQuery = <T>() => {
 
 
 
-      queryClient.invalidateQueries({queryKey:["laboratorios"]}) // Recarga la tabla laboratorios
+      queryClient.invalidateQueries({queryKey:["laboratorios"]}) // Recarga la tabla
     }
   })
 
