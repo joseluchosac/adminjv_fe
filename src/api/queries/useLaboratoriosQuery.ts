@@ -243,7 +243,7 @@ export const useMutationLaboratoriosQuery = <T>() => {
   useEffect(()=>{
     if((data as ApiResp)?.errorType === "errorToken"){
       resetSessionStore()
-      navigate("/auth")
+      navigate("/signin")
     }
   },[data])
 

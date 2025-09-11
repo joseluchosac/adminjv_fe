@@ -33,7 +33,7 @@ const SidebarNavItem:React.FC<Props> = ({ item }) => {
 
   return (
     <li
-      className={`nav-item ${item.children.length ? 'is-parent ' : ''}`}
+      className={`nav-item ${item.children.length ? 'parent ' : ''}`}
     >
       {item.children.length 
         ?       

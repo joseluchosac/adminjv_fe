@@ -45,6 +45,7 @@ function AppRouter() {
       <Route element={<PrivateRoute redirectTo="signin" />}>
         <Route index element={<Navigate to="home" />} />
         <Route path="home" element={<HomePage />} />
+        <Route path="home/:id" element={<HomePage />} />
         <Route path="catalogos" element={<CatalogosPage />} />
         <Route path="categorias" element={<CategoriasPage />} />
         <Route path="clientes" element={<ClientesPage />} />
@@ -58,6 +59,7 @@ function AppRouter() {
         <Route path="productos" element={<ProductosPage />} />
         <Route path="profile" element={<ProfilePage />} />
         <Route path="roles" element={<RolesPage />} />
+        <Route path="sinpermi" element={<div>SinPermi</div>} />
         <Route path="users" 
           element={<Suspense fallback={<div>Loading...</div>}><UsersPage /></Suspense>}  
         />

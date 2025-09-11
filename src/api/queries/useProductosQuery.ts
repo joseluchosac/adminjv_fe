@@ -256,7 +256,7 @@ export const useMutationProductosQuery = <T>() => {
     const r = data as ApiResp
     if(r?.errorType === "errorToken"){
       resetSessionStore()
-      navigate("/auth")
+      navigate("/signin")
     }
   },[data])
 

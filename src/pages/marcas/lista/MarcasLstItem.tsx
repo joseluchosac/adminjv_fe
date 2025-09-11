@@ -1,4 +1,4 @@
-import { MarcaItem} from "../../../app/types";
+import { ApiResp, MarcaItem} from "../../../app/types";
 import { FaEdit, FaToggleOff, FaToggleOn, FaTrash } from "react-icons/fa";
 import { useMutationMarcasQuery } from "../../../api/queries/useMarcasQuery";
 import Swal from "sweetalert2";
@@ -21,7 +21,7 @@ function MarcasListItem({ marca }: Props) {
     isPending: isPendingMutation,
     deleteMarca,
     setStateMarca,
-  } = useMutationMarcasQuery()
+  } = useMutationMarcasQuery<ApiResp>()
 
   const handleToEdit = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
     e.preventDefault()

@@ -175,7 +175,7 @@ export const useMutationMarcasQuery = <T>() => {
     if(!data) return
     if((data as ApiResp).errorType === "errorToken"){
       resetSessionStore()
-      navigate("/auth")
+      navigate("/signin")
     }
   },[data])
 

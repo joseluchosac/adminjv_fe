@@ -167,16 +167,6 @@ export type Establecimiento = {
 
 // ✅ TIPOS PARA LA TABLA MODULOS
 export type Modulo = z.infer<typeof ModuloSchema>
-// export type Modulo = {
-//   id: number;
-//   nombre: string;
-//   descripcion: string;
-//   padre_id: number;
-//   icon_menu: string;
-//   orden: number;
-//   assign?: boolean;
-//   children?: any;
-// }
 
 export interface Padre {
   id: number;

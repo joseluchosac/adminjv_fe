@@ -1,3 +1,4 @@
+const basename = import.meta.env.VITE_BASENAME;
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -9,7 +10,7 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 const queryClient = new QueryClient()
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <BrowserRouter /*basename="/build_react"*/
+    <BrowserRouter basename={basename}
       future={{
         v7_startTransition: true,
         v7_relativeSplatPath: true,

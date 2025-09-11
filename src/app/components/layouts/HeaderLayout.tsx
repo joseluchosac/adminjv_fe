@@ -61,6 +61,8 @@ function HeaderLayout () {
           >
             <Link to="/home" className="nav-link">Inicio</Link>
             <Link to="/users" className="nav-link">Usuarios</Link>
+            <Link to="/inexis" className="nav-link">Inexis</Link>
+            <Link to="/sinpermi" className="nav-link">Sinpermi</Link>
           </Nav>
           <Nav>
             <NavDropdown

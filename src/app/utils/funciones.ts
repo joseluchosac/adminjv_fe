@@ -207,10 +207,10 @@ export async function delay(ms: number){
 }
 
 // ✅ FUNCION QUE DEVUELVE UN SLUG A PARTIR DE UN STRING
-// const titulo = "Este es un Título con Espacios y Caracteres Especiales";
-// const slug = generarSlug(titulo);
-// console.log(slug); // Output: este-es-un-titulo-con-espacios-y-caracteres-especiales
 export function generarSlug(texto: string) {
+  // const cadena = "Este es un Título con Espacios y Caracteres Especiales";
+  // const slug = generarSlug(cadena);
+  // console.log(slug); // Output: este-es-un-titulo-con-espacios-y-caracteres-especiales
   texto = texto.trim();  // Eliminar espacios al principio y al final
   texto = texto.toLowerCase();  // Convertir a minúsculas
   texto = texto.normalize('NFD').replace(/[\u0300-\u036f]/g, '');  // Reemplazar caracteres especiales y acentos

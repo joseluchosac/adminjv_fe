@@ -11,6 +11,8 @@ import IconsModal from "../../app/components/IconsModal"
 import { LdsBar } from "../../app/components/Loaders"
 import { moduloFormInit } from "../../app/utils/constants"
 import { useQueryClient } from "@tanstack/react-query"
+import { generarSlug } from "../../app/utils/funciones"
+import { ApiResp } from "../../app/types"
 
 const ModulosPage:React.FC = () => {
   const [showIconsModal, setShowIconsModal] = useState(false);
@@ -23,7 +25,7 @@ const ModulosPage:React.FC = () => {
     createModulo, 
     updateModulo, 
     deleteModulo, 
-  } = useMutateModulosQuery()
+  } = useMutateModulosQuery<ApiResp>()
 
   const {
     isPendingGetModulos,
@@ -38,7 +40,8 @@ const ModulosPage:React.FC = () => {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const {name, value} = e.currentTarget
-    setModuloForm({...moduloForm, [name]: value})
+
+    setModuloForm({...moduloForm, [name]: (name === "nombre") ? generarSlug(value) : value})
   }
 
   const handleChangeSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -184,7 +187,7 @@ const ModulosPage:React.FC = () => {
                   </Col>
                   <Col xl={6}>
                     <Form.Group className="mb-3">
-                      <Form.Label>Nombre</Form.Label>
+                      <Form.Label>Nombre (SLUG)</Form.Label>
                       <Form.Control 
                         type="text" 
                         name="nombre"

@@ -337,10 +337,12 @@ export const useUnidadesMedidaQuery = () => {
 
 // ****** MUTATION CATALOGOS ******
 export const useMutationCatalogosQuery = () => {
+  // const [abortController, setAbortController] = useState<AbortController | null>(null);
   const fnName = useRef("");
   const resetSessionStore = useSessionStore((state) => state.resetSessionStore);
   const navigate = useNavigate();
   const token = useSessionStore((state) => state.tknSession);
+const abortControllerRef = useRef<AbortController | null>(null);
 
   const { data, isPending, isError, mutate } = useMutation({
     mutationKey: ["mutation_catalogos"],
@@ -350,6 +352,19 @@ export const useMutationCatalogosQuery = () => {
       // queryClient.invalidateQueries({queryKey:["catalogos"]})
     },
   });
+
+  const getTipoComprobante = (id: number) => {
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+    const options: FetchOptions = {
+      method: "POST",
+      url: apiURL + "catalogos/get_tipo_comprobante",
+      body: JSON.stringify({id}),
+      authorization: "Bearer " + token,
+      signal: controller.signal
+    };
+    mutate(options);
+  }
 
   const createTipoComprobante = (param: TipoComprobante) => {
     fnName.current = createTipoComprobante.name;
@@ -388,7 +403,7 @@ export const useMutationCatalogosQuery = () => {
     if (!data) return;
     if (data?.errorType === "errorToken") {
       resetSessionStore();
-      navigate("/auth");
+      navigate("/signin");
     }
   }, [data]);
 
@@ -396,6 +411,8 @@ export const useMutationCatalogosQuery = () => {
     data,
     isPending,
     isError,
+    abortController: abortControllerRef.current,
+    getTipoComprobante,
     createTipoComprobante,
     updateTipoComprobante,
     deleteTipoComprobante,

@@ -71,7 +71,7 @@ export const useMutationNumeracionesQuery = () => {
   useEffect(()=>{
     if(data?.errorType === "errorToken"){
       resetSessionStore()
-      navigate("/auth")
+      navigate("/signin")
     }
   },[data])
 

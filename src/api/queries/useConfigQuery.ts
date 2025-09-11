@@ -127,7 +127,7 @@ export const useMutationConfigQuery = () => {
   useEffect(()=>{
     if(data?.errorType === "errorToken"){
       resetSessionStore()
-      navigate("/auth")
+      navigate("/signin")
     }
 
   },[data])
