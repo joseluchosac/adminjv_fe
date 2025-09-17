@@ -1,4 +1,3 @@
-const apiDOCS = import.meta.env.VITE_DOCS_URL;
 import { useNavigate } from "react-router-dom";
 import {
   Badge,
@@ -13,7 +12,7 @@ import {
 import { FaFilter} from "react-icons/fa";
 import { BsFiletypePdf, BsFiletypeXlsx } from "react-icons/bs";
 import DynaIcon from "../../../app/components/DynaComponents";
-import { objToUriBase64 } from "../../../app/utils/funciones";
+// import { objToUriBase64 } from "../../../app/utils/funciones";
 import { useUsers } from "../context/UsersContext";
 
 type Props = { info:string };
@@ -24,7 +23,7 @@ export default function UsersHead({ info }: Props) {
     stateUsers:{
       userFilterInfo: { equal, between, order },
       userFilterForm,
-      userFilterParam
+      // userFilterParam
     },
     dispatchUsers
   } = useUsers();
@@ -56,9 +55,9 @@ export default function UsersHead({ info }: Props) {
   };
 
   const handleTraerTodo = () => {
-    const param = objToUriBase64(userFilterParam);
+    // const param = objToUriBase64(userFilterParam);
     // console.log(apiDOCS + "pdf/?action=users_report&p=" + param)
-    window.open(apiDOCS + "pdf/?action=users_report&p=" + param);
+    // window.open(apiDOCS + "pdf/?action=users_report&p=" + param);
   };
 
 
