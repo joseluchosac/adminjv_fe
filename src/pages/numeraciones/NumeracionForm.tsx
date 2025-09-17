@@ -122,7 +122,7 @@ export default function NumeracionForm() {
   }, [watch("serie_pre"), watch("serie_suf")])
 
   return (
-    <Modal show={showForm} onHide={()=>setShowForm(false)} backdrop="static" size="md" >
+    <Modal show={showForm} onHide={()=>setShowForm(false)} backdrop="static" size="lg" >
       <Modal.Header closeButton className="py-2">
         <Modal.Title>{currentNumeracionId ? "Editar numeración" : "Agregar numeración"}</Modal.Title>
       </Modal.Header>

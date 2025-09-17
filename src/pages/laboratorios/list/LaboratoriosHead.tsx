@@ -1,17 +1,17 @@
 import { Badge, Button, Col, Container, Form, InputGroup, Row, Stack } from "react-bootstrap";
-import { BsFiletypePdf, BsFiletypeXlsx } from "react-icons/bs";
 import DynaIcon from "../../../app/components/DynaComponents";
 import useLaboratoriosStore from "../../../app/store/useLaboratoriosStore";
 import { FaFilter } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 type Props = { info:string };
 
 export default function LaboratoriosHead({info}: Props) {
+  const navigate = useNavigate()
   const {equal, between, order} = useLaboratoriosStore(state => state.laboratorioFilterInfo)
   const laboratorioFilterForm = useLaboratoriosStore(state => state.laboratorioFilterForm)
   const setShowLaboratorioFilter = useLaboratoriosStore(state => state.setShowLaboratorioFilter)
   const setLaboratorioFilterForm = useLaboratoriosStore(state => state.setLaboratorioFilterForm)
-  const setShowLaboratorioForm = useLaboratoriosStore(state => state.setShowLaboratorioForm)
   const setLaboratorioFilterFormResetEqualItem = useLaboratoriosStore(state => state.setLaboratorioFilterFormResetEqualItem)
 
   const handleSetShowLaboratoriosFilterMdl = (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
@@ -27,15 +27,6 @@ export default function LaboratoriosHead({info}: Props) {
 
   const resetSort = () => {
     setLaboratorioFilterForm({ ...laboratorioFilterForm, order: [] })
-  };
-
-  const handleNuevo = () => {
-    setShowLaboratorioForm({showLaboratorioForm: true, currentLaboratorioId: 0})
-  };
-
-  const handleTraerTodo = () => {
-    // const param = objToUriBase64(laboratorioFilterParam);
-    // window.open(apiDOCS + "pdf/?action=laboratorios_report&p=" + param);
   };
 
   return (
@@ -68,20 +59,12 @@ export default function LaboratoriosHead({info}: Props) {
         <Col className="text-center flex-sm-grow-0">
           <div className="d-flex justify-content-center align-items-center gap-3">
             <div className="d-flex">
-              <Button variant="outline-success" className="border-0"
-                title="Generar archivo excel"
-                onClick={handleTraerTodo}
-              >
-                <BsFiletypeXlsx className="fs-5" />
-              </Button>
-              <Button variant="outline-danger" className="border-0"
-                title="Generar archivo pdf"
-                onClick={handleTraerTodo}
-              >
-                <BsFiletypePdf className="fs-5" />
-              </Button>
+
             </div>
-            <Button onClick={handleNuevo} variant="primary">
+            <Button 
+              onClick={() => navigate(`${location.pathname}?edit=0`)}
+              variant="primary"
+            >
               Nuevo
             </Button>
           </div>

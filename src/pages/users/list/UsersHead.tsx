@@ -1,4 +1,5 @@
 const apiDOCS = import.meta.env.VITE_DOCS_URL;
+import { useNavigate } from "react-router-dom";
 import {
   Badge,
   Button,
@@ -18,6 +19,7 @@ import { useUsers } from "../context/UsersContext";
 type Props = { info:string };
 
 export default function UsersHead({ info }: Props) {
+  const navigate = useNavigate()
   const {
     stateUsers:{
       userFilterInfo: { equal, between, order },
@@ -50,13 +52,6 @@ export default function UsersHead({ info }: Props) {
     dispatchUsers({
       type: 'SET_USER_FILTER_FORM',
       payload: { ...userFilterForm, order: [] }
-    });
-  };
-
-  const handleNuevo = () => {
-    dispatchUsers({
-      type: 'SET_SHOW_USER_FORM',
-      payload: {showUserForm: true, currentUserId: 0},
     });
   };
 
@@ -114,7 +109,10 @@ export default function UsersHead({ info }: Props) {
                 <BsFiletypePdf className="fs-5" />
               </Button>
             </div>
-            <Button onClick={handleNuevo} variant="primary">
+            <Button 
+              onClick={() => navigate(`${location.pathname}?edit=0`)}
+              variant="primary"
+            >
               Nuevo
             </Button>
           </div>

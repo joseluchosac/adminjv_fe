@@ -7,13 +7,15 @@ import { MutationUserResp, UserItem } from "../../../app/types";
 import { useUsers } from "../context/UsersContext";
 import useLayoutStore from "../../../app/store/useLayoutStore";
 import { useMutationUsersQuery } from "../../../api/queries/useUsersQuery";
+import { useNavigate } from "react-router-dom";
 
 interface Props {
   user: UserItem ;
 }
 
 function UsersLstItem({ user }: Props) {
-  const { dispatchUsers, stateUsers: {camposUser} } = useUsers()
+  const { stateUsers: {camposUser} } = useUsers()
+  const navigate = useNavigate()
   const darkMode = useLayoutStore(state => state.layout.darkMode)
 
   const {
@@ -30,10 +32,7 @@ function UsersLstItem({ user }: Props) {
 
   const handleToEdit = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
     e.preventDefault()
-    dispatchUsers({
-      type: 'SET_SHOW_USER_FORM',
-      payload: {showUserForm: true, currentUserId: user.id},
-    });
+    navigate(`${location.pathname}?edit=${user.id}`);
   }
 
   const handleDelete = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {

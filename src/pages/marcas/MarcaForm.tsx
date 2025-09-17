@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import Modal from "react-bootstrap/Modal";
 import { Button, Col, Form, Row, Spinner } from "react-bootstrap";
 import Swal from "sweetalert2";
@@ -8,7 +8,7 @@ import { LdsBar, LdsEllipsisCenter } from "../../app/components/Loaders";
 import useLayoutStore from "../../app/store/useLayoutStore";
 import { useMutationMarcasQuery } from "../../api/queries/useMarcasQuery";
 import { Marca, MarcaItem, ApiResp } from "../../app/types";
-import useMarcasStore from "../../app/store/useMarcasStore";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const marcaFormInit = {id: 0, nombre: "", estado: 1,}
 
@@ -22,7 +22,8 @@ type MutationRes = ApiResp & {
 };
 
 export default function MarcaForm() {
-  const {showMarcaForm, setShowMarcaForm, currentMarcaId} = useMarcasStore()
+  const navigate = useNavigate()
+  const location = useLocation()
   const darkMode = useLayoutStore(state => state.layout.darkMode)
 
   const {
@@ -47,6 +48,11 @@ export default function MarcaForm() {
     reset,
   } = useForm<Marca>({defaultValues: marcaFormInit})
 
+  const id = useMemo(() => {
+    const params = new URLSearchParams(location.search)
+    return params.get('edit')
+  }, [location]);
+
   const submit = (marca: Marca) => {
     Swal.fire({
       icon: 'question',
@@ -69,19 +75,24 @@ export default function MarcaForm() {
     });
   };
 
+  const handleClose = () => {
+    navigate(location.pathname)
+  };
+    
   useEffect(() => {
-    if(showMarcaForm){
-      if(currentMarcaId) getMarca(currentMarcaId)
+    if(!id) return reset(marcaFormInit)
+    if(+id || 0){
+      getMarca(+id)
     }else{
       reset(marcaFormInit)
     }
-  }, [showMarcaForm])
+  }, [id]);
 
   useEffect(() => {
     if(!marcaRes) return
     if(isErrMarcaRes(marcaRes)){
       toast.error("Error al obtener la marca");
-      setShowMarcaForm({showMarcaForm: false, currentMarcaId: 0});
+      handleClose();
     }else{
       reset(marcaRes)
     }
@@ -89,14 +100,14 @@ export default function MarcaForm() {
   
   useEffect(() => {
     if(!mutation) return
-    if(!mutation.error) setShowMarcaForm({showMarcaForm: false, currentMarcaId: 0});
+    if(!mutation.error) handleClose();
     toast(mutation.msg, {type: mutation.msgType})
   }, [mutation])
 
   useEffect(() => {
     if(!isErrorMarca) return
     toast.error("Error al obtener datos")
-    setShowMarcaForm({showMarcaForm: false, currentMarcaId: 0})
+    handleClose()
   }, [isErrorMarca])
 
   useEffect(() => {
@@ -108,13 +119,13 @@ export default function MarcaForm() {
   return (
     <div>
       <Modal 
-        size="md"
+        show={!!id}
+        size="lg"
         backdrop="static"
-        show={showMarcaForm} 
-        onHide={()=>setShowMarcaForm({showMarcaForm: false, currentMarcaId: 0})} 
+        onHide={handleClose} 
       >
         <Modal.Header closeButton className="py-2">
-          <Modal.Title>{currentMarcaId ? "Editar marca" : "Nueva marca"}</Modal.Title>
+          <Modal.Title>{(id && +id) ? "Editar marca" : "Nueva marca"}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Form onSubmit={handleSubmit(submit)} id="marca_form">
@@ -140,12 +151,12 @@ export default function MarcaForm() {
                 onClick={() => reset(marcaFormInit)}
                 variant="seccondary"
                 type="button"
-                hidden={currentMarcaId ? true : false}
+                hidden={(id && +id) ? true : false}
               >Reset</Button>
               <Button
                 variant="seccondary"
                 type="button"
-                onClick={()=>setShowMarcaForm({showMarcaForm: false, currentMarcaId: 0})}
+                onClick={handleClose}
               >Cerrar</Button>
               <Button 
                 variant="primary" 

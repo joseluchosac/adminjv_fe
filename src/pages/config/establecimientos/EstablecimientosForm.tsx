@@ -156,7 +156,7 @@ export default function EstablecimientoForm() {
 
   return (
     <div>
-      <Modal show={showEstablecimientoForm} onHide={()=>setShowEstablecimientoForm(false)} backdrop="static" size="md" >
+      <Modal show={showEstablecimientoForm} onHide={()=>setShowEstablecimientoForm(false)} backdrop="static" size="lg" >
         <Modal.Header closeButton className="py-2">
           <Modal.Title>{currentEstablecimientoId ? "Editar establecimiento" : "Nuevo establecimiento"}</Modal.Title>
         </Modal.Header>

@@ -1,6 +1,6 @@
-import { useNavigate } from "react-router-dom"
+import { useLocation, useNavigate } from "react-router-dom"
 import { useMutationCatalogosQuery } from "../../api/queries/useCatalogosQuery"
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { TipoComprobanteSchema } from "../../app/schemas/catalogos-schema"
 import z from "zod"
 import { toast } from "react-toastify"
@@ -16,9 +16,10 @@ const tipoComprobanteInit: TipoComprobante = {
   estado: 1,
 }
 
-export default function View({id}:{id: string | null}) {
+export default function View() {
   const [tipoComprobante, setTipoComprobante] = useState<TipoComprobante>(tipoComprobanteInit)
   const navigate = useNavigate()
+  const location = useLocation()
 
   const{
     data: getTipoComprobanteResp,
@@ -27,6 +28,10 @@ export default function View({id}:{id: string | null}) {
     abortController
   } = useMutationCatalogosQuery()
 
+  const id = useMemo(() => {
+    const params = new URLSearchParams(location.search)
+    return params.get('view')
+  }, [location])
 
   useEffect(() => {
     return () => abortController?.abort();

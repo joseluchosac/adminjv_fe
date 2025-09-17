@@ -6,6 +6,7 @@ import useLayoutStore from "../../../app/store/useLayoutStore";
 import { useEffect } from "react";
 import { toast } from "react-toastify";
 import useProveedoresStore from "../../../app/store/useProveedoresStore";
+import { useNavigate } from "react-router-dom";
 
 interface Props {
   proveedor: ProveedorItem ;
@@ -16,7 +17,7 @@ interface ProveedorMutQryRes extends ApiResp {content: ProveedorItem}
 function ProveedoresListItem({ proveedor }: Props) {
   const darkMode = useLayoutStore(state => state.layout.darkMode)
   const camposProveedor = useProveedoresStore(state => state.camposProveedor)
-  const setShowProveedorForm = useProveedoresStore(state=>state.setShowProveedorForm)
+  const navigate = useNavigate()
 
   const {
     data: mutation,
@@ -27,7 +28,7 @@ function ProveedoresListItem({ proveedor }: Props) {
 
   const handleToEdit = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
     e.preventDefault()
-    setShowProveedorForm({showProveedorForm: true, currentProveedorId: proveedor.id})
+    navigate(`${location.pathname}?edit=${proveedor.id}`);
   }
   
   const handleDelete = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {

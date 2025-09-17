@@ -1,10 +1,9 @@
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import Modal from "react-bootstrap/Modal";
 import { Button, Col, Form, Row, Spinner } from "react-bootstrap";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import Swal from "sweetalert2" ;
-import { useUsers } from "./context/UsersContext";
 import {zodResolver} from "@hookform/resolvers/zod";
 import { ErrorValidate, GetUserResp, MutationUserResp, UserForm } from "../../app/types";
 import useLayoutStore from "../../app/store/useLayoutStore";
@@ -14,16 +13,14 @@ import { userFormInit } from "../../app/utils/constants";
 import { useMutationUsersQuery } from "../../api/queries/useUsersQuery";
 import { LdsBar, LdsEllipsisCenter } from "../../app/components/Loaders";
 import { UserFormSchema } from "../../app/schemas/users-schema";
+import { useLocation, useNavigate } from "react-router-dom";
 
 export default function Userform(){
   const darkMode = useLayoutStore(state => state.layout.darkMode)
+  const navigate = useNavigate()
+  const location = useLocation()
   const {roles} = useRolesQuery()  
   const {cajas} = useCajasQuery()
-
-  const {
-    stateUsers: { showUserForm, currentUserId },
-    dispatchUsers
-  } = useUsers()
 
   const {
     data: getUserResp,
@@ -50,6 +47,11 @@ export default function Userform(){
     resolver: zodResolver(UserFormSchema),
   })
 
+  const id = useMemo(() => {
+    const params = new URLSearchParams(location.search)
+    return params.get('edit')
+  }, [location]);
+
   const submit = (data: UserForm) => {
     Swal.fire({
       icon: 'question',
@@ -75,19 +77,17 @@ export default function Userform(){
   };
 
   const closeForm = () => {
-    dispatchUsers({
-      type: 'SET_SHOW_USER_FORM',
-      payload: {showUserForm: false, currentUserId: null},
-    });
+    navigate(location.pathname)
   }
 
   useEffect(() => {
-    if(showUserForm){
-      if(currentUserId) getUser(currentUserId)
+    if(!id) return reset(userFormInit)
+    if(+id || 0){
+      getUser(+id)
     }else{
       reset(userFormInit)
     }
-  }, [showUserForm])
+  }, [id]);
 
   useEffect(() => {
     if(!getUserResp) return
@@ -122,13 +122,13 @@ export default function Userform(){
 
   return (
     <Modal
-      show={showUserForm}
+      show={!!id}
       backdrop="static"
-      size="md"
+      size="lg"
       onHide={()=> closeForm()}
     >
       <Modal.Header closeButton>
-        <Modal.Title>{currentUserId ? "Editar usuario" : "Nuevo usuario"}</Modal.Title>
+        <Modal.Title>{id && +id ? "Editar usuario" : "Nuevo usuario"}</Modal.Title>
       </Modal.Header>
       <Modal.Body> 
         <Form onSubmit={handleSubmit(submit)} id="form_users">
@@ -156,7 +156,7 @@ export default function Userform(){
               <Form.Control
                 id="username"
                 autoComplete="false"
-                disabled={currentUserId ? true : false}
+                disabled={id && +id ? true : false}
                 {...register('username')}
               />
               {errors.username && <Fdbk msg={errors.username?.message} />}
@@ -167,12 +167,12 @@ export default function Userform(){
                 type="text"
                 id="email"
                 autoComplete="false"
-                disabled={currentUserId ? true : false}
+                disabled={id && +id ? true : false}
                 {...register('email')}
               />
               {errors.email && <Fdbk msg={errors.email?.message} />}       
             </Form.Group>
-            {!Boolean(currentUserId) &&
+            {!(id && +id) &&
               <>
                 <Form.Group as={Col} md={6} className="mb-3">
                   <Form.Label htmlFor="password">Contraseña</Form.Label>

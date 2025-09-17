@@ -6,6 +6,7 @@ import useLayoutStore from "../../../app/store/useLayoutStore";
 import { useEffect } from "react";
 import { toast } from "react-toastify";
 import useClientesStore from "../../../app/store/useClientesStore";
+import { useNavigate } from "react-router-dom";
 
 interface Props {
   cliente: ClienteItem ;
@@ -17,7 +18,7 @@ interface ClienteMutQryRes extends ApiResp {content: ClienteItem}
 function ClientesListItem({ cliente }: Props) {
   const darkMode = useLayoutStore(state => state.layout.darkMode)
   const camposCliente = useClientesStore(state => state.camposCliente)
-  const setShowClienteForm = useClientesStore(state=>state.setShowClienteForm)
+  const navigate = useNavigate()
 
   const {
     data: mutation,
@@ -28,7 +29,7 @@ function ClientesListItem({ cliente }: Props) {
 
   const handleToEdit = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
     e.preventDefault()
-    setShowClienteForm({showClienteForm: true, currentClienteId: cliente.id})
+    navigate(`${location.pathname}?edit=${cliente.id}`);
   }
   
   const handleDelete = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {

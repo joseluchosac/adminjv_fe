@@ -6,6 +6,7 @@ import useLayoutStore from "../../../app/store/useLayoutStore";
 import { useEffect } from "react";
 import { toast } from "react-toastify";
 import useMarcasStore from "../../../app/store/useMarcasStore";
+import { useNavigate } from "react-router-dom";
 
 interface Props {
   marca: MarcaItem ;
@@ -14,8 +15,7 @@ interface Props {
 function MarcasListItem({ marca }: Props) {
   const darkMode = useLayoutStore(state => state.layout.darkMode)
   const camposMarca = useMarcasStore(state => state.camposMarca)
-  const setShowMarcaForm = useMarcasStore(state=>state.setShowMarcaForm)
-
+  const navigate = useNavigate()
   const {
     data: mutation,
     isPending: isPendingMutation,
@@ -24,8 +24,8 @@ function MarcasListItem({ marca }: Props) {
   } = useMutationMarcasQuery<ApiResp>()
 
   const handleToEdit = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
-    e.preventDefault()
-    setShowMarcaForm({showMarcaForm: true, currentMarcaId: marca.id})
+    e.preventDefault();
+    navigate(`${location.pathname}?edit=${marca.id}`);
   }
   
   const handleDelete = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {

@@ -1,19 +1,17 @@
 import { Badge, Button, Col, Container, Form, InputGroup, Row, Stack } from "react-bootstrap";
-import { BsFiletypePdf, BsFiletypeXlsx } from "react-icons/bs";
 import DynaIcon from "../../../app/components/DynaComponents";
 import useProveedoresStore from "../../../app/store/useProveedoresStore";
-// import { objToUriBase64 } from "../../../app/utils/funciones";
 import { FaFilter } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 type Props = { info:string };
 
 export default function ProveedoresHead({info}: Props) {
+  const navigate = useNavigate()
   const {equal, between, order} = useProveedoresStore(state => state.proveedorFilterInfo)
   const proveedorFilterForm = useProveedoresStore(state => state.proveedorFilterForm)
-  // const proveedorFilterParam = useProveedoresStore(state => state.proveedorFilterParam)
   const setShowProveedorFilter = useProveedoresStore(state => state.setShowProveedorFilter)
   const setProveedorFilterForm = useProveedoresStore(state => state.setProveedorFilterForm)
-  const setShowProveedorForm = useProveedoresStore(state => state.setShowProveedorForm)
   const setProveedorFilterFormResetEqualItem = useProveedoresStore(state => state.setProveedorFilterFormResetEqualItem)
 
   const handleSetShowProveedoresFilterMdl = (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
@@ -31,14 +29,6 @@ export default function ProveedoresHead({info}: Props) {
     setProveedorFilterForm({ ...proveedorFilterForm, order: [] })
   };
 
-  const handleNuevo = () => {
-    setShowProveedorForm({showProveedorForm: true, currentProveedorId: 0})
-  };
-
-  const handleTraerTodo = () => {
-    // const param = objToUriBase64(proveedorFilterParam);
-    // window.open(apiDOCS + "pdf/?action=proveedores_report&p=" + param);
-  };
 
   return (
     <Container className="mb-2 pt-2 position-relative">
@@ -70,20 +60,12 @@ export default function ProveedoresHead({info}: Props) {
         <Col className="text-center flex-sm-grow-0">
           <div className="d-flex justify-content-center align-items-center gap-3">
             <div className="d-flex">
-              <Button variant="outline-success" className="border-0"
-                title="Generar archivo excel"
-                onClick={handleTraerTodo}
-              >
-                <BsFiletypeXlsx className="fs-5" />
-              </Button>
-              <Button variant="outline-danger" className="border-0"
-                title="Generar archivo pdf"
-                onClick={handleTraerTodo}
-              >
-                <BsFiletypePdf className="fs-5" />
-              </Button>
+
             </div>
-            <Button onClick={handleNuevo} variant="primary">
+            <Button 
+              onClick={() => navigate(`${location.pathname}?edit=0`)}
+              variant="primary"
+            >
               Nuevo
             </Button>
           </div>

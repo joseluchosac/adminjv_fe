@@ -1,7 +1,7 @@
 const basename = import.meta.env.VITE_BASENAME;
-import { useNavigate } from "react-router-dom"
+import { useLocation, useNavigate } from "react-router-dom"
 import { useMutationCatalogosQuery } from "../../api/queries/useCatalogosQuery"
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { TipoComprobanteSchema } from "../../app/schemas/catalogos-schema"
 import z from "zod"
 import { toast } from "react-toastify"
@@ -17,9 +17,10 @@ const tipoComprobanteFormInit: TipoComprobante = {
   estado: 1,
 }
 
-export default function Edit({id}:{id: string | null}) {
+export default function Edit() {
   const [tipoComprobanteForm, setTipoComprobanteForm] = useState<TipoComprobante>(tipoComprobanteFormInit)
   const navigate = useNavigate()
+  const location = useLocation()
 
   const{
     data: getTipoComprobanteResp,
@@ -27,6 +28,11 @@ export default function Edit({id}:{id: string | null}) {
     getTipoComprobante,
     abortController
   } = useMutationCatalogosQuery()
+
+  const id = useMemo(() => {
+    const params = new URLSearchParams(location.search)
+    return params.get('edit')
+  }, [location])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const {name, value} = e.target
@@ -38,15 +44,11 @@ export default function Edit({id}:{id: string | null}) {
   }, []);
 
   useEffect(() => {
-    if(id){
-      if(+id){
-        getTipoComprobante(+id)
-      }else{
-        setTipoComprobanteForm(tipoComprobanteFormInit)
-      }
+    if(!id) return setTipoComprobanteForm(tipoComprobanteFormInit)
+    if(+id || 0){
+      getTipoComprobante(+id)
     }else{
       setTipoComprobanteForm(tipoComprobanteFormInit)
-      abortController?.abort()
     }
   }, [id]);
 

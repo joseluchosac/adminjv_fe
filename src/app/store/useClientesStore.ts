@@ -13,18 +13,11 @@ const clienteFilterParamInit: FilterParam = {
 
 interface UseClientesStore {
   camposCliente: CampoTable[];
-  showClienteForm: boolean;
-  currentClienteId: number | null;
   showClientesFilter: boolean;
   clienteFilterForm: FilterParam;
   clienteFilterParam: FilterParam;
   clienteFilterInfo: FilterParam;
   setCamposCliente: () => void;
-  setShowClienteForm: (param: {
-    showClienteForm: boolean;
-    currentClienteId: number | null;
-  }) => void;
-  setCurrentClienteId: (clienteId: number | null) => void;
   setShowClienteFilter: (show: boolean) => void;
   setClienteFilterForm: (filterParam: FilterParam) => void;
   setClienteFilterFormSort: (param: {
@@ -49,8 +42,6 @@ interface UseClientesStore {
 
 export const clientesStoreInit = {
   camposCliente: camposClienteInit,
-  showClienteForm: false,
-  currentClienteId: null,
   showClientesFilter: false,
   clienteFilterForm: clienteFilterParamInit,
   clienteFilterParam: clienteFilterParamInit,
@@ -69,12 +60,7 @@ const useClientesStore = create<UseClientesStore>((set, get) => ({
     });
     set({ camposCliente: newCamposClientes });
   },
-  setCurrentClienteId: (currentClienteId) => {
-    set({ currentClienteId });
-  },
-  setShowClienteForm: ({ showClienteForm, currentClienteId }) => {
-    set({ showClienteForm, currentClienteId });
-  },
+
   setShowClienteFilter: (show) => {
     set({ showClientesFilter: show });
   },

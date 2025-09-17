@@ -12,8 +12,6 @@ const userFilterParamInit: FilterParam = {
 
 export type UsersStateType = {
   camposUser: CampoTable[];
-  showUserForm: boolean;
-  currentUserId: number | null;
   showUsersFilter: boolean;
   userFilterForm: FilterParam; // Parametros de formulario de filtro
   userFilterParam: FilterParam; // Parametros para el envio al back-end
@@ -22,7 +20,6 @@ export type UsersStateType = {
 
 export type UsersActionsType = 
   { type: 'SET_CAMPOS_USER' } | // devaluar deprecar, esta funcion se ejecuta en SET_USER_FILTER_INFO
-  { type: 'SET_SHOW_USER_FORM'; payload: {showUserForm: boolean, currentUserId: number | null} } |
   { type: 'SET_SHOW_USER_FILTER'; payload: boolean } |
   { type: 'SET_OFFSET'; payload: number } |
   { type: 'SET_USER_FILTER_FORM'; payload: FilterParam } |
@@ -57,8 +54,6 @@ export type UsersActionsType =
 
 export const usersStateInit: UsersStateType = {
   camposUser: camposUserInit,
-  showUserForm: false,
-  currentUserId: null,
   showUsersFilter: false,
   userFilterParam: userFilterParamInit,
   userFilterForm: userFilterParamInit,
@@ -77,10 +72,6 @@ export const usersReducer = (
         return orderh ? {...el, order_dir: orderh?.order_dir} : {...el, order_dir: ""}
       })
       return { ...state, camposUser: newCamposUsers }
-    };
-    case 'SET_SHOW_USER_FORM':{
-      const {showUserForm, currentUserId} = action.payload
-      return { ...state, showUserForm, currentUserId }
     };
     case 'SET_SHOW_USER_FILTER':
       {return { ...state, showUsersFilter: action.payload }};

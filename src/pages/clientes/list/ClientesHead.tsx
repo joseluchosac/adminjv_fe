@@ -1,19 +1,17 @@
 import { Badge, Button, Col, Container, Form, InputGroup, Row, Stack } from "react-bootstrap";
-import { BsFiletypePdf, BsFiletypeXlsx } from "react-icons/bs";
 import DynaIcon from "../../../app/components/DynaComponents";
 import useClientesStore from "../../../app/store/useClientesStore";
-// import { objToUriBase64 } from "../../../app/utils/funciones";
 import { FaFilter } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 type Props = { info:string };
 
 export default function ClientesHead({info}: Props) {
+  const navigate = useNavigate()
   const {equal, between, order} = useClientesStore(state => state.clienteFilterInfo)
   const clienteFilterForm = useClientesStore(state => state.clienteFilterForm)
-  // const clienteFilterParam = useClientesStore(state => state.clienteFilterParam)
   const setShowClienteFilter = useClientesStore(state => state.setShowClienteFilter)
   const setClienteFilterForm = useClientesStore(state => state.setClienteFilterForm)
-  const setShowClienteForm = useClientesStore(state => state.setShowClienteForm)
   const setClienteFilterFormResetEqualItem = useClientesStore(state => state.setClienteFilterFormResetEqualItem)
 
   const handleSetShowClientesFilterMdl = (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
@@ -31,14 +29,7 @@ export default function ClientesHead({info}: Props) {
     setClienteFilterForm({ ...clienteFilterForm, order: [] })
   };
 
-  const handleNuevo = () => {
-    setShowClienteForm({showClienteForm: true, currentClienteId: 0})
-  };
 
-  const handleTraerTodo = () => {
-    // const param = objToUriBase64(clienteFilterParam);
-    // window.open(apiDOCS + "pdf/?action=clientes_report&p=" + param);
-  };
 
   return (
     <Container className="mb-2 pt-2 position-relative">
@@ -70,20 +61,12 @@ export default function ClientesHead({info}: Props) {
         <Col className="text-center flex-sm-grow-0">
           <div className="d-flex justify-content-center align-items-center gap-3">
             <div className="d-flex">
-              <Button variant="outline-success" className="border-0"
-                title="Generar archivo excel"
-                onClick={handleTraerTodo}
-              >
-                <BsFiletypeXlsx className="fs-5" />
-              </Button>
-              <Button variant="outline-danger" className="border-0"
-                title="Generar archivo pdf"
-                onClick={handleTraerTodo}
-              >
-                <BsFiletypePdf className="fs-5" />
-              </Button>
+
             </div>
-            <Button onClick={handleNuevo} variant="primary">
+            <Button 
+              onClick={() => navigate(`${location.pathname}?edit=0`)}
+              variant="primary"
+            >
               Nuevo
             </Button>
           </div>

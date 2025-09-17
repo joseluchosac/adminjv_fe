@@ -13,18 +13,11 @@ const proveedorFilterParamInit: FilterParam = {
 
 interface UseProveedoresStore {
   camposProveedor: CampoTable[];
-  showProveedorForm: boolean;
-  currentProveedorId: number | null;
   showProveedoresFilter: boolean;
   proveedorFilterForm: FilterParam;
   proveedorFilterParam: FilterParam;
   proveedorFilterInfo: FilterParam;
   setCamposProveedor: () => void;
-  setShowProveedorForm: (param: {
-    showProveedorForm: boolean;
-    currentProveedorId: number | null;
-  }) => void;
-  setCurrentProveedorId: (proveedorId: number | null) => void;
   setShowProveedorFilter: (show: boolean) => void;
   setProveedorFilterForm: (filterParam: FilterParam) => void;
   setProveedorFilterFormSort: (param: {
@@ -49,8 +42,6 @@ interface UseProveedoresStore {
 
 export const proveedoresStoreInit = {
   camposProveedor: camposProveedorInit,
-  showProveedorForm: false,
-  currentProveedorId: null,
   showProveedoresFilter: false,
   proveedorFilterForm: proveedorFilterParamInit,
   proveedorFilterParam: proveedorFilterParamInit,
@@ -69,12 +60,7 @@ const useProveedoresStore = create<UseProveedoresStore>((set, get) => ({
     });
     set({ camposProveedor: newCamposProveedores });
   },
-  setCurrentProveedorId: (currentProveedorId) => {
-    set({ currentProveedorId });
-  },
-  setShowProveedorForm: ({ showProveedorForm, currentProveedorId }) => {
-    set({ showProveedorForm, currentProveedorId });
-  },
+
   setShowProveedorFilter: (show) => {
     set({ showProveedoresFilter: show });
   },

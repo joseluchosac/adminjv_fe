@@ -15,6 +15,7 @@ import { toast } from "react-toastify";
 import { Controller, useForm } from "react-hook-form";
 import { FaSearch } from "react-icons/fa";
 import SelectAsync from "react-select/async";
+import { useLocation, useNavigate } from "react-router-dom";
 import {
   proveedorFormInit,
   selectDark,
@@ -26,7 +27,6 @@ import {
   UbigeoItem,
   QueryDocumentResp,
 } from "../../app/types";
-import useProveedoresStore from "../../app/store/useProveedoresStore";
 import useLayoutStore from "../../app/store/useLayoutStore";
 import { useMutationProveedoresQuery } from "../../api/queries/useProveedoresQuery";
 import { LdsBar, LdsEllipsisCenter } from "../../app/components/Loaders";
@@ -49,11 +49,8 @@ type Props = {
 }
 
 export default function ProveedorForm({onMutation}:Props) {
-  const showProveedorForm = useProveedoresStore((state) => state.showProveedorForm);
-  const setShowProveedorForm = useProveedoresStore(
-    (state) => state.setShowProveedorForm
-  );
-  const currentProveedorId = useProveedoresStore((state) => state.currentProveedorId);
+  const navigate = useNavigate()
+  const location = useLocation()
   const darkMode = useLayoutStore((state) => state.layout.darkMode);
   const abortUbigeos = useRef<AbortController | null>(null);
   const token = useSessionStore((state) => state.tknSession);
@@ -91,6 +88,11 @@ export default function ProveedorForm({onMutation}:Props) {
     clearErrors,
     watch,
   } = useForm<Proveedor>({ defaultValues: proveedorFormInit });
+
+  const id = useMemo(() => {
+    const params = new URLSearchParams(location.search)
+    return params.get('edit')
+  }, [location]);
 
   const docum = useMemo(() => {
     if(queryDocumentResp && "nro_documento" in queryDocumentResp){
@@ -163,18 +165,17 @@ export default function ProveedorForm({onMutation}:Props) {
   };
 
   const handleClose = () => {
-    setShowProveedorForm({showProveedorForm: false, currentProveedorId: 0});
+    navigate(location.pathname)
   };
 
   useEffect(() => {
-    if (showProveedorForm) {
-      if (currentProveedorId) {
-        getProveedor(currentProveedorId);
-      }
-    } else {
-      resetForm();
+    if(!id) return resetForm()
+    if(+id || 0){
+      getProveedor(+id)
+    }else{
+      resetForm()
     }
-  }, [showProveedorForm]);
+  }, [id]);
 
   useEffect(() => {
     if (!queryDocumentResp) return;
@@ -196,7 +197,7 @@ export default function ProveedorForm({onMutation}:Props) {
     if (!proveedorRes) return;
     if(isErrProveedorRes(proveedorRes)){
       toast.error("Error al obtener los datos del proveedor");
-      setShowProveedorForm({showProveedorForm: false, currentProveedorId: 0});
+      handleClose()
     }else{
       reset(proveedorRes);
     }
@@ -205,7 +206,7 @@ export default function ProveedorForm({onMutation}:Props) {
   useEffect(() => {
     if (!isErrorProveedor) return;
     toast.error("Error de conexion");
-    setShowProveedorForm({showProveedorForm: false, currentProveedorId: 0});
+    handleClose()
   }, [isErrorProveedor]);
 
   useEffect(() => {  
@@ -214,7 +215,7 @@ export default function ProveedorForm({onMutation}:Props) {
       if(onMutation){
         onMutation(mutationRes?.proveedor)
       }
-      setShowProveedorForm({showProveedorForm: false, currentProveedorId: 0})
+      handleClose()
     }
     toast(mutationRes.msg, { type: mutationRes.msgType });
   }, [mutationRes]);
@@ -222,14 +223,14 @@ export default function ProveedorForm({onMutation}:Props) {
   return (
     <div>
       <Modal
-        show={showProveedorForm}
+        show={!!id}
         onHide={handleClose}
         backdrop="static"
-        size="md"
+        size="lg"
       >
         <Modal.Header closeButton className="py-2">
           <Modal.Title>
-            {currentProveedorId ? "Editar proveedor" : "Nuevo proveedor"}
+            {id && +id ? "Editar proveedor" : "Nuevo proveedor"}
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
@@ -251,7 +252,7 @@ export default function ProveedorForm({onMutation}:Props) {
                   })}
                   disabled={
                     docum?.nombre_razon_social ||
-                    currentProveedorId
+                    (id && +id)
                       ? true
                       : false
                   }
@@ -302,7 +303,7 @@ export default function ProveedorForm({onMutation}:Props) {
                     })}
                     disabled={
                       docum?.nombre_razon_social ||
-                      currentProveedorId
+                      (id && +id)
                         ? true
                         : false
                     }
@@ -469,7 +470,7 @@ export default function ProveedorForm({onMutation}:Props) {
                 onClick={() => resetForm()}
                 variant="seccondary"
                 type="button"
-                hidden={currentProveedorId ? true : false}
+                hidden={id && +id ? true : false}
               >
                 Reset
               </Button>

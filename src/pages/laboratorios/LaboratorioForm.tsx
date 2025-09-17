@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import Modal from "react-bootstrap/Modal";
 import { Button, Col, Form, Row, Spinner } from "react-bootstrap";
 import Swal from "sweetalert2";
@@ -8,7 +8,7 @@ import { LdsBar, LdsEllipsisCenter } from "../../app/components/Loaders";
 import useLayoutStore from "../../app/store/useLayoutStore";
 import { MutationLaboratorioRes, useMutationLaboratoriosQuery } from "../../api/queries/useLaboratoriosQuery";
 import { Laboratorio, LaboratorioItem, ApiResp } from "../../app/types";
-import useLaboratoriosStore from "../../app/store/useLaboratoriosStore";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const laboratorioFormInit = {id: 0, nombre: "", estado: 1,}
 
@@ -19,7 +19,8 @@ export function isErrLaboratorioRes(response: LaboratorioRes): response is ApiRe
 
 
 export default function LaboratorioForm() {
-  const {showLaboratorioForm, setShowLaboratorioForm, currentLaboratorioId} = useLaboratoriosStore()
+  const navigate = useNavigate()
+  const location = useLocation()
   const darkMode = useLayoutStore(state => state.layout.darkMode)
 
   const {
@@ -44,6 +45,11 @@ export default function LaboratorioForm() {
     reset,
   } = useForm<Laboratorio>({defaultValues: laboratorioFormInit})
 
+  const id = useMemo(() => {
+    const params = new URLSearchParams(location.search)
+    return params.get('edit')
+  }, [location]);
+
   const submit = (laboratorio: Laboratorio) => {
     Swal.fire({
       icon: 'question',
@@ -66,19 +72,24 @@ export default function LaboratorioForm() {
     });
   };
 
+  const handleClose = () => {
+    navigate(location.pathname)
+  };
+  
   useEffect(() => {
-    if(showLaboratorioForm){
-      if(currentLaboratorioId) getLaboratorio(currentLaboratorioId)
+    if(!id) return reset(laboratorioFormInit)
+    if(+id || 0){
+      getLaboratorio(+id)
     }else{
       reset(laboratorioFormInit)
     }
-  }, [showLaboratorioForm])
+  }, [id]);
 
   useEffect(() => {
     if(!laboratorioRes) return
     if(isErrLaboratorioRes(laboratorioRes)){
       toast.error("Error al obtener la laboratorio");
-      setShowLaboratorioForm({showLaboratorioForm: false, currentLaboratorioId: 0});
+      handleClose();
     }else{
       reset(laboratorioRes)
     }
@@ -86,14 +97,14 @@ export default function LaboratorioForm() {
   
   useEffect(() => {
     if(!mutation) return
-    if(!mutation.error) setShowLaboratorioForm({showLaboratorioForm: false, currentLaboratorioId: 0});
+    if(!mutation.error) handleClose();
     toast(mutation.msg, {type: mutation.msgType})
   }, [mutation])
 
   useEffect(() => {
     if(!isErrorLaboratorio) return
     toast.error("Error al obtener datos")
-    setShowLaboratorioForm({showLaboratorioForm: false, currentLaboratorioId: 0})
+    handleClose()
   }, [isErrorLaboratorio])
 
   useEffect(() => {
@@ -105,13 +116,13 @@ export default function LaboratorioForm() {
   return (
     <div>
       <Modal 
-        size="md"
+        show={!!id} 
+        size="lg"
         backdrop="static"
-        show={showLaboratorioForm} 
-        onHide={()=>setShowLaboratorioForm({showLaboratorioForm: false, currentLaboratorioId: 0})} 
+        onHide={handleClose} 
       >
         <Modal.Header closeButton className="py-2">
-          <Modal.Title>{currentLaboratorioId ? "Editar laboratorio" : "Nueva laboratorio"}</Modal.Title>
+          <Modal.Title>{(id && +id) ? "Editar laboratorio" : "Nueva laboratorio"}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Form onSubmit={handleSubmit(submit)} id="laboratorio_form">
@@ -137,12 +148,12 @@ export default function LaboratorioForm() {
                 onClick={() => reset(laboratorioFormInit)}
                 variant="seccondary"
                 type="button"
-                hidden={currentLaboratorioId ? true : false}
+                hidden={(id && +id) ? true : false}
               >Reset</Button>
               <Button
                 variant="seccondary"
                 type="button"
-                onClick={()=>setShowLaboratorioForm({showLaboratorioForm: false, currentLaboratorioId: 0})}
+                onClick={handleClose}
               >Cerrar</Button>
               <Button 
                 variant="primary" 

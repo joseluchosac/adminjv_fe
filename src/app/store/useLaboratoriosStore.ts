@@ -13,18 +13,11 @@ const laboratorioFilterParamInit: FilterParam = {
 
 interface UseLaboratoriosStore {
   camposLaboratorio: CampoTable[];
-  showLaboratorioForm: boolean;
-  currentLaboratorioId: number | null;
   showLaboratoriosFilter: boolean;
   laboratorioFilterForm: FilterParam;
   laboratorioFilterParam: FilterParam;
   laboratorioFilterInfo: FilterParam;
   setCamposLaboratorio: () => void;
-  setShowLaboratorioForm: (param: {
-    showLaboratorioForm: boolean;
-    currentLaboratorioId: number | null;
-  }) => void;
-  setCurrentLaboratorioId: (laboratorioId: number | null) => void;
   setShowLaboratorioFilter: (show: boolean) => void;
   setLaboratorioFilterForm: (filterParam: FilterParam) => void;
   setLaboratorioFilterFormSort: (param: {
@@ -49,8 +42,6 @@ interface UseLaboratoriosStore {
 
 export const laboratoriosStoreInit = {
   camposLaboratorio: camposLaboratorioInit,
-  showLaboratorioForm: false,
-  currentLaboratorioId: null,
   showLaboratoriosFilter: false,
   laboratorioFilterForm: laboratorioFilterParamInit,
   laboratorioFilterParam: laboratorioFilterParamInit,
@@ -68,12 +59,6 @@ const useLaboratoriosStore = create<UseLaboratoriosStore>((set, get) => ({
         : { ...el, order_dir: "" };
     });
     set({ camposLaboratorio: newCamposLaboratorios });
-  },
-  setCurrentLaboratorioId: (currentLaboratorioId) => {
-    set({ currentLaboratorioId });
-  },
-  setShowLaboratorioForm: ({ showLaboratorioForm, currentLaboratorioId }) => {
-    set({ showLaboratorioForm, currentLaboratorioId });
   },
   setShowLaboratorioFilter: (show) => {
     set({ showLaboratoriosFilter: show });

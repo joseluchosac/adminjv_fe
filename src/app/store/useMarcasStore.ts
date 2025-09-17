@@ -13,18 +13,11 @@ const marcaFilterParamInit: FilterParam = {
 
 interface UseMarcasStore {
   camposMarca: CampoTable[];
-  showMarcaForm: boolean;
-  currentMarcaId: number | null;
   showMarcasFilter: boolean;
   marcaFilterForm: FilterParam;
   marcaFilterParam: FilterParam;
   marcaFilterInfo: FilterParam;
   setCamposMarca: () => void;
-  setShowMarcaForm: (param: {
-    showMarcaForm: boolean;
-    currentMarcaId: number | null;
-  }) => void;
-  setCurrentMarcaId: (marcaId: number | null) => void;
   setShowMarcaFilter: (show: boolean) => void;
   setMarcaFilterForm: (filterParam: FilterParam) => void;
   setMarcaFilterFormSort: (param: {
@@ -49,8 +42,6 @@ interface UseMarcasStore {
 
 export const marcasStoreInit = {
   camposMarca: camposMarcaInit,
-  showMarcaForm: false,
-  currentMarcaId: null,
   showMarcasFilter: false,
   marcaFilterForm: marcaFilterParamInit,
   marcaFilterParam: marcaFilterParamInit,
@@ -69,12 +60,7 @@ const useMarcasStore = create<UseMarcasStore>((set, get) => ({
     });
     set({ camposMarca: newCamposMarcas });
   },
-  setCurrentMarcaId: (currentMarcaId) => {
-    set({ currentMarcaId });
-  },
-  setShowMarcaForm: ({ showMarcaForm, currentMarcaId }) => {
-    set({ showMarcaForm, currentMarcaId });
-  },
+
   setShowMarcaFilter: (show) => {
     set({ showMarcasFilter: show });
   },

@@ -6,6 +6,7 @@ import useLayoutStore from "../../../app/store/useLayoutStore";
 import { useEffect } from "react";
 import { toast } from "react-toastify";
 import useLaboratoriosStore from "../../../app/store/useLaboratoriosStore";
+import { useNavigate } from "react-router-dom";
 
 interface Props {
   laboratorio: LaboratorioItem ;
@@ -16,7 +17,7 @@ type MutationRes = ApiResp & {
 function LaboratoriosListItem({ laboratorio }: Props) {
   const darkMode = useLayoutStore(state => state.layout.darkMode)
   const camposLaboratorio = useLaboratoriosStore(state => state.camposLaboratorio)
-  const setShowLaboratorioForm = useLaboratoriosStore(state=>state.setShowLaboratorioForm)
+  const navigate = useNavigate()
 
   const {
     data: mutation,
@@ -27,7 +28,7 @@ function LaboratoriosListItem({ laboratorio }: Props) {
 
   const handleToEdit = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
     e.preventDefault()
-    setShowLaboratorioForm({showLaboratorioForm: true, currentLaboratorioId: laboratorio.id})
+    navigate(`${location.pathname}?edit=${laboratorio.id}`);
   }
   
   const handleDelete = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {

@@ -458,7 +458,7 @@ function MarcaForm({showMarcaForm, setShowMarcaForm, setValue}: MarcaFormProps){
   }, [isErrorMutation])
 
   return (
-    <Modal show={showMarcaForm} onHide={()=>setShowMarcaForm(false)} size="md" >
+    <Modal show={showMarcaForm} onHide={()=>setShowMarcaForm(false)} size="lg" >
       <Modal.Header closeButton className="py-2">
         <Modal.Title>Crear marca</Modal.Title>
       </Modal.Header>
@@ -541,7 +541,7 @@ function LaboratorioForm({showLaboratorioForm, setShowLaboratorioForm, setValue}
   }, [isErrorMutation])
 
   return (
-    <Modal show={showLaboratorioForm} onHide={()=>setShowLaboratorioForm(false)} size="md" >
+    <Modal show={showLaboratorioForm} onHide={()=>setShowLaboratorioForm(false)} size="lg" >
       <Modal.Header closeButton className="py-2">
         <Modal.Title>Crear laboratorio</Modal.Title>
       </Modal.Header>

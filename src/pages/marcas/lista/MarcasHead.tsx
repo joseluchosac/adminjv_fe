@@ -1,17 +1,17 @@
 import { Badge, Button, Col, Container, Form, InputGroup, Row, Stack } from "react-bootstrap";
-import { BsFiletypePdf, BsFiletypeXlsx } from "react-icons/bs";
 import DynaIcon from "../../../app/components/DynaComponents";
 import useMarcasStore from "../../../app/store/useMarcasStore";
 import { FaFilter } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 type Props = { info:string };
 
 export default function MarcasHead({info}: Props) {
+  const navigate = useNavigate()
   const {equal, between, order} = useMarcasStore(state => state.marcaFilterInfo)
   const marcaFilterForm = useMarcasStore(state => state.marcaFilterForm)
   const setShowMarcaFilter = useMarcasStore(state => state.setShowMarcaFilter)
   const setMarcaFilterForm = useMarcasStore(state => state.setMarcaFilterForm)
-  const setShowMarcaForm = useMarcasStore(state => state.setShowMarcaForm)
   const setMarcaFilterFormResetEqualItem = useMarcasStore(state => state.setMarcaFilterFormResetEqualItem)
 
   const handleSetShowMarcasFilterMdl = (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
@@ -29,14 +29,6 @@ export default function MarcasHead({info}: Props) {
     setMarcaFilterForm({ ...marcaFilterForm, order: [] })
   };
 
-  const handleNuevo = () => {
-    setShowMarcaForm({showMarcaForm: true, currentMarcaId: 0})
-  };
-
-  const handleTraerTodo = () => {
-    // const param = objToUriBase64(marcaFilterParam);
-    // window.open(apiDOCS + "pdf/?action=marcas_report&p=" + param);
-  };
 
   return (
     <Container className="mb-2 pt-2 position-relative">
@@ -68,20 +60,12 @@ export default function MarcasHead({info}: Props) {
         <Col className="text-center flex-sm-grow-0">
           <div className="d-flex justify-content-center align-items-center gap-3">
             <div className="d-flex">
-              <Button variant="outline-success" className="border-0"
-                title="Generar archivo excel"
-                onClick={handleTraerTodo}
-              >
-                <BsFiletypeXlsx className="fs-5" />
-              </Button>
-              <Button variant="outline-danger" className="border-0"
-                title="Generar archivo pdf"
-                onClick={handleTraerTodo}
-              >
-                <BsFiletypePdf className="fs-5" />
-              </Button>
+
             </div>
-            <Button onClick={handleNuevo} variant="primary">
+            <Button 
+              onClick={() => navigate(`${location.pathname}?edit=0`)}
+              variant="primary"
+            >
               Nuevo
             </Button>
           </div>

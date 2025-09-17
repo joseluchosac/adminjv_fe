@@ -26,7 +26,6 @@ import {
   ApiResp,
   UbigeoItem,
 } from "../../app/types";
-import useClientesStore from "../../app/store/useClientesStore";
 import useLayoutStore from "../../app/store/useLayoutStore";
 import { useMutationClientesQuery } from "../../api/queries/useClientesQuery";
 import { LdsBar, LdsEllipsisCenter } from "../../app/components/Loaders";
@@ -34,6 +33,7 @@ import { cropText, debounce } from "../../app/utils/funciones";
 import useSessionStore from "../../app/store/useSessionStore";
 import { useTiposDocumentoQuery } from "../../api/queries/useCatalogosQuery";
 import { fnFetch } from "../../api/fnFetch";
+import { useLocation, useNavigate } from "react-router-dom";
 
 type ClienteRes = Cliente | ApiResp
 export function isErrClienteRes(response: ClienteRes): response is ApiResp {
@@ -49,11 +49,8 @@ type Props = {
 }
 
 export default function ClienteForm({onMutation}:Props) {
-  const showClienteForm = useClientesStore((state) => state.showClienteForm);
-  const setShowClienteForm = useClientesStore(
-    (state) => state.setShowClienteForm
-  );
-  const currentClienteId = useClientesStore((state) => state.currentClienteId);
+  const navigate = useNavigate()
+  const location = useLocation()
   const darkMode = useLayoutStore((state) => state.layout.darkMode);
   const {tiposDocumento} = useTiposDocumentoQuery()
   const abortUbigeos = useRef<AbortController | null>(null);
@@ -90,6 +87,11 @@ export default function ClienteForm({onMutation}:Props) {
     clearErrors,
     watch,
   } = useForm<Cliente>({ defaultValues: clienteFormInit });
+
+  const id = useMemo(() => {
+    const params = new URLSearchParams(location.search)
+    return params.get('edit')
+  }, [location]);
 
   const docum = useMemo(() => {
     if(queryDocumentResp && "nro_documento" in queryDocumentResp){
@@ -160,18 +162,27 @@ export default function ClienteForm({onMutation}:Props) {
   };
 
   const handleClose = () => {
-    setShowClienteForm({showClienteForm: false, currentClienteId: 0});
+    navigate(location.pathname)
   };
 
   useEffect(() => {
-    if (showClienteForm) {
-      if (currentClienteId) {
-        getCliente(currentClienteId);
-      }
-    } else {
-      resetForm();
+    if(!id) return resetForm()
+    if(+id || 0){
+      getCliente(+id)
+    }else{
+      resetForm()
     }
-  }, [showClienteForm]);
+  }, [id]);
+
+  // useEffect(() => {
+  //   if (showClienteForm) {
+  //     if (currentClienteId) {
+  //       getCliente(currentClienteId);
+  //     }
+  //   } else {
+  //     resetForm();
+  //   }
+  // }, [showClienteForm]);
 
   useEffect(() => {
     if (!queryDocumentResp) return;
@@ -193,7 +204,7 @@ export default function ClienteForm({onMutation}:Props) {
     if (!clienteRes) return;
     if(isErrClienteRes(clienteRes)){
       toast.error("Error al obtener el cliente");
-      setShowClienteForm({showClienteForm: false, currentClienteId: 0});
+      handleClose();
     }else{
       reset(clienteRes);
     }
@@ -202,7 +213,7 @@ export default function ClienteForm({onMutation}:Props) {
   useEffect(() => {
     if (!isErrorCliente) return;
     toast.error("Error de conexion");
-    setShowClienteForm({showClienteForm: false, currentClienteId: 0});
+    handleClose();
   }, [isErrorCliente]);
 
   useEffect(() => {
@@ -211,7 +222,7 @@ export default function ClienteForm({onMutation}:Props) {
       if(onMutation){
         onMutation(mutationRes?.cliente)
       }
-      setShowClienteForm({showClienteForm: false, currentClienteId: 0})
+      handleClose()
     }
     toast(mutationRes.msg, { type: mutationRes.msgType });
   }, [mutationRes]);
@@ -219,14 +230,14 @@ export default function ClienteForm({onMutation}:Props) {
   return (
     <div>
       <Modal
-        show={showClienteForm}
+        show={!!id}
         onHide={handleClose}
         backdrop="static"
-        size="md"
+        size="lg"
       >
         <Modal.Header closeButton className="py-2">
           <Modal.Title>
-            {currentClienteId ? "Editar cliente" : "Nuevo cliente"}
+            {(id && +id) ? "Editar cliente" : "Nuevo cliente"}
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
@@ -248,7 +259,7 @@ export default function ClienteForm({onMutation}:Props) {
                   })}
                   disabled={
                     docum?.nombre_razon_social ||
-                    currentClienteId
+                    (id && +id)
                       ? true
                       : false
                   }
@@ -299,7 +310,7 @@ export default function ClienteForm({onMutation}:Props) {
                     })}
                     disabled={
                       docum?.nombre_razon_social ||
-                      currentClienteId
+                      (id && +id)
                         ? true
                         : false
                     }
@@ -466,7 +477,7 @@ export default function ClienteForm({onMutation}:Props) {
                 onClick={() => resetForm()}
                 variant="seccondary"
                 type="button"
-                hidden={currentClienteId ? true : false}
+                hidden={(id && +id) ? true : false}
               >
                 Reset
               </Button>
